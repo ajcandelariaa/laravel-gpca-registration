@@ -14,6 +14,10 @@
     </div>
     @endif
 
+    <a href="/admin/event">Manage Events</a>
+    <br>
+    <a href="/admin/member">Manage Members</a>
+    <br>
     <a href="/admin/logout">Logout</a>
 </body>
 </html>
