@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,5 +15,15 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('welcome_welcome');
+});
+
+Route::prefix('admin')->group(function () {
+    Route::middleware(['isAdmin'])->group(function () {
+        Route::get('/dashboard', [AdminController::class, 'dashboardView']);
+        Route::get('/logout', [AdminController::class, 'logout']);
+    });
+
+    Route::get('/login', [AdminController::class, 'loginView']);
+    Route::post('/login', [AdminController::class, 'login']);
 });
