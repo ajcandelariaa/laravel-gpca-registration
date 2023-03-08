@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\EventController;
+use App\Http\Controllers\MemberController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -22,8 +24,10 @@ Route::prefix('admin')->group(function () {
     Route::middleware(['isAdmin'])->group(function () {
         Route::get('/logout', [AdminController::class, 'logout']);
         Route::get('/dashboard', [AdminController::class, 'dashboardView']);
-        Route::get('/event', [AdminController::class, 'manageEventView']);
-        Route::get('/member', [AdminController::class, 'manageMemberView']);
+        Route::get('/event', [EventController::class, 'manageEventView']);
+
+        Route::get('/member', [MemberController::class, 'manageMemberView']);
+        Route::post('/member/add', [MemberController::class, 'addMember']);
     });
 
     Route::get('/login', [AdminController::class, 'loginView']);

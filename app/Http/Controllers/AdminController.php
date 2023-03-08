@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Session;
 
 class AdminController extends Controller
 {
+    // RENDER VIEWS
     public function loginView(){
         if(Session::has('userType')){
             if(Session::get('userType') == 'gpcaAdmin'){
@@ -21,18 +22,9 @@ class AdminController extends Controller
             "pageTitle" => "Dashboard"
         ]);
     }
-    public function manageEventView(){
-        return view('admin.event.events', [
-            "pageTitle" => "Manage Event"
-        ]);
-    }
-    public function manageMemberView(){
-        return view('admin.member.members', [
-            "pageTitle" => "Manage Member"
-        ]);
-    }
 
 
+    // RENDER LOGICS
     public function login(Request $request){
         $request->validate([ 
             'username' => 'required',
