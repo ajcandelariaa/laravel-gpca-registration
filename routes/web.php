@@ -20,8 +20,10 @@ Route::get('/', function () {
 
 Route::prefix('admin')->group(function () {
     Route::middleware(['isAdmin'])->group(function () {
-        Route::get('/dashboard', [AdminController::class, 'dashboardView']);
         Route::get('/logout', [AdminController::class, 'logout']);
+        Route::get('/dashboard', [AdminController::class, 'dashboardView']);
+        Route::get('/event', [AdminController::class, 'manageEventView']);
+        Route::get('/member', [AdminController::class, 'manageMemberView']);
     });
 
     Route::get('/login', [AdminController::class, 'loginView']);

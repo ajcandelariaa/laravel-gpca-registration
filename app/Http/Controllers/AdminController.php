@@ -17,7 +17,19 @@ class AdminController extends Controller
         return view('admin.login');
     }
     public function dashboardView(){
-        return view('admin.dashboard');
+        return view('admin.dashboard', [
+            "pageTitle" => "Dashboard"
+        ]);
+    }
+    public function manageEventView(){
+        return view('admin.event.events', [
+            "pageTitle" => "Manage Event"
+        ]);
+    }
+    public function manageMemberView(){
+        return view('admin.member.members', [
+            "pageTitle" => "Manage Member"
+        ]);
     }
 
 
