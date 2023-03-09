@@ -15,6 +15,78 @@ class MemberController extends Controller
                 'name' => "AT",
                 'sector' => 'TEST',
             ],
+            [
+                'name' => "AT",
+                'sector' => 'TEST',
+            ],
+            [
+                'name' => "AT",
+                'sector' => 'TEST',
+            ],
+            [
+                'name' => "AT",
+                'sector' => 'TEST',
+            ],
+            [
+                'name' => "AT",
+                'sector' => 'TEST',
+            ],
+            [
+                'name' => "AT",
+                'sector' => 'TEST',
+            ],
+            [
+                'name' => "AT",
+                'sector' => 'TEST',
+            ],
+            [
+                'name' => "AT",
+                'sector' => 'TEST',
+            ],
+            [
+                'name' => "AT",
+                'sector' => 'TEST',
+            ],
+            [
+                'name' => "AT",
+                'sector' => 'TEST',
+            ],
+            [
+                'name' => "AT",
+                'sector' => 'TEST',
+            ],
+            [
+                'name' => "AT",
+                'sector' => 'TEST',
+            ],
+            [
+                'name' => "AT",
+                'sector' => 'TEST',
+            ],
+            [
+                'name' => "AT",
+                'sector' => 'TEST',
+            ],
+            [
+                'name' => "AT",
+                'sector' => 'TEST',
+            ],
+            [
+                'name' => "AT",
+                'sector' => 'TEST',
+            ],
+            [
+                'name' => "AT",
+                'sector' => 'TEST',
+            ],
+            [
+                'name' => "AT",
+                'sector' => 'TEST',
+            ],
+            [
+                'name' => "AT",
+                'sector' => 'TEST',
+            ],
         ];
         return view('admin.member.members', [
             'pageTitle' => "Manage Member",
@@ -23,7 +95,9 @@ class MemberController extends Controller
     }
 
 
-    public function addMember()
-    {
+    public function addMember(Request $request){
+        $request->validate([
+            'name' => 'required'
+        ]);
     }
 }
