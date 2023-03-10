@@ -1,4 +1,4 @@
-<div class="container mx-auto flex gap-32w my-10">
+<div class="container mx-auto my-10">
     @include('livewire.registration.progress_bar')
 
     @if ($currentStep == 1)
