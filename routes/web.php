@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\MemberController;
+use App\Http\Controllers\RegistrationController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -33,3 +34,5 @@ Route::prefix('admin')->group(function () {
     Route::get('/login', [AdminController::class, 'loginView']);
     Route::post('/login', [AdminController::class, 'login']);
 });
+
+Route::get('/register/{year}/{eventName}/{eventId}', [RegistrationController::class, 'registrationView']);
