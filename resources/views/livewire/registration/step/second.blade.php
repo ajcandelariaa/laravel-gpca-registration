@@ -1,3 +1,5 @@
 <div>
-    step 2
+    <div class="text-registrationPrimaryColor italic font-bold text-xl">
+        Company Information
+    </div>
 </div>

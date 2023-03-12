@@ -1,28 +1,28 @@
 {{-- PROGRESS BAR --}}
-<div class="fixed z-10 overflow-hidden" style="width: 350px;">
+<div>
     {{-- STEP 1 --}}
     <div class="flex items-center gap-6">
         <div class="font-bold text-white rounded-full bg-registrationPrimaryColor flex items-center justify-center"
-            style="height: 60px; width: 60px; font-size: 22px;">
+            style="height: 55px; width: 55px; font-size: 18px;">
             1
         </div>
 
-        <div class="text-registrationPrimaryColor font-bold text-2xl">
+        <div class="text-registrationPrimaryColor font-bold text-xl">
             Registration Type
         </div>
     </div>
 
     {{-- STEP 2 --}}
     <div style="width: 60px;" class="flex justify-center">
-        <div class="h-12 w-1 bg-registrationPrimaryColor"></div>
+        <div style="width: 2px;" class="h-12 bg-registrationPrimaryColor"></div>
     </div>
     <div class="flex items-center gap-6">
-        <div class="font-bold text-registrationPrimaryColor rounded-full bg-white border-solid border-registrationPrimaryColor border-4 flex items-center justify-center"
-            style="height: 60px; width: 60px; font-size: 22px;">
+        <div class="font-bold text-registrationPrimaryColor rounded-full bg-white border-solid border-registrationPrimaryColor border-2 flex items-center justify-center"
+            style="height: 55px; width: 55px; font-size: 18px;">
             2
         </div>
 
-        <div class="text-registrationPrimaryColor font-bold text-2xl">
+        <div class="text-registrationPrimaryColor font-bold text-xl">
             Delegate Details
         </div>
     </div>
@@ -30,15 +30,15 @@
 
     {{-- STEP 3 --}}
     <div style="width: 60px;" class="flex justify-center">
-        <div class="h-12 w-1 bg-registrationPrimaryColor"></div>
+        <div style="width: 2px;" class="h-12 bg-registrationPrimaryColor"></div>
     </div>
     <div class="flex items-center gap-6">
-        <div class="font-bold text-registrationPrimaryColor rounded-full bg-white border-solid border-registrationPrimaryColor border-4 flex items-center justify-center"
-            style="height: 60px; width: 60px; font-size: 22px;">
+        <div class="font-bold text-registrationPrimaryColor rounded-full bg-white border-solid border-registrationPrimaryColor border-2 flex items-center justify-center"
+            style="height: 55px; width: 55px; font-size: 18px;">
             3
         </div>
 
-        <div class="text-registrationPrimaryColor font-bold text-2xl">
+        <div class="text-registrationPrimaryColor font-bold text-xl">
             Package Summary
         </div>
     </div>
@@ -46,15 +46,15 @@
 
     {{-- STEP 4 --}}
     <div style="width: 60px;" class="flex justify-center">
-        <div class="h-12 w-1 bg-registrationPrimaryColor"></div>
+        <div style="width: 2px;" class="h-12 bg-registrationPrimaryColor"></div>
     </div>
     <div class="flex items-center gap-6">
-        <div class="font-bold text-registrationPrimaryColor rounded-full bg-white border-solid border-registrationPrimaryColor border-4 flex items-center justify-center"
-            style="height: 60px; width: 60px; font-size: 22px;">
+        <div class="font-bold text-registrationPrimaryColor rounded-full bg-white border-solid border-registrationPrimaryColor border-2 flex items-center justify-center"
+            style="height: 55px; width: 55px; font-size: 18px;">
             4
         </div>
 
-        <div class="text-registrationPrimaryColor font-bold text-2xl">
+        <div class="text-registrationPrimaryColor font-bold text-xl">
             Confirmation
         </div>
     </div>

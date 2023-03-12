@@ -16,7 +16,7 @@
     @livewireStyles()
 </head>
 <body class="min-h-screen flex flex-col">
-    <div class="h-36">
+    <div class="container mx-auto">
         <img src="{{ asset('assets/images/reg-banner.png') }}" alt="" class="h-full w-full object-fill object-center">
     </div>
 
@@ -24,7 +24,7 @@
     @livewireScripts()
 
     <footer class="bg-registrationPrimaryColor w-full py-5 text-center text-white mt-auto">
-        <p>2023 GPCA Registration. All Rights Reserved</p>
+        <p>2023 GPCA Registration © All Rights Reserved</p>
     </footer>
 </body>
 </html>
