@@ -2,7 +2,7 @@
 <div>
     {{-- STEP 1 --}}
     <div class="flex items-center gap-6">
-        <div class="font-bold text-white rounded-full bg-registrationPrimaryColor flex items-center justify-center"
+        <div class="bg-registrationPrimaryColor font-bold text-white rounded-full flex items-center justify-center"
             style="height: 55px; width: 55px; font-size: 18px;">
             1
         </div>
@@ -17,7 +17,7 @@
         <div style="width: 2px;" class="h-12 bg-registrationPrimaryColor"></div>
     </div>
     <div class="flex items-center gap-6">
-        <div class="font-bold text-registrationPrimaryColor rounded-full bg-white border-solid border-registrationPrimaryColor border-2 flex items-center justify-center"
+        <div class="{{ $currentStep >= 2 ? 'bg-registrationPrimaryColor text-white' : 'text-registrationPrimaryColor bg-white border-solid border-registrationPrimaryColor border-2' }} font-bold rounded-full flex items-center justify-center"
             style="height: 55px; width: 55px; font-size: 18px;">
             2
         </div>
@@ -33,7 +33,7 @@
         <div style="width: 2px;" class="h-12 bg-registrationPrimaryColor"></div>
     </div>
     <div class="flex items-center gap-6">
-        <div class="font-bold text-registrationPrimaryColor rounded-full bg-white border-solid border-registrationPrimaryColor border-2 flex items-center justify-center"
+        <div class="{{ $currentStep >= 3 ? 'bg-registrationPrimaryColor text-white' : 'text-registrationPrimaryColor bg-white border-solid border-registrationPrimaryColor border-2' }} font-bold rounded-full flex items-center justify-center"
             style="height: 55px; width: 55px; font-size: 18px;">
             3
         </div>
@@ -49,7 +49,7 @@
         <div style="width: 2px;" class="h-12 bg-registrationPrimaryColor"></div>
     </div>
     <div class="flex items-center gap-6">
-        <div class="font-bold text-registrationPrimaryColor rounded-full bg-white border-solid border-registrationPrimaryColor border-2 flex items-center justify-center"
+        <div class="{{ $currentStep >= 4 ? 'bg-registrationPrimaryColor text-white' : 'text-registrationPrimaryColor bg-white border-solid border-registrationPrimaryColor border-2' }} font-bold rounded-full flex items-center justify-center"
             style="height: 55px; width: 55px; font-size: 18px;">
             4
         </div>

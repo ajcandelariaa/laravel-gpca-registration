@@ -299,13 +299,6 @@
         </div>
     </div>
 
-    <div class="w-full mt-20 flex justify-center gap-5">
-        <button
-            class="hover:bg-registrationPrimaryColor hover:text-white font-bold border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor w-52 rounded-md py-2 ">PREVIOUS</button>
-        <button
-            class="hover:bg-registrationPrimaryColor hover:text-white font-bold border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor w-52 rounded-md py-2 ">NEXT</button>
-    </div>
-
     {{-- <script>
         var input = document.querySelector("#phone"),
             errorMsg = document.querySelector("#error-msg"),

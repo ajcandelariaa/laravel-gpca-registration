@@ -103,9 +103,4 @@
             </div>
         </div>
     </div>
-
-    <div class="text-center mt-20">
-        <button
-            class="hover:bg-registrationPrimaryColor hover:text-white font-bold border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor w-52 rounded-md py-2 ">NEXT</button>
-    </div>
 </div>
