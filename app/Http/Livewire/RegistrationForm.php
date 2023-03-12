@@ -6,7 +6,7 @@ use Livewire\Component;
 
 class RegistrationForm extends Component
 {
-    public $currentStep = 2;
+    public $currentStep = 4;
 
     public function render()
     {
