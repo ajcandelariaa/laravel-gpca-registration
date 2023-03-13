@@ -34,89 +34,94 @@
         </div>
 
         <div class="mt-5 flex gap-5">
-            <button
-                class="hover:bg-registrationSecondaryColor hover:text-white font-bold border-registrationSecondaryColor border-2 bg-white text-registrationSecondaryColor w-52 rounded-md py-5 ">
+            <button wire:click="btClicked()"
+                class="{{ $paymentMethod == 'bankTransfer' ? 'bg-registrationSecondaryColor text-white' : 'hover:bg-registrationSecondaryColor hover:text-white border-registrationSecondaryColor border-2 bg-white text-registrationSecondaryColor' }} font-bold w-52 rounded-md py-5 ">
                 <i class="fa-solid fa-building-columns mr-2"></i> Bank Transfer</button>
-            <button
-                class="hover:bg-registrationSecondaryColor hover:text-white font-bold border-registrationSecondaryColor border-2 bg-white text-registrationSecondaryColor w-52 rounded-md py-5 ">
+            <button wire:click="ccClicked()"
+                class="{{ $paymentMethod == 'creditCard' ? 'bg-registrationSecondaryColor text-white' : 'hover:bg-registrationSecondaryColor hover:text-white border-registrationSecondaryColor border-2 bg-white text-registrationSecondaryColor' }} font-bold w-52 rounded-md py-5 ">
                 <i class="fa-solid fa-credit-card mr-2"></i> Credit Card</button>
         </div>
 
-        <div class="mt-5 bg-registrationCardBGColor p-5 rounded-lg">
-            <div class="text-registrationPrimaryColor font-bold text-lg">
-                Bank Details
-            </div>
-
-            <div class="ml-5 text-black mt-2">
-                <p>In favour of: Gulf Petrochemicals & Chemicals Association Mashreq Bank Riqqa Branch, Deira, P.O. Box
-                    5511, Dubai, UAE</p>
-                <p class="mt-5">USD Acct No. <strong>0190-00-05007-7</strong></p>
-                <p>IBAN No. <strong>AE360330000019000050077</strong></p>
-                <p>Swift Code <strong>BOMLAEAD</strong></p>
-            </div>
-        </div>
-
-        <div class="mt-5 bg-registrationCardBGColor p-5 rounded-lg">
-            <div class="text-registrationPrimaryColor font-bold text-lg">
-                Credit Card Details
-            </div>
-
-            <div class="mt-5 grid grid-cols-3 gap-y-3 gap-x-5">
-
-                {{-- ROW 1 --}}
-                <div class="space-y-2 col-span-3">
-                    <div class="text-registrationPrimaryColor">
-                        Name on Card <span class="text-red-500">*</span>
-                    </div>
-                    <div>
-                        <input placeholder="AJ CANDELARIA" type="text" name="" id=""
-                            class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                    </div>
+        @if ($paymentMethod == 'bankTransfer')
+            <div class="mt-5 bg-registrationCardBGColor p-5 rounded-lg">
+                <div class="text-registrationPrimaryColor font-bold text-lg">
+                    Bank Details
                 </div>
 
-                {{-- ROW 2 --}}
-                <div class="space-y-2 col-span-3">
-                    <div class="text-registrationPrimaryColor">
-                        Card Number <span class="text-red-500">*</span>
-                    </div>
-                    <div>
-                        <input placeholder="xxxx-xxxx-xxxx-xxxx" type="text" name="" id=""
-                            class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                    </div>
-                </div>
-
-                {{-- ROW 3 --}}
-                <div class="space-y-2">
-                    <div class="text-registrationPrimaryColor">
-                        Expiration Month <span class="text-red-500">*</span>
-                    </div>
-                    <div>
-                        <input placeholder="mm" type="text" name="" id=""
-                            class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                    </div>
-                </div>
-
-                <div class="space-y-2">
-                    <div class="text-registrationPrimaryColor">
-                        Expiration Year <span class="text-red-500">*</span>
-                    </div>
-                    <div>
-                        <input placeholder="yyyy" type="text" name="" id=""
-                            class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                    </div>
-                </div>
-
-                <div class="space-y-2">
-                    <div class="text-registrationPrimaryColor">
-                        CVC <span class="text-red-500">*</span>
-                    </div>
-                    <div>
-                        <input placeholder="xxx" type="text" name="" id=""
-                            class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                    </div>
+                <div class="ml-5 text-black mt-2">
+                    <p>In favour of: Gulf Petrochemicals & Chemicals Association Mashreq Bank Riqqa Branch, Deira, P.O.
+                        Box
+                        5511, Dubai, UAE</p>
+                    <p class="mt-5">USD Acct No. <strong>0190-00-05007-7</strong></p>
+                    <p>IBAN No. <strong>AE360330000019000050077</strong></p>
+                    <p>Swift Code <strong>BOMLAEAD</strong></p>
                 </div>
             </div>
-        </div>
+        @endif
+
+        @if ($paymentMethod == 'creditCard')
+            <div class="mt-5 bg-registrationCardBGColor p-5 rounded-lg">
+                <div class="text-registrationPrimaryColor font-bold text-lg">
+                    Credit Card Details
+                </div>
+
+                <div class="mt-5 grid grid-cols-3 gap-y-3 gap-x-5">
+
+                    {{-- ROW 1 --}}
+                    <div class="space-y-2 col-span-3">
+                        <div class="text-registrationPrimaryColor">
+                            Name on Card <span class="text-red-500">*</span>
+                        </div>
+                        <div>
+                            <input placeholder="AJ CANDELARIA" type="text" name="" id=""
+                                class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                        </div>
+                    </div>
+
+                    {{-- ROW 2 --}}
+                    <div class="space-y-2 col-span-3">
+                        <div class="text-registrationPrimaryColor">
+                            Card Number <span class="text-red-500">*</span>
+                        </div>
+                        <div>
+                            <input placeholder="xxxx-xxxx-xxxx-xxxx" type="text" name="" id=""
+                                class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                        </div>
+                    </div>
+
+                    {{-- ROW 3 --}}
+                    <div class="space-y-2">
+                        <div class="text-registrationPrimaryColor">
+                            Expiration Month <span class="text-red-500">*</span>
+                        </div>
+                        <div>
+                            <input placeholder="mm" type="text" name="" id=""
+                                class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <div class="text-registrationPrimaryColor">
+                            Expiration Year <span class="text-red-500">*</span>
+                        </div>
+                        <div>
+                            <input placeholder="yyyy" type="text" name="" id=""
+                                class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <div class="text-registrationPrimaryColor">
+                            CVC <span class="text-red-500">*</span>
+                        </div>
+                        <div>
+                            <input placeholder="xxx" type="text" name="" id=""
+                                class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
     </div>
 
     <div class="mt-5">
@@ -198,7 +203,8 @@
         <ul class="list-decimal ml-8 mt-5">
             <li>For any cancellation, please notify us within 7 days from the receipt of the invoice. Any
                 cancellation made after 7 days shall not be accepted hence the invoice has to be settled. </li>
-            <li class="mt-4">If any delegate is unable to attend, we will accept a substitute delegate at no extra cost. Please
+            <li class="mt-4">If any delegate is unable to attend, we will accept a substitute delegate at no extra
+                cost. Please
                 notify us in writing an email to: forumregistration@gpca.org.ae with the name, job title, email
                 address and telephone number of both the registered and substitute delegate. </li>
             <li class="mt-4">Refund Policy

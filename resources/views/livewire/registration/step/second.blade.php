@@ -12,8 +12,19 @@
                     Company Name <span class="text-red-500">*</span>
                 </div>
                 <div>
-                    <input placeholder="Company Name" type="text" name="" id=""
+                    @if ($delegatePassType == 'member')
+                        <select required name="" id=""
+                            class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                            <option value="" disabled selected hidden>Please select...</option>
+                            @foreach ($companySectors as $companySector)
+                                <option value="">{{ $companySector }}</option>
+                            @endforeach
+                            <option value="">Others</option>
+                        </select>
+                    @else
+                        <input placeholder="Company Name" type="text" name="" id=""
                         class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                    @endif
                 </div>
             </div>
 
@@ -25,10 +36,10 @@
                     <select required name="" id=""
                         class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                         <option value="" disabled selected hidden>Please select...</option>
-                        <option value="">971</option>
-                        <option value="">53</option>
-                        <option value="">132</option>
-                        <option value="">131</option>
+                        @foreach ($companySectors as $companySector)
+                            <option value="">{{ $companySector }}</option>
+                        @endforeach
+                        <option value="">Others</option>
                     </select>
                 </div>
             </div>
@@ -146,10 +157,9 @@
                             <select required name="" id=""
                                 class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                                 <option value="" disabled selected hidden>Choose...</option>
-                                <option value="">971</option>
-                                <option value="">53</option>
-                                <option value="">132</option>
-                                <option value="">131</option>
+                                @foreach ($salutations as $salutation)
+                                    <option value="">{{ $salutation }}</option>
+                                @endforeach
                             </select>
                         </div>
                     </div>

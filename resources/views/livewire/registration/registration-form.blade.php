@@ -37,7 +37,7 @@
                     class="hover:bg-registrationPrimaryColor hover:text-white font-bold border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor w-52 rounded-md py-2" wire:click="increaseStep()">SUBMIT</button>
             </div>
         @else
-            @include('livewire.registration.step.fourth')
+            
         @endif
         {{-- </form> --}}
     </div>

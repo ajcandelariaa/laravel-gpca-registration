@@ -95,10 +95,10 @@
             <div class="bg-gray-200 py-4 px-2">
                 <h1 class="text-2xl text-registrationPrimaryColor font-bold text-center">DELEGATE PASS TYPE</h1>
                 <div class="bg-white mx-1 mt-5 p-5 flex flex-col justify-center items-center gap-3">
-                    <button
-                        class="hover:bg-registrationPrimaryColor hover:text-white border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor w-48 py-1 rounded-md">Member</button>
-                    <button
-                        class="hover:bg-registrationPrimaryColor hover:text-white border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor w-48 py-1 rounded-md">Non-Member</button>
+                    <button wire:click="memberClicked()"
+                        class="{{ $delegatePassType == 'member' ? 'bg-registrationPrimaryColor text-white' : 'hover:bg-registrationPrimaryColor hover:text-white border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor' }} w-48 py-1 rounded-md">Member</button>
+                    <button wire:click="nonMemberClicked()"
+                        class="{{ $delegatePassType == 'nonMember' ? 'bg-registrationPrimaryColor text-white' : 'hover:bg-registrationPrimaryColor hover:text-white border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor' }} w-48 py-1 rounded-md">Non-Member</button>
                 </div>
             </div>
         </div>
