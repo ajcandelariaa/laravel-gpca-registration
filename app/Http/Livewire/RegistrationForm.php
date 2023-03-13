@@ -6,6 +6,7 @@ use Livewire\Component;
 
 class RegistrationForm extends Component
 {
+    // public $phoneTest;
     public $currentStep = 1;
     public $paymentMethod;
     public $delegatePassType;

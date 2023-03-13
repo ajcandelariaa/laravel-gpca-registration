@@ -23,7 +23,7 @@
                         </select>
                     @else
                         <input placeholder="Company Name" type="text" name="" id=""
-                        class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                            class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                     @endif
                 </div>
             </div>
@@ -92,7 +92,7 @@
             {{-- ROW 4 --}}
             <div class="space-y-2">
                 <div class="text-registrationPrimaryColor">
-                    Telephone Number <span class="italic">(optional)</span>
+                    Landline Number <span class="italic">(optional)</span>
                 </div>
                 <div>
                     <input placeholder="xxxxxxx" type="text" name="" id=""
@@ -129,10 +129,11 @@
                     <select required name="" id=""
                         class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                         <option value="" disabled selected hidden>Please select...</option>
-                        <option value="">971</option>
-                        <option value="">53</option>
-                        <option value="">132</option>
-                        <option value="">131</option>
+                        <option value="">Social Media</option>
+                        <option value="">Friends</option>
+                        <option value="">Family</option>
+                        <option value="">News</option>
+                        <option value="">Others</option>
                     </select>
                 </div>
             </div>
@@ -309,43 +310,114 @@
         </div>
     </div>
 
-    {{-- <script>
-        var input = document.querySelector("#phone"),
-            errorMsg = document.querySelector("#error-msg"),
-            validMsg = document.querySelector("#valid-msg");
+    {{-- <div class="form-group has-danger" wire:ignore>
+        <input id="phoneTest" name="phoneTest" class="" type="tel" maxlength="15"
+            wire:model="phoneTest">
+        <br>
+        <span id="error-msg" class="hide"></span>
+        <p id="result"></p>
+    </div>
 
-        // here, the index maps to the error code returned from getValidationError - see readme
-        var errorMap = ["Invalid number", "Invalid country code", "Too short", "Too long", "Invalid number"];
+    @push('scripts')
+        <link rel="stylesheet" type="text/css"
+            href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.15/css/intlTelInput.css">
+        <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.15/js/intlTelInput.js">
+        </script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"
+            integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous">
+        </script>
+        
+        <script>
+            var input = document.querySelector("#phoneTest"),
+                errorMap = [
+                    "Invalid number",
+                    "Invalid country code",
+                    "Too short",
+                    "Too long",
+                    "Invalid number",
+                ],
+                result = document.querySelector("#result");
 
-        // initialise plugin
-        var iti = window.intlTelInput(input, {
-            utilsScript: "../../build/js/utils.js?1678446285328"
-        });
+            window.addEventListener("load", function() {
+                errorMsg = document.querySelector("#error-msg");
+                var iti = window.intlTelInput(input, {
+                    hiddenInput: "full_number",
+                    nationalMode: false,
+                    formatOnDisplay: true,
+                    separateDialCode: true,
+                    autoHideDialCode: true,
+                    autoPlaceholder: "aggressive",
+                    initialCountry: "auto",
+                    placeholderNumberType: "MOBILE",
+                    preferredCountries: ["us", "ae"],
+                    initialCountry: "us",
+                    utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.15/js/utils.js",
+                });
+                input.addEventListener("keyup", formatIntlTelInput);
+                input.addEventListener("change", formatIntlTelInput);
 
-        var reset = function() {
-            input.classList.remove("error");
-            errorMsg.innerHTML = "";
-            errorMsg.classList.add("hide");
-            validMsg.classList.add("hide");
-        };
-
-        // on blur: validate
-        input.addEventListener('blur', function() {
-            reset();
-            if (input.value.trim()) {
-                if (iti.isValidNumber()) {
-                    validMsg.classList.remove("hide");
-                } else {
-                    input.classList.add("error");
-                    var errorCode = iti.getValidationError();
-                    errorMsg.innerHTML = errorMap[errorCode];
-                    errorMsg.classList.remove("hide");
+                function formatIntlTelInput() {
+                    if (typeof intlTelInputUtils !== "undefined") {
+                        // utils are lazy loaded, so must check
+                        var currentText = iti.getNumber(
+                            intlTelInputUtils.numberFormat.E164
+                        );
+                        if (typeof currentText === "string") {
+                            // sometimes the currentText is an object :)
+                            iti.setNumber(currentText); // will autoformat because of formatOnDisplay=true
+                        }
+                    }
                 }
-            }
-        });
+                input.addEventListener("keyup", function() {
+                    reset();
+                    if (input.value.trim()) {
+                        if (iti.isValidNumber()) {
+                            $(input).addClass("form-control is-valid");
+                        } else {
+                            $(input).addClass("form-control is-invalid");
+                            var errorCode = iti.getValidationError();
+                            errorMsg.innerHTML = errorMap[errorCode];
+                            $(errorMsg).show();
+                        }
+                    }
+                });
+                input.addEventListener("change", reset);
+                input.addEventListener("keyup", reset);
+                var reset = function() {
+                    $(input).removeClass("form-control is-invalid");
+                    errorMsg.innerHTML = "";
+                    $(errorMsg).hide();
+                };
+                input.addEventListener(
+                    "keyup",
+                    function(e) {
+                        e.preventDefault();
+                        var num = iti.getNumber(),
+                            valid = iti.isValidNumber();
+                        result.textContent = "Number: " + num + ", valid: " + valid;
+                    },
+                    false
+                );
+                input.addEventListener(
+                    "focus",
+                    function() {
+                        result.textContent = "";
+                    },
+                    false
+                );
+                $(input).on("focusout", function(e, countryData) {
+                    var intlNumber = iti.getNumber();
+                    console.log(intlNumber);
+                });
+            });
 
-        // on keyup / change flag: reset
-        input.addEventListener('change', reset);
-        input.addEventListener('keyup', reset);
-    </script> --}}
+            function isPhoneNumberKey(evt) {
+                var charCode = evt.which ? evt.which : evt.keyCode;
+                if (charCode != 43 && charCode > 31 && (charCode < 48 || charCode > 57))
+                    return false;
+                return true;
+            }
+        </script>
+    @endpush --}}
 </div>

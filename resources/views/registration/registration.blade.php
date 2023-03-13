@@ -12,14 +12,15 @@
         integrity="sha512-SzlrxWUlpfuzQ+pcUCosxcglQRNAq/DZjVsC0lE40xsADsfeQoEypE+enwcOiGjk/bSuGGKHEyjSoQ1zVisanQ=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-
+    {{-- intlTelInput --}}
+    {{-- @include('helpers.intlTelInput') --}}
 
     {{-- VITE --}}
     @vite('resources/css/app.css')
 
     {{-- LIVEWIRE --}}
     @livewireStyles()
-    
+
     <style>
         select:required:invalid {
             color: #afafaf;
@@ -31,6 +32,7 @@
     </style>
 </head>
 
+
 <body class="min-h-screen flex flex-col">
     <div class="container mx-auto">
         <img src="{{ asset('assets/images/reg-banner.png') }}" alt=""
@@ -41,8 +43,14 @@
     @livewireScripts()
 
     <footer class="bg-registrationPrimaryColor w-full py-5 text-center text-white mt-auto">
-        <p>2023 GPCA Registration © All Rights Reserved</p>
+        <p>Copyright © 2023 GPCA Registration</p>
     </footer>
+
+    <script>
+        window.onbeforeunload = function(e) {
+            return "Are you sure?";
+        }
+    </script>
 </body>
 
 </html>
