@@ -16,8 +16,8 @@
                         <select required name="" id=""
                             class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                             <option value="" disabled selected hidden>Please select...</option>
-                            @foreach ($companySectors as $companySector)
-                                <option value="">{{ $companySector }}</option>
+                            @foreach ($members as $member)
+                                <option value="">{{ $member->name }}</option>
                             @endforeach
                             <option value="">Others</option>
                         </select>
@@ -243,57 +243,61 @@
         </div>
     </div>
 
-    <div class="mt-10">
-        <div class="text-registrationPrimaryColor italic font-bold text-xl">
-            Additional Delegate(s)
-        </div>
+    @if (!empty($additionalDelegates))
+        <div class="mt-10">
+            <div class="text-registrationPrimaryColor italic font-bold text-xl">
+                Additional Delegate(s)
+            </div>
 
-        <div class="mt-5">
-            <div class="grid grid-cols-4">
-                <div class="col-span-1 text-registrationPrimaryColor hover:underline cursor-pointer">
-                    Delegate 2
-                </div>
-                <div class="col-span-2 text-registrationPrimaryColor">
-                    Albert Joseph Candelaria
-                </div>
-                <div class="col-span-1 flex gap-3">
-                    <div class="cursor-pointer hover:text-yellow-600 text-yellow-500">
-                        <i class="fa-solid fa-pen-to-square"></i>
-                        Edit
+            <div class="mt-5">
+                <div class="grid grid-cols-4">
+                    <div class="col-span-1 text-registrationPrimaryColor hover:underline cursor-pointer">
+                        Delegate 2
                     </div>
-                    <div class="cursor-pointer hover:text-red-600 text-red-500">
-                        <i class="fa-solid fa-trash"></i>
-                        Remove
+                    <div class="col-span-2 text-registrationPrimaryColor">
+                        Albert Joseph Candelaria
+                    </div>
+                    <div class="col-span-1 flex gap-3">
+                        <div class="cursor-pointer hover:text-yellow-600 text-yellow-500">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                            Edit
+                        </div>
+                        <div class="cursor-pointer hover:text-red-600 text-red-500">
+                            <i class="fa-solid fa-trash"></i>
+                            Remove
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="my-4 w-full">
+
+                <div class="grid grid-cols-4">
+                    <div class="col-span-1 text-registrationPrimaryColor hover:underline cursor-pointer">
+                        Delegate 3
+                    </div>
+                    <div class="col-span-2 text-registrationPrimaryColor">
+                        Wesam Issa
+                    </div>
+                    <div class="col-span-1 flex gap-3">
+                        <div class="cursor-pointer hover:text-yellow-600 text-yellow-500">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                            Edit
+                        </div>
+                        <div class="cursor-pointer hover:text-red-600 text-red-500">
+                            <i class="fa-solid fa-trash"></i>
+                            Remove
+                        </div>
                     </div>
                 </div>
             </div>
-
-            <hr class="my-4 w-full">
-
-            <div class="grid grid-cols-4">
-                <div class="col-span-1 text-registrationPrimaryColor hover:underline cursor-pointer">
-                    Delegate 3
-                </div>
-                <div class="col-span-2 text-registrationPrimaryColor">
-                    Wesam Issa
-                </div>
-                <div class="col-span-1 flex gap-3">
-                    <div class="cursor-pointer hover:text-yellow-600 text-yellow-500">
-                        <i class="fa-solid fa-pen-to-square"></i>
-                        Edit
-                    </div>
-                    <div class="cursor-pointer hover:text-red-600 text-red-500">
-                        <i class="fa-solid fa-trash"></i>
-                        Remove
-                    </div>
-                </div>
-            </div>
         </div>
-    </div>
+    @endif
 
     <div class="mt-10 grid grid-addDelegateGrid grid-flow-col gap-x-10 items-center">
         <div class="col-span-1">
-            <button
+            @include('livewire.registration.add_delegate_model')
+
+            <button wire:click="openModal()"
                 class="hover:bg-registrationPrimaryColor hover:text-white font-bold border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor  rounded-md py-4 px-10">+
                 Add Delegate</button>
         </div>

@@ -3,6 +3,7 @@
 namespace App\Http\Livewire;
 
 use Livewire\Component;
+use App\Models\Member as Members;
 
 class RegistrationForm extends Component
 {
@@ -45,58 +46,92 @@ class RegistrationForm extends Component
         'Dr.',
         'Eng.',
     ];
+    public $showAddDelegateModal = false;
+    public $additionalDelegates = [];
+    public $members;
 
     public function render()
     {
+        $this->members = Members::select('name')->get();
         return view('livewire.registration.registration-form');
     }
 
-    public function increaseStep(){
+    public function increaseStep()
+    {
         $this->currentStep += 1;
     }
 
-    public function decreaseStep(){
+    public function decreaseStep()
+    {
         $this->currentStep -= 1;
     }
 
-    public function btClicked(){
-        if($this->paymentMethod == 'creditCard'){
+    public function btClicked()
+    {
+        if ($this->paymentMethod == 'creditCard') {
             $this->paymentMethod = 'bankTransfer';
-        } else if($this->paymentMethod == 'bankTransfer'){
+        } else if ($this->paymentMethod == 'bankTransfer') {
             $this->paymentMethod = '';
         } else {
             $this->paymentMethod = 'bankTransfer';
         }
     }
 
-    public function ccClicked(){
-        if($this->paymentMethod == 'bankTransfer'){
+    public function ccClicked()
+    {
+        if ($this->paymentMethod == 'bankTransfer') {
             $this->paymentMethod = 'creditCard';
-        } else if($this->paymentMethod == 'creditCard'){
+        } else if ($this->paymentMethod == 'creditCard') {
             $this->paymentMethod = '';
         } else {
             $this->paymentMethod = 'creditCard';
         }
     }
 
-    
-    public function memberClicked(){
-        if($this->delegatePassType == 'nonMember'){
+
+    public function memberClicked()
+    {
+        if ($this->delegatePassType == 'nonMember') {
             $this->delegatePassType = 'member';
-        } else if($this->delegatePassType == 'member'){
+        } else if ($this->delegatePassType == 'member') {
             $this->delegatePassType = '';
         } else {
             $this->delegatePassType = 'member';
         }
     }
 
-    public function nonMemberClicked(){
-        if($this->delegatePassType == 'member'){
+    public function nonMemberClicked()
+    {
+        if ($this->delegatePassType == 'member') {
             $this->delegatePassType = 'nonMember';
-        } else if($this->delegatePassType == 'nonMember'){
+        } else if ($this->delegatePassType == 'nonMember') {
             $this->delegatePassType = '';
         } else {
             $this->delegatePassType = 'nonMember';
         }
+    }
+
+    public function openModal()
+    {
+        $this->showAddDelegateModal = true;
+    }
+    public function closeModal()
+    {
+        $this->showAddDelegateModal = false;
+        // Reset form fields here
+    }
+    public function saveAdditionalDelegate()
+    {
+        array_push($this->additionalDelegates, [
+            'salutation' => 'Mr.',
+            'fname' => 'AJ',
+            'mname' => '',
+            'lname' => 'Candelaria',
+            'emailAddress' => 'aj@gpca.org.ae',
+            'mobileNumber' => '12312313',
+            'nationality' => 'Filipino',
+            'jobTitle' => 'IT Coordinator',
+        ]);
+        $this->showAddDelegateModal = false;
     }
 }
