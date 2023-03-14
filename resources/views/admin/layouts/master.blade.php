@@ -18,20 +18,20 @@
 </head>
 
 <body class="bg-gray-100">
-    <div class="bg-blue-600">
+    <div class="bg-registrationPrimaryColor">
         <div class="container mx-auto py-3 px-5">
             <div class="flex justify-between">
                 <div>
                     <img src="{{ asset('assets/images/logo2.jpg') }}" class="max-h-16" alt="logo">
                 </div>
-                <div class="text-white flex items-center gap-10">
+                <div class="text-white font-semibold flex items-center gap-10">
                     <a href="/admin/dashboard"
-                        class="{{ request()->is('admin/dashboard*') ? 'underline' : '' }} hover:underline">Dashboard</a>
+                        class="{{ request()->is('admin/dashboard*') ? 'text-dashboardNavItemHoverColor' : 'hover:underline' }}">Dashboard</a>
                     <a href="/admin/event"
-                        class="{{ request()->is('admin/event*') ? 'underline' : '' }} hover:underline">Manage
+                        class="{{ request()->is('admin/event*') ? 'text-dashboardNavItemHoverColor' : 'hover:underline' }}">Manage
                         Events</a>
                     <a href="/admin/member"
-                        class="{{ request()->is('admin/member*') ? 'underline' : '' }} hover:underline">Manage
+                        class="{{ request()->is('admin/member*') ? 'text-dashboardNavItemHoverColor' : 'hover:underline' }}">Manage
                         Members</a>
                     <a href="/admin/logout" class="hover:underline">Logout</a>
                     <br><br>
@@ -41,6 +41,7 @@
     </div>
     
     @yield('content')
+
     @livewireScripts()
 </body>
 

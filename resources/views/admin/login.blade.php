@@ -12,6 +12,7 @@
         integrity="sha512-SzlrxWUlpfuzQ+pcUCosxcglQRNAq/DZjVsC0lE40xsADsfeQoEypE+enwcOiGjk/bSuGGKHEyjSoQ1zVisanQ=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
 
+    {{-- TAILWINDCSS --}}
     @vite('resources/css/app.css')
 
     <style>
@@ -80,7 +81,6 @@
                             <i class="fa-solid fa-lock text-gray-400"></i>
                         </div>
                     </div>
-
 
                     <div class="text-center mt-3">
                         <input type="submit" value="Login"

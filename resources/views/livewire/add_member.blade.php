@@ -1,49 +1,69 @@
-<div class="shadow-lg my-5 py-5 bg-white rounded-md	">
-    <h1 class="text-center text-2xl">Add Member</h1>
-    <div class="mt-10 flex justify-center">
-        <form>
-            @csrf
-            <div class="flex flex-col gap-5">
-                <div class="items-center grid grid-cols-2">
-                    <label class="mr-5">Company Name: <span class="text-red-600">*</span></label>
+<div class="shadow-lg bg-white rounded-md w-72">
+    <form>
+        @csrf
+        <div class="p-5">
+            <div class="text-registrationPrimaryColor italic text-center font-bold text-2xl mt-4">
+                Add member
+            </div>
+
+            <div class="space-y-2 mt-10">
+                <div class="text-registrationPrimaryColor">
+                    Company Name: <span class="text-red-500">*</span>
+                </div>
+                <div>
                     <input type="text" wire:model="name"
-                        class="border focus:border-black rounded-md w-full h-full py-1 px-2 text-sm focus:outline-non text-gray-700">
+                        class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                     @error('name')
                         <span class="mt-2 text-red-600 italic text-sm">
                             {{ $message }}
                         </span>
                     @enderror
                 </div>
+            </div>
 
-                <div class="items-center grid grid-cols-2">
-                    <label class="mr-5">Company Sector: </label>
-                    <input type="text" wire:model="sector"
-                        class="border focus:border-black rounded-md w-full h-full py-1 px-2 text-sm focus:outline-non text-gray-700">
+            <div class="space-y-2 mt-5">
+                <div class="text-registrationPrimaryColor">
+                    Company Sector:
                 </div>
-
-                <div class="items-center grid grid-cols-2">
-                    <label class="mr-5">Company Logo: </label>
-                    <div class="flex-row">
-                        <input type="file" accept="image/*" wire:model="logo"
-                            class="border focus:border-black rounded-md w-full h-full px-2 text-sm focus:outline-non text-gray-700">
-                        @error('logo')
-                            <span class="mt-2 text-red-600 italic text-sm">
-                                {{ $message }}
-                            </span>
-                        @enderror
-
-                        @if ($logo)
-                            Photo Preview:
-                            <img src="{{ $logo->temporaryUrl() }}">
-                        @endif
-                    </div>
-                </div>
-
-                <div class="text-center">
-                    <button wire:click.prevent="addMember()"
-                        class="bg-blue-500 rounded-md text-white py-1 px-14 hover:cursor-pointer hover:bg-blue-700">Add</button>
+                <div>
+                    <select required wire:model="sector"
+                        class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                        <option value=""></option>
+                        @foreach ($companySectors as $companySector)
+                            <option value="{{ $companySector }}">{{ $companySector }}</option>
+                        @endforeach
+                        <option value="Others">Others</option>
+                    </select>
                 </div>
             </div>
-        </form>
-    </div>
+
+            <div class="space-y-2 mt-5">
+                <div class="text-registrationPrimaryColor">
+                    Company Logo:
+                </div>
+                <div>
+                    <input type="file" accept="image/*" wire:model="logo"
+                        class="border focus:border-black rounded-md w-full h-full px-2 text-sm focus:outline-non text-gray-700">
+                    @error('logo')
+                        <span class="mt-2 text-red-600 italic text-sm">
+                            {{ $message }}
+                        </span>
+                    @enderror
+
+                    <div class="flex justify-center mt-5">
+                        <img src="{{ $logo ? $logo->temporaryUrl() : 'https://via.placeholder.com/150' }}"
+                            alt="Image Preview" class="h-32 w-32 object-cover">
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-10">
+                <button wire:click.prevent="addMember()"
+                    class="bg-registrationPrimaryColor hover:bg-registrationPrimaryColorHover text-white font-medium py-2 px-5 rounded inline-flex items-center text-sm">
+                    <span class="mr-2"><i class="fas fa-plus"></i></span>
+                    <span>Add Member</span>
+                </button>
+            </div>
+        </div>
+
+    </form>
 </div>

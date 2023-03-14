@@ -13,6 +13,7 @@ module.exports = {
         registrationInputFieldsBGColor: '#F5F5F5',
         registrationSecondaryColor: '#D9A125',
         registrationCardBGColor: '#E3EDF6',
+        dashboardNavItemHoverColor: '#F9BC35',
       },
       gridTemplateColumns: {
         addDelegateGrid: '250px auto',

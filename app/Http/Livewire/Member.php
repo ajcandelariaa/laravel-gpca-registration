@@ -13,6 +13,34 @@ class Member extends Component
     public $members, $name, $logo, $sector;
     public $updateMember = false;
     public $oldImage, $memberId;
+    public $companySectors = [
+        'Academia / Educational & Research Institutes / Universities',
+        'Brand owners',
+        'Catalyst or Additive Manufacturers ',
+        'Chemical / Petrochemical Producers    ',
+        'Chemical Traders / Distributors ',
+        'Engineering Company / EPC Contractors',
+        'Equipment Manufacturers',
+        'Governments & Regulators',
+        'Industry Associations',
+        'Investment / Financial / Audit / Insurance Firms',
+        'Legal firms',
+        'Logistics Service Providers',
+        'NGOs',
+        'Oil & Gas (Upstream) ',
+        'Petroleum Producers / Refineries / Gas processing plants',
+        'Plastics Convertors',
+        'Power & Utilities',
+        'Press/media ',
+        'Retailers',
+        'Shipping Lines',
+        'Strategy Consultancies ',
+        'Technology Consultancies',
+        'Technology Services Providers',
+        'Terminal Operators',
+        'Venture Capitalists ',
+        'Waste Management & Recycling',
+    ];
 
     protected $listeners = [
         'deleteMemberScript' => 'deleteMember'
@@ -68,6 +96,8 @@ class Member extends Component
 
     public function showEditMember($memberId)
     {
+        $this->logo = null;
+        
         $member = Members::findOrFail($memberId);
         $this->name = $member->name;
         $this->sector = $member->sector;
