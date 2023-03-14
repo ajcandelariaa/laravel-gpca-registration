@@ -44,7 +44,7 @@
                 </div>
                 <div>
                     <input type="file" accept="image/*" wire:model="logo"
-                        class="border focus:border-black rounded-md w-full h-full px-2 text-sm focus:outline-non text-gray-700">
+                    class="border-2 focus:border-registrationPrimaryColor rounded-md w-full h-full px-2 text-sm focus:outline-none text-gray-700">
                     @error('logo')
                         <span class="mt-2 text-red-600 italic text-sm">
                             {{ $message }}

@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\MemberController;
+use App\Http\Controllers\DelegateController;
 use App\Http\Controllers\RegistrationController;
 use Illuminate\Support\Facades\Route;
 
@@ -23,16 +24,21 @@ Route::get('/', function () {
 
 Route::prefix('admin')->group(function () {
     Route::middleware(['isAdmin'])->group(function () {
-        Route::get('/logout', [AdminController::class, 'logout']);
-        Route::get('/dashboard', [AdminController::class, 'dashboardView']);
-        Route::get('/event', [EventController::class, 'manageEventView']);
+        Route::get('/logout', [AdminController::class, 'logout'])->name('admin.logout');
+        Route::get('/dashboard', [AdminController::class, 'dashboardView'])->name('admin.dashboard.view');
 
-        Route::get('/member', [MemberController::class, 'manageMemberView']);
-        Route::post('/member/add', [MemberController::class, 'addMember']);
+        Route::get('/event', [EventController::class, 'manageEventView'])->name('admin.event.view');
+        Route::get('/event/add', [EventController::class, 'manageAddEventView'])->name('admin.event.add.view');
+        Route::post('/event/add', [EventController::class, 'addEvent'])->name('admin.event.add.post');
+
+        Route::get('/member', [MemberController::class, 'manageMemberView'])->name('admin.member.view');
+
+        Route::get('/delegate', [DelegateController::class, 'manageDelegateView'])->name('admin.delegate.view');
+
     });
 
-    Route::get('/login', [AdminController::class, 'loginView']);
-    Route::post('/login', [AdminController::class, 'login']);
+    Route::get('/login', [AdminController::class, 'loginView'])->name('admin.login.view');
+    Route::post('/login', [AdminController::class, 'login'])->name('admin.login.post');
 });
 
-Route::get('/register/{year}/{eventName}/{eventId}', [RegistrationController::class, 'registrationView']);
+Route::get('/register/{year}/{eventName}/{eventId}', [RegistrationController::class, 'registrationView'])->name('register.view');

@@ -15,18 +15,24 @@ return new class extends Migration
     {
         Schema::create('events', function (Blueprint $table) {
             $table->id();
-            $table->string('year');
+            $table->string('category');
             $table->string('name');
+            $table->string('location');
+            $table->string('description');
             $table->string('start_date');
             $table->string('end_date');
-            $table->string('location');
-            $table->string('member_eb_rate');
-            $table->string('nmember_eb_rate');
-            $table->string('member_std_rate');
-            $table->string('nmember_std_rate');
-            $table->string('description');
             $table->string('banner');
             $table->string('logo');
+
+            $table->string('eb_end_date')->nullable();
+            $table->decimal('member_eb_rate', 10, 2)->nullable();
+            $table->decimal('nmember_eb_rate', 10, 2)->nullable();
+
+            $table->string('std_start_date');
+            $table->decimal('member_std_rate', 10, 2);
+            $table->decimal('nmember_std_rate', 10, 2);
+            
+            $table->string('year');
             $table->boolean('active');
             $table->timestamps();
         });
