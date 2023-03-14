@@ -295,7 +295,7 @@
 
     <div class="mt-10 grid grid-addDelegateGrid grid-flow-col gap-x-10 items-center">
         <div class="col-span-1">
-            @include('livewire.registration.add_delegate_model')
+            @include('livewire.registration.add_delegate_modal')
 
             <button wire:click="openModal()"
                 class="hover:bg-registrationPrimaryColor hover:text-white font-bold border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor  rounded-md py-4 px-10">+
