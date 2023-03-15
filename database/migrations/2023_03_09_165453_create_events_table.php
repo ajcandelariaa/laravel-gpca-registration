@@ -18,19 +18,19 @@ return new class extends Migration
             $table->string('category');
             $table->string('name');
             $table->string('location');
-            $table->string('description');
-            $table->string('start_date');
-            $table->string('end_date');
+            $table->mediumText('description');
+            $table->date('event_start_date');
+            $table->date('event_end_date');
             $table->string('banner');
             $table->string('logo');
 
-            $table->string('eb_end_date')->nullable();
-            $table->decimal('member_eb_rate', 10, 2)->nullable();
-            $table->decimal('nmember_eb_rate', 10, 2)->nullable();
+            $table->date('eb_end_date')->nullable();
+            $table->decimal('eb_member_rate', 10, 2)->nullable();
+            $table->decimal('eb_nmember_rate', 10, 2)->nullable();
 
-            $table->string('std_start_date');
-            $table->decimal('member_std_rate', 10, 2);
-            $table->decimal('nmember_std_rate', 10, 2);
+            $table->date('std_start_date');
+            $table->decimal('std_member_rate', 10, 2);
+            $table->decimal('std_nmember_rate', 10, 2);
             
             $table->string('year');
             $table->boolean('active');

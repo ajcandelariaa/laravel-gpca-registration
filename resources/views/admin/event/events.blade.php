@@ -2,6 +2,16 @@
 
 @section('content')
     <div class="container mx-auto my-5">
+        @if (session('success'))
+            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded fixed top-4 left-1/2 transform -translate-x-1/2 w-96"
+                role="alert">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <span class="block sm:inline">{{ session('success') }}</span>
+                    </div>
+                </div>
+            </div>
+        @endif
 
         <a href="{{ route('admin.event.add.view') }}"
             class="bg-registrationPrimaryColor hover:bg-registrationPrimaryColorHover text-white font-medium py-2 px-5 rounded inline-flex items-center text-sm">

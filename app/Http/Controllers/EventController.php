@@ -7,8 +7,18 @@ use Illuminate\Http\Request;
 
 class EventController extends Controller
 {
+    public $eventCategories = [
+        'SCC',
+        'PC',
+        'ANC',
+        'RIC',
+        'RC',
+        'AF',
+    ];
+
     // RENDER VIEWS
-    public function manageEventView(){
+    public function manageEventView()
+    {
         $events = Event::all();
         return view('admin.event.events', [
             "pageTitle" => "Manage Event",
@@ -16,15 +26,105 @@ class EventController extends Controller
         ]);
     }
 
-    public function manageAddEventView(){
-        return view('admin.event.add_event', [
+    public function manageAddEventView()
+    {
+        return view('admin.event.add.add_event', [
             "pageTitle" => "Add Event",
+            "eventCategories" => $this->eventCategories,
         ]);
     }
 
 
     // RENDER LOGICS
-    public function addEvent(Request $request){
-        dd($request);
+    public function addEvent(Request $request)
+    {
+        $request->validate(
+            [
+                'category' => 'required',
+                'name' => 'required',
+                'location' => 'required',
+                'description' => 'required',
+                'event_start_date' => 'required|date',
+                'event_end_date' => 'required|date',
+                'logo' => 'required|mimes:jpeg,png,jpg,gif',
+                'banner' => 'required|mimes:jpeg,png,jpg,gif',
+
+                'eb_end_date' => 'nullable|date',
+                'eb_member_rate' => 'nullable|numeric|min:0|max:99999.99',
+                'eb_nmember_rate' => 'nullable|numeric|min:0|max:99999.99',
+
+                'std_start_date' => 'required|date',
+                'std_member_rate' => 'required|numeric|min:0|max:99999.99',
+                'std_nmember_rate' => 'required|numeric|min:0|max:99999.99',
+            ],
+            [
+                'category.required' => 'Event Category is required',
+                'name.required' => 'Event Name is required',
+                'location.required' => 'Event Location is required',
+                'description.required' => 'Event Description is required',
+                'event_start_date.required' => 'Event Start Date is required',
+                'event_start_date.date' => 'Event Start Date must be a date',
+                'event_end_date.required' => 'Event End Date is required',
+                'event_end_date.date' => 'Event End Date must be a date',
+                'logo.required' => 'Event Logo is required',
+                'logo.mimes' => 'Event Logo must be in jpeg, png, jpg, gif format',
+                'banner.required' => 'Event Banner is required',
+                'banner.mimes' => 'Event Banner must be in jpeg, png, jpg, gif format',
+
+
+
+                'eb_end_date.date' => 'Early Bird End Date must be a date',
+
+                'eb_member_rate.numeric' => 'Early Bird Member Rate must be a number.',
+                'eb_member_rate.min' => 'Early Bird Member Rate must be at least :min.',
+                'eb_member_rate.max' => 'Early Bird Member Rate may not be greater than :max.',
+                'eb_nmember_rate.numeric' => 'Early Bird Non-Member Rate must be a number.',
+                'eb_nmember_rate.min' => 'Early Bird Non-Member Rate must be at least :min.',
+                'eb_nmember_rate.max' => 'Early Bird Non-Member Rate may not be greater than :max.',
+
+
+
+                'std_start_date.required' => 'Standard Start Date is required',
+                'std_start_date.date' => 'Standard Start Date must be a date',
+
+                'std_member_rate.required' => 'Standard Member Rate is required',
+                'std_member_rate.numeric' => 'Standard Member Rate must be a number.',
+                'std_member_rate.min' => 'Standard Member Rate must be at least :min.',
+                'std_member_rate.max' => 'Standard Member Rate may not be greater than :max.',
+
+                'std_nmember_rate.required' => 'Standard Non-Member Rate is required',
+                'std_nmember_rate.numeric' => 'Standard Non-Member Rate must be a number.',
+                'std_nmember_rate.min' => 'Standard Non-Member Rate must be at least :min.',
+                'std_nmember_rate.max' => 'Standard Non-Member Rate may not be greater than :max.',
+            ]
+        );
+
+        $currentYear = date('Y');
+        $logoPath = $request->file('logo')->store('public/event/' . $currentYear . 'logos');
+        $bannerPath = $request->file('banner')->store('public/event/' . $currentYear . 'banners');
+
+        Event::create([
+            'category' => $request->category,
+            'name' => $request->name,
+            'location' => $request->location,
+            'description' => $request->description,
+            'event_start_date' => $request->event_start_date,
+            'event_end_date' => $request->event_end_date,
+            'banner' => $logoPath,
+            'logo' => $bannerPath,
+
+            'eb_end_date' => $request->eb_end_date,
+            'eb_member_rate' => $request->eb_member_rate,
+            'eb_nmember_rate' => $request->eb_nmember_rate,
+
+            'std_start_date' => $request->std_start_date,
+            'std_member_rate' => $request->std_member_rate,
+            'std_nmember_rate' => $request->std_nmember_rate,
+
+            'year' => $currentYear,
+            'active' => true,
+        ]);
+
+        return redirect()->route('admin.event.view')->with('success', 'Event added successfully.');;
     }
 }
