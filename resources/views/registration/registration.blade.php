@@ -35,11 +35,12 @@
 
 <body class="min-h-screen flex flex-col">
     <div class="container mx-auto">
-        <img src="{{ asset('assets/images/reg-banner.png') }}" alt=""
-            class="h-full w-full object-fill object-center">
+        <img src="{{ Storage::url($event->banner) }}" alt=""
+            class="h-52 w-full object-fill object-center">
     </div>
 
-    @livewire('registration-form')
+    @livewire('registration-form', ['data' => "$event"])
+
     @livewireScripts()
 
     <footer class="bg-registrationPrimaryColor w-full py-5 text-center text-white mt-auto">

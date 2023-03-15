@@ -66,16 +66,19 @@
             $count = 1;
         @endphp
         @foreach ($members as $member)
-            <div class="grid grid-cols-11 pt-2 pb-2 mb-1 place-items-center {{ $count % 2 == 0 ? 'bg-registrationInputFieldsBGColor' : 'bg-registrationCardBGColor' }}">
+            <div
+                class="grid grid-cols-11 pt-2 pb-2 mb-1 place-items-center {{ $count % 2 == 0 ? 'bg-registrationInputFieldsBGColor' : 'bg-registrationCardBGColor' }}">
                 <div class="col-span-1">{{ $count }}</div>
-                <div class="col-span-3 flex justify-start items-start">
+                <div class="col-span-3 flex justify-start items-center gap-2">
                     @if ($member->logo != null)
-                        <img src="{{ Storage::url($member->logo) }}" alt="logo" class="object-fill h-5 w-10">
+                        <img src="{{ Storage::url($member->logo) }}" alt="logo" class="object-cover w-10">
                     @else
                         <img src="{{ asset('assets/images/logo-placeholder-image.png') }}" alt="logo"
-                            class="object-fill h-5 w-10">
+                            class="object-cover w-10">
                     @endif
-                    {{ $member->name }}
+                    <div>
+                        {{ $member->name }}
+                    </div>
                 </div>
                 <div class="col-span-4">{{ $member->sector }}</div>
                 <div class="col-span-1">

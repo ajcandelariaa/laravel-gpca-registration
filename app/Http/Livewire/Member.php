@@ -57,7 +57,7 @@ class Member extends Component
         $image = null;
         $this->validate([
             'name' => 'required',
-            'logo' => 'sometimes|image||dimensions:min_width=100,min_height=100,max_width=1000,max_height=1000'
+            'logo' => 'nullable|image||dimensions:min_width=100,min_height=100,max_width=1000,max_height=1000'
         ]);
 
         try {

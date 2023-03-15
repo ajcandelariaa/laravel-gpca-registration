@@ -50,9 +50,16 @@ class RegistrationForm extends Component
     public $additionalDelegates = [];
     public $members;
 
+    public $event;
+
+    public function mount($data)
+    {
+        $this->event = $data;
+        $this->members = Members::select('name', 'logo')->get();
+    }
+
     public function render()
     {
-        $this->members = Members::select('name')->get();
         return view('livewire.registration.registration-form');
     }
 

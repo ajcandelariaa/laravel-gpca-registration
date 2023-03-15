@@ -10,7 +10,7 @@
     </div>
 
     <div class="shadow-lg bg-white rounded-md container mx-auto mt-5 mb-10">
-        <form class="add-event-form" action="{{ route('admin.event.add.post') }}" method="POST">
+        <form class="add-event-form" action="{{ route('admin.event.add.post') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="p-5">
 

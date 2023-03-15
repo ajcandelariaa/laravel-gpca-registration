@@ -26,12 +26,36 @@ class EventController extends Controller
         ]);
     }
 
-    public function manageAddEventView()
+    public function addEventView()
     {
         return view('admin.event.add.add_event', [
             "pageTitle" => "Add Event",
             "eventCategories" => $this->eventCategories,
         ]);
+    }
+
+    public function eventDetailView($eventCategory, $eventId){
+        if(Event::where('category', $eventCategory)->where('id', $eventId)->exists()){
+            return view('admin.event.detail.view_event', [
+                "pageTitle" => "Event Details",
+                "eventCategory" => $eventCategory,
+                "eventId" => $eventId,
+            ]);
+        } else {
+            abort(404, 'The URL is incorrect');
+        }
+    }
+    
+    public function eventEditView($eventCategory, $eventId){
+        if(Event::where('category', $eventCategory)->where('id', $eventId)->exists()){
+            return view('admin.event.edit.edit_event', [
+                "pageTitle" => "Edit Event",
+                "eventCategory" => $eventCategory,
+                "eventId" => $eventId,
+            ]);
+        } else {
+            abort(404, 'The URL is incorrect');
+        }
     }
 
 
@@ -100,8 +124,8 @@ class EventController extends Controller
         );
 
         $currentYear = date('Y');
-        $logoPath = $request->file('logo')->store('public/event/' . $currentYear . 'logos');
-        $bannerPath = $request->file('banner')->store('public/event/' . $currentYear . 'banners');
+        $logoPath = $request->file('logo')->store('public/event/' . $currentYear . '/logos');
+        $bannerPath = $request->file('banner')->store('public/event/' . $currentYear . '/banners');
 
         Event::create([
             'category' => $request->category,
@@ -110,8 +134,8 @@ class EventController extends Controller
             'description' => $request->description,
             'event_start_date' => $request->event_start_date,
             'event_end_date' => $request->event_end_date,
-            'banner' => $logoPath,
-            'logo' => $bannerPath,
+            'logo' => $logoPath,
+            'banner' => $bannerPath,
 
             'eb_end_date' => $request->eb_end_date,
             'eb_member_rate' => $request->eb_member_rate,
