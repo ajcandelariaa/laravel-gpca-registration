@@ -7,6 +7,8 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>{{ $pageTitle }}</title>
 
+    {{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script> --}}
+
     {{-- FONT AWESOME LINK --}}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css"
         integrity="sha512-SzlrxWUlpfuzQ+pcUCosxcglQRNAq/DZjVsC0lE40xsADsfeQoEypE+enwcOiGjk/bSuGGKHEyjSoQ1zVisanQ=="
@@ -58,6 +60,8 @@
     @yield('content')
 
     @livewireScripts()
+    <script src="{{ asset('js/imagePreview.js') }}"></script>
+    <script src="{{ asset('js/toggleEarlyBirdFields.js') }}"></script>
 </body>
 
 </html>

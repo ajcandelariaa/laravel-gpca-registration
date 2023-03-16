@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class EventController extends Controller
 {
@@ -34,8 +35,9 @@ class EventController extends Controller
         ]);
     }
 
-    public function eventDetailView($eventCategory, $eventId){
-        if(Event::where('category', $eventCategory)->where('id', $eventId)->exists()){
+    public function eventDetailView($eventCategory, $eventId)
+    {
+        if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {
             return view('admin.event.detail.view_event', [
                 "pageTitle" => "Event Details",
                 "eventCategory" => $eventCategory,
@@ -45,13 +47,16 @@ class EventController extends Controller
             abort(404, 'The URL is incorrect');
         }
     }
-    
-    public function eventEditView($eventCategory, $eventId){
-        if(Event::where('category', $eventCategory)->where('id', $eventId)->exists()){
+
+    public function eventEditView($eventCategory, $eventId)
+    {
+        if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {
+            $event = Event::where('category', $eventCategory)->where('id', $eventId)->first();
+
             return view('admin.event.edit.edit_event', [
                 "pageTitle" => "Edit Event",
-                "eventCategory" => $eventCategory,
-                "eventId" => $eventId,
+                "eventCategories" => $this->eventCategories,
+                "event" => $event,
             ]);
         } else {
             abort(404, 'The URL is incorrect');
@@ -150,5 +155,108 @@ class EventController extends Controller
         ]);
 
         return redirect()->route('admin.event.view')->with('success', 'Event added successfully.');;
+    }
+
+    public function updateEvent(Request $request, $eventCategory, $eventId)
+    {
+        if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {
+            $validatedData = $request->validate(
+                [
+                    'eventId' => 'required',
+                    'category' => 'required',
+                    'name' => 'required',
+                    'location' => 'required',
+                    'description' => 'required',
+                    'event_start_date' => 'required|date',
+                    'event_end_date' => 'required|date',
+                    'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif',
+                    'banner' => 'nullable|image|mimes:jpeg,png,jpg,gif',
+
+                    'eb_end_date' => 'nullable|date',
+                    'eb_member_rate' => 'nullable|numeric|min:0|max:99999.99',
+                    'eb_nmember_rate' => 'nullable|numeric|min:0|max:99999.99',
+
+                    'std_start_date' => 'required|date',
+                    'std_member_rate' => 'required|numeric|min:0|max:99999.99',
+                    'std_nmember_rate' => 'required|numeric|min:0|max:99999.99',
+                ],
+                [
+                    'category.required' => 'Event Category is required',
+                    'name.required' => 'Event Name is required',
+                    'location.required' => 'Event Location is required',
+                    'description.required' => 'Event Description is required',
+                    'event_start_date.required' => 'Event Start Date is required',
+                    'event_start_date.date' => 'Event Start Date must be a date',
+                    'event_end_date.required' => 'Event End Date is required',
+                    'event_end_date.date' => 'Event End Date must be a date',
+                    'logo.image' => 'Event Logo must be an image',
+                    'logo.mimes' => 'Event Logo must be in jpeg, png, jpg, gif format',
+                    'banner.image' => 'Event Banner must be an image',
+                    'banner.mimes' => 'Event Banner must be in jpeg, png, jpg, gif format',
+
+
+
+                    'eb_end_date.date' => 'Early Bird End Date must be a date',
+
+                    'eb_member_rate.numeric' => 'Early Bird Member Rate must be a number.',
+                    'eb_member_rate.min' => 'Early Bird Member Rate must be at least :min.',
+                    'eb_member_rate.max' => 'Early Bird Member Rate may not be greater than :max.',
+                    'eb_nmember_rate.numeric' => 'Early Bird Non-Member Rate must be a number.',
+                    'eb_nmember_rate.min' => 'Early Bird Non-Member Rate must be at least :min.',
+                    'eb_nmember_rate.max' => 'Early Bird Non-Member Rate may not be greater than :max.',
+
+
+
+                    'std_start_date.required' => 'Standard Start Date is required',
+                    'std_start_date.date' => 'Standard Start Date must be a date',
+
+                    'std_member_rate.required' => 'Standard Member Rate is required',
+                    'std_member_rate.numeric' => 'Standard Member Rate must be a number.',
+                    'std_member_rate.min' => 'Standard Member Rate must be at least :min.',
+                    'std_member_rate.max' => 'Standard Member Rate may not be greater than :max.',
+
+                    'std_nmember_rate.required' => 'Standard Non-Member Rate is required',
+                    'std_nmember_rate.numeric' => 'Standard Non-Member Rate must be a number.',
+                    'std_nmember_rate.min' => 'Standard Non-Member Rate must be at least :min.',
+                    'std_nmember_rate.max' => 'Standard Non-Member Rate may not be greater than :max.',
+                ]
+            );
+
+            $event = Event::findOrFail($validatedData['eventId']);
+
+            $event->category = $validatedData['category'];
+            $event->name = $validatedData['name'];
+            $event->location = $validatedData['location'];
+            $event->event_start_date = $validatedData['event_start_date'];
+            $event->event_end_date = $validatedData['event_end_date'];
+
+            $event->eb_end_date = $validatedData['eb_end_date'];
+            $event->eb_member_rate = $validatedData['eb_member_rate'];
+            $event->eb_nmember_rate = $validatedData['eb_nmember_rate'];
+
+            $event->std_start_date = $validatedData['std_start_date'];
+            $event->std_member_rate = $validatedData['std_member_rate'];
+            $event->std_nmember_rate = $validatedData['std_nmember_rate'];
+            
+        
+            $currentYear = date('Y');
+            if($request->hasFile('logo')){
+                Storage::delete($event->logo);
+                $logoPath = $request->file('logo')->store('public/event/' . $currentYear . '/logos');
+                $event->logo = $logoPath;
+            }
+            
+            if($request->hasFile('banner')){
+                Storage::delete($event->banner);
+                $bannerPath = $request->file('banner')->store('public/event/' . $currentYear . '/banners');
+                $event->banner = $bannerPath;
+            }
+
+            $event->save();
+            
+            return redirect()->route('admin.event.view')->with('success', 'Event updated successfully.');
+        } else {
+            abort(404, 'The URL is incorrect');
+        }
     }
 }

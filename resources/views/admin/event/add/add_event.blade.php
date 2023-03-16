@@ -30,25 +30,6 @@
                     <div class="space-y-2 col-span-2 mt-6"><hr></div>
 
                     @include('admin.event.add.std_details')
-
-                    {{-- ROW 6
-                    <div class="space-y-2 col-span-2 grid grid-cols-3 gap-5 items-end">
-                        <div>
-                            <div class="text-registrationPrimaryColor font-medium text-lg">
-                                Delegate fees
-                            </div>
-                            <div class="text-registrationPrimaryColor mt-2">
-                                Standrd Start Date <span class="text-red-500">*</span>
-                            </div>
-                            <div>
-                                <input type="text" name="" placeholder="Select a date"
-                                    class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                            </div>
-                        </div>
-                        <div>
-                            <button type="button" class="btn btn-primary" id="add-more">Add More</button>
-                        </div>
-                    </div> --}}
                 </div>
 
                 <div class="text-center mt-10">

@@ -9,7 +9,7 @@
                 class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                 <option value="" disabled selected hidden>Please select...</option>
                 @foreach ($eventCategories as $eventCategory)
-                    <option value="{{ $eventCategory }}" @if (old('category') == $eventCategory) selected @endif>
+                    <option value="{{ $eventCategory }}" @if ($event->category == $eventCategory) selected @endif>
                         {{ $eventCategory }}</option>
                 @endforeach
             </select>
@@ -26,7 +26,7 @@
             Event Name <span class="text-red-500">*</span>
         </div>
         <div>
-            <input placeholder="14th GPCA Supply Chain" type="text" name="name" value="{{ old('name') }}"
+            <input placeholder="14th GPCA Supply Chain" type="text" name="name" value="{{ $event->name }}"
                 class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
             @error('name')
                 <div class="text-red-500 text-xs italic mt-1">
@@ -42,7 +42,7 @@
         </div>
         <div>
             <input placeholder="Le Méridien Al Khobar, Saudi Arabia" type="text" name="location"
-                value="{{ old('location') }}"
+                value="{{ $event->location }}"
                 class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
 
             @error('location')
@@ -61,7 +61,7 @@
     </div>
     <div>
         <textarea name="description" rows="3" placeholder="Type a description here..."
-            class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">{{ old('description') }}</textarea>
+            class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">{{ $event->description }}</textarea>
 
         @error('description')
             <div class="text-red-500 text-xs italic mt-1">
@@ -77,7 +77,7 @@
         Event Start Date <span class="text-red-500">*</span>
     </div>
     <div>
-        <input type="date" name="event_start_date" placeholder="Select a date" value="{{ old('event_start_date') }}"
+        <input type="date" name="event_start_date" placeholder="Select a date" value="{{ $event->event_start_date }}"
             class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
 
         @error('event_start_date')
@@ -93,7 +93,7 @@
         Event End Date <span class="text-red-500">*</span>
     </div>
     <div>
-        <input type="date" name="event_end_date" placeholder="Select a date" value="{{ old('event_end_date') }}"
+        <input type="date" name="event_end_date" placeholder="Select a date" value="{{ $event->event_end_date }}"
             class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
 
         @error('event_end_date')
@@ -123,7 +123,7 @@
         </div>
 
         <div>
-            <img src="https://via.placeholder.com/150" alt="logo" class="h-36 object-cover" id="imgLogo">
+            <img src="{{ Storage::url($event->logo) }}" alt="logo" class="h-36 object-cover" id="imgLogo">
         </div>
     </div>
 </div>
@@ -132,9 +132,10 @@
     <div class="text-registrationPrimaryColor">
         Event Banner <span class="text-red-500">*</span>
     </div>
+
     <div class="flex gap-3 flex-col">
         <div>
-            <input type="file" accept="image/*" name="banner" id="bannerInput" onchange="previewBanner(event)"
+            <input type="file" accept="image/*" name="banner" onchange="previewBanner(event)"
                 class="border-2 focus:border-registrationPrimaryColor rounded-md px-2 text-sm focus:outline-none text-gray-700">
             
             @error('banner')
@@ -145,7 +146,7 @@
         </div>
 
         <div>
-            <img src="http://via.placeholder.com/640x360" alt="banner" class="h-36 object-cover" id="imgBanner">
+            <img src="{{ Storage::url($event->banner) }}" alt="banner" class="h-36 object-cover" id="imgBanner">
         </div>
     </div>
 </div>

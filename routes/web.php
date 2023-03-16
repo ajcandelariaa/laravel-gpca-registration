@@ -32,6 +32,7 @@ Route::prefix('admin')->group(function () {
         Route::get('/event/{eventCategory}/{eventId}/edit', [EventController::class, 'eventEditView'])->name('admin.event.edit.view');
         Route::get('/event/add', [EventController::class, 'addEventView'])->name('admin.event.add.view');
         Route::post('/event/add', [EventController::class, 'addEvent'])->name('admin.event.add.post');
+        Route::post('/event/{eventCategory}/{eventId}/edit', [EventController::class, 'updateEvent'])->name('admin.event.edit.post');
 
         Route::get('/member', [MemberController::class, 'manageMemberView'])->name('admin.member.view');
 
