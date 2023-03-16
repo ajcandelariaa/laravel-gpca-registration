@@ -21,11 +21,11 @@
                                 Salutation
                             </div>
                             <div>
-                                <select required name="" id=""
+                                <select required wire:model="subSalutation"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                                     <option value="" disabled selected hidden>Choose...</option>
                                     @foreach ($salutations as $salutation)
-                                        <option value="">{{ $salutation }}</option>
+                                        <option value="{{ $salutation }}">{{ $salutation }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -36,7 +36,7 @@
                                 First Name <span class="text-red-500">*</span>
                             </div>
                             <div>
-                                <input placeholder="First Name" type="text" name="" id=""
+                                <input placeholder="First Name" type="text" wire:model="subFirstName"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                             </div>
                         </div>
@@ -47,7 +47,7 @@
                                 Middle Name
                             </div>
                             <div>
-                                <input placeholder="Middle Name" type="text" name="" id=""
+                                <input placeholder="Middle Name" type="text" wire:model="subMiddleName"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                             </div>
                         </div>
@@ -57,7 +57,7 @@
                                 Last Name <span class="text-red-500">*</span>
                             </div>
                             <div>
-                                <input placeholder="Last Name" type="text" name="" id=""
+                                <input placeholder="Last Name" type="text" wire:model="subLastName"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                             </div>
                         </div>
@@ -69,7 +69,7 @@
                                 Email Address <span class="text-red-500">*</span>
                             </div>
                             <div>
-                                <input placeholder="Email Address" type="text" name="" id=""
+                                <input placeholder="Email Address" type="text" wire:model="subEmailAddress"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                             </div>
                         </div>
@@ -79,7 +79,7 @@
                                 Mobile Number <span class="text-red-500">*</span>
                             </div>
                             <div>
-                                <input placeholder="xxxxxxx" type="text" name="" id=""
+                                <input placeholder="xxxxxxx" type="text" wire:model="subMobileNumber"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                             </div>
                         </div>
@@ -91,7 +91,7 @@
                                 Nationality <span class="text-red-500">*</span>
                             </div>
                             <div>
-                                <input placeholder="Nationality" type="text" name="" id=""
+                                <input placeholder="Nationality" type="text" wire:model="subNationality"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                             </div>
                         </div>
@@ -101,7 +101,7 @@
                                 Job Title <span class="text-red-500">*</span>
                             </div>
                             <div>
-                                <input placeholder="Job Title" type="text" name="" id=""
+                                <input placeholder="Job Title" type="text" wire:model="subJobTitle"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                             </div>
                         </div>

@@ -39,7 +39,7 @@
             class="h-52 w-full object-fill object-center">
     </div>
 
-    @livewire('registration-form', ['data' => "$event"])
+    @livewire('registration-form', ['data' => $event])
 
     @livewireScripts()
 

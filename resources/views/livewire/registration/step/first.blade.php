@@ -3,12 +3,14 @@
         <thead>
             <tr>
                 <td class="py-4 font-bold text-lg">Pass Category</td>
+                @if ($event->eb_end_date != null && $event->eb_member_rate != null && $event->eb_nmember_rate != null)
+                    <td class="py-4 font-bold text-lg">
+                        <span>Early Bird Rate <br> <span class="font-normal text-base">(valid until 30 Nov
+                                2020)</span></span>
+                    </td>
+                @endif
                 <td class="py-4 font-bold text-lg">
-                    <span>Early Bird Rate <br> <span class="font-normal text-base">(valid until 30 Nov
-                            2020)</span></span>
-                </td>
-                <td class="py-4 font-bold text-lg">
-                    <span>Standard Rate <br> <span class="font-normal text-base">(starting 1 Dec 2020)</span></span>
+                    <span>Standard Rate <br> <span class="font-normal text-base">(starting 31 Dev 2023)</span></span>
                 </td>
             </tr>
         </thead>
@@ -19,14 +21,16 @@
                         Member
                     </div>
                 </td>
-                <td class="text-black">
-                    <div class="bg-white py-4">
-                        $ 999.00 + 5% VAT
-                    </div>
-                </td>
+                @if ($event->eb_end_date != null && $event->eb_member_rate != null && $event->eb_nmember_rate != null)
+                    <td class="text-black">
+                        <div class="bg-white py-4">
+                            $ {{ $event->eb_member_rate }}
+                        </div>
+                    </td>
+                @endif
                 <td class="text-black">
                     <div class="bg-white py-4 mr-1">
-                        $ 1250.00 + 5% VAT
+                        $ {{ $event->std_nmember_rate }}
                     </div>
                 </td>
             </tr>
@@ -36,14 +40,16 @@
                         Non-Member
                     </div>
                 </td>
-                <td class="text-black">
-                    <div class="bg-white py-4 mb-1">
-                        $ 999.00 + 5% VAT
-                    </div>
-                </td>
+                @if ($event->eb_end_date != null && $event->eb_member_rate != null && $event->eb_nmember_rate != null)
+                    <td class="text-black">
+                        <div class="bg-white py-4 mb-1">
+                            $ {{ $event->eb_nmember_rate }}
+                        </div>
+                    </td>
+                @endif
                 <td class="text-black">
                     <div class="bg-white py-4 mb-1 mr-1">
-                        $ 1250.00 + 5% VAT
+                        $ {{ $event->std_nmember_rate }}
                     </div>
                 </td>
             </tr>
@@ -95,9 +101,9 @@
             <div class="bg-gray-200 py-4 px-2">
                 <h1 class="text-2xl text-registrationPrimaryColor font-bold text-center">DELEGATE PASS TYPE</h1>
                 <div class="bg-white mx-1 mt-5 p-5 flex flex-col justify-center items-center gap-3">
-                    <button wire:click="memberClicked()"
+                    <button wire:click.prevent="memberClicked()"
                         class="{{ $delegatePassType == 'member' ? 'bg-registrationPrimaryColor text-white' : 'hover:bg-registrationPrimaryColor hover:text-white border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor' }} w-48 py-1 rounded-md">Member</button>
-                    <button wire:click="nonMemberClicked()"
+                    <button wire:click.prevent="nonMemberClicked()"
                         class="{{ $delegatePassType == 'nonMember' ? 'bg-registrationPrimaryColor text-white' : 'hover:bg-registrationPrimaryColor hover:text-white border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor' }} w-48 py-1 rounded-md">Non-Member</button>
                 </div>
             </div>

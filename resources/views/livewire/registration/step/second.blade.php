@@ -5,7 +5,7 @@
             Company Information
         </div>
 
-        <div class="mt-5 grid grid-cols-2 gap-y-3 gap-x-5">
+        <div class="mt-5 grid grid-cols-2 gap-y-3 gap-x-5 items-start">
             {{-- ROW 1 --}}
             <div class="space-y-2">
                 <div class="text-registrationPrimaryColor">
@@ -13,18 +13,23 @@
                 </div>
                 <div>
                     @if ($delegatePassType == 'member')
-                        <select required name="" id=""
+                        <select required wire:model="companyName"
                             class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                             <option value="" disabled selected hidden>Please select...</option>
                             @foreach ($members as $member)
-                                <option value="">{{ $member->name }}</option>
+                                <option value="{{ $member->name }}">{{ $member->name }}</option>
                             @endforeach
-                            <option value="">Others</option>
                         </select>
                     @else
-                        <input placeholder="Company Name" type="text" name="" id=""
+                        <input placeholder="Company Name" type="text" wire:model="companyName"
                             class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                     @endif
+
+                    @error('companyName')
+                        <div class="text-red-500 text-xs italic mt-1">
+                            {{ $message }}
+                        </div>
+                    @enderror
                 </div>
             </div>
 
@@ -33,14 +38,20 @@
                     Company Sector <span class="text-red-500">*</span>
                 </div>
                 <div>
-                    <select required name="" id=""
+                    <select required wire:model="companySector"
                         class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                         <option value="" disabled selected hidden>Please select...</option>
                         @foreach ($companySectors as $companySector)
-                            <option value="">{{ $companySector }}</option>
+                            <option value="{{ $companySector }}">{{ $companySector }}</option>
                         @endforeach
-                        <option value="">Others</option>
+                        <option value="Others">Others</option>
                     </select>
+
+                    @error('companySector')
+                        <div class="text-red-500 text-xs italic mt-1">
+                            {{ $message }}
+                        </div>
+                    @enderror
                 </div>
             </div>
 
@@ -50,9 +61,14 @@
                     Company Address <span class="text-red-500">*</span>
                 </div>
                 <div>
-                    <input placeholder="Please enter Complete Company Address" type="text" name=""
-                        id=""
+                    <input placeholder="Please enter Complete Company Address" type="text"
+                        wire:model="companyAddress"
                         class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                    @error('companyAddress')
+                        <div class="text-red-500 text-xs italic mt-1">
+                            {{ $message }}
+                        </div>
+                    @enderror
                 </div>
             </div>
 
@@ -62,14 +78,20 @@
                     Country <span class="text-red-500">*</span>
                 </div>
                 <div>
-                    <select required name="" id=""
+                    <select required wire:model="companyCountry"
                         class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                         <option value="" disabled selected hidden>Please select...</option>
-                        <option value="">971</option>
-                        <option value="">53</option>
-                        <option value="">132</option>
-                        <option value="">131</option>
+                        <option value="Country 1">Country 1</option>
+                        <option value="Country 2">Country 2</option>
+                        <option value="Country 3">Country 3</option>
+                        <option value="Country 4">Country 4</option>
                     </select>
+
+                    @error('companyCountry')
+                        <div class="text-red-500 text-xs italic mt-1">
+                            {{ $message }}
+                        </div>
+                    @enderror
                 </div>
             </div>
 
@@ -78,14 +100,20 @@
                     City <span class="text-red-500">*</span>
                 </div>
                 <div>
-                    <select required name="" id=""
+                    <select required wire:model="companyCity"
                         class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                         <option value="" disabled selected hidden>Please select...</option>
-                        <option value="">971</option>
-                        <option value="">53</option>
-                        <option value="">132</option>
-                        <option value="">131</option>
+                        <option value="City 1">City 1</option>
+                        <option value="City 2">City 2</option>
+                        <option value="City 3">City 3</option>
+                        <option value="City 4">City 4</option>
                     </select>
+
+                    @error('companyCity')
+                        <div class="text-red-500 text-xs italic mt-1">
+                            {{ $message }}
+                        </div>
+                    @enderror
                 </div>
             </div>
 
@@ -95,8 +123,14 @@
                     Landline Number <span class="italic">(optional)</span>
                 </div>
                 <div>
-                    <input placeholder="xxxxxxx" type="text" name="" id=""
+                    <input placeholder="xxxxxxx" type="text" wire:model="companyLandlineNumber"
                         class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+
+                    @error('companyLandlineNumber')
+                        <div class="text-red-500 text-xs italic mt-1">
+                            {{ $message }}
+                        </div>
+                    @enderror
                 </div>
             </div>
 
@@ -105,8 +139,13 @@
                     Mobile Number <span class="text-red-500">*</span>
                 </div>
                 <div>
-                    <input placeholder="xxxxxxx" type="text" name="" id=""
+                    <input placeholder="xxxxxxx" type="text" wire:model="companyMobileNumber"
                         class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                    @error('companyMobileNumber')
+                        <div class="text-red-500 text-xs italic mt-1">
+                            {{ $message }}
+                        </div>
+                    @enderror
                 </div>
             </div>
 
@@ -116,8 +155,13 @@
                     Promo Code
                 </div>
                 <div>
-                    <input placeholder="Enter your promo code here" type="text" name="" id=""
+                    <input placeholder="Enter your promo code here" type="text" wire:model="promoCode"
                         class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                    @error('promoCode')
+                        <div class="text-red-500 text-xs italic mt-1">
+                            {{ $message }}
+                        </div>
+                    @enderror
                 </div>
             </div>
 
@@ -126,14 +170,14 @@
                     Where did you hear about us? <span class="text-red-500">*</span>
                 </div>
                 <div>
-                    <select required name="" id=""
+                    <select required wire:model="heardWhere"
                         class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                         <option value="" disabled selected hidden>Please select...</option>
-                        <option value="">Social Media</option>
-                        <option value="">Friends</option>
-                        <option value="">Family</option>
-                        <option value="">News</option>
-                        <option value="">Others</option>
+                        <option value="Social Media">Social Media</option>
+                        <option value="Friends">Friends</option>
+                        <option value="Family">Family</option>
+                        <option value="News">News</option>
+                        <option value="Others">Others</option>
                     </select>
                 </div>
             </div>
@@ -155,13 +199,19 @@
                             Salutation
                         </div>
                         <div>
-                            <select required name="" id=""
+                            <select required wire:model="salutation"
                                 class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                                 <option value="" disabled selected hidden>Choose...</option>
                                 @foreach ($salutations as $salutation)
-                                    <option value="">{{ $salutation }}</option>
+                                    <option value="{{ $salutation }}">{{ $salutation }}</option>
                                 @endforeach
                             </select>
+
+                            @error('salutation')
+                                <div class="text-red-500 text-xs italic mt-1">
+                                    {{ $message }}
+                                </div>
+                            @enderror
                         </div>
                     </div>
 
@@ -170,8 +220,14 @@
                             First Name <span class="text-red-500">*</span>
                         </div>
                         <div>
-                            <input placeholder="First Name" type="text" name="" id=""
+                            <input placeholder="First Name" type="text" wire:model="firstName"
                                 class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+
+                            @error('firstName')
+                                <div class="text-red-500 text-xs italic mt-1">
+                                    {{ $message }}
+                                </div>
+                            @enderror
                         </div>
                     </div>
 
@@ -180,8 +236,14 @@
                             Middle Name <span class="text-red-500">*</span>
                         </div>
                         <div>
-                            <input placeholder="Middle Name" type="text" name="" id=""
+                            <input placeholder="Middle Name" type="text" wire:model="middleName"
                                 class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+
+                            @error('middleName')
+                                <div class="text-red-500 text-xs italic mt-1">
+                                    {{ $message }}
+                                </div>
+                            @enderror
                         </div>
                     </div>
 
@@ -190,8 +252,14 @@
                             Last Name <span class="text-red-500">*</span>
                         </div>
                         <div>
-                            <input placeholder="Last Name" type="text" name="" id=""
+                            <input placeholder="Last Name" type="text" wire:model="lastName"
                                 class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+
+                            @error('lastName')
+                                <div class="text-red-500 text-xs italic mt-1">
+                                    {{ $message }}
+                                </div>
+                            @enderror
                         </div>
                     </div>
                 </div>
@@ -204,8 +272,14 @@
                     Email Address <span class="text-red-500">*</span>
                 </div>
                 <div>
-                    <input placeholder="Email Address" type="text" name="" id=""
+                    <input placeholder="Email Address" type="text" wire:model="emailAddress"
                         class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+
+                    @error('emailAddress')
+                        <div class="text-red-500 text-xs italic mt-1">
+                            {{ $message }}
+                        </div>
+                    @enderror
                 </div>
             </div>
 
@@ -214,8 +288,14 @@
                     Mobile Number <span class="text-red-500">*</span>
                 </div>
                 <div>
-                    <input placeholder="xxxxxxx" type="text" name="" id=""
+                    <input placeholder="xxxxxxx" type="text" wire:model="mobileNumber"
                         class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+
+                    @error('mobileNumber')
+                        <div class="text-red-500 text-xs italic mt-1">
+                            {{ $message }}
+                        </div>
+                    @enderror
                 </div>
             </div>
 
@@ -226,8 +306,14 @@
                     Nationality <span class="text-red-500">*</span>
                 </div>
                 <div>
-                    <input placeholder="Nationality" type="text" name="" id=""
+                    <input placeholder="Nationality" type="text" wire:model="natioanlity"
                         class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+
+                    @error('natioanlity')
+                        <div class="text-red-500 text-xs italic mt-1">
+                            {{ $message }}
+                        </div>
+                    @enderror
                 </div>
             </div>
 
@@ -236,8 +322,14 @@
                     Job Title <span class="text-red-500">*</span>
                 </div>
                 <div>
-                    <input placeholder="Job Title" type="text" name="" id=""
+                    <input placeholder="Job Title" type="text" wire:model="jobTitle"
                         class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+
+                    @error('jobTitle')
+                        <div class="text-red-500 text-xs italic mt-1">
+                            {{ $message }}
+                        </div>
+                    @enderror
                 </div>
             </div>
         </div>
@@ -250,45 +342,38 @@
             </div>
 
             <div class="mt-5">
-                <div class="grid grid-cols-4">
-                    <div class="col-span-1 text-registrationPrimaryColor hover:underline cursor-pointer">
-                        Delegate 2
-                    </div>
-                    <div class="col-span-2 text-registrationPrimaryColor">
-                        Albert Joseph Candelaria
-                    </div>
-                    <div class="col-span-1 flex gap-3">
-                        <div class="cursor-pointer hover:text-yellow-600 text-yellow-500">
-                            <i class="fa-solid fa-pen-to-square"></i>
-                            Edit
+                @foreach ($additionalDelegates as $additionalDelegate)
+                    <div class="grid grid-cols-12">
+                        <div class="col-span-2 text-registrationPrimaryColor">
+                            {{ $additionalDelegate['subSalutation'] }} {{ $additionalDelegate['subFirstName'] }} {{ $additionalDelegate['subMiddleName'] }} {{ $additionalDelegate['subLastName'] }}
                         </div>
-                        <div class="cursor-pointer hover:text-red-600 text-red-500">
-                            <i class="fa-solid fa-trash"></i>
-                            Remove
+                        <div class="col-span-2 text-registrationPrimaryColor">
+                            {{ $additionalDelegate['subEmailAddress'] }} 
+                        </div>
+                        <div class="col-span-2 text-registrationPrimaryColor">
+                            {{ $additionalDelegate['subMobileNumber'] }} 
+                        </div>
+                        <div class="col-span-2 text-registrationPrimaryColor">
+                            {{ $additionalDelegate['subNationality'] }} 
+                        </div>
+                        <div class="col-span-2 text-registrationPrimaryColor">
+                            {{ $additionalDelegate['subJobTitle'] }} 
+                        </div>
+                        <div class="col-span-2 flex gap-3">
+                            <div class="cursor-pointer hover:text-yellow-600 text-yellow-500">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                                Edit
+                            </div>
+                            
+                            <div wire:click="removeAdditionalDelegate('{{ $additionalDelegate }}')" class="cursor-pointer hover:text-red-600 text-red-500">
+                                <i class="fa-solid fa-trash"></i>
+                                Remove
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <hr class="my-4 w-full">
-
-                <div class="grid grid-cols-4">
-                    <div class="col-span-1 text-registrationPrimaryColor hover:underline cursor-pointer">
-                        Delegate 3
-                    </div>
-                    <div class="col-span-2 text-registrationPrimaryColor">
-                        Wesam Issa
-                    </div>
-                    <div class="col-span-1 flex gap-3">
-                        <div class="cursor-pointer hover:text-yellow-600 text-yellow-500">
-                            <i class="fa-solid fa-pen-to-square"></i>
-                            Edit
-                        </div>
-                        <div class="cursor-pointer hover:text-red-600 text-red-500">
-                            <i class="fa-solid fa-trash"></i>
-                            Remove
-                        </div>
-                    </div>
-                </div>
+                    <hr class="my-4 w-full">
+                @endforeach
             </div>
         </div>
     @endif
@@ -297,7 +382,7 @@
         <div class="col-span-1">
             @include('livewire.registration.add_delegate_modal')
 
-            <button wire:click="openModal()"
+            <button wire:click.prevent="openModal()"
                 class="hover:bg-registrationPrimaryColor hover:text-white font-bold border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor  rounded-md py-4 px-10">+
                 Add Delegate</button>
         </div>

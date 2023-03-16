@@ -4,13 +4,14 @@ namespace App\Http\Livewire;
 
 use Livewire\Component;
 use App\Models\Member as Members;
+use Illuminate\Support\Str;
+
 
 class RegistrationForm extends Component
 {
     // public $phoneTest;
+    public $totalSteps = 4;
     public $currentStep = 1;
-    public $paymentMethod;
-    public $delegatePassType;
     public $companySectors = [
         'Academia / Educational & Research Institutes / Universities',
         'Brand owners',
@@ -46,20 +47,65 @@ class RegistrationForm extends Component
         'Dr.',
         'Eng.',
     ];
+    public $members;
+    public $event;
+
+
+
+    // DELEGATE PASS TYPE
+    public $delegatePassType;
+
+    // COMPANY INFO
+    public $companyName;
+    public $companySector;
+    public $companyAddress;
+    public $companyCountry;
+    public $companyCity;
+    public $companyLandlineNumber;
+    public $companyMobileNumber;
+    public $promoCode;
+    public $heardWhere;
+
+    // MAIN DELEGATE
+    public $salutation;
+    public $firstName;
+    public $middleName;
+    public $lastName;
+    public $emailAddress;
+    public $mobileNumber;
+    public $nationality;
+    public $jobTitle;
+
+    // SUB DELEGATE
+    public $subSalutation;
+    public $subFirstName;
+    public $subMiddleName;
+    public $subLastName;
+    public $subEmailAddress;
+    public $subMobileNumber;
+    public $subNationality;
+    public $subJobTitle;
+
     public $showAddDelegateModal = false;
     public $additionalDelegates = [];
-    public $members;
 
-    public $event;
+    // 3RD
+    public $paymentMethod;
+
+
+
+
+
 
     public function mount($data)
     {
         $this->event = $data;
-        $this->members = Members::select('name', 'logo')->get();
+        $this->currentStep = 1;
     }
 
     public function render()
     {
+        $this->members = Members::select('name', 'logo')->get();
         return view('livewire.registration.registration-form');
     }
 
@@ -73,12 +119,18 @@ class RegistrationForm extends Component
         $this->currentStep -= 1;
     }
 
+    public function validateData()
+    {
+        if ($this->currentStep == 1) {
+        }
+    }
+
     public function btClicked()
     {
         if ($this->paymentMethod == 'creditCard') {
             $this->paymentMethod = 'bankTransfer';
         } else if ($this->paymentMethod == 'bankTransfer') {
-            $this->paymentMethod = '';
+            $this->paymentMethod = null;
         } else {
             $this->paymentMethod = 'bankTransfer';
         }
@@ -89,7 +141,7 @@ class RegistrationForm extends Component
         if ($this->paymentMethod == 'bankTransfer') {
             $this->paymentMethod = 'creditCard';
         } else if ($this->paymentMethod == 'creditCard') {
-            $this->paymentMethod = '';
+            $this->paymentMethod = null;
         } else {
             $this->paymentMethod = 'creditCard';
         }
@@ -101,7 +153,7 @@ class RegistrationForm extends Component
         if ($this->delegatePassType == 'nonMember') {
             $this->delegatePassType = 'member';
         } else if ($this->delegatePassType == 'member') {
-            $this->delegatePassType = '';
+            $this->delegatePassType = null;
         } else {
             $this->delegatePassType = 'member';
         }
@@ -112,7 +164,7 @@ class RegistrationForm extends Component
         if ($this->delegatePassType == 'member') {
             $this->delegatePassType = 'nonMember';
         } else if ($this->delegatePassType == 'nonMember') {
-            $this->delegatePassType = '';
+            $this->delegatePassType = null;
         } else {
             $this->delegatePassType = 'nonMember';
         }
@@ -130,15 +182,23 @@ class RegistrationForm extends Component
     public function saveAdditionalDelegate()
     {
         array_push($this->additionalDelegates, [
-            'salutation' => 'Mr.',
-            'fname' => 'AJ',
-            'mname' => '',
-            'lname' => 'Candelaria',
-            'emailAddress' => 'aj@gpca.org.ae',
-            'mobileNumber' => '12312313',
-            'nationality' => 'Filipino',
-            'jobTitle' => 'IT Coordinator',
+            'subSalutation' => $this->subSalutation,
+            'subFirstName' => $this->subFirstName,
+            'subMiddleName' => $this->subMiddleName,
+            'subLastName' => $this->subLastName,
+            'subEmailAddress' => $this->subEmailAddress,
+            'subMobileNumber' => $this->subMobileNumber,
+            'subNationality' => $this->subNationality,
+            'subJobTitle' => $this->subJobTitle,
         ]);
+
         $this->showAddDelegateModal = false;
+    }
+    public function removeAdditionalDelegate($delegate)
+    {
+        $index = array_search($delegate, $this->additionalDelegates);
+        if ($index !== false) {
+            unset($this->additionalDelegates[$index]);
+        }
     }
 }
