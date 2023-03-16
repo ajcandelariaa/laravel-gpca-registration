@@ -10,7 +10,7 @@
     </div>
 
     <div class="shadow-lg bg-white rounded-md container mx-auto mt-5 mb-10">
-        <form class="add-event-form" action="{{ route('admin.event.add.post') }}" method="POST" enctype="multipart/form-data">
+        <form id="add_form" class="add-event-form" action="{{ route('admin.event.add.post') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="p-5">
 
@@ -33,8 +33,8 @@
                 </div>
 
                 <div class="text-center mt-10">
-                    <input type="submit" value="Publish"
-                        class="bg-registrationPrimaryColor hover:bg-registrationPrimaryColorHover text-white font-medium py-2 px-10 rounded inline-flex items-center text-sm cursor-pointer">
+                    <button id="add_btn" type="submit" 
+                        class="bg-registrationPrimaryColor hover:bg-registrationPrimaryColorHover text-white font-medium py-2 px-10 rounded inline-flex items-center text-sm cursor-pointer">Publish</button>
                 </div>
             </div>
         </form>

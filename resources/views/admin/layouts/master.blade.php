@@ -60,8 +60,17 @@
     @yield('content')
 
     @livewireScripts()
-    <script src="{{ asset('js/imagePreview.js') }}"></script>
-    <script src="{{ asset('js/toggleEarlyBirdFields.js') }}"></script>
+
+
+    @if (request()->is('admin/event/add'))
+        <script src="{{ asset('js/manageEvents/toggleEarlyBirdFieldsAdd.js') }}"></script>
+        <script src="{{ asset('js/manageEvents/loadingButtonAdd.js') }}"></script>
+    @elseif(request()->is('admin/event/edit/*'))
+        <script src="{{ asset('js/manageEvents/toggleEarlyBirdFieldsEdit.js') }}"></script>
+        <script src="{{ asset('js/manageEvents/loadingButtonEdit.js') }}"></script>
+    @else
+    @endif
+    <script src="{{ asset('js/manageEvents/imagePreview.js') }}"></script>
 </body>
 
 </html>
