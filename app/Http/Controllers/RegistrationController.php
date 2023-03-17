@@ -13,7 +13,7 @@ class RegistrationController extends Controller
             $event = Event::where('year', $eventYear)->where('category', $eventCategory)->where('id', $eventId)->first();
 
             return view('registration.registration',[
-                'pageTitle' => "Register $eventCategory",
+                'pageTitle' => $event->name,
                 'event' => $event,
             ]);
         } else {

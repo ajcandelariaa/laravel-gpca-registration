@@ -17,7 +17,7 @@
             </div>
 
             <div>
-                Albert Joseph M. Candelaria
+                {{ $salutation . ' ' . $firstName . ' ' . $middleName . ' ' . $lastName }}
             </div>
 
             <div class="text-registrationPrimaryColor">
@@ -25,7 +25,7 @@
             </div>
 
             <div>
-                ajcandelaria@gmail.com
+                {{ $emailAddress }}
             </div>
 
             <div class="text-registrationPrimaryColor col-span-2">
@@ -146,24 +146,28 @@
 
             <div class="grid grid-cols-5 gap-2">
                 <div class="col-span-2 bg-white p-4">
-                    <p>15th Annual GPCA Forum – February 10-11, 2021 at Madinat Jumeirah Hotel, Dubai, UAE</p>
+                    <p>{{ $event->name }} – {{ $finalEventStartDate . ' - ' . $finalEventEndDate }} at {{ $event->location }}</p>
                     <p class="mt-5">Delegate Registration Fee – EB Member Rate </p>
                     <ul class="mt-2 list-decimal ml-4">
-                        <li>Aj Candelaria</li>
-                        <li>Wesam Issa</li>
+                        <li>{{ $salutation . ' ' . $firstName . ' ' . $middleName . ' ' . $lastName }}</li>
+                        @if(!empty($additionalDelegates))
+                            @foreach ($additionalDelegates as $additionalDelegate)
+                                <li>{{ $additionalDelegates['salutation'] . ' ' . $additionalDelegate['firstName']firstName . ' ' . $additionalDelegate['middleName'] . ' ' . $additionalDelegate['lastName'] }}</li>
+                            @endforeach
+                        @endif
                     </ul>
                 </div>
 
                 <div class="col-span-1 bg-white p-4 flex justify-center items-center">
-                    <p>3</p>
+                    <p>{{ $finalQuantity }}</p>
                 </div>
 
                 <div class="col-span-1 bg-white p-4 flex justify-center items-center">
-                    <p>$ 1,500.00</p>
+                    <p>$ {{ $finalUnitPrice }}</p>
                 </div>
 
                 <div class="col-span-1 bg-white p-4 flex justify-center items-center">
-                    <p>$ 4,500.00</p>
+                    <p>$ {{ $finalNetAmount }}</p>
                 </div>
             </div>
 
@@ -173,7 +177,7 @@
                 </div>
 
                 <div class="col-span-1 bg-white p-4 text-right">
-                    <p>$ 4,500.00</p>
+                    <p>$ {{ $finalNetAmount }}</p>
                 </div>
 
                 <div class="col-span-4 bg-white p-4">
@@ -181,7 +185,7 @@
                 </div>
 
                 <div class="col-span-1 bg-white p-4 text-right">
-                    <p>$ 225.00</p>
+                    <p>$ {{ $finalVat }}</p>
                 </div>
 
                 <div class="col-span-4 bg-white p-4 font-bold">
@@ -189,7 +193,7 @@
                 </div>
 
                 <div class="col-span-1 bg-white p-4 text-right font-bold">
-                    <p>$ 4,725.00</p>
+                    <p>$ {{ $finalTotal }}</p>
                 </div>
             </div>
         </div>

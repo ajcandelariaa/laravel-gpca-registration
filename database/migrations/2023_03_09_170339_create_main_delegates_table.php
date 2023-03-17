@@ -33,7 +33,6 @@ return new class extends Migration
             $table->string('job_title');
             $table->string('email_address');
             $table->string('nationality');
-            $table->string('telephone_number');
             $table->string('mobile_number');
             $table->string('quantity');
             $table->string('unit_price');
@@ -42,7 +41,6 @@ return new class extends Migration
             $table->string('discount_price');
             $table->string('total_amount');
             $table->string('mode_of_payment');
-            $table->string('bar_code');
             $table->string('status');
             $table->string('registered_date');
             $table->string('paid_date');

@@ -80,7 +80,13 @@
                         {{ $member->name }}
                     </div>
                 </div>
-                <div class="col-span-4">{{ $member->sector }}</div>
+                <div class="col-span-4">
+                    @if ($member->sector == null)
+                        N/A
+                    @else
+                        {{ $member->sector }}
+                    @endif
+                </div>
                 <div class="col-span-1">
                     @if ($member->active)
                         <button wire:click="updateStatus({{ $member->id }}, {{ $member->active }})"

@@ -4,14 +4,15 @@ namespace App\Http\Livewire;
 
 use Livewire\Component;
 use App\Models\Member as Members;
+use App\Models\MainDelegate as MainDelegates;
+use App\Models\AdditionalDelegate as AdditionalDelegates;
+use Carbon\Carbon;
 use Illuminate\Support\Str;
 
 
 class RegistrationForm extends Component
 {
     // public $phoneTest;
-    public $totalSteps = 4;
-    public $currentStep = 1;
     public $companySectors = [
         'Academia / Educational & Research Institutes / Universities',
         'Brand owners',
@@ -47,10 +48,14 @@ class RegistrationForm extends Component
         'Dr.',
         'Eng.',
     ];
+
     public $members;
     public $event;
 
+    public $finalEbEndDate, $finalStdStartDate;
 
+    public $totalSteps = 4;
+    public $currentStep = 1;
 
     // DELEGATE PASS TYPE
     public $delegatePassType;
@@ -93,6 +98,14 @@ class RegistrationForm extends Component
     public $paymentMethod;
 
 
+    public $finalEventStartDate;
+    public $finalEventEndDate;
+    public $finalQuantity;
+    public $finalUnitPrice;
+    public $finalNetAmount;
+    public $finalDiscount;
+    public $finalVat;
+    public $finalTotal;
 
 
 
@@ -101,17 +114,115 @@ class RegistrationForm extends Component
     {
         $this->event = $data;
         $this->currentStep = 1;
+
+        $this->finalEbEndDate = Carbon::parse($this->event->eb_end_date)->format('d M Y');
+        $this->finalStdStartDate = Carbon::parse($this->event->std_start_date)->format('d M Y');
+
+        $this->finalEventStartDate = Carbon::parse($this->event->event_start_date)->format('d M Y');
+        $this->finalEventEndDate = Carbon::parse($this->event->event_end_date)->format('d M Y');
+
     }
 
     public function render()
     {
-        $this->members = Members::select('name', 'logo')->get();
+        $this->members = Members::where('active', true)->get();
         return view('livewire.registration.registration-form');
+    }
+
+    public function calculateAmount()
+    {
+        $today = Carbon::today();
+
+        // CHECK UNIT PRICE
+        if ($this->event->eb_end_date != null && $this->event->eb_member_rate != null && $this->event->eb_nmember_rate != null) {
+            if ($today->lte(Carbon::parse($this->event->eb_end_date))) {
+                if ($this->delegatePassType == "member") {
+                    $this->finalUnitPrice = $this->event->eb_member_rate;
+                } else {
+                    $this->finalUnitPrice = $this->event->eb_nmember_rate;
+                }
+            } else {
+                if ($this->delegatePassType == "member") {
+                    $this->finalUnitPrice = $this->event->std_member_rate;
+                } else {
+                    $this->finalUnitPrice = $this->event->std_nmember_rate;
+                }
+            }
+        } else {
+            if ($this->delegatePassType == "member") {
+                $this->finalUnitPrice = $this->event->std_member_rate;
+            } else {
+                $this->finalUnitPrice = $this->event->std_nmember_rate;
+            }
+        }
+
+        $this->finalQuantity = count($this->additionalDelegates) + 1;
+        $this->finalNetAmount = $this->finalQuantity * $this->finalUnitPrice;
+        $this->finalVat = $this->finalNetAmount * .05;
+        $this->finalTotal = $this->finalNetAmount + $this->finalVat;
     }
 
     public function increaseStep()
     {
-        $this->currentStep += 1;
+        if ($this->currentStep == 2) {
+            $this->calculateAmount();
+        }
+
+        if ($this->currentStep == 3) {
+            // this will submit the form
+            // $newRegistrant = MainDelegates::create([
+            //     'event_id' => $this->event->id,
+            //     'pass_type' => $this->delegatePassType,
+            //     'company_name' => $this->companyName,
+            //     'company_sector' => $this->companySector,
+            //     'company_address' => $this->companyAddress,
+            //     'company_country' => $this->companyCountry,
+            //     'company_city' => $this->companyCity,
+            //     'company_telephone_number' => $this->companyLandlineNumber,
+            //     'company_mobile_number' => $this->companyMobileNumber,
+            //     'pcode_used' => $this->promoCode,
+            //     'heard_where' => $this->heardWhere,
+
+            //     'salutation' => $this->salutation,
+            //     'first_name' => $this->firstName,
+            //     'middle_name' => $this->middleName,
+            //     'last_name' => $this->lastName,
+            //     'job_title' => $this->jobTitle,
+            //     'email_address' => $this->emailAddress,
+            //     'nationality' => $this->nationality,
+            //     'mobile_number' => $this->mobileNumber,
+
+            //     'quantity' => 0,
+            //     'unit_price' => $this->event,
+            //     'net_amount' => $this->event,
+            //     'vat_price' => $this->event,
+            //     'discount_price' => $this->event,
+            //     'total_amount' => $this->event,
+            //     'mode_of_payment' => $this->event,
+            //     'bar_code' => $this->event,
+            //     'status' => $this->event,
+            //     'registered_date' => $this->event,
+            //     'paid_date' => $this->event,
+            // ]);
+
+            // if (!empty($this->additionalDelegates)) {
+            //     foreach ($this->additionalDelegates as $additionalDelegate) {
+            //         AdditionalDelegates::create([
+            //             'main_delegate_id' => $newRegistrant->id,
+            //             'salutation' => $additionalDelegate['subSalutation'],
+            //             'first_name' => $additionalDelegate['subFirstName'],
+            //             'middle_name' => $additionalDelegate['subMiddleName'],
+            //             'last_name' => $additionalDelegate['subLastName'],
+            //             'job_title' => $additionalDelegate['subJobTitle'],
+            //             'email_address' => $additionalDelegate['subEmailAddress'],
+            //             'nationality' => $additionalDelegate['subNationality'],
+            //             'mobile_number' => $additionalDelegate['subMobileNumber'],
+            //         ]);
+            //     }
+            // }
+        } else {
+            $this->currentStep += 1;
+        }
     }
 
     public function decreaseStep()
@@ -121,8 +232,6 @@ class RegistrationForm extends Component
 
     public function validateData()
     {
-        if ($this->currentStep == 1) {
-        }
     }
 
     public function btClicked()
@@ -181,7 +290,9 @@ class RegistrationForm extends Component
     }
     public function saveAdditionalDelegate()
     {
+        $uuid = Str::uuid();
         array_push($this->additionalDelegates, [
+            'subDelegateId' => $uuid->toString(),
             'subSalutation' => $this->subSalutation,
             'subFirstName' => $this->subFirstName,
             'subMiddleName' => $this->subMiddleName,
@@ -194,11 +305,14 @@ class RegistrationForm extends Component
 
         $this->showAddDelegateModal = false;
     }
-    public function removeAdditionalDelegate($delegate)
+    public function removeAdditionalDelegate($subDelegateId)
     {
-        $index = array_search($delegate, $this->additionalDelegates);
-        if ($index !== false) {
-            unset($this->additionalDelegates[$index]);
-        }
+        $this->additionalDelegates = array_filter($this->additionalDelegates, function ($item) use ($subDelegateId) {
+            return $item['subDelegateId'] != $subDelegateId;
+        });
+    }
+    public function pop()
+    {
+        array_pop($this->additionalDelegates);
     }
 }

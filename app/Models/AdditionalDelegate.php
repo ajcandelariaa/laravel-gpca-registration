@@ -18,7 +18,6 @@ class AdditionalDelegate extends Model
         'job_title',
         'email_address',
         'nationality',
-        'telephone_number',
         'mobile_number',
     ];
 }

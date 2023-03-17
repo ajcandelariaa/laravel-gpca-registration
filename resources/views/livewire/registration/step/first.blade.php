@@ -5,12 +5,11 @@
                 <td class="py-4 font-bold text-lg">Pass Category</td>
                 @if ($event->eb_end_date != null && $event->eb_member_rate != null && $event->eb_nmember_rate != null)
                     <td class="py-4 font-bold text-lg">
-                        <span>Early Bird Rate <br> <span class="font-normal text-base">(valid until 30 Nov
-                                2020)</span></span>
+                        <span>Early Bird Rate <br> <span class="font-normal text-base">(valid until {{ $finalEbEndDate }})</span></span>
                     </td>
                 @endif
                 <td class="py-4 font-bold text-lg">
-                    <span>Standard Rate <br> <span class="font-normal text-base">(starting 31 Dev 2023)</span></span>
+                    <span>Standard Rate <br> <span class="font-normal text-base">(starting {{ $finalStdStartDate }})</span></span>
                 </td>
             </tr>
         </thead>

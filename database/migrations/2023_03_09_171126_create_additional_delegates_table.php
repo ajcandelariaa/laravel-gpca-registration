@@ -23,7 +23,6 @@ return new class extends Migration
             $table->string('job_title');
             $table->string('email_address');
             $table->string('nationality');
-            $table->string('telephone_number');
             $table->string('mobile_number');
             $table->timestamps();
             $table->foreign('main_delegate_id')->references('id')->on('main_delegates')->onDelete('cascade');

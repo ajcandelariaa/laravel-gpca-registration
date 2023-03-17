@@ -17,7 +17,7 @@
                             class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                             <option value="" disabled selected hidden>Please select...</option>
                             @foreach ($members as $member)
-                                <option value="{{ $member->name }}">{{ $member->name }}</option>
+                                <option value="{{ $member->name }}" data-icon="{{ Storage::url($member->logo) }}">{{ $member->name }}</option>
                             @endforeach
                         </select>
                     @else
@@ -306,7 +306,7 @@
                     Nationality <span class="text-red-500">*</span>
                 </div>
                 <div>
-                    <input placeholder="Nationality" type="text" wire:model="natioanlity"
+                    <input placeholder="Nationality" type="text" wire:model="nationality"
                         class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
 
                     @error('natioanlity')
@@ -365,7 +365,7 @@
                                 Edit
                             </div>
                             
-                            <div wire:click="removeAdditionalDelegate('{{ $additionalDelegate }}')" class="cursor-pointer hover:text-red-600 text-red-500">
+                            <div wire:click="removeAdditionalDelegate('{{ $additionalDelegate['subDelegateId'] }}')" class="cursor-pointer hover:text-red-600 text-red-500">
                                 <i class="fa-solid fa-trash"></i>
                                 Remove
                             </div>
