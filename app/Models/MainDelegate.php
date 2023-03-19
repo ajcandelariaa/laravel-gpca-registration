@@ -12,6 +12,7 @@ class MainDelegate extends Model
     protected $fillable = [
         'event_id',
         'pass_type',
+        'badge_type',
 
         'company_name',
         'company_sector',
@@ -40,7 +41,7 @@ class MainDelegate extends Model
         'total_amount',
         'mode_of_payment',
         'status',
-        'registered_date',
+        'registered_date_time',
         'paid_date',
     ];
 }
