@@ -11,12 +11,13 @@ class PromoCode extends Model
     
     protected $fillable = [
         'event_id',
+        'event_category',
         'active',
         'description',
         'badge_type',
         'promo_code',
         'discount',
-        'remaining_codes',
+        'total_usage',
         'number_of_codes',
         'validity',
     ];

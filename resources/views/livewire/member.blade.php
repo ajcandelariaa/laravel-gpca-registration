@@ -24,9 +24,9 @@
 
     <div class="float-left">
         @if ($updateMember)
-            @include('livewire.member.edit_member')
+            @include('livewire.members.edit_member')
         @else
-            @include('livewire.member.add_member')
+            @include('livewire.members.add_member')
         @endif
     </div>
 

@@ -1,339 +1,9 @@
 <div>
     {{-- COMPANY INFORMATION --}}
-    <div>
-        <div class="text-registrationPrimaryColor italic font-bold text-xl">
-            Company Information
-        </div>
-
-        <div class="mt-5 grid grid-cols-2 gap-y-3 gap-x-5 items-start">
-            {{-- ROW 1 --}}
-            <div class="space-y-2">
-                <div class="text-registrationPrimaryColor">
-                    Company Name <span class="text-red-500">*</span>
-                </div>
-                <div>
-                    @if ($delegatePassType == 'member')
-                        <select required wire:model="companyName"
-                            class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                            <option value=""></option>
-                            @foreach ($members as $member)
-                                <option value="{{ $member->name }}" data-icon="{{ Storage::url($member->logo) }}">{{ $member->name }}</option>
-                            @endforeach
-                        </select>
-                    @else
-                        <input placeholder="Company Name" type="text" wire:model="companyName"
-                            class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                    @endif
-
-                    @error('companyName')
-                        <div class="text-red-500 text-xs italic mt-1">
-                            {{ $message }}
-                        </div>
-                    @enderror
-                </div>
-            </div>
-
-            <div class="space-y-2">
-                <div class="text-registrationPrimaryColor">
-                    Company Sector <span class="text-red-500">*</span>
-                </div>
-                <div>
-                    <select required wire:model="companySector"
-                        class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                        <option value=""></option>
-                        @foreach ($companySectors as $companySector)
-                            <option value="{{ $companySector }}">{{ $companySector }}</option>
-                        @endforeach
-                        <option value="Others">Others</option>
-                    </select>
-
-                    @error('companySector')
-                        <div class="text-red-500 text-xs italic mt-1">
-                            {{ $message }}
-                        </div>
-                    @enderror
-                </div>
-            </div>
-
-            {{-- ROW 2 --}}
-            <div class="space-y-2 col-span-2">
-                <div class="text-registrationPrimaryColor">
-                    Company Address <span class="text-red-500">*</span>
-                </div>
-                <div>
-                    <input placeholder="Please enter Complete Company Address" type="text"
-                        wire:model="companyAddress"
-                        class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                    @error('companyAddress')
-                        <div class="text-red-500 text-xs italic mt-1">
-                            {{ $message }}
-                        </div>
-                    @enderror
-                </div>
-            </div>
-
-            {{-- ROW 3 --}}
-            <div class="space-y-2">
-                <div class="text-registrationPrimaryColor">
-                    Country <span class="text-red-500">*</span>
-                </div>
-                <div>
-                    <select required wire:model="companyCountry"
-                        class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                        <option value="" disabled selected hidden>Please select...</option>
-                        <option value="Country 1">Country 1</option>
-                        <option value="Country 2">Country 2</option>
-                        <option value="Country 3">Country 3</option>
-                        <option value="Country 4">Country 4</option>
-                    </select>
-
-                    @error('companyCountry')
-                        <div class="text-red-500 text-xs italic mt-1">
-                            {{ $message }}
-                        </div>
-                    @enderror
-                </div>
-            </div>
-
-            <div class="space-y-2">
-                <div class="text-registrationPrimaryColor">
-                    City <span class="text-red-500">*</span>
-                </div>
-                <div>
-                    <select required wire:model="companyCity"
-                        class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                        <option value="" disabled selected hidden>Please select...</option>
-                        <option value="City 1">City 1</option>
-                        <option value="City 2">City 2</option>
-                        <option value="City 3">City 3</option>
-                        <option value="City 4">City 4</option>
-                    </select>
-
-                    @error('companyCity')
-                        <div class="text-red-500 text-xs italic mt-1">
-                            {{ $message }}
-                        </div>
-                    @enderror
-                </div>
-            </div>
-
-            {{-- ROW 4 --}}
-            <div class="space-y-2">
-                <div class="text-registrationPrimaryColor">
-                    Landline Number <span class="italic">(optional)</span>
-                </div>
-                <div>
-                    <input placeholder="xxxxxxx" type="text" wire:model="companyLandlineNumber"
-                        class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-
-                    @error('companyLandlineNumber')
-                        <div class="text-red-500 text-xs italic mt-1">
-                            {{ $message }}
-                        </div>
-                    @enderror
-                </div>
-            </div>
-
-            <div class="space-y-2">
-                <div class="text-registrationPrimaryColor">
-                    Mobile Number <span class="text-red-500">*</span>
-                </div>
-                <div>
-                    <input placeholder="xxxxxxx" type="text" wire:model="companyMobileNumber"
-                        class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                    @error('companyMobileNumber')
-                        <div class="text-red-500 text-xs italic mt-1">
-                            {{ $message }}
-                        </div>
-                    @enderror
-                </div>
-            </div>
-
-            {{-- ROW 5 --}}
-            <div class="space-y-2">
-                <div class="text-registrationPrimaryColor">
-                    Promo Code
-                </div>
-                <div>
-                    <input placeholder="Enter your promo code here" type="text" wire:model="promoCode"
-                        class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                    @error('promoCode')
-                        <div class="text-red-500 text-xs italic mt-1">
-                            {{ $message }}
-                        </div>
-                    @enderror
-                </div>
-            </div>
-
-            <div class="space-y-2">
-                <div class="text-registrationPrimaryColor">
-                    Where did you hear about us?
-                </div>
-                <div>
-                    <select required wire:model="heardWhere"
-                        class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                        <option value=""></option>
-                        <option value="Social Media">Social Media</option>
-                        <option value="Friends">Friends</option>
-                        <option value="Family">Family</option>
-                        <option value="News">News</option>
-                        <option value="Others">Others</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-    </div>
+    @include('livewire.registration.step.second_company')
 
     {{-- MAIN DELEGATE --}}
-    <div class="mt-10">
-        <div class="text-registrationPrimaryColor italic font-bold text-xl">
-            Main Delegate
-        </div>
-
-        <div class="mt-5 grid grid-cols-2 gap-y-3 gap-x-5">
-            {{-- ROW 1 --}}
-            <div class="space-y-2 col-span-2">
-                <div class="grid grid-cols-10 gap-x-5">
-                    <div class="col-span-1">
-                        <div class="text-registrationPrimaryColor">
-                            Salutation
-                        </div>
-                        <div>
-                            <select required wire:model="salutation"
-                                class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                                <option value=""></option>
-                                @foreach ($salutations as $salutation)
-                                    <option value="{{ $salutation }}">{{ $salutation }}</option>
-                                @endforeach
-                            </select>
-
-                            @error('salutation')
-                                <div class="text-red-500 text-xs italic mt-1">
-                                    {{ $message }}
-                                </div>
-                            @enderror
-                        </div>
-                    </div>
-
-                    <div class="col-span-3">
-                        <div class="text-registrationPrimaryColor">
-                            First Name <span class="text-red-500">*</span>
-                        </div>
-                        <div>
-                            <input placeholder="First Name" type="text" wire:model="firstName"
-                                class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-
-                            @error('firstName')
-                                <div class="text-red-500 text-xs italic mt-1">
-                                    {{ $message }}
-                                </div>
-                            @enderror
-                        </div>
-                    </div>
-
-                    <div class="col-span-3">
-                        <div class="text-registrationPrimaryColor">
-                            Middle Name <span class="text-red-500">*</span>
-                        </div>
-                        <div>
-                            <input placeholder="Middle Name" type="text" wire:model="middleName"
-                                class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-
-                            @error('middleName')
-                                <div class="text-red-500 text-xs italic mt-1">
-                                    {{ $message }}
-                                </div>
-                            @enderror
-                        </div>
-                    </div>
-
-                    <div class="col-span-3">
-                        <div class="text-registrationPrimaryColor">
-                            Last Name <span class="text-red-500">*</span>
-                        </div>
-                        <div>
-                            <input placeholder="Last Name" type="text" wire:model="lastName"
-                                class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-
-                            @error('lastName')
-                                <div class="text-red-500 text-xs italic mt-1">
-                                    {{ $message }}
-                                </div>
-                            @enderror
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-
-            {{-- ROW 2 --}}
-            <div class="space-y-2">
-                <div class="text-registrationPrimaryColor">
-                    Email Address <span class="text-red-500">*</span>
-                </div>
-                <div>
-                    <input placeholder="Email Address" type="text" wire:model="emailAddress"
-                        class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-
-                    @error('emailAddress')
-                        <div class="text-red-500 text-xs italic mt-1">
-                            {{ $message }}
-                        </div>
-                    @enderror
-                </div>
-            </div>
-
-            <div class="space-y-2">
-                <div class="text-registrationPrimaryColor">
-                    Mobile Number <span class="text-red-500">*</span>
-                </div>
-                <div>
-                    <input placeholder="xxxxxxx" type="text" wire:model="mobileNumber"
-                        class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-
-                    @error('mobileNumber')
-                        <div class="text-red-500 text-xs italic mt-1">
-                            {{ $message }}
-                        </div>
-                    @enderror
-                </div>
-            </div>
-
-
-            {{-- ROW 3 --}}
-            <div class="space-y-2">
-                <div class="text-registrationPrimaryColor">
-                    Nationality <span class="text-red-500">*</span>
-                </div>
-                <div>
-                    <input placeholder="Nationality" type="text" wire:model="nationality"
-                        class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-
-                    @error('natioanlity')
-                        <div class="text-red-500 text-xs italic mt-1">
-                            {{ $message }}
-                        </div>
-                    @enderror
-                </div>
-            </div>
-
-            <div class="space-y-2">
-                <div class="text-registrationPrimaryColor">
-                    Job Title <span class="text-red-500">*</span>
-                </div>
-                <div>
-                    <input placeholder="Job Title" type="text" wire:model="jobTitle"
-                        class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-
-                    @error('jobTitle')
-                        <div class="text-red-500 text-xs italic mt-1">
-                            {{ $message }}
-                        </div>
-                    @enderror
-                </div>
-            </div>
-        </div>
-    </div>
+    @include('livewire.registration.step.second_main_delegate')
 
     @if (!empty($additionalDelegates))
         <div class="mt-10">
@@ -345,27 +15,29 @@
                 @foreach ($additionalDelegates as $additionalDelegate)
                     <div class="grid grid-cols-12">
                         <div class="col-span-2 text-registrationPrimaryColor">
-                            {{ $additionalDelegate['subSalutation'] }} {{ $additionalDelegate['subFirstName'] }} {{ $additionalDelegate['subMiddleName'] }} {{ $additionalDelegate['subLastName'] }}
+                            {{ $additionalDelegate['subSalutation'] }} {{ $additionalDelegate['subFirstName'] }}
+                            {{ $additionalDelegate['subMiddleName'] }} {{ $additionalDelegate['subLastName'] }}
                         </div>
                         <div class="col-span-2 text-registrationPrimaryColor">
-                            {{ $additionalDelegate['subEmailAddress'] }} 
+                            {{ $additionalDelegate['subEmailAddress'] }}
                         </div>
                         <div class="col-span-2 text-registrationPrimaryColor">
-                            {{ $additionalDelegate['subMobileNumber'] }} 
+                            {{ $additionalDelegate['subMobileNumber'] }}
                         </div>
                         <div class="col-span-2 text-registrationPrimaryColor">
-                            {{ $additionalDelegate['subNationality'] }} 
+                            {{ $additionalDelegate['subNationality'] }}
                         </div>
                         <div class="col-span-2 text-registrationPrimaryColor">
-                            {{ $additionalDelegate['subJobTitle'] }} 
+                            {{ $additionalDelegate['subJobTitle'] }}
                         </div>
                         <div class="col-span-2 flex gap-3">
                             <div class="cursor-pointer hover:text-yellow-600 text-yellow-500">
                                 <i class="fa-solid fa-pen-to-square"></i>
                                 Edit
                             </div>
-                            
-                            <div wire:click="removeAdditionalDelegate('{{ $additionalDelegate['subDelegateId'] }}')" class="cursor-pointer hover:text-red-600 text-red-500">
+
+                            <div wire:click="removeAdditionalDelegate('{{ $additionalDelegate['subDelegateId'] }}')"
+                                class="cursor-pointer hover:text-red-600 text-red-500">
                                 <i class="fa-solid fa-trash"></i>
                                 Remove
                             </div>
@@ -380,11 +52,24 @@
 
     <div class="mt-10 grid grid-addDelegateGrid grid-flow-col gap-x-10 items-center">
         <div class="col-span-1">
+
             @include('livewire.registration.add_delegate_modal')
 
-            <button wire:click.prevent="openModal()"
-                class="hover:bg-registrationPrimaryColor hover:text-white font-bold border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor  rounded-md py-4 px-10">+
-                Add Delegate</button>
+            @if (
+                $firstName != null &&
+                    $lastName != null &&
+                    $emailAddress != null &&
+                    $mobileNumber != null &&
+                    $nationality != null &&
+                    $jobTitle != null && (count($additionalDelegates) < 4))
+                <button wire:click.prevent="openModal()" wire:key="btn_add_delegate"
+                    class="cursor-pointer hover:bg-registrationPrimaryColor hover:text-white font-bold border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor  rounded-md py-4 px-10">+
+                    Add Delegate</button>
+            @else
+                <button disabled
+                    class="cursor-not-allowed font-bold border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor  rounded-md py-4 px-10">+
+                    Add Delegate</button>
+            @endif
         </div>
 
         <div class="col-span-1">

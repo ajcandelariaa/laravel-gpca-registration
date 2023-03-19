@@ -48,6 +48,17 @@ class RegistrationForm extends Component
         'Dr.',
         'Eng.',
     ];
+    public $badgeTypes = [
+        'VVIP',
+        'VIP',
+        'Speaker',
+        'Commitee',
+        'Sponsor',
+        'Exhibitor',
+        'Delegate',
+        'Media partner',
+        'Organizer',
+    ];
 
     public $members;
     public $event;
@@ -59,6 +70,7 @@ class RegistrationForm extends Component
 
     // DELEGATE PASS TYPE
     public $delegatePassType;
+    public $badgeType;
 
     // COMPANY INFO
     public $companyName;
@@ -68,7 +80,6 @@ class RegistrationForm extends Component
     public $companyCity;
     public $companyLandlineNumber;
     public $companyMobileNumber;
-    public $promoCode;
     public $heardWhere;
 
     // MAIN DELEGATE
@@ -80,6 +91,7 @@ class RegistrationForm extends Component
     public $mobileNumber;
     public $nationality;
     public $jobTitle;
+    public $promoCode;
 
     // SUB DELEGATE
     public $subSalutation;
@@ -90,14 +102,13 @@ class RegistrationForm extends Component
     public $subMobileNumber;
     public $subNationality;
     public $subJobTitle;
+    public $subPromoCode;
 
     public $showAddDelegateModal = false;
     public $additionalDelegates = [];
 
     // 3RD
     public $paymentMethod;
-
-
     public $finalEventStartDate;
     public $finalEventEndDate;
     public $finalQuantity;
@@ -107,7 +118,8 @@ class RegistrationForm extends Component
     public $finalVat;
     public $finalTotal;
 
-
+    // ERROR CHECKER
+    public $delegatePassTypeError;
 
 
     public function mount($data)
@@ -130,7 +142,6 @@ class RegistrationForm extends Component
         $this->finalStdStartDate = Carbon::parse($this->event->std_start_date)->format('d M Y');
         $this->finalEventStartDate = Carbon::parse($this->event->event_start_date)->format('d M Y');
         $this->finalEventEndDate = Carbon::parse($this->event->event_end_date)->format('d M Y');
-
     }
 
     public function render()
@@ -174,11 +185,34 @@ class RegistrationForm extends Component
 
     public function increaseStep()
     {
-        if ($this->currentStep == 2) {
-            $this->calculateAmount();
-        }
+        if ($this->currentStep == 1) {
+            if ($this->delegatePassType != null && $this->badgeType != null) {
+                $this->delegatePassTypeError = null;
+                $this->currentStep += 1;
+            } else {
+                $this->delegatePassTypeError = "Please select first";
+            }
+        } else if ($this->currentStep == 2) {
+            $this->validate([
+                'companyName' => 'required',
+                'companySector' => 'required',
+                'companyAddress' => 'required',
+                'companyCountry' => 'required',
+                'companyCity' => 'required',
+                'companyMobileNumber' => 'required',
+                'heardWhere' => 'required',
 
-        if ($this->currentStep == 3) {
+                'firstName' => 'required',
+                'lastName' => 'required',
+                'emailAddress' => 'required',
+                'nationality' => 'required',
+                'mobileNumber' => 'required',
+                'jobTitle' => 'required',
+            ]);
+
+            $this->calculateAmount();
+            $this->currentStep += 1;
+        } else if ($this->currentStep == 3) {
             // this will submit the form
             // $newRegistrant = MainDelegates::create([
             //     'event_id' => $this->event->id,
@@ -230,8 +264,8 @@ class RegistrationForm extends Component
             //         ]);
             //     }
             // }
-        } else {
             $this->currentStep += 1;
+        } else {
         }
     }
 
@@ -240,9 +274,6 @@ class RegistrationForm extends Component
         $this->currentStep -= 1;
     }
 
-    public function validateData()
-    {
-    }
 
     public function btClicked()
     {
@@ -300,6 +331,15 @@ class RegistrationForm extends Component
     }
     public function saveAdditionalDelegate()
     {
+        $this->validate([
+            'subFirstName' => 'required',
+            'subLastName' => 'required',
+            'subEmailAddress' => 'required',
+            'subMobileNumber' => 'required',
+            'subNationality' => 'required',
+            'subJobTitle' => 'required',
+        ]);
+
         $uuid = Str::uuid();
         array_push($this->additionalDelegates, [
             'subDelegateId' => $uuid->toString(),
@@ -311,7 +351,18 @@ class RegistrationForm extends Component
             'subMobileNumber' => $this->subMobileNumber,
             'subNationality' => $this->subNationality,
             'subJobTitle' => $this->subJobTitle,
+            'subPromoCode' => $this->subPromoCode,
         ]);
+
+        $this->subSalutation = null;
+        $this->subFirstName = null;
+        $this->subMiddleName = null;
+        $this->subLastName = null;
+        $this->subEmailAddress = null;
+        $this->subMobileNumber = null;
+        $this->subNationality = null;
+        $this->subJobTitle = null;
+        $this->subPromoCode = null;
 
         $this->showAddDelegateModal = false;
     }

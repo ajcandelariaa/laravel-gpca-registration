@@ -49,7 +49,7 @@ class Member extends Component
     public function render()
     {
         $this->members = Members::orderBy('name', 'ASC')->get();
-        return view('livewire.member.member');
+        return view('livewire.member');
     }
 
     public function addMember()
@@ -57,7 +57,11 @@ class Member extends Component
         $image = null;
         $this->validate([
             'name' => 'required',
-            'logo' => 'nullable|image||dimensions:min_width=100,min_height=100,max_width=1000,max_height=1000'
+            'logo' => 'nullable|mimes:jpeg,png,jpg,gif',
+        ], 
+        [
+            'name.required' => 'Name is required',
+            'logo.mimes' => 'Logo must be in jpeg, png, jpg, gif format',
         ]);
 
         try {
@@ -118,7 +122,11 @@ class Member extends Component
 
         $this->validate([
             'name' => 'required',
-            'logo' => 'nullable|image||dimensions:min_width=100,min_height=100,max_width=1000,max_height=1000'
+            'logo' => 'nullable|mimes:jpeg,png,jpg,gif',
+        ], 
+        [
+            'name.required' => 'Name is required',
+            'logo.mimes' => 'Logo must be in jpeg, png, jpg, gif format',
         ]);
 
         try {

@@ -5,11 +5,13 @@
                 <td class="py-4 font-bold text-lg">Pass Category</td>
                 @if ($finalEbEndDate != null)
                     <td class="py-4 font-bold text-lg">
-                        <span>Early Bird Rate <br> <span class="font-normal text-base">(valid until {{ $finalEbEndDate }})</span></span>
+                        <span>Early Bird Rate <br> <span class="font-normal text-base">(valid until
+                                {{ $finalEbEndDate }})</span></span>
                     </td>
                 @endif
                 <td class="py-4 font-bold text-lg">
-                    <span>Standard Rate <br> <span class="font-normal text-base">(starting {{ $finalStdStartDate }})</span></span>
+                    <span>Standard Rate <br> <span class="font-normal text-base">(starting
+                            {{ $finalStdStartDate }})</span></span>
                 </td>
             </tr>
         </thead>
@@ -99,11 +101,36 @@
             </div>
             <div class="bg-gray-200 py-4 px-2">
                 <h1 class="text-2xl text-registrationPrimaryColor font-bold text-center">DELEGATE PASS TYPE</h1>
-                <div class="bg-white mx-1 mt-5 p-5 flex flex-col justify-center items-center gap-3">
-                    <button wire:click.prevent="memberClicked()"
-                        class="{{ $delegatePassType == 'member' ? 'bg-registrationPrimaryColor text-white' : 'hover:bg-registrationPrimaryColor hover:text-white border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor' }} w-48 py-1 rounded-md">Member</button>
-                    <button wire:click.prevent="nonMemberClicked()"
-                        class="{{ $delegatePassType == 'nonMember' ? 'bg-registrationPrimaryColor text-white' : 'hover:bg-registrationPrimaryColor hover:text-white border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor' }} w-48 py-1 rounded-md">Non-Member</button>
+                <div class="bg-white mx-1 mt-5 p-5">
+                    <div class="flex flex-row justify-center items-center gap-3">
+                        <button wire:click.prevent="memberClicked()"
+                            class="{{ $delegatePassType == 'member' ? 'bg-registrationPrimaryColor text-white' : 'hover:bg-registrationPrimaryColor hover:text-white border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor' }} w-48 py-1 rounded-md">Member</button>
+                        <button wire:click.prevent="nonMemberClicked()"
+                            class="{{ $delegatePassType == 'nonMember' ? 'bg-registrationPrimaryColor text-white' : 'hover:bg-registrationPrimaryColor hover:text-white border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor' }} w-48 py-1 rounded-md">Non-Member</button>
+                    </div>
+
+                    <div class="flex flex-row items-center justify-center gap-4 mt-5">
+                        <div class="text-registrationPrimaryColor">
+                            Badge Type:  <span class="text-red-500">*</span>
+                        </div>
+                        <div>
+                            <select wire:model="badgeType"
+                                class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                                <option value=""></option>
+                                @foreach ($badgeTypes as $badgeType)
+                                    <option value="{{ $badgeType }}"
+                                        @if (old('badgeType') == $badgeType) selected @endif>
+                                        {{ $badgeType }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+
+                    @if ($delegatePassTypeError != null)
+                        <div class="text-red-500 text-xs italic mt-1 text-center">
+                            {{ $delegatePassTypeError }}
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>

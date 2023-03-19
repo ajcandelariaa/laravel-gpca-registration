@@ -18,12 +18,13 @@ return new class extends Migration
             $table->unsignedBigInteger('main_delegate_id');
             $table->string('salutation')->nullable();
             $table->string('first_name');
-            $table->string('middle_name');
+            $table->string('middle_name')->nullable();
             $table->string('last_name');
-            $table->string('job_title');
             $table->string('email_address');
-            $table->string('nationality');
             $table->string('mobile_number');
+            $table->string('nationality');
+            $table->string('job_title');
+            $table->string('pcode_used')->nullable();
             $table->timestamps();
             $table->foreign('main_delegate_id')->references('id')->on('main_delegates')->onDelete('cascade');
         });

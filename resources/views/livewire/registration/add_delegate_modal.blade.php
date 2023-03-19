@@ -14,14 +14,13 @@
                     </div>
 
                     <div class="mt-5 grid grid-cols-2 gap-y-3 gap-x-5">
-
                         {{-- ROW 1 --}}
                         <div class="space-y-2">
                             <div class="text-registrationPrimaryColor">
                                 Salutation
                             </div>
                             <div>
-                                <select required wire:model="subSalutation"
+                                <select wire:model="subSalutation"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                                     <option value=""></option>
                                     @foreach ($salutations as $salutation)
@@ -38,6 +37,11 @@
                             <div>
                                 <input placeholder="First Name" type="text" wire:model="subFirstName"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                                @error('subFirstName')
+                                    <div class="text-red-500 text-xs italic mt-1">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
                             </div>
                         </div>
 
@@ -59,6 +63,11 @@
                             <div>
                                 <input placeholder="Last Name" type="text" wire:model="subLastName"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                                @error('subLastName')
+                                    <div class="text-red-500 text-xs italic mt-1">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
                             </div>
                         </div>
 
@@ -71,6 +80,11 @@
                             <div>
                                 <input placeholder="Email Address" type="text" wire:model="subEmailAddress"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                                @error('subEmailAddress')
+                                    <div class="text-red-500 text-xs italic mt-1">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
                             </div>
                         </div>
 
@@ -81,6 +95,11 @@
                             <div>
                                 <input placeholder="xxxxxxx" type="text" wire:model="subMobileNumber"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                                @error('subMobileNumber')
+                                    <div class="text-red-500 text-xs italic mt-1">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
                             </div>
                         </div>
 
@@ -93,6 +112,11 @@
                             <div>
                                 <input placeholder="Nationality" type="text" wire:model="subNationality"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                                @error('subNationality')
+                                    <div class="text-red-500 text-xs italic mt-1">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
                             </div>
                         </div>
 
@@ -102,6 +126,24 @@
                             </div>
                             <div>
                                 <input placeholder="Job Title" type="text" wire:model="subJobTitle"
+                                    class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                                @error('subJobTitle')
+                                    <div class="text-red-500 text-xs italic mt-1">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
+                            </div>
+                        </div>
+
+
+                        {{-- ROW 6 --}}
+                        <div class="space-y-2 col-span-2">
+                            <div class="text-registrationPrimaryColor">
+                                Promo Code
+                            </div>
+
+                            <div>
+                                <input placeholder="Enter your promo code here" type="text" wire:model="subPromoCode"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                             </div>
                         </div>

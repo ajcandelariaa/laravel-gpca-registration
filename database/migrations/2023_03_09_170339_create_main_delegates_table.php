@@ -17,23 +17,26 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('event_id');
             $table->string('pass_type');
+
             $table->string('company_name');
             $table->string('company_sector');
             $table->string('company_address');
             $table->string('company_country');
             $table->string('company_city');
-            $table->string('company_telephone_number');
+            $table->string('company_telephone_number')->nullable();
             $table->string('company_mobile_number');
-            $table->string('pcode_used');
-            $table->string('heard_where');
+            
             $table->string('salutation')->nullable();
             $table->string('first_name');
-            $table->string('middle_name');
+            $table->string('middle_name')->nullable();
             $table->string('last_name');
-            $table->string('job_title');
             $table->string('email_address');
-            $table->string('nationality');
             $table->string('mobile_number');
+            $table->string('nationality');
+            $table->string('job_title');
+            $table->string('pcode_used')->nullable();
+
+            $table->string('heard_where')->nullable();
             $table->string('quantity');
             $table->string('unit_price');
             $table->string('net_amount');

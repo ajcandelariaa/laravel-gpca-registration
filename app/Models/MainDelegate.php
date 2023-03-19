@@ -12,6 +12,7 @@ class MainDelegate extends Model
     protected $fillable = [
         'event_id',
         'pass_type',
+
         'company_name',
         'company_sector',
         'company_address',
@@ -19,16 +20,18 @@ class MainDelegate extends Model
         'company_city',
         'company_telephone_number',
         'company_mobile_number',
-        'pcode_used',
-        'heard_where',
+        
         'salutation',
         'first_name',
         'middle_name',
         'last_name',
-        'job_title',
         'email_address',
-        'nationality',
         'mobile_number',
+        'nationality',
+        'job_title',
+        'pcode_used',
+
+        'heard_where',
         'quantity',
         'unit_price',
         'net_amount',

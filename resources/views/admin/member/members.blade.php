@@ -2,6 +2,6 @@
 
 @section('content')
 
-    @livewire('member.member')
+    @livewire('member')
     
 @endsection

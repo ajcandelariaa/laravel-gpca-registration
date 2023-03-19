@@ -15,9 +15,10 @@ class AdditionalDelegate extends Model
         'first_name',
         'middle_name',
         'last_name',
-        'job_title',
         'email_address',
-        'nationality',
         'mobile_number',
+        'nationality',
+        'job_title',
+        'pcode_used',
     ];
 }

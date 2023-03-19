@@ -16,12 +16,14 @@ return new class extends Migration
         Schema::create('promo_codes', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('event_id');
+            $table->string('event_category');
             $table->boolean('active');
-            $table->mediumText('description');
+            $table->mediumText('description')->nullable();
             $table->string('badge_type');
             $table->string('promo_code');
-            $table->string('discount');
-            $table->string('number_of_usage');
+            $table->integer('discount');
+            $table->integer('total_usage');
+            $table->integer('number_of_codes');
             $table->dateTime('validity');
             $table->timestamps();
             $table->foreign('event_id')->references('id')->on('events')->onDelete('cascade');
