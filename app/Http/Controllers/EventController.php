@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -38,8 +39,69 @@ class EventController extends Controller
     public function eventDetailView($eventCategory, $eventId)
     {
         if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {
-            return view('admin.event.detail.view_event', [
+            $event = Event::where('category', $eventCategory)->where('id', $eventId)->first();
+
+            $today = Carbon::today();
+            if ($event->eb_end_date != null && $event->eb_member_rate != null && $event->eb_nmember_rate != null) {
+                if ($today->lte(Carbon::parse($event->eb_end_date))) {
+                    $finalEbEndDate = Carbon::parse($event->eb_end_date)->format('d M Y');
+                } else {
+                    $finalEbEndDate = null;
+                }
+            } else {
+                $finalEbEndDate = null;
+            }
+
+            $finalStdStartDate = Carbon::parse($event->std_start_date)->format('d M Y');
+            $finalEventStartDate = Carbon::parse($event->event_start_date)->format('d M Y');
+            $finalEventEndDate = Carbon::parse($event->event_end_date)->format('d M Y');
+
+            return view('admin.event.detail.event_details', [
                 "pageTitle" => "Event Details",
+                "eventCategory" => $eventCategory,
+                "eventId" => $eventId,
+                "event" => $event,
+                "finalEbEndDate" => $finalEbEndDate,
+                "finalStdStartDate" => $finalStdStartDate,
+                "finalEventStartDate" => $finalEventStartDate,
+                "finalEventEndDate" => $finalEventEndDate,
+            ]);
+        } else {
+            abort(404, 'The URL is incorrect');
+        }
+    }
+
+    public function eventPromoCodeView($eventCategory, $eventId)
+    {
+        if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {
+            return view('admin.event.detail.promo_codes', [
+                "pageTitle" => "Event Promo Codes",
+                "eventCategory" => $eventCategory,
+                "eventId" => $eventId,
+            ]);
+        } else {
+            abort(404, 'The URL is incorrect');
+        }
+    }
+
+    public function eventRegistrantsView($eventCategory, $eventId)
+    {
+        if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {
+            return view('admin.event.detail.registrants', [
+                "pageTitle" => "Event Registrants",
+                "eventCategory" => $eventCategory,
+                "eventId" => $eventId,
+            ]);
+        } else {
+            abort(404, 'The URL is incorrect');
+        }
+    }
+
+    public function eventDelegateView($eventCategory, $eventId)
+    {
+        if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {
+            return view('admin.event.detail.delegate', [
+                "pageTitle" => "Event Delegate",
                 "eventCategory" => $eventCategory,
                 "eventId" => $eventId,
             ]);
@@ -75,6 +137,7 @@ class EventController extends Controller
                 'description' => 'required',
                 'event_start_date' => 'required|date',
                 'event_end_date' => 'required|date',
+                'event_vat' => 'required|numeric|min:0|max:100',
                 'logo' => 'required|mimes:jpeg,png,jpg,gif',
                 'banner' => 'required|mimes:jpeg,png,jpg,gif',
 
@@ -95,6 +158,10 @@ class EventController extends Controller
                 'event_start_date.date' => 'Event Start Date must be a date',
                 'event_end_date.required' => 'Event End Date is required',
                 'event_end_date.date' => 'Event End Date must be a date',
+                'event_vat.required' => 'Vat is required',
+                'event_vat.numeric' => 'Vat must be a number.',
+                'event_vat.min' => 'Vat must be at least :min.',
+                'event_vat.max' => 'Vat may not be greater than :max.',
                 'logo.required' => 'Event Logo is required',
                 'logo.mimes' => 'Event Logo must be in jpeg, png, jpg, gif format',
                 'banner.required' => 'Event Banner is required',
@@ -139,6 +206,7 @@ class EventController extends Controller
             'description' => $request->description,
             'event_start_date' => $request->event_start_date,
             'event_end_date' => $request->event_end_date,
+            'event_vat' => $request->event_vat,
             'logo' => $logoPath,
             'banner' => $bannerPath,
 
@@ -169,6 +237,7 @@ class EventController extends Controller
                     'description' => 'required',
                     'event_start_date' => 'required|date',
                     'event_end_date' => 'required|date',
+                    'event_vat' => 'required|numeric|min:0|max:100',
                     'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif',
                     'banner' => 'nullable|image|mimes:jpeg,png,jpg,gif',
 
@@ -189,6 +258,10 @@ class EventController extends Controller
                     'event_start_date.date' => 'Event Start Date must be a date',
                     'event_end_date.required' => 'Event End Date is required',
                     'event_end_date.date' => 'Event End Date must be a date',
+                    'event_vat.required' => 'Vat is required',
+                    'event_vat.numeric' => 'Vat must be a number.',
+                    'event_vat.min' => 'Vat must be at least :min.',
+                    'event_vat.max' => 'Vat may not be greater than :max.',
                     'logo.image' => 'Event Logo must be an image',
                     'logo.mimes' => 'Event Logo must be in jpeg, png, jpg, gif format',
                     'banner.image' => 'Event Banner must be an image',
@@ -229,6 +302,7 @@ class EventController extends Controller
             $event->location = $validatedData['location'];
             $event->event_start_date = $validatedData['event_start_date'];
             $event->event_end_date = $validatedData['event_end_date'];
+            $event->event_vat = $validatedData['event_vat'];
 
             $event->eb_end_date = $validatedData['eb_end_date'];
             $event->eb_member_rate = $validatedData['eb_member_rate'];
@@ -237,23 +311,23 @@ class EventController extends Controller
             $event->std_start_date = $validatedData['std_start_date'];
             $event->std_member_rate = $validatedData['std_member_rate'];
             $event->std_nmember_rate = $validatedData['std_nmember_rate'];
-            
-        
+
+
             $currentYear = date('Y');
-            if($request->hasFile('logo')){
+            if ($request->hasFile('logo')) {
                 Storage::delete($event->logo);
                 $logoPath = $request->file('logo')->store('public/event/' . $currentYear . '/logos');
                 $event->logo = $logoPath;
             }
-            
-            if($request->hasFile('banner')){
+
+            if ($request->hasFile('banner')) {
                 Storage::delete($event->banner);
                 $bannerPath = $request->file('banner')->store('public/event/' . $currentYear . '/banners');
                 $event->banner = $bannerPath;
             }
 
             $event->save();
-            
+
             return redirect()->route('admin.event.view')->with('success', 'Event updated successfully.');
         } else {
             abort(404, 'The URL is incorrect');

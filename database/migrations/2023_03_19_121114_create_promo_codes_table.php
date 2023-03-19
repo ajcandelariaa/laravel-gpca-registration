@@ -1,0 +1,40 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('promo_codes', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('event_id');
+            $table->boolean('active');
+            $table->mediumText('description');
+            $table->string('badge_type');
+            $table->string('promo_code');
+            $table->string('discount');
+            $table->string('number_of_usage');
+            $table->dateTime('validity');
+            $table->timestamps();
+            $table->foreign('event_id')->references('id')->on('events')->onDelete('cascade');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('promo_codes');
+    }
+};

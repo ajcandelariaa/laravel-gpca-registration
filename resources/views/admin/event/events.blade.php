@@ -46,7 +46,7 @@
                             {{ $event->category }}
                         </div>
 
-                        <div class="col-span-2 flex justify-start items-center gap-2">
+                        <div class="col-span-2 flex justify-start items-center gap-2 ">
                             @if ($event->logo != null)
                                 <img src="{{ Storage::url($event->logo) }}" alt="logo" class="object-cover w-10">
                             @else

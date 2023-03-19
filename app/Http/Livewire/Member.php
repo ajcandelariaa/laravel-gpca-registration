@@ -49,7 +49,7 @@ class Member extends Component
     public function render()
     {
         $this->members = Members::orderBy('name', 'ASC')->get();
-        return view('livewire.member');
+        return view('livewire.member.member');
     }
 
     public function addMember()

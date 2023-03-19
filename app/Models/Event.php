@@ -16,6 +16,7 @@ class Event extends Model
         'description',
         'event_start_date',
         'event_end_date',
+        'event_vat',
         'banner',
         'logo',
 

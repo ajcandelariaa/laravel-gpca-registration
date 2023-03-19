@@ -152,7 +152,7 @@
                         <li>{{ $salutation . ' ' . $firstName . ' ' . $middleName . ' ' . $lastName }}</li>
                         @if(!empty($additionalDelegates))
                             @foreach ($additionalDelegates as $additionalDelegate)
-                                <li>{{ $additionalDelegates['salutation'] . ' ' . $additionalDelegate['firstName']firstName . ' ' . $additionalDelegate['middleName'] . ' ' . $additionalDelegate['lastName'] }}</li>
+                                <li>{{ $additionalDelegate['subSalutation'] . ' ' . $additionalDelegate['subFirstName'] . ' ' . $additionalDelegate['subMiddleName'] . ' ' . $additionalDelegate['subLastName'] }}</li>
                             @endforeach
                         @endif
                     </ul>
@@ -181,7 +181,7 @@
                 </div>
 
                 <div class="col-span-4 bg-white p-4">
-                    <p>VAT @5%</p>
+                    <p>VAT {{ $this->event->event_vat }}%</p>
                 </div>
 
                 <div class="col-span-1 bg-white p-4 text-right">

@@ -4,10 +4,10 @@ namespace App\Http\Livewire;
 
 use Livewire\Component;
 
-class Event extends Component
+class PromoCode extends Component
 {
     public function render()
     {
-        return view('livewire.event');
+        return view('livewire.promoCodes.promo-code');
     }
 }

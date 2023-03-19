@@ -21,6 +21,7 @@ return new class extends Migration
             $table->mediumText('description');
             $table->date('event_start_date');
             $table->date('event_end_date');
+            $table->integer('event_vat');
             $table->string('banner');
             $table->string('logo');
 

@@ -57,10 +57,13 @@
         </div>
     </div>
 
+    @if (request()->is('admin/event/detail*') || request()->is('admin/event/promo-codes*') || request()->is('admin/event/registrants*') || request()->is('admin/event/delegates*'))
+        @include('admin.event.detail.navigations')
+    @endif
+
     @yield('content')
 
     @livewireScripts()
-
 
     @if (request()->is('admin/event/add'))
         <script src="{{ asset('js/manageEvents/toggleEarlyBirdFieldsAdd.js') }}"></script>

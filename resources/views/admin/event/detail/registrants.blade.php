@@ -1,7 +1,5 @@
 @extends('admin.layouts.master')
 
 @section('content')
-
-    @livewire('member.member')
-    
+    <h1>Registrants</h1>
 @endsection

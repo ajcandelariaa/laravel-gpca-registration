@@ -15,7 +15,7 @@
                     @if ($delegatePassType == 'member')
                         <select required wire:model="companyName"
                             class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                            <option value="" disabled selected hidden>Please select...</option>
+                            <option value=""></option>
                             @foreach ($members as $member)
                                 <option value="{{ $member->name }}" data-icon="{{ Storage::url($member->logo) }}">{{ $member->name }}</option>
                             @endforeach
@@ -40,7 +40,7 @@
                 <div>
                     <select required wire:model="companySector"
                         class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                        <option value="" disabled selected hidden>Please select...</option>
+                        <option value=""></option>
                         @foreach ($companySectors as $companySector)
                             <option value="{{ $companySector }}">{{ $companySector }}</option>
                         @endforeach
@@ -167,12 +167,12 @@
 
             <div class="space-y-2">
                 <div class="text-registrationPrimaryColor">
-                    Where did you hear about us? <span class="text-red-500">*</span>
+                    Where did you hear about us?
                 </div>
                 <div>
                     <select required wire:model="heardWhere"
                         class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                        <option value="" disabled selected hidden>Please select...</option>
+                        <option value=""></option>
                         <option value="Social Media">Social Media</option>
                         <option value="Friends">Friends</option>
                         <option value="Family">Family</option>
@@ -201,7 +201,7 @@
                         <div>
                             <select required wire:model="salutation"
                                 class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                                <option value="" disabled selected hidden>Choose...</option>
+                                <option value=""></option>
                                 @foreach ($salutations as $salutation)
                                     <option value="{{ $salutation }}">{{ $salutation }}</option>
                                 @endforeach

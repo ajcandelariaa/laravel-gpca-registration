@@ -115,9 +115,19 @@ class RegistrationForm extends Component
         $this->event = $data;
         $this->currentStep = 1;
 
-        $this->finalEbEndDate = Carbon::parse($this->event->eb_end_date)->format('d M Y');
-        $this->finalStdStartDate = Carbon::parse($this->event->std_start_date)->format('d M Y');
+        $today = Carbon::today();
 
+        if ($this->event->eb_end_date != null && $this->event->eb_member_rate != null && $this->event->eb_nmember_rate != null) {
+            if ($today->lte(Carbon::parse($this->event->eb_end_date))) {
+                $this->finalEbEndDate = Carbon::parse($this->event->eb_end_date)->format('d M Y');
+            } else {
+                $this->finalEbEndDate = null;
+            }
+        } else {
+            $this->finalEbEndDate = null;
+        }
+
+        $this->finalStdStartDate = Carbon::parse($this->event->std_start_date)->format('d M Y');
         $this->finalEventStartDate = Carbon::parse($this->event->event_start_date)->format('d M Y');
         $this->finalEventEndDate = Carbon::parse($this->event->event_end_date)->format('d M Y');
 
@@ -158,7 +168,7 @@ class RegistrationForm extends Component
 
         $this->finalQuantity = count($this->additionalDelegates) + 1;
         $this->finalNetAmount = $this->finalQuantity * $this->finalUnitPrice;
-        $this->finalVat = $this->finalNetAmount * .05;
+        $this->finalVat = $this->finalNetAmount * ($this->event->event_vat / 100);
         $this->finalTotal = $this->finalNetAmount + $this->finalVat;
     }
 

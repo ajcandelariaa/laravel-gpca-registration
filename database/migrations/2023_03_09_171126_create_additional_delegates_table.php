@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('additional_delegates', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('main_delegate_id');
-            $table->string('salutation');
+            $table->string('salutation')->nullable();
             $table->string('first_name');
             $table->string('middle_name');
             $table->string('last_name');

@@ -3,7 +3,7 @@
         <thead>
             <tr>
                 <td class="py-4 font-bold text-lg">Pass Category</td>
-                @if ($event->eb_end_date != null && $event->eb_member_rate != null && $event->eb_nmember_rate != null)
+                @if ($finalEbEndDate != null)
                     <td class="py-4 font-bold text-lg">
                         <span>Early Bird Rate <br> <span class="font-normal text-base">(valid until {{ $finalEbEndDate }})</span></span>
                     </td>
@@ -20,16 +20,16 @@
                         Member
                     </div>
                 </td>
-                @if ($event->eb_end_date != null && $event->eb_member_rate != null && $event->eb_nmember_rate != null)
+                @if ($finalEbEndDate != null)
                     <td class="text-black">
                         <div class="bg-white py-4">
-                            $ {{ $event->eb_member_rate }}
+                            $ {{ $event->eb_member_rate }} + {{ $event->event_vat }}%
                         </div>
                     </td>
                 @endif
                 <td class="text-black">
                     <div class="bg-white py-4 mr-1">
-                        $ {{ $event->std_nmember_rate }}
+                        $ {{ $event->std_nmember_rate }} + {{ $event->event_vat }}%
                     </div>
                 </td>
             </tr>
@@ -39,16 +39,16 @@
                         Non-Member
                     </div>
                 </td>
-                @if ($event->eb_end_date != null && $event->eb_member_rate != null && $event->eb_nmember_rate != null)
+                @if ($finalEbEndDate != null)
                     <td class="text-black">
                         <div class="bg-white py-4 mb-1">
-                            $ {{ $event->eb_nmember_rate }}
+                            $ {{ $event->eb_nmember_rate }} + {{ $event->event_vat }}%
                         </div>
                     </td>
                 @endif
                 <td class="text-black">
                     <div class="bg-white py-4 mb-1 mr-1">
-                        $ {{ $event->std_nmember_rate }}
+                        $ {{ $event->std_nmember_rate }} + {{ $event->event_vat }}%
                     </div>
                 </td>
             </tr>

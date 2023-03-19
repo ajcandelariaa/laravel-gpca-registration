@@ -5,7 +5,7 @@
         <a href="{{ route('admin.event.view') }}"
             class="bg-red-500 hover:bg-red-400 text-white font-medium py-2 px-5 rounded inline-flex items-center text-sm">
             <span class="mr-2"><i class="fa-sharp fa-solid fa-arrow-left"></i></span>
-            <span>Cancel</span>
+            <span>List of Events</span>
         </a>
     </div>
 

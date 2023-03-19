@@ -23,7 +23,7 @@
                             <div>
                                 <select required wire:model="subSalutation"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                                    <option value="" disabled selected hidden>Choose...</option>
+                                    <option value=""></option>
                                     @foreach ($salutations as $salutation)
                                         <option value="{{ $salutation }}">{{ $salutation }}</option>
                                     @endforeach
