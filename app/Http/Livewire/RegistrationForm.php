@@ -79,7 +79,7 @@ class RegistrationForm extends Component
 
     // SUB DELEGATE
     public $subSalutation, $subFirstName, $subMiddleName, $subLastName, $subEmailAddress, $subMobileNumber, $subNationality, $subJobTitle, $subPromoCode;
-    
+
     // SUB DELEGATE EDIT
     public $subIdEdit, $subSalutationEdit, $subFirstNameEdit, $subMiddleNameEdit, $subLastNameEdit, $subEmailAddressEdit, $subMobileNumberEdit, $subNationalityEdit, $subJobTitleEdit, $subPromoCodeEdit;
 
@@ -168,7 +168,6 @@ class RegistrationForm extends Component
                 'companyCountry' => 'required',
                 'companyCity' => 'required',
                 'companyMobileNumber' => 'required',
-                'heardWhere' => 'required',
 
                 'firstName' => 'required',
                 'lastName' => 'required',
@@ -192,61 +191,64 @@ class RegistrationForm extends Component
 
     public function submit()
     {
-        // $newRegistrant = MainDelegates::create([
-        //     'event_id' => $this->event->id,
-        //     'pass_type' => $this->delegatePassType,
-        //     'badge_type' => $this->badgeType,
 
-        //     'company_name' => $this->companyName,
-        //     'company_sector' => $this->companySector,
-        //     'company_address' => $this->companyAddress,
-        //     'company_country' => $this->companyCountry,
-        //     'company_city' => $this->companyCity,
-        //     'company_telephone_number' => $this->companyLandlineNumber,
-        //     'company_mobile_number' => $this->companyMobileNumber,
-
-        //     'salutation' => $this->salutation,
-        //     'first_name' => $this->firstName,
-        //     'middle_name' => $this->middleName,
-        //     'last_name' => $this->lastName,
-        //     'email_address' => $this->emailAddress,
-        //     'mobile_number' => $this->mobileNumber,
-        //     'nationality' => $this->nationality,
-        //     'job_title' => $this->jobTitle,
-        //     'pcode_used' => $this->promoCode,
-
-        //     'heard_where' => $this->heardWhere,
-        //     'quantity' => $this->finalQuantity,
-        //     'unit_price' => $this->finalUnitPrice,
-        //     'net_amount' => $this->finalNetAmount,
-        //     'vat_price' => $this->finalVat,
-        //     'discount_price' => $this->finalDiscount,
-        //     'total_amount' => $this->finalTotal,
-        //     'mode_of_payment' => $this->paymentMethod,
-        //     'status' => "pending",
-        //     'registered_date_time' => Carbon::now(),
-        // ]);
-
-        // if (!empty($this->additionalDelegates)) {
-        //     foreach ($this->additionalDelegates as $additionalDelegate) {
-        //         AdditionalDelegates::create([
-        //             'main_delegate_id' => $newRegistrant->id,
-        //             'salutation' => $additionalDelegate['subSalutation'],
-        //             'first_name' => $additionalDelegate['subFirstName'],
-        //             'middle_name' => $additionalDelegate['subMiddleName'],
-        //             'last_name' => $additionalDelegate['subLastName'],
-        //             'job_title' => $additionalDelegate['subJobTitle'],
-        //             'email_address' => $additionalDelegate['subEmailAddress'],
-        //             'nationality' => $additionalDelegate['subNationality'],
-        //             'mobile_number' => $additionalDelegate['subMobileNumber'],
-        //             'pcode_used' => $additionalDelegate['subPromoCode'],
-        //         ]);
-        //     }
-        // }
-        if($this->currentStep == 3){
-            if($this->paymentMethod == null){
+        if ($this->currentStep == 3) {
+            if ($this->paymentMethod == null) {
                 $this->paymentMethodError = "Please choose your payment method first";
             } else {
+                $newRegistrant = MainDelegates::create([
+                    'event_id' => $this->event->id,
+                    'pass_type' => $this->delegatePassType,
+                    'badge_type' => $this->badgeType,
+
+                    'company_name' => $this->companyName,
+                    'company_sector' => $this->companySector,
+                    'company_address' => $this->companyAddress,
+                    'company_country' => $this->companyCountry,
+                    'company_city' => $this->companyCity,
+                    'company_telephone_number' => ($this->companyLandlineNumber == null) ? "" : $this->companyLandlineNumber,
+                    'company_mobile_number' => $this->companyMobileNumber,
+
+                    'salutation' => $this->salutation,
+                    'first_name' => $this->firstName,
+                    'middle_name' => $this->middleName,
+                    'last_name' => $this->lastName,
+                    'email_address' => $this->emailAddress,
+                    'mobile_number' => $this->mobileNumber,
+                    'nationality' => $this->nationality,
+                    'job_title' => $this->jobTitle,
+                    'pcode_used' => $this->promoCode,
+
+                    'heard_where' => $this->heardWhere,
+                    'quantity' => $this->finalQuantity,
+                    'unit_price' => $this->finalUnitPrice,
+                    'net_amount' => $this->finalNetAmount,
+                    'vat_price' => $this->finalVat,
+                    'discount_price' => ($this->finalDiscount != null) ? $this->finalDiscount : "0",
+                    'total_amount' => $this->finalTotal,
+                    'mode_of_payment' => $this->paymentMethod,
+                    'status' => "pending",
+                    'registered_date_time' => Carbon::now(),
+                    'paid_date' => ($this->paymentMethod == "creditCard") ? Carbon::now() : "",
+                ]);
+
+                if (!empty($this->additionalDelegates)) {
+                    foreach ($this->additionalDelegates as $additionalDelegate) {
+                        AdditionalDelegates::create([
+                            'main_delegate_id' => $newRegistrant->id,
+                            'salutation' => $additionalDelegate['subSalutation'],
+                            'first_name' => $additionalDelegate['subFirstName'],
+                            'middle_name' => $additionalDelegate['subMiddleName'],
+                            'last_name' => $additionalDelegate['subLastName'],
+                            'job_title' => $additionalDelegate['subJobTitle'],
+                            'email_address' => $additionalDelegate['subEmailAddress'],
+                            'nationality' => $additionalDelegate['subNationality'],
+                            'mobile_number' => $additionalDelegate['subMobileNumber'],
+                            'pcode_used' => $additionalDelegate['subPromoCode'],
+                        ]);
+                    }
+                }
+
                 $this->currentStep = 4;
             }
         }
@@ -303,7 +305,7 @@ class RegistrationForm extends Component
     {
         $this->showAddDelegateModal = true;
     }
-    
+
     public function closeAddModal()
     {
         $this->showAddDelegateModal = false;
@@ -322,8 +324,8 @@ class RegistrationForm extends Component
     public function openEditModal($subDelegateId)
     {
         $this->showEditDelegateModal = true;
-        foreach ($this->additionalDelegates as $additionalDelegate){
-            if($additionalDelegate['subDelegateId'] == $subDelegateId){
+        foreach ($this->additionalDelegates as $additionalDelegate) {
+            if ($additionalDelegate['subDelegateId'] == $subDelegateId) {
                 $this->subIdEdit = $additionalDelegate['subDelegateId'];
                 $this->subSalutationEdit = $additionalDelegate['subSalutation'];
                 $this->subFirstNameEdit = $additionalDelegate['subFirstName'];
@@ -337,21 +339,21 @@ class RegistrationForm extends Component
             }
         }
     }
-    
+
     public function closeEditModal()
     {
         $this->showEditDelegateModal = false;
 
         $this->subIdEdit = null;
-        $this->subSalutationEdit = null; 
-        $this->subFirstNameEdit = null; 
-        $this->subMiddleNameEdit = null; 
-        $this->subLastNameEdit = null; 
-        $this->subEmailAddressEdit = null; 
-        $this->subMobileNumberEdit = null; 
-        $this->subNationalityEdit = null; 
-        $this->subJobTitleEdit = null; 
-        $this->subPromoCodeEdit = null; 
+        $this->subSalutationEdit = null;
+        $this->subFirstNameEdit = null;
+        $this->subMiddleNameEdit = null;
+        $this->subLastNameEdit = null;
+        $this->subEmailAddressEdit = null;
+        $this->subMobileNumberEdit = null;
+        $this->subNationalityEdit = null;
+        $this->subJobTitleEdit = null;
+        $this->subPromoCodeEdit = null;
     }
 
     public function saveAdditionalDelegate()
@@ -400,14 +402,15 @@ class RegistrationForm extends Component
 
         $this->additionalDelegates = [];
 
-        foreach($arrayTemp as $delegate){
+        foreach ($arrayTemp as $delegate) {
             array_push($this->additionalDelegates, $delegate);
         }
     }
 
-    public function editAdditionalDelegate($subDelegateId){
-        for($i=0; $i < count($this->additionalDelegates); $i++){
-            if($this->additionalDelegates[$i]['subDelegateId'] == $subDelegateId){
+    public function editAdditionalDelegate($subDelegateId)
+    {
+        for ($i = 0; $i < count($this->additionalDelegates); $i++) {
+            if ($this->additionalDelegates[$i]['subDelegateId'] == $subDelegateId) {
                 $this->additionalDelegates[$i]['subSalutation'] = $this->subSalutationEdit;
                 $this->additionalDelegates[$i]['subFirstName'] = $this->subFirstNameEdit;
                 $this->additionalDelegates[$i]['subMiddleName'] = $this->subMiddleNameEdit;
@@ -417,17 +420,17 @@ class RegistrationForm extends Component
                 $this->additionalDelegates[$i]['subNationality'] = $this->subNationalityEdit;
                 $this->additionalDelegates[$i]['subJobTitle'] = $this->subJobTitleEdit;
                 $this->additionalDelegates[$i]['subPromoCode'] = $this->subPromoCodeEdit;
-                
+
                 $this->subIdEdit = null;
-                $this->subSalutationEdit = null; 
-                $this->subFirstNameEdit = null; 
-                $this->subMiddleNameEdit = null; 
-                $this->subLastNameEdit = null; 
-                $this->subEmailAddressEdit = null; 
-                $this->subMobileNumberEdit = null; 
-                $this->subNationalityEdit = null; 
-                $this->subJobTitleEdit = null; 
-                $this->subPromoCodeEdit = null; 
+                $this->subSalutationEdit = null;
+                $this->subFirstNameEdit = null;
+                $this->subMiddleNameEdit = null;
+                $this->subLastNameEdit = null;
+                $this->subEmailAddressEdit = null;
+                $this->subMobileNumberEdit = null;
+                $this->subNationalityEdit = null;
+                $this->subJobTitleEdit = null;
+                $this->subPromoCodeEdit = null;
 
                 $this->showEditDelegateModal = false;
             }
