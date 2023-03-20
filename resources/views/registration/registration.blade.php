@@ -41,7 +41,6 @@
 
     @livewire('registration-form', ['data' => $event])
 
-    @livewireScripts()
 
     <footer class="bg-registrationPrimaryColor w-full py-5 text-center text-white mt-auto">
         <p>Copyright © 2023 GPCA Registration</p>
@@ -52,6 +51,7 @@
             return "Are you sure?";
         }
     </script> --}}
+    @livewireScripts()
 </body>
 
 </html>

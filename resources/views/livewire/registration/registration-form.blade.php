@@ -5,8 +5,7 @@
     </div>
 
     <div style="margin-left: 360px;">
-        <form wire:submit.prevent="increaseStep">
-            @csrf
+        <form wire:submit.prevent="submit">
             @if ($currentStep == 1)
                 @include('livewire.registration.step.first')
             @elseif ($currentStep == 2)
@@ -24,17 +23,17 @@
                 @if ($currentStep == 2 || $currentStep == 3)
                     <button type="button"
                         class="hover:bg-registrationPrimaryColor hover:text-white font-bold border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor w-52 rounded-md py-2"
-                        wire:click.prevent="decreaseStep()">PREVIOUS</button>
+                        wire:click.prevent="decreaseStep">PREVIOUS</button>
                 @endif
                 @if ($currentStep == 1 || $currentStep == 2)
                     <button type="button"
                         class="hover:bg-registrationPrimaryColor hover:text-white font-bold border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor w-52 rounded-md py-2"
-                        wire:click.prevent="increaseStep()">NEXT</button>
+                        wire:click.prevent="increaseStep">NEXT</button>
                 @endif
                 @if ($currentStep == 3)
                     <button type="submit"
                         class="hover:bg-registrationPrimaryColor hover:text-white font-bold border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor w-52 rounded-md py-2"
-                        wire:click="increaseStep()">SUBMIT</button>
+                        >SUBMIT</button>
                 @endif
             </div>
 

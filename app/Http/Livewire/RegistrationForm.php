@@ -62,10 +62,7 @@ class RegistrationForm extends Component
 
     public $members;
     public $event;
-
     public $finalEbEndDate, $finalStdStartDate;
-
-    public $totalSteps = 4;
     public $currentStep = 1;
 
     // DELEGATE PASS TYPE
@@ -176,7 +173,7 @@ class RegistrationForm extends Component
                 $this->finalUnitPrice = $this->event->std_nmember_rate;
             }
         }
-    
+
         $this->finalQuantity = count($this->additionalDelegates) + 1;
         $this->finalNetAmount = $this->finalQuantity * $this->finalUnitPrice;
         $this->finalVat = $this->finalNetAmount * ($this->event->event_vat / 100);
@@ -212,60 +209,8 @@ class RegistrationForm extends Component
 
             $this->calculateAmount();
             $this->currentStep += 1;
-        } else if ($this->currentStep == 3) {
-            $newRegistrant = MainDelegates::create([
-                'event_id' => $this->event->id,
-                'pass_type' => $this->delegatePassType,
-                'badge_type' => $this->badgeType,
-                
-                'company_name' => $this->companyName,
-                'company_sector' => $this->companySector,
-                'company_address' => $this->companyAddress,
-                'company_country' => $this->companyCountry,
-                'company_city' => $this->companyCity,
-                'company_telephone_number' => $this->companyLandlineNumber,
-                'company_mobile_number' => $this->companyMobileNumber,
-                
-                'salutation' => $this->salutation,
-                'first_name' => $this->firstName,
-                'middle_name' => $this->middleName,
-                'last_name' => $this->lastName,
-                'email_address' => $this->emailAddress,
-                'mobile_number' => $this->mobileNumber,
-                'nationality' => $this->nationality,
-                'job_title' => $this->jobTitle,
-                'pcode_used' => $this->promoCode,
-
-                'heard_where' => $this->heardWhere,
-                'quantity' => $this->finalQuantity,
-                'unit_price' => $this->finalUnitPrice,
-                'net_amount' => $this->finalNetAmount,
-                'vat_price' => $this->finalVat,
-                'discount_price' => $this->finalDiscount,
-                'total_amount' => $this->finalTotal,
-                'mode_of_payment' => $this->paymentMethod,
-                'status' => "pending",
-                'registered_date_time' => Carbon::now(),
-            ]);
-
-            if (!empty($this->additionalDelegates)) {
-                foreach ($this->additionalDelegates as $additionalDelegate) {
-                    AdditionalDelegates::create([
-                        'main_delegate_id' => $newRegistrant->id,
-                        'salutation' => $additionalDelegate['subSalutation'],
-                        'first_name' => $additionalDelegate['subFirstName'],
-                        'middle_name' => $additionalDelegate['subMiddleName'],
-                        'last_name' => $additionalDelegate['subLastName'],
-                        'job_title' => $additionalDelegate['subJobTitle'],
-                        'email_address' => $additionalDelegate['subEmailAddress'],
-                        'nationality' => $additionalDelegate['subNationality'],
-                        'mobile_number' => $additionalDelegate['subMobileNumber'],
-                        'pcode_used' => $additionalDelegate['subPromoCode'],
-                    ]);
-                }
-            }
-            $this->currentStep += 1;
         } else {
+            // do nothing
         }
     }
 
@@ -274,6 +219,64 @@ class RegistrationForm extends Component
         $this->currentStep -= 1;
     }
 
+    public function submit()
+    {
+        // $newRegistrant = MainDelegates::create([
+        //     'event_id' => $this->event->id,
+        //     'pass_type' => $this->delegatePassType,
+        //     'badge_type' => $this->badgeType,
+
+        //     'company_name' => $this->companyName,
+        //     'company_sector' => $this->companySector,
+        //     'company_address' => $this->companyAddress,
+        //     'company_country' => $this->companyCountry,
+        //     'company_city' => $this->companyCity,
+        //     'company_telephone_number' => $this->companyLandlineNumber,
+        //     'company_mobile_number' => $this->companyMobileNumber,
+
+        //     'salutation' => $this->salutation,
+        //     'first_name' => $this->firstName,
+        //     'middle_name' => $this->middleName,
+        //     'last_name' => $this->lastName,
+        //     'email_address' => $this->emailAddress,
+        //     'mobile_number' => $this->mobileNumber,
+        //     'nationality' => $this->nationality,
+        //     'job_title' => $this->jobTitle,
+        //     'pcode_used' => $this->promoCode,
+
+        //     'heard_where' => $this->heardWhere,
+        //     'quantity' => $this->finalQuantity,
+        //     'unit_price' => $this->finalUnitPrice,
+        //     'net_amount' => $this->finalNetAmount,
+        //     'vat_price' => $this->finalVat,
+        //     'discount_price' => $this->finalDiscount,
+        //     'total_amount' => $this->finalTotal,
+        //     'mode_of_payment' => $this->paymentMethod,
+        //     'status' => "pending",
+        //     'registered_date_time' => Carbon::now(),
+        // ]);
+
+        // if (!empty($this->additionalDelegates)) {
+        //     foreach ($this->additionalDelegates as $additionalDelegate) {
+        //         AdditionalDelegates::create([
+        //             'main_delegate_id' => $newRegistrant->id,
+        //             'salutation' => $additionalDelegate['subSalutation'],
+        //             'first_name' => $additionalDelegate['subFirstName'],
+        //             'middle_name' => $additionalDelegate['subMiddleName'],
+        //             'last_name' => $additionalDelegate['subLastName'],
+        //             'job_title' => $additionalDelegate['subJobTitle'],
+        //             'email_address' => $additionalDelegate['subEmailAddress'],
+        //             'nationality' => $additionalDelegate['subNationality'],
+        //             'mobile_number' => $additionalDelegate['subMobileNumber'],
+        //             'pcode_used' => $additionalDelegate['subPromoCode'],
+        //         ]);
+        //     }
+        // }
+        if($this->currentStep == 3){
+            $this->currentStep = 4;
+        }
+        dd("Test");
+    }
 
     public function btClicked()
     {
@@ -324,11 +327,12 @@ class RegistrationForm extends Component
     {
         $this->showAddDelegateModal = true;
     }
+    
     public function closeModal()
     {
         $this->showAddDelegateModal = false;
-        // Reset form fields here
     }
+
     public function saveAdditionalDelegate()
     {
         $this->validate([
@@ -366,14 +370,11 @@ class RegistrationForm extends Component
 
         $this->showAddDelegateModal = false;
     }
+
     public function removeAdditionalDelegate($subDelegateId)
     {
         $this->additionalDelegates = array_filter($this->additionalDelegates, function ($item) use ($subDelegateId) {
             return $item['subDelegateId'] != $subDelegateId;
         });
-    }
-    public function pop()
-    {
-        array_pop($this->additionalDelegates);
     }
 }
