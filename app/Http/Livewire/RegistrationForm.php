@@ -12,7 +12,6 @@ use Illuminate\Support\Str;
 
 class RegistrationForm extends Component
 {
-    // public $phoneTest;
     public $companySectors = [
         'Academia / Educational & Research Institutes / Universities',
         'Brand owners',
@@ -60,63 +59,35 @@ class RegistrationForm extends Component
         'Organizer',
     ];
 
-    public $members;
-    public $event;
+    // public $phoneTest;
+    public $members, $event;
     public $finalEbEndDate, $finalStdStartDate;
     public $currentStep = 1;
+    public $showAddDelegateModal = false;
+    public $showEditDelegateModal = false;
+    public $additionalDelegates = [];
 
     // DELEGATE PASS TYPE
     public $delegatePassType;
     public $badgeType;
 
     // COMPANY INFO
-    public $companyName;
-    public $companySector;
-    public $companyAddress;
-    public $companyCountry;
-    public $companyCity;
-    public $companyLandlineNumber;
-    public $companyMobileNumber;
-    public $heardWhere;
+    public $companyName, $companySector, $companyAddress, $companyCountry, $companyCity, $companyLandlineNumber, $companyMobileNumber, $heardWhere;
 
     // MAIN DELEGATE
-    public $salutation;
-    public $firstName;
-    public $middleName;
-    public $lastName;
-    public $emailAddress;
-    public $mobileNumber;
-    public $nationality;
-    public $jobTitle;
-    public $promoCode;
+    public $salutation, $firstName, $middleName, $lastName, $emailAddress, $mobileNumber, $nationality, $jobTitle, $promoCode;
 
     // SUB DELEGATE
-    public $subSalutation;
-    public $subFirstName;
-    public $subMiddleName;
-    public $subLastName;
-    public $subEmailAddress;
-    public $subMobileNumber;
-    public $subNationality;
-    public $subJobTitle;
-    public $subPromoCode;
+    public $subSalutation, $subFirstName, $subMiddleName, $subLastName, $subEmailAddress, $subMobileNumber, $subNationality, $subJobTitle, $subPromoCode;
+    
+    // SUB DELEGATE EDIT
+    public $subIdEdit, $subSalutationEdit, $subFirstNameEdit, $subMiddleNameEdit, $subLastNameEdit, $subEmailAddressEdit, $subMobileNumberEdit, $subNationalityEdit, $subJobTitleEdit, $subPromoCodeEdit;
 
-    public $showAddDelegateModal = false;
-    public $additionalDelegates = [];
-
-    // 3RD
-    public $paymentMethod;
-    public $finalEventStartDate;
-    public $finalEventEndDate;
-    public $finalQuantity;
-    public $finalUnitPrice;
-    public $finalNetAmount;
-    public $finalDiscount;
-    public $finalVat;
-    public $finalTotal;
+    // 3RD PAGE
+    public $paymentMethod, $finalEventStartDate, $finalEventEndDate, $finalQuantity, $finalUnitPrice, $finalNetAmount, $finalDiscount, $finalVat, $finalTotal;
 
     // ERROR CHECKER
-    public $delegatePassTypeError;
+    public $delegatePassTypeError, $paymentMethodError;
 
 
     public function mount($data)
@@ -273,13 +244,17 @@ class RegistrationForm extends Component
         //     }
         // }
         if($this->currentStep == 3){
-            $this->currentStep = 4;
+            if($this->paymentMethod == null){
+                $this->paymentMethodError = "Please choose your payment method first";
+            } else {
+                $this->currentStep = 4;
+            }
         }
-        dd("Test");
     }
 
     public function btClicked()
     {
+        $this->paymentMethodError = null;
         if ($this->paymentMethod == 'creditCard') {
             $this->paymentMethod = 'bankTransfer';
         } else if ($this->paymentMethod == 'bankTransfer') {
@@ -291,6 +266,7 @@ class RegistrationForm extends Component
 
     public function ccClicked()
     {
+        $this->paymentMethodError = null;
         if ($this->paymentMethod == 'bankTransfer') {
             $this->paymentMethod = 'creditCard';
         } else if ($this->paymentMethod == 'creditCard') {
@@ -323,14 +299,59 @@ class RegistrationForm extends Component
         }
     }
 
-    public function openModal()
+    public function openAddModal()
     {
         $this->showAddDelegateModal = true;
     }
     
-    public function closeModal()
+    public function closeAddModal()
     {
         $this->showAddDelegateModal = false;
+
+        $this->subSalutation = null;
+        $this->subFirstName = null;
+        $this->subMiddleName = null;
+        $this->subLastName = null;
+        $this->subEmailAddress = null;
+        $this->subMobileNumber = null;
+        $this->subNationality = null;
+        $this->subJobTitle = null;
+        $this->subPromoCode = null;
+    }
+
+    public function openEditModal($subDelegateId)
+    {
+        $this->showEditDelegateModal = true;
+        foreach ($this->additionalDelegates as $additionalDelegate){
+            if($additionalDelegate['subDelegateId'] == $subDelegateId){
+                $this->subIdEdit = $additionalDelegate['subDelegateId'];
+                $this->subSalutationEdit = $additionalDelegate['subSalutation'];
+                $this->subFirstNameEdit = $additionalDelegate['subFirstName'];
+                $this->subMiddleNameEdit = $additionalDelegate['subMiddleName'];
+                $this->subLastNameEdit = $additionalDelegate['subLastName'];
+                $this->subEmailAddressEdit = $additionalDelegate['subEmailAddress'];
+                $this->subMobileNumberEdit = $additionalDelegate['subMobileNumber'];
+                $this->subNationalityEdit = $additionalDelegate['subNationality'];
+                $this->subJobTitleEdit = $additionalDelegate['subJobTitle'];
+                $this->subPromoCodeEdit = $additionalDelegate['subPromoCode'];
+            }
+        }
+    }
+    
+    public function closeEditModal()
+    {
+        $this->showEditDelegateModal = false;
+
+        $this->subIdEdit = null;
+        $this->subSalutationEdit = null; 
+        $this->subFirstNameEdit = null; 
+        $this->subMiddleNameEdit = null; 
+        $this->subLastNameEdit = null; 
+        $this->subEmailAddressEdit = null; 
+        $this->subMobileNumberEdit = null; 
+        $this->subNationalityEdit = null; 
+        $this->subJobTitleEdit = null; 
+        $this->subPromoCodeEdit = null; 
     }
 
     public function saveAdditionalDelegate()
@@ -373,8 +394,43 @@ class RegistrationForm extends Component
 
     public function removeAdditionalDelegate($subDelegateId)
     {
-        $this->additionalDelegates = array_filter($this->additionalDelegates, function ($item) use ($subDelegateId) {
+        $arrayTemp = array_filter($this->additionalDelegates, function ($item) use ($subDelegateId) {
             return $item['subDelegateId'] != $subDelegateId;
         });
+
+        $this->additionalDelegates = [];
+
+        foreach($arrayTemp as $delegate){
+            array_push($this->additionalDelegates, $delegate);
+        }
+    }
+
+    public function editAdditionalDelegate($subDelegateId){
+        for($i=0; $i < count($this->additionalDelegates); $i++){
+            if($this->additionalDelegates[$i]['subDelegateId'] == $subDelegateId){
+                $this->additionalDelegates[$i]['subSalutation'] = $this->subSalutationEdit;
+                $this->additionalDelegates[$i]['subFirstName'] = $this->subFirstNameEdit;
+                $this->additionalDelegates[$i]['subMiddleName'] = $this->subMiddleNameEdit;
+                $this->additionalDelegates[$i]['subLastName'] = $this->subLastNameEdit;
+                $this->additionalDelegates[$i]['subEmailAddress'] = $this->subEmailAddressEdit;
+                $this->additionalDelegates[$i]['subMobileNumber'] = $this->subMobileNumberEdit;
+                $this->additionalDelegates[$i]['subNationality'] = $this->subNationalityEdit;
+                $this->additionalDelegates[$i]['subJobTitle'] = $this->subJobTitleEdit;
+                $this->additionalDelegates[$i]['subPromoCode'] = $this->subPromoCodeEdit;
+                
+                $this->subIdEdit = null;
+                $this->subSalutationEdit = null; 
+                $this->subFirstNameEdit = null; 
+                $this->subMiddleNameEdit = null; 
+                $this->subLastNameEdit = null; 
+                $this->subEmailAddressEdit = null; 
+                $this->subMobileNumberEdit = null; 
+                $this->subNationalityEdit = null; 
+                $this->subJobTitleEdit = null; 
+                $this->subPromoCodeEdit = null; 
+
+                $this->showEditDelegateModal = false;
+            }
+        }
     }
 }

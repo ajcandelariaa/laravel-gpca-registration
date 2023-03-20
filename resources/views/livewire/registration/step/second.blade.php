@@ -31,12 +31,12 @@
                             {{ $additionalDelegate['subJobTitle'] }}
                         </div>
                         <div class="col-span-2 flex gap-3">
-                            <div class="cursor-pointer hover:text-yellow-600 text-yellow-500">
+                            <div wire:click.prevent="openEditModal('{{ $additionalDelegate['subDelegateId'] }}')" class="cursor-pointer hover:text-yellow-600 text-yellow-500">
                                 <i class="fa-solid fa-pen-to-square"></i>
                                 Edit
                             </div>
 
-                            <div wire:click.prevent="removeAdditionalDelegate('{{ $additionalDelegate['subDelegateId'] }}')"
+                            <div wire:click.prevent="removeAdditionalDelegate('{{ $additionalDelegate['subDelegateId'] }}')" 
                                 class="cursor-pointer hover:text-red-600 text-red-500">
                                 <i class="fa-solid fa-trash"></i>
                                 Remove
@@ -53,8 +53,12 @@
     <div class="mt-10 grid grid-addDelegateGrid grid-flow-col gap-x-10 items-center">
         <div class="col-span-1">
 
-            @if ()
+            @if ($showAddDelegateModal)
                 @include('livewire.registration.add_delegate_modal')
+            @endif
+
+            @if ($showEditDelegateModal)
+                @include('livewire.registration.edit_delegate_modal')
             @endif
 
             @if (
@@ -64,7 +68,7 @@
                     $mobileNumber != null &&
                     $nationality != null &&
                     $jobTitle != null && (count($additionalDelegates) < 4))
-                <button wire:click.prevent="openModal" type="button"
+                <button wire:click.prevent="openAddModal" type="button" wire:key="btnOpenAddModal"
                     class="cursor-pointer hover:bg-registrationPrimaryColor hover:text-white font-bold border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor rounded-md py-4 px-10">+ Add Delegate</button>
             @else
                 <button disabled type="button"

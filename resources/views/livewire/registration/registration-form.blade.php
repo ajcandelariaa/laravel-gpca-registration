@@ -21,17 +21,17 @@
                     <div></div>
                 @endif
                 @if ($currentStep == 2 || $currentStep == 3)
-                    <button type="button"
+                    <button type="button" wire:key="btnDecreaseStep"
                         class="hover:bg-registrationPrimaryColor hover:text-white font-bold border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor w-52 rounded-md py-2"
                         wire:click.prevent="decreaseStep">PREVIOUS</button>
                 @endif
                 @if ($currentStep == 1 || $currentStep == 2)
-                    <button type="button"
+                    <button type="button" wire:key="btnIncreaseStep"
                         class="hover:bg-registrationPrimaryColor hover:text-white font-bold border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor w-52 rounded-md py-2"
                         wire:click.prevent="increaseStep">NEXT</button>
                 @endif
                 @if ($currentStep == 3)
-                    <button type="submit"
+                    <button type="submit" wire:key="btnSubmit"
                         class="hover:bg-registrationPrimaryColor hover:text-white font-bold border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor w-52 rounded-md py-2"
                         >SUBMIT</button>
                 @endif

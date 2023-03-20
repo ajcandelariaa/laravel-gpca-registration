@@ -41,6 +41,12 @@
                 class="{{ $paymentMethod == 'creditCard' ? 'bg-registrationSecondaryColor text-white' : 'hover:bg-registrationSecondaryColor hover:text-white border-registrationSecondaryColor border-2 bg-white text-registrationSecondaryColor' }} font-bold w-52 rounded-md py-5 ">
                 <i class="fa-solid fa-credit-card mr-2"></i> Credit Card</button>
         </div>
+        
+        @if ($paymentMethodError != null)
+        <div class="text-red-500 text-xs italic mt-2">
+            {{ $paymentMethodError }}
+        </div>
+    @endif
 
         @if ($paymentMethod == 'bankTransfer')
             <div class="mt-5 bg-registrationCardBGColor p-5 rounded-lg">

@@ -10,7 +10,7 @@
                 {{-- SUB DELEGATE --}}
                 <div>
                     <div class="text-registrationPrimaryColor italic font-bold text-xl">
-                        Add Delegate
+                        Edit Delegate
                     </div>
 
                     <div class="mt-5 grid grid-cols-2 gap-y-3 gap-x-5">
@@ -20,11 +20,11 @@
                                 Salutation
                             </div>
                             <div>
-                                <select wire:model="subSalutation"
+                                <select wire:model="subSalutationEdit"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                                     <option value=""></option>
                                     @foreach ($salutations as $salutation)
-                                        <option value="{{ $salutation }}">{{ $salutation }}</option>
+                                        <option value="{{ $salutation }}" {{ $subSalutationEdit == $salutation ? 'selected' : '' }}>{{ $salutation }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -35,9 +35,9 @@
                                 First Name <span class="text-red-500">*</span>
                             </div>
                             <div>
-                                <input placeholder="First Name" type="text" wire:model="subFirstName"
+                                <input placeholder="First Name" type="text" wire:model="subFirstNameEdit"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                                @error('subFirstName')
+                                @error('subFirstNameEdit')
                                     <div class="text-red-500 text-xs italic mt-1">
                                         {{ $message }}
                                     </div>
@@ -51,7 +51,7 @@
                                 Middle Name
                             </div>
                             <div>
-                                <input placeholder="Middle Name" type="text" wire:model="subMiddleName"
+                                <input placeholder="Middle Name" type="text" wire:model="subMiddleNameEdit"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                             </div>
                         </div>
@@ -61,9 +61,9 @@
                                 Last Name <span class="text-red-500">*</span>
                             </div>
                             <div>
-                                <input placeholder="Last Name" type="text" wire:model="subLastName"
+                                <input placeholder="Last Name" type="text" wire:model="subLastNameEdit"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                                @error('subLastName')
+                                @error('subLastNameEdit')
                                     <div class="text-red-500 text-xs italic mt-1">
                                         {{ $message }}
                                     </div>
@@ -78,9 +78,9 @@
                                 Email Address <span class="text-red-500">*</span>
                             </div>
                             <div>
-                                <input placeholder="Email Address" type="text" wire:model="subEmailAddress"
+                                <input placeholder="Email Address" type="text" wire:model="subEmailAddressEdit"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                                @error('subEmailAddress')
+                                @error('subEmailAddressEdit')
                                     <div class="text-red-500 text-xs italic mt-1">
                                         {{ $message }}
                                     </div>
@@ -93,9 +93,9 @@
                                 Mobile Number <span class="text-red-500">*</span>
                             </div>
                             <div>
-                                <input placeholder="xxxxxxx" type="text" wire:model="subMobileNumber"
+                                <input placeholder="xxxxxxx" type="text" wire:model="subMobileNumberEdit"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                                @error('subMobileNumber')
+                                @error('subMobileNumberEdit')
                                     <div class="text-red-500 text-xs italic mt-1">
                                         {{ $message }}
                                     </div>
@@ -110,9 +110,9 @@
                                 Nationality <span class="text-red-500">*</span>
                             </div>
                             <div>
-                                <input placeholder="Nationality" type="text" wire:model="subNationality"
+                                <input placeholder="Nationality" type="text" wire:model="subNationalityEdit"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                                @error('subNationality')
+                                @error('subNationalityEdit')
                                     <div class="text-red-500 text-xs italic mt-1">
                                         {{ $message }}
                                     </div>
@@ -125,9 +125,9 @@
                                 Job Title <span class="text-red-500">*</span>
                             </div>
                             <div>
-                                <input placeholder="Job Title" type="text" wire:model="subJobTitle"
+                                <input placeholder="Job Title" type="text" wire:model="subJobTitleEdit"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                                @error('subJobTitle')
+                                @error('subJobTitleEdit')
                                     <div class="text-red-500 text-xs italic mt-1">
                                         {{ $message }}
                                     </div>
@@ -143,7 +143,7 @@
                             </div>
 
                             <div>
-                                <input placeholder="Enter your promo code here" type="text" wire:model="subPromoCode"
+                                <input placeholder="Enter your promo code here" type="text" wire:model="subPromoCodeEdit"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                             </div>
                         </div>
@@ -151,12 +151,12 @@
                 </div>
             </div>
             <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                <button type="button" wire:key="btnSaveAdditionalDelegate"
+                <button type="button" wire:key="btnUpdateAdditionalDelegate"
                     class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
-                    wire:click.prevent="saveAdditionalDelegate">Save</button>
-                <button type="button" wire:key="btnCancelAddtionalDelegate"
+                    wire:click.prevent="editAdditionalDelegate('{{ $subIdEdit }}')">Update</button>
+                <button type="button" wire:key="btnCancelEditAddtionalDelegate"
                     class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-                    wire:click.prevent="closeAddModal">Cancel</button>
+                    wire:click.prevent="closeEditModal">Cancel</button>
             </div>
         </div>
     </div>
