@@ -5,6 +5,34 @@
     {{-- MAIN DELEGATE --}}
     @include('livewire.registration.step.second_main_delegate')
 
+    {{-- <div class="bg-registrationCardBGColor px-5 py-2 mt-5 flex justify-between rounded-md">
+        <div>
+            <div class="font-bold text-2xl flex items-center gap-2 mt-1">
+                <p>Mr. Albert Joseph Malda Candelaria</p>
+                <p class="border-2 border-registrationPrimaryColor rounded-full text-registrationPrimaryColor py-1 px-3 text-sm">Speaker</p>
+            </div>
+            <p class="mt-2">aj@gpca.org.ae, 0965123123</p>
+            <p>Nationality: Filipino</p>
+            <p>Promo code used: XXXX</p>
+        </div>
+        <div class="flex flex-col justify-between items-end">
+            
+            <p class="text-registrationPrimaryColor font-bold">Delegate 2</p>
+            <div class="flex gap-3">
+                <div class="cursor-pointer hover:text-yellow-600 text-yellow-500">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                    Edit
+                </div>
+    
+                <div 
+                    class="cursor-pointer hover:text-red-600 text-red-500">
+                    <i class="fa-solid fa-trash"></i>
+                    Remove
+                </div>
+            </div>
+        </div>
+    </div> --}}
+
     @if (!empty($additionalDelegates))
         <div class="mt-10">
             <div class="text-registrationPrimaryColor italic font-bold text-xl">
@@ -12,39 +40,42 @@
             </div>
 
             <div class="mt-5">
+                @php $count = 2; @endphp
                 @foreach ($additionalDelegates as $additionalDelegate)
-                    <div class="grid grid-cols-12">
-                        <div class="col-span-2 text-registrationPrimaryColor">
-                            {{ $additionalDelegate['subSalutation'] }} {{ $additionalDelegate['subFirstName'] }}
-                            {{ $additionalDelegate['subMiddleName'] }} {{ $additionalDelegate['subLastName'] }}
-                        </div>
-                        <div class="col-span-2 text-registrationPrimaryColor">
-                            {{ $additionalDelegate['subEmailAddress'] }}
-                        </div>
-                        <div class="col-span-2 text-registrationPrimaryColor">
-                            {{ $additionalDelegate['subMobileNumber'] }}
-                        </div>
-                        <div class="col-span-2 text-registrationPrimaryColor">
-                            {{ $additionalDelegate['subNationality'] }}
-                        </div>
-                        <div class="col-span-2 text-registrationPrimaryColor">
-                            {{ $additionalDelegate['subJobTitle'] }}
-                        </div>
-                        <div class="col-span-2 flex gap-3">
-                            <div wire:click.prevent="openEditModal('{{ $additionalDelegate['subDelegateId'] }}')" class="cursor-pointer hover:text-yellow-600 text-yellow-500">
-                                <i class="fa-solid fa-pen-to-square"></i>
-                                Edit
+                    <div class="bg-registrationCardBGColor px-5 py-2 mt-5 flex justify-between rounded-md">
+                        <div>
+                            <div class="font-bold text-2xl flex items-center gap-2 mt-1">
+                                <p>{{ $additionalDelegate['subSalutation'] }} {{ $additionalDelegate['subFirstName'] }} {{ $additionalDelegate['subMiddleName'] }} {{ $additionalDelegate['subLastName'] }}</p>
+                                <p class="border-2 border-registrationPrimaryColor rounded-full text-registrationPrimaryColor py-1 px-3 text-sm">
+                                    {{ $additionalDelegate['subBadgeType'] }}</p>
                             </div>
+                            <p class="mt-2"> {{ $additionalDelegate['subEmailAddress'] }}, {{ $additionalDelegate['subMobileNumber'] }}, {{ $additionalDelegate['subJobTitle'] }}</p>
+                            <p>Nationality: {{ $additionalDelegate['subNationality'] }}</p>
+                            @if ($additionalDelegate['subPromoCode'] == null)
+                                <p>Promo code used: None</p>
+                            @else
+                                <p>Promo code used: <span class="font-bold">{{ $additionalDelegate['subPromoCode'] }}</span> <span class="text-green-500 text-xs italic mt-1">({{ $additionalDelegate['promoCodeSuccessSub'] }})</span></p>
+                            @endif
+                        </div>
+                        <div class="flex flex-col justify-between items-end">
+                            <p class="text-registrationPrimaryColor font-bold">Delegate {{ $count }}</p>
+                            <div class="flex gap-3">
+                                <div wire:click.prevent="openEditModal('{{ $additionalDelegate['subDelegateId'] }}')"
+                                    class="cursor-pointer hover:text-yellow-600 text-yellow-500">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                    Edit
+                                </div>
 
-                            <div wire:click.prevent="removeAdditionalDelegate('{{ $additionalDelegate['subDelegateId'] }}')" 
+                                <div wire:click.prevent="removeAdditionalDelegate('{{ $additionalDelegate['subDelegateId'] }}')"
                                 class="cursor-pointer hover:text-red-600 text-red-500">
                                 <i class="fa-solid fa-trash"></i>
                                 Remove
                             </div>
+                            </div>
                         </div>
                     </div>
-
-                    <hr class="my-4 w-full">
+                    
+                    @php $count++; @endphp
                 @endforeach
             </div>
         </div>
@@ -67,10 +98,12 @@
                     $emailAddress != null &&
                     $mobileNumber != null &&
                     $nationality != null &&
-                    $jobTitle != null && 
-                    $badgeType != null && (count($additionalDelegates) < 4))
+                    $jobTitle != null &&
+                    $badgeType != null &&
+                    count($additionalDelegates) < 4)
                 <button wire:click.prevent="openAddModal" type="button" wire:key="btnOpenAddModal"
-                    class="cursor-pointer hover:bg-registrationPrimaryColor hover:text-white font-bold border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor rounded-md py-4 px-10">+ Add Delegate</button>
+                    class="cursor-pointer hover:bg-registrationPrimaryColor hover:text-white font-bold border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor rounded-md py-4 px-10">+
+                    Add Delegate</button>
             @else
                 <button disabled type="button"
                     class="cursor-not-allowed font-bold border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor  rounded-md py-4 px-10">+

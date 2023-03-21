@@ -46,11 +46,11 @@
         <p>Copyright © 2023 GPCA Registration</p>
     </footer>
 
-    {{-- <script>
+    <script>
         window.onbeforeunload = function(e) {
             return "Are you sure?";
         }
-    </script> --}}
+    </script>
     @livewireScripts()
 </body>
 

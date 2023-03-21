@@ -344,6 +344,7 @@ class RegistrationForm extends Component
                 $this->subMobileNumberEdit = $additionalDelegate['subMobileNumber'];
                 $this->subNationalityEdit = $additionalDelegate['subNationality'];
                 $this->subJobTitleEdit = $additionalDelegate['subJobTitle'];
+                $this->subBadgeTypeEdit = $additionalDelegate['subBadgeType'];
                 $this->subPromoCodeEdit = $additionalDelegate['subPromoCode'];
                 $this->promoCodeSuccessSubEdit = $additionalDelegate['promoCodeSuccessSub'];
                 $this->promoCodeFailSubEdit = $additionalDelegate['promoCodeFailSub'];
@@ -365,6 +366,8 @@ class RegistrationForm extends Component
         $this->subNationalityEdit = null;
         $this->subJobTitleEdit = null;
         $this->subPromoCodeEdit = null;
+        $this->promoCodeSuccessSubEdit = null;
+        $this->promoCodeFailSubEdit = null;
     }
 
     public function saveAdditionalDelegate()
@@ -439,6 +442,8 @@ class RegistrationForm extends Component
                 $this->additionalDelegates[$i]['subJobTitle'] = $this->subJobTitleEdit;
                 $this->additionalDelegates[$i]['subBadgeType'] = $this->subBadgeTypeEdit;
                 $this->additionalDelegates[$i]['subPromoCode'] = ($this->promoCodeSuccessSubEdit != null) ? $this->subPromoCodeEdit : null;
+                $this->additionalDelegates[$i]['promoCodeSuccessSub'] = $this->promoCodeSuccessSubEdit;
+                $this->additionalDelegates[$i]['promoCodeFailSub'] = $this->promoCodeFailSubEdit;
 
                 $this->subIdEdit = null;
                 $this->subSalutationEdit = null;
@@ -450,6 +455,8 @@ class RegistrationForm extends Component
                 $this->subNationalityEdit = null;
                 $this->subJobTitleEdit = null;
                 $this->subPromoCodeEdit = null;
+                $this->promoCodeSuccessSubEdit = null;
+                $this->promoCodeFailSubEdit = null;
 
                 $this->showEditDelegateModal = false;
             }
@@ -506,7 +513,7 @@ class RegistrationForm extends Component
                     $this->promoCodeFailSub = "Invalid Code";
                 } else {
                     foreach($this->promoCodes as $promoCode){
-                        if($this->subPromoCode == $promoCode->promo_code && $this->badgeType == $promoCode->badge_type){
+                        if($this->subPromoCode == $promoCode->promo_code && $this->subBadgeType == $promoCode->badge_type){
                             if($promoCode->total_usage < $promoCode->number_of_codes ){
                                 $validityDateTime = Carbon::parse($promoCode->validity);
                                 if(Carbon::now()->lt($validityDateTime)){
@@ -545,7 +552,7 @@ class RegistrationForm extends Component
                     $this->promoCodeFailSubEdit = "Invalid Code";
                 } else {
                     foreach($this->promoCodes as $promoCode){
-                        if($this->subPromoCodeEdit == $promoCode->promo_code && $this->badgeType == $promoCode->badge_type){
+                        if($this->subPromoCodeEdit == $promoCode->promo_code && $this->subBadgeTypeEdit == $promoCode->badge_type){
                             if($promoCode->total_usage < $promoCode->number_of_codes ){
                                 $validityDateTime = Carbon::parse($promoCode->validity);
                                 if(Carbon::now()->lt($validityDateTime)){

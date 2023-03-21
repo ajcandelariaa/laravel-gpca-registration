@@ -179,16 +179,18 @@
                                 @endif
                             </div>
 
-                            @if ($promoCodeFailSubEdit != null)
-                                <div class="text-red-500 text-xs italic mt-1">
-                                    {{ $promoCodeFailSubEdit }}
-                                </div>
-                            @endif
+                            @if($subPromoCodeEdit != null)
+                                @if ($promoCodeFailSubEdit != null)
+                                    <div class="text-red-500 text-xs italic mt-1">
+                                        {{ $promoCodeFailSubEdit }}
+                                    </div>
+                                @endif
 
-                            @if ($promoCodeSuccessSubEdit != null)
-                                <div class="text-green-500 text-xs italic mt-1">
-                                    {{ $promoCodeSuccessSubEdit }}
-                                </div>
+                                @if ($promoCodeSuccessSubEdit != null)
+                                    <div class="text-green-500 text-xs italic mt-1">
+                                        {{ $promoCodeSuccessSubEdit }}
+                                    </div>
+                                @endif
                             @endif
                         </div>
                     </div>
