@@ -67,7 +67,8 @@
                     $emailAddress != null &&
                     $mobileNumber != null &&
                     $nationality != null &&
-                    $jobTitle != null && (count($additionalDelegates) < 4))
+                    $jobTitle != null && 
+                    $badgeType != null && (count($additionalDelegates) < 4))
                 <button wire:click.prevent="openAddModal" type="button" wire:key="btnOpenAddModal"
                     class="cursor-pointer hover:bg-registrationPrimaryColor hover:text-white font-bold border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor rounded-md py-4 px-10">+ Add Delegate</button>
             @else

@@ -132,7 +132,7 @@
 
     <div class="mt-5">
         <div class="bg-registrationInputFieldsBGColor p-2">
-            <div class="grid grid-cols-5 text-center font-bold text-registrationPrimaryColor text-lg pt-2 pb-4">
+            <div class="grid grid-cols-6 text-center font-bold text-registrationPrimaryColor text-lg pt-2 pb-4">
                 <div class="col-span-2">
                     <p>Description</p>
                 </div>
@@ -146,14 +146,22 @@
                 </div>
 
                 <div class="col-span-1">
+                    <p>Discount</p>
+                </div>
+
+                <div class="col-span-1">
                     <p>Net amount</p>
                 </div>
             </div>
 
-            <div class="grid grid-cols-5 gap-2">
+            <div class="grid grid-cols-6 gap-2">
                 <div class="col-span-2 bg-white p-4">
                     <p>{{ $event->name }} – {{ $finalEventStartDate . ' - ' . $finalEventEndDate }} at {{ $event->location }}</p>
-                    <p class="mt-5">Delegate Registration Fee – EB Member Rate </p>
+                    @if ($rateType == "std")
+                        <p class="mt-5">Delegate Registration Fee – Standard {{ $delegatePassType }} Rate </p>
+                    @else
+                        <p class="mt-5">Delegate Registration Fee – Early Bird {{ $delegatePassType }} Rate </p>
+                    @endif
                     <ul class="mt-2 list-decimal ml-4">
                         <li>{{ $salutation . ' ' . $firstName . ' ' . $middleName . ' ' . $lastName }}</li>
                         @if(!empty($additionalDelegates))
@@ -169,11 +177,15 @@
                 </div>
 
                 <div class="col-span-1 bg-white p-4 flex justify-center items-center">
-                    <p>$ {{ $finalUnitPrice }}</p>
+                    <p>$ {{ number_format($finalUnitPrice, 2, '.', ',') }}</p>
                 </div>
 
                 <div class="col-span-1 bg-white p-4 flex justify-center items-center">
-                    <p>$ {{ $finalNetAmount }}</p>
+                    <p>$ {{ number_format($finalDiscount, 2, '.', ',') }}</p>
+                </div>
+
+                <div class="col-span-1 bg-white p-4 flex justify-center items-center">
+                    <p>$ {{ number_format($finalNetAmount, 2, '.', ',') }}</p>
                 </div>
             </div>
 
@@ -183,15 +195,15 @@
                 </div>
 
                 <div class="col-span-1 bg-white p-4 text-right">
-                    <p>$ {{ $finalNetAmount }}</p>
+                    <p>$ {{ number_format($finalNetAmount, 2, '.', ',') }}</p>
                 </div>
 
                 <div class="col-span-4 bg-white p-4">
-                    <p>VAT {{ $this->event->event_vat }}%</p>
+                    <p>VAT {{ $event->event_vat }}%</p>
                 </div>
 
                 <div class="col-span-1 bg-white p-4 text-right">
-                    <p>$ {{ $finalVat }}</p>
+                    <p>$ {{ number_format($finalVat, 2, '.', ',') }}</p>
                 </div>
 
                 <div class="col-span-4 bg-white p-4 font-bold">
@@ -199,7 +211,7 @@
                 </div>
 
                 <div class="col-span-1 bg-white p-4 text-right font-bold">
-                    <p>$ {{ $finalTotal }}</p>
+                    <p>$ {{ number_format($finalTotal, 2, '.', ',') }}</p>
                 </div>
             </div>
         </div>

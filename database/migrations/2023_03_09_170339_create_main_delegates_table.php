@@ -17,7 +17,6 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('event_id');
             $table->string('pass_type');
-            $table->string('badge_type');
 
             $table->string('company_name');
             $table->string('company_sector');
@@ -35,6 +34,7 @@ return new class extends Migration
             $table->string('mobile_number');
             $table->string('nationality');
             $table->string('job_title');
+            $table->string('badge_type');
             $table->string('pcode_used')->nullable();
 
             $table->string('heard_where')->nullable();
@@ -47,7 +47,7 @@ return new class extends Migration
             $table->string('mode_of_payment');
             $table->string('status');
             $table->string('registered_date_time');
-            $table->string('paid_date');
+            $table->string('paid_date')->nullable();
             $table->timestamps();
             $table->foreign('event_id')->references('id')->on('events')->onDelete('cascade');
         });

@@ -12,7 +12,6 @@ class MainDelegate extends Model
     protected $fillable = [
         'event_id',
         'pass_type',
-        'badge_type',
 
         'company_name',
         'company_sector',
@@ -30,6 +29,7 @@ class MainDelegate extends Model
         'mobile_number',
         'nationality',
         'job_title',
+        'badge_type',
         'pcode_used',
 
         'heard_where',

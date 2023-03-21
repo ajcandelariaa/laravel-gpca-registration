@@ -137,15 +137,59 @@
 
 
                         {{-- ROW 6 --}}
-                        <div class="space-y-2 col-span-2">
+                        <div class="space-y-2 col-span-1">
+                            <div class="text-registrationPrimaryColor">
+                                Registration type
+                            </div>
+
+                            <select wire:model="subBadgeTypeEdit"
+                                class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                                <option value=""></option>
+                                @foreach ($badgeTypes as $badgeType)
+                                    <option value="{{ $badgeType }}" {{ $subBadgeTypeEdit == $badgeType ? 'selected' : '' }}>{{ $badgeType }}</option>
+                                @endforeach
+                            </select>
+
+                            @error('subBadgeTypeEdit')
+                                <div class="text-red-500 text-xs italic mt-1">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
+                        <div class="space-y-2 col-span-1">
                             <div class="text-registrationPrimaryColor">
                                 Promo Code
                             </div>
 
-                            <div>
-                                <input placeholder="Enter your promo code here" type="text" wire:model="subPromoCodeEdit"
-                                    class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                            <div class="flex">
+                                @if ($promoCodeSuccessSubEdit != null)
+                                    <input readonly type="text" wire:model="subPromoCodeEdit"
+                                        class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-none cursor-not-allowed">
+
+                                    <button wire:click.prevent="removePromoCodeSubEdit" wire:key="btnRemovePromoCodeSubEdit"
+                                        type="button" class="bg-red-300 px-5 ml-2">Remove</button>
+                                @else
+                                    <input placeholder="Enter your promo code here" type="text"
+                                        wire:model="subPromoCodeEdit"
+                                        class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+
+                                    <button wire:click.prevent="applyPromoCodeSubEdit" wire:key="btnApplyPromoCodeSubEdit"
+                                        type="button"
+                                        class="bg-registrationPrimaryColor text-white px-5 ml-2 hover:bg-registrationPrimaryColorHover">Apply</button>
+                                @endif
                             </div>
+
+                            @if ($promoCodeFailSubEdit != null)
+                                <div class="text-red-500 text-xs italic mt-1">
+                                    {{ $promoCodeFailSubEdit }}
+                                </div>
+                            @endif
+
+                            @if ($promoCodeSuccessSubEdit != null)
+                                <div class="text-green-500 text-xs italic mt-1">
+                                    {{ $promoCodeSuccessSubEdit }}
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>

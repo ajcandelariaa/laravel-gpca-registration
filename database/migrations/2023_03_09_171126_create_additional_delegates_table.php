@@ -24,6 +24,7 @@ return new class extends Migration
             $table->string('mobile_number');
             $table->string('nationality');
             $table->string('job_title');
+            $table->string('badge_type');
             $table->string('pcode_used')->nullable();
             $table->timestamps();
             $table->foreign('main_delegate_id')->references('id')->on('main_delegates')->onDelete('cascade');

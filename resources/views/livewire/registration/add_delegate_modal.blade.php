@@ -1,4 +1,4 @@
-<div class="fixed z-10 inset-0 overflow-y-auto" >
+<div class="fixed z-10 inset-0 overflow-y-auto">
     <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
         <div class="fixed inset-0 transition-opacity">
             <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
@@ -9,8 +9,9 @@
             <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                 {{-- SUB DELEGATE --}}
                 <div>
-                    <div class="text-registrationPrimaryColor italic font-bold text-xl">
-                        Add Delegate
+                    <div class="text-registrationPrimaryColor italic font-bold text-xl flex items-center gap-2">
+                        <span>Add Delegate </span>
+                        <span class="text-red-500 text-xs font-normal">Please note to add delegate only in the same company!</span>
                     </div>
 
                     <div class="mt-5 grid grid-cols-2 gap-y-3 gap-x-5">
@@ -137,15 +138,59 @@
 
 
                         {{-- ROW 6 --}}
-                        <div class="space-y-2 col-span-2">
+                        <div class="space-y-2 col-span-1">
+                            <div class="text-registrationPrimaryColor">
+                                Registration type
+                            </div>
+
+                            <select wire:model="subBadgeType"
+                                class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                                <option value=""></option>
+                                @foreach ($badgeTypes as $badgeType)
+                                    <option value="{{ $badgeType }}">{{ $badgeType }}</option>
+                                @endforeach
+                            </select>
+
+                            @error('subBadgeType')
+                                <div class="text-red-500 text-xs italic mt-1">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
+                        <div class="space-y-2 col-span-1">
                             <div class="text-registrationPrimaryColor">
                                 Promo Code
                             </div>
 
-                            <div>
-                                <input placeholder="Enter your promo code here" type="text" wire:model="subPromoCode"
-                                    class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                            <div class="flex">
+                                @if ($promoCodeSuccessSub != null)
+                                    <input readonly type="text" wire:model="subPromoCode"
+                                        class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-none cursor-not-allowed">
+
+                                    <button wire:click.prevent="removePromoCodeSub" wire:key="btnRemovePromoCodeSub"
+                                        type="button" class="bg-red-300 px-5 ml-2">Remove</button>
+                                @else
+                                    <input placeholder="Enter your promo code here" type="text"
+                                        wire:model="subPromoCode"
+                                        class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+
+                                    <button wire:click.prevent="applyPromoCodeSub" wire:key="btnApplyPromoCodeSub"
+                                        type="button"
+                                        class="bg-registrationPrimaryColor text-white px-5 ml-2 hover:bg-registrationPrimaryColorHover">Apply</button>
+                                @endif
                             </div>
+
+                            @if ($promoCodeFailSub != null)
+                                <div class="text-red-500 text-xs italic mt-1">
+                                    {{ $promoCodeFailSub }}
+                                </div>
+                            @endif
+
+                            @if ($promoCodeSuccessSub != null)
+                                <div class="text-green-500 text-xs italic mt-1">
+                                    {{ $promoCodeSuccessSub }}
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>

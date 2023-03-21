@@ -19,6 +19,7 @@ class AdditionalDelegate extends Model
         'mobile_number',
         'nationality',
         'job_title',
+        'badge_type',
         'pcode_used',
     ];
 }
