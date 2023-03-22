@@ -154,40 +154,45 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-6 gap-2">
-                <div class="col-span-2 bg-white p-4">
-                    <p>{{ $event->name }} – {{ $finalEventStartDate . ' - ' . $finalEventEndDate }} at {{ $event->location }}</p>
-                    @if ($rateType == "std")
-                        <p class="mt-5">Delegate Registration Fee – Standard {{ $delegatePassType }} Rate </p>
-                    @else
-                        <p class="mt-5">Delegate Registration Fee – Early Bird {{ $delegatePassType }} Rate </p>
-                    @endif
-                    <ul class="mt-2 list-decimal ml-4">
-                        <li>{{ $salutation . ' ' . $firstName . ' ' . $middleName . ' ' . $lastName }}</li>
-                        @if(!empty($additionalDelegates))
-                            @foreach ($additionalDelegates as $additionalDelegate)
-                                <li>{{ $additionalDelegate['subSalutation'] . ' ' . $additionalDelegate['subFirstName'] . ' ' . $additionalDelegate['subMiddleName'] . ' ' . $additionalDelegate['subLastName'] }}</li>
-                            @endforeach
+            @php
+                $count = 1;
+            @endphp
+
+            @foreach ($delegatInvoiceDetails as $delegatInvoiceDetail)
+                <div class="grid grid-cols-6 gap-2">
+                    <div class="col-span-2 bg-white p-4">
+                        @if ($count == 1)
+                            <p>{{ $event->name }} – {{ $finalEventStartDate . ' - ' . $finalEventEndDate }} at {{ $event->location }}</p>
                         @endif
-                    </ul>
+                        <p class="mt-5">{{ $delegatInvoiceDetail['delegateDescription'] }}</p>
+                        <ul class="mt-2 list-decimal ml-4">
+                            @foreach ($delegatInvoiceDetail['delegateNames'] as $name)
+                                <li>{{ $name }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+
+                    <div class="col-span-1 bg-white p-4 flex justify-center items-center">
+                        <p>{{ $delegatInvoiceDetail['quantity'] }}</p>
+                    </div>
+
+                    <div class="col-span-1 bg-white p-4 flex justify-center items-center">
+                        <p>$ {{ number_format($finalUnitPrice, 2, '.', ',') }}</p>
+                    </div>
+
+                    <div class="col-span-1 bg-white p-4 flex justify-center items-center">
+                        <p>$ {{ number_format($delegatInvoiceDetail['totalDiscount'], 2, '.', ',') }}</p>
+                    </div>
+
+                    <div class="col-span-1 bg-white p-4 flex justify-center items-center">
+                        <p>$ {{ number_format($delegatInvoiceDetail['totalNetAmount'], 2, '.', ',') }}</p>
+                    </div>
                 </div>
 
-                <div class="col-span-1 bg-white p-4 flex justify-center items-center">
-                    <p>{{ $finalQuantity }}</p>
-                </div>
-
-                <div class="col-span-1 bg-white p-4 flex justify-center items-center">
-                    <p>$ {{ number_format($finalUnitPrice, 2, '.', ',') }}</p>
-                </div>
-
-                <div class="col-span-1 bg-white p-4 flex justify-center items-center">
-                    <p>$ {{ number_format($finalDiscount, 2, '.', ',') }}</p>
-                </div>
-
-                <div class="col-span-1 bg-white p-4 flex justify-center items-center">
-                    <p>$ {{ number_format($finalNetAmount, 2, '.', ',') }}</p>
-                </div>
-            </div>
+                @php
+                    $count += 1;
+                @endphp
+            @endforeach
 
             <div class="grid grid-cols-5 gap-2 mt-2">
                 <div class="col-span-4 bg-white p-4">

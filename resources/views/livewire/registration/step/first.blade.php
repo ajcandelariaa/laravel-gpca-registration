@@ -25,13 +25,13 @@
                 @if ($finalEbEndDate != null)
                     <td class="text-black">
                         <div class="bg-white py-4">
-                            $ {{ $event->eb_member_rate }} + {{ $event->event_vat }}%
+                            $ {{ $event->eb_member_rate }} {{ ($event->event_vat == 0) ? '' : '+ '.$event->event_vat.'%' }}
                         </div>
                     </td>
                 @endif
                 <td class="text-black">
                     <div class="bg-white py-4 mr-1">
-                        $ {{ $event->std_nmember_rate }} + {{ $event->event_vat }}%
+                        $ {{ $event->std_nmember_rate }} {{ ($event->event_vat == 0) ? '' : '+ '.$event->event_vat.'%' }}
                     </div>
                 </td>
             </tr>
@@ -44,13 +44,13 @@
                 @if ($finalEbEndDate != null)
                     <td class="text-black">
                         <div class="bg-white py-4 mb-1">
-                            $ {{ $event->eb_nmember_rate }} + {{ $event->event_vat }}%
+                            $ {{ $event->eb_nmember_rate }} {{ ($event->event_vat == 0) ? '' : '+ '.$event->event_vat.'%' }}
                         </div>
                     </td>
                 @endif
                 <td class="text-black">
                     <div class="bg-white py-4 mb-1 mr-1">
-                        $ {{ $event->std_nmember_rate }} + {{ $event->event_vat }}%
+                        $ {{ $event->std_nmember_rate }} {{ ($event->event_vat == 0) ? '' : '+ '.$event->event_vat.'%' }}
                     </div>
                 </td>
             </tr>

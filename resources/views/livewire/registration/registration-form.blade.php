@@ -32,7 +32,7 @@
                 @endif
                 @if ($currentStep == 3)
                     <button type="submit" wire:key="btnSubmit"
-                        class="hover:bg-registrationPrimaryColor hover:text-white font-bold border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor w-52 rounded-md py-2"
+                        class="hover:bg-registrationPrimaryColorHover font-bold bg-registrationPrimaryColor text-white w-52 rounded-md py-2"
                         >SUBMIT</button>
                 @endif
             </div>
