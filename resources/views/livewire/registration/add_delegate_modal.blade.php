@@ -11,7 +11,8 @@
                 <div>
                     <div class="text-registrationPrimaryColor italic font-bold text-xl flex items-center gap-2">
                         <span>Add Delegate </span>
-                        <span class="text-red-500 text-xs font-normal">Please note to add delegate only in the same company!</span>
+                        <span class="text-red-500 text-xs font-normal">Please note to add delegate only in the same
+                            company!</span>
                     </div>
 
                     <div class="mt-5 grid grid-cols-2 gap-y-3 gap-x-5">
@@ -142,14 +143,19 @@
                             <div class="text-registrationPrimaryColor">
                                 Registration type
                             </div>
-
-                            <select wire:model="subBadgeType"
-                                class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                                <option value=""></option>
-                                @foreach ($badgeTypes as $badgeType)
-                                    <option value="{{ $badgeType }}">{{ $badgeType }}</option>
-                                @endforeach
-                            </select>
+                            @if ($promoCodeSuccessSub != null)
+                                <input readonly wire:model="subBadgeType" type="text"
+                                    class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-none cursor-not-allowed">
+                            @else
+                                <select wire:model="subBadgeType"
+                                    class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                                    <option value=""></option>
+                                    @foreach ($badgeTypes as $badgeType)
+                                        <option value="{{ $badgeType }}">
+                                            {{ $badgeType }}</option>
+                                    @endforeach
+                                </select>
+                            @endif
 
                             @error('subBadgeType')
                                 <div class="text-red-500 text-xs italic mt-1">

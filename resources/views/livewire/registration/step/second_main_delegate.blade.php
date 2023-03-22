@@ -146,14 +146,19 @@
                         Registration type <span class="text-red-500">*</span>
                     </div>
                     <div>
-                        <select wire:model="badgeType"
-                            class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                            <option value=""></option>
-                            @foreach ($badgeTypes as $badgeType)
-                                <option value="{{ $badgeType }}">
-                                    {{ $badgeType }}</option>
-                            @endforeach
-                        </select>
+                        @if ($promoCodeSuccessMain != null)
+                            <input readonly wire:model="badgeType" type="text"
+                                class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-none cursor-not-allowed">
+                        @else
+                            <select wire:model="badgeType"
+                                class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                                <option value=""></option>
+                                @foreach ($badgeTypes as $badgeType)
+                                    <option value="{{ $badgeType }}">
+                                        {{ $badgeType }}</option>
+                                @endforeach
+                            </select>
+                        @endif
 
                         @error('badgeType')
                             <div class="text-red-500 text-xs italic mt-1">

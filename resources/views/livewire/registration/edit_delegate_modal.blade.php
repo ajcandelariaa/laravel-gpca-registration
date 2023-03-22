@@ -1,4 +1,4 @@
-<div class="fixed z-10 inset-0 overflow-y-auto" >
+<div class="fixed z-10 inset-0 overflow-y-auto">
     <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
         <div class="fixed inset-0 transition-opacity">
             <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
@@ -24,7 +24,9 @@
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                                     <option value=""></option>
                                     @foreach ($salutations as $salutation)
-                                        <option value="{{ $salutation }}" {{ $subSalutationEdit == $salutation ? 'selected' : '' }}>{{ $salutation }}</option>
+                                        <option value="{{ $salutation }}"
+                                            {{ $subSalutationEdit == $salutation ? 'selected' : '' }}>
+                                            {{ $salutation }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -142,13 +144,20 @@
                                 Registration type
                             </div>
 
-                            <select wire:model="subBadgeTypeEdit"
-                                class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                                <option value=""></option>
-                                @foreach ($badgeTypes as $badgeType)
-                                    <option value="{{ $badgeType }}" {{ $subBadgeTypeEdit == $badgeType ? 'selected' : '' }}>{{ $badgeType }}</option>
-                                @endforeach
-                            </select>
+                            @if ($promoCodeSuccessSubEdit != null)
+                                <input readonly wire:model="subBadgeTypeEdit" type="text"
+                                    class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-none cursor-not-allowed">
+                            @else
+                                <select wire:model="subBadgeTypeEdit"
+                                    class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                                    <option value=""></option>
+                                    @foreach ($badgeTypes as $badgeType)
+                                        <option value="{{ $badgeType }}"
+                                            {{ $subBadgeTypeEdit == $badgeType ? 'selected' : '' }}>
+                                            {{ $badgeType }}</option>
+                                    @endforeach
+                                </select>
+                            @endif
 
                             @error('subBadgeTypeEdit')
                                 <div class="text-red-500 text-xs italic mt-1">
@@ -166,20 +175,21 @@
                                     <input readonly type="text" wire:model="subPromoCodeEdit"
                                         class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-none cursor-not-allowed">
 
-                                    <button wire:click.prevent="removePromoCodeSubEdit" wire:key="btnRemovePromoCodeSubEdit"
-                                        type="button" class="bg-red-300 px-5 ml-2">Remove</button>
+                                    <button wire:click.prevent="removePromoCodeSubEdit"
+                                        wire:key="btnRemovePromoCodeSubEdit" type="button"
+                                        class="bg-red-300 px-5 ml-2">Remove</button>
                                 @else
                                     <input placeholder="Enter your promo code here" type="text"
                                         wire:model="subPromoCodeEdit"
                                         class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
 
-                                    <button wire:click.prevent="applyPromoCodeSubEdit" wire:key="btnApplyPromoCodeSubEdit"
-                                        type="button"
+                                    <button wire:click.prevent="applyPromoCodeSubEdit"
+                                        wire:key="btnApplyPromoCodeSubEdit" type="button"
                                         class="bg-registrationPrimaryColor text-white px-5 ml-2 hover:bg-registrationPrimaryColorHover">Apply</button>
                                 @endif
                             </div>
 
-                            @if($subPromoCodeEdit != null)
+                            @if ($subPromoCodeEdit != null)
                                 @if ($promoCodeFailSubEdit != null)
                                     <div class="text-red-500 text-xs italic mt-1">
                                         {{ $promoCodeFailSubEdit }}

@@ -117,7 +117,6 @@ class RegistrationForm extends Component
     public function render()
     {
         $this->members = Members::where('active', true)->get();
-        $this->promoCodes = PromoCodes::where('event_id', $this->event->id)->where('event_category', $this->event->category)->where('active', true)->get();
         return view('livewire.registration.registration-form');
     }
 
@@ -470,10 +469,11 @@ class RegistrationForm extends Component
             if($this->promoCode == null){
                 $this->promoCodeFailMain = "Promo code is required.";
             } else {
-                if(empty($this->promoCodes)){
+                $promoCodes = PromoCodes::where('event_id', $this->event->id)->where('event_category', $this->event->category)->where('active', true)->get();
+                if($promoCodes->isEmpty()){
                     $this->promoCodeFailMain = "Invalid Code";
                 } else {
-                    foreach($this->promoCodes as $promoCode){
+                    foreach($promoCodes as $promoCode){
                         if($this->promoCode == $promoCode->promo_code && $this->badgeType == $promoCode->badge_type){
                             if($promoCode->total_usage < $promoCode->number_of_codes ){
                                 $validityDateTime = Carbon::parse($promoCode->validity);
@@ -509,10 +509,11 @@ class RegistrationForm extends Component
             if($this->subPromoCode == null){
                 $this->promoCodeFailSub = "Promo code is required.";
             } else {
-                if(empty($this->promoCodes)){
+                $promoCodes = PromoCodes::where('event_id', $this->event->id)->where('event_category', $this->event->category)->where('active', true)->get();
+                if($promoCodes->isEmpty()){
                     $this->promoCodeFailSub = "Invalid Code";
                 } else {
-                    foreach($this->promoCodes as $promoCode){
+                    foreach($promoCodes as $promoCode){
                         if($this->subPromoCode == $promoCode->promo_code && $this->subBadgeType == $promoCode->badge_type){
                             if($promoCode->total_usage < $promoCode->number_of_codes ){
                                 $validityDateTime = Carbon::parse($promoCode->validity);
@@ -548,10 +549,11 @@ class RegistrationForm extends Component
             if($this->subPromoCodeEdit == null){
                 $this->promoCodeFailSubEdit = "Promo code is required.";
             } else {
-                if(empty($this->promoCodes)){
+                $promoCodes = PromoCodes::where('event_id', $this->event->id)->where('event_category', $this->event->category)->where('active', true)->get();
+                if($promoCodes->isEmpty()){
                     $this->promoCodeFailSubEdit = "Invalid Code";
                 } else {
-                    foreach($this->promoCodes as $promoCode){
+                    foreach($promoCodes as $promoCode){
                         if($this->subPromoCodeEdit == $promoCode->promo_code && $this->subBadgeTypeEdit == $promoCode->badge_type){
                             if($promoCode->total_usage < $promoCode->number_of_codes ){
                                 $validityDateTime = Carbon::parse($promoCode->validity);

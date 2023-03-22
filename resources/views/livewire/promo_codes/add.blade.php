@@ -23,7 +23,7 @@
 
             <div class="space-y-2 mt-5">
                 <div class="text-registrationPrimaryColor">
-                    Badge Type: <span class="text-red-500">*</span>
+                    Registration Type: <span class="text-red-500">*</span>
                 </div>
                 <div>
                     <select wire:model="badge_type"

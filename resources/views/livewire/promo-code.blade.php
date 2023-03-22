@@ -13,7 +13,7 @@
             <h1 class="text-center text-2xl">Promo codes</h1>
             <div class="grid grid-cols-9 pt-4 pb-2 place-items-center">
                 <div class="col-span-1">Code</div>
-                <div class="col-span-1">Badge Type</div>
+                <div class="col-span-1">Registration Type</div>
                 <div class="col-span-1">Discount</div>
                 <div class="col-span-1">Remaining Usage</div>
                 <div class="col-span-1">Total Usage</div>
