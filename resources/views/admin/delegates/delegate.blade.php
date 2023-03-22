@@ -1,7 +1,5 @@
 @extends('admin.layouts.master')
 
 @section('content')
-    <div>
-        <h1>Test</h1>
-    </div>
+<img src="{{ asset('assets/images/website-under-construction.jpg') }}" alt="" class="mx-auto w-full object-cover" style="height: 85vh">
 @endsection

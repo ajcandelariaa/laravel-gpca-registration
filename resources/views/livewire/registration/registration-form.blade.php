@@ -36,7 +36,6 @@
                         >SUBMIT</button>
                 @endif
             </div>
-
         </form>
     </div>
 </div>

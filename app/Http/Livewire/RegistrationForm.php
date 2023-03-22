@@ -60,10 +60,10 @@ class RegistrationForm extends Component
         'Organizer',
     ];
 
-    // public $phoneTest;
-    public $members, $event, $promoCodes;
+    public $members, $event;
+
     public $finalEbEndDate, $finalStdStartDate;
-    public $currentStep = 1;
+    public $currentStep = 4;
     public $showAddDelegateModal = false;
     public $showEditDelegateModal = false;
     public $additionalDelegates = [];
@@ -84,11 +84,11 @@ class RegistrationForm extends Component
     public $subIdEdit, $subSalutationEdit, $subFirstNameEdit, $subMiddleNameEdit, $subLastNameEdit, $subEmailAddressEdit, $subMobileNumberEdit, $subNationalityEdit, $subJobTitleEdit, $subBadgeTypeEdit, $subPromoCodeEdit, $subPromoCodeDiscountEdit;
 
     // 3RD PAGE
-    public $paymentMethod, $finalEventStartDate, $finalEventEndDate, $finalQuantity, $finalUnitPrice, $finalNetAmount, $finalDiscount = 0.00, $finalVat, $finalTotal;
+    public $paymentMethod, $finalEventStartDate, $finalEventEndDate, $finalQuantity, $finalUnitPrice, $finalNetAmount, $finalDiscount, $finalVat, $finalTotal;
     public $delegatInvoiceDetails = array();
 
     // ERROR CHECKER
-    public $delegatePassTypeError, $paymentMethodError, $rateType = "std";
+    public $delegatePassTypeError, $paymentMethodError, $rateType;
     public $promoCodeFailMain, $promoCodeSuccessMain, $promoCodeFailSub, $promoCodeSuccessSub;
     public $promoCodeFailSubEdit, $promoCodeSuccessSubEdit;
 
@@ -96,7 +96,7 @@ class RegistrationForm extends Component
     public function mount($data)
     {
         $this->event = $data;
-        $this->currentStep = 1;
+        $this->currentStep = 4;
 
         $today = Carbon::today();
 
@@ -156,7 +156,13 @@ class RegistrationForm extends Component
 
     public function calculateAmount()
     {
-        $promoCodeMainDiscountString = ($this->promoCodeDiscount == null) ? '' : "- " . $this->promoCodeDiscount . "% discount";
+        if($this->promoCodeDiscount == null){
+            $this->promoCode = null;
+            $promoCodeMainDiscountString = "";
+        } else {
+            $promoCodeMainDiscountString = "- " . $this->promoCodeDiscount . "% discount";
+        }
+
         array_push($this->delegatInvoiceDetails, [
             'delegateDescription' => "Delegate Registration Fee - {$this->rateType} - {$this->badgeType} {$promoCodeMainDiscountString}",
             'delegateNames' => [
@@ -182,7 +188,7 @@ class RegistrationForm extends Component
                     }
                 }
 
-                if($checkIfExisting){
+                if ($checkIfExisting) {
                     array_push(
                         $this->delegatInvoiceDetails[$existingIndex]['delegateNames'],
                         $this->additionalDelegates[$i]['subSalutation'] . " " . $this->additionalDelegates[$i]['subFirstName'] . " " . $this->additionalDelegates[$i]['subMiddleName'] . " " . $this->additionalDelegates[$i]['subLastName']
@@ -197,29 +203,37 @@ class RegistrationForm extends Component
                     $this->delegatInvoiceDetails[$existingIndex]['totalNetAmount'] = $totalNetAmountTemp;
                 } else {
                     $promoCodeSubDiscountString = ($this->additionalDelegates[$i]['subPromoCodeDiscount'] == null) ? '' : "- " . $this->additionalDelegates[$i]['subPromoCodeDiscount'] . "% discount";
-                        array_push($this->delegatInvoiceDetails, [
-                            'delegateDescription' => "Delegate Registration Fee - {$this->rateType} - {$this->additionalDelegates[$i]['subBadgeType']}{$promoCodeSubDiscountString}",
-                            'delegateNames' => [
-                                $this->additionalDelegates[$i]['subSalutation'] . " " . $this->additionalDelegates[$i]['subFirstName'] . " " . $this->additionalDelegates[$i]['subMiddleName'] . " " . $this->additionalDelegates[$i]['subLastName'],
-                            ],
-                            'badgeType' => $this->additionalDelegates[$i]['subBadgeType'],
-                            'quantity' => 1,
-                            'totalDiscount' => $this->finalUnitPrice * ($this->additionalDelegates[$i]['subPromoCodeDiscount'] / 100),
-                            'totalNetAmount' =>  $this->finalUnitPrice - ($this->finalUnitPrice * ($this->additionalDelegates[$i]['subPromoCodeDiscount'] / 100)),
-                            'promoCodeDiscount' => $this->additionalDelegates[$i]['subPromoCodeDiscount'],
-                        ]);
+                    array_push($this->delegatInvoiceDetails, [
+                        'delegateDescription' => "Delegate Registration Fee - {$this->rateType} - {$this->additionalDelegates[$i]['subBadgeType']}{$promoCodeSubDiscountString}",
+                        'delegateNames' => [
+                            $this->additionalDelegates[$i]['subSalutation'] . " " . $this->additionalDelegates[$i]['subFirstName'] . " " . $this->additionalDelegates[$i]['subMiddleName'] . " " . $this->additionalDelegates[$i]['subLastName'],
+                        ],
+                        'badgeType' => $this->additionalDelegates[$i]['subBadgeType'],
+                        'quantity' => 1,
+                        'totalDiscount' => $this->finalUnitPrice * ($this->additionalDelegates[$i]['subPromoCodeDiscount'] / 100),
+                        'totalNetAmount' =>  $this->finalUnitPrice - ($this->finalUnitPrice * ($this->additionalDelegates[$i]['subPromoCodeDiscount'] / 100)),
+                        'promoCodeDiscount' => $this->additionalDelegates[$i]['subPromoCodeDiscount'],
+                    ]);
                 }
             }
         }
 
-        foreach($this->delegatInvoiceDetails as $delegatInvoiceDetail){
+        foreach ($this->delegatInvoiceDetails as $delegatInvoiceDetail) {
             $this->finalQuantity += $delegatInvoiceDetail['quantity'];
             $this->finalDiscount += $delegatInvoiceDetail['totalDiscount'];
             $this->finalNetAmount += $delegatInvoiceDetail['totalNetAmount'];
         }
-
         $this->finalVat = $this->finalNetAmount * ($this->event->event_vat / 100);
         $this->finalTotal = $this->finalNetAmount + $this->finalVat;
+    }
+
+    public function resetCalculations(){
+        $this->delegatInvoiceDetails = array();
+        $this->finalQuantity = 0;
+        $this->finalDiscount = 0;
+        $this->finalNetAmount = 0;
+        $this->finalVat = 0;
+        $this->finalTotal = 0;
     }
 
     public function increaseStep()
@@ -233,13 +247,8 @@ class RegistrationForm extends Component
                 $this->delegatePassTypeError = "Delegate pass type is required";
             }
         } else if ($this->currentStep == 2) {
-            $this->delegatInvoiceDetails = array();
-            $this->finalQuantity = 0;
-            $this->finalDiscount = 0;
-            $this->finalNetAmount = 0;
-            $this->finalVat = 0;
-            $this->finalTotal = 0;
-
+            $this->resetCalculations();
+            
             $this->validate([
                 'companyName' => 'required',
                 'companySector' => 'required',
@@ -260,8 +269,6 @@ class RegistrationForm extends Component
             $this->checkUnitPrice();
             $this->calculateAmount();
             $this->currentStep += 1;
-        } else {
-            // do nothing
         }
     }
 
@@ -270,14 +277,11 @@ class RegistrationForm extends Component
         if ($this->currentStep == 3) {
             $this->members = Members::where('active', true)->get();
         }
-        if($this->currentStep == 2) {
-            $this->delegatInvoiceDetails = array();
-            $this->finalQuantity = 0;
-            $this->finalDiscount = 0;
-            $this->finalNetAmount = 0;
-            $this->finalVat = 0;
-            $this->finalTotal = 0;
+
+        if ($this->currentStep == 2) {
+            $this->resetCalculations();
         }
+
         $this->currentStep -= 1;
     }
 
@@ -296,7 +300,7 @@ class RegistrationForm extends Component
                     'company_address' => $this->companyAddress,
                     'company_country' => $this->companyCountry,
                     'company_city' => $this->companyCity,
-                    'company_telephone_number' => ($this->companyLandlineNumber == null) ? "" : $this->companyLandlineNumber,
+                    'company_telephone_number' => $this->companyLandlineNumber,
                     'company_mobile_number' => $this->companyMobileNumber,
 
                     'salutation' => $this->salutation,
@@ -315,12 +319,12 @@ class RegistrationForm extends Component
                     'unit_price' => $this->finalUnitPrice,
                     'net_amount' => $this->finalNetAmount,
                     'vat_price' => $this->finalVat,
-                    'discount_price' => ($this->finalDiscount != null) ? $this->finalDiscount : "0",
+                    'discount_price' => $this->finalDiscount,
                     'total_amount' => $this->finalTotal,
                     'mode_of_payment' => $this->paymentMethod,
-                    'status' => "pending",
+                    'status' => ($this->paymentMethod == "bankTransfer") ? "pending" : "paid",
                     'registered_date_time' => Carbon::now(),
-                    'paid_date' => ($this->paymentMethod == "creditCard") ? Carbon::now() : "",
+                    'paid_date' => ($this->paymentMethod == "creditCard") ? Carbon::now() : null,
                 ]);
 
                 if (!empty($this->additionalDelegates)) {
@@ -335,11 +339,12 @@ class RegistrationForm extends Component
                             'email_address' => $additionalDelegate['subEmailAddress'],
                             'nationality' => $additionalDelegate['subNationality'],
                             'mobile_number' => $additionalDelegate['subMobileNumber'],
+                            'badge_type' => $additionalDelegate['subBadgeType'],
                             'pcode_used' => $additionalDelegate['subPromoCode'],
                         ]);
                     }
                 }
-
+                
                 $this->currentStep = 4;
             }
         }
@@ -397,10 +402,7 @@ class RegistrationForm extends Component
         $this->showAddDelegateModal = true;
     }
 
-    public function closeAddModal()
-    {
-        $this->showAddDelegateModal = false;
-
+    public function resetAddModalFields(){
         $this->subSalutation = null;
         $this->subFirstName = null;
         $this->subMiddleName = null;
@@ -413,6 +415,13 @@ class RegistrationForm extends Component
         $this->promoCodeSuccessSub = null;
         $this->promoCodeFailSub = null;
         $this->subPromoCode = null;
+        $this->subPromoCodeDiscount = null;
+    }
+
+    public function closeAddModal()
+    {
+        $this->showAddDelegateModal = false;
+        $this->resetAddModalFields();
     }
 
     public function openEditModal($subDelegateId)
@@ -438,10 +447,7 @@ class RegistrationForm extends Component
         }
     }
 
-    public function closeEditModal()
-    {
-        $this->showEditDelegateModal = false;
-
+    public function resetEditModalFields(){
         $this->subIdEdit = null;
         $this->subSalutationEdit = null;
         $this->subFirstNameEdit = null;
@@ -455,6 +461,12 @@ class RegistrationForm extends Component
         $this->subPromoCodeDiscountEdit = null;
         $this->promoCodeSuccessSubEdit = null;
         $this->promoCodeFailSubEdit = null;
+    }
+
+    public function closeEditModal()
+    {
+        $this->showEditDelegateModal = false;
+        $this->resetEditModalFields();
     }
 
     public function saveAdditionalDelegate()
@@ -487,20 +499,7 @@ class RegistrationForm extends Component
             'promoCodeFailSub' => $this->promoCodeFailSub,
         ]);
 
-        $this->subSalutation = null;
-        $this->subFirstName = null;
-        $this->subMiddleName = null;
-        $this->subLastName = null;
-        $this->subEmailAddress = null;
-        $this->subMobileNumber = null;
-        $this->subNationality = null;
-        $this->subJobTitle = null;
-        $this->subBadgeType = null;
-        $this->promoCodeSuccessSub = null;
-        $this->promoCodeFailSub = null;
-        $this->subPromoCode = null;
-        $this->subPromoCodeDiscount = null;
-
+        $this->resetAddModalFields();
         $this->showAddDelegateModal = false;
     }
 
@@ -535,20 +534,7 @@ class RegistrationForm extends Component
                 $this->additionalDelegates[$i]['promoCodeSuccessSub'] = $this->promoCodeSuccessSubEdit;
                 $this->additionalDelegates[$i]['promoCodeFailSub'] = $this->promoCodeFailSubEdit;
 
-                $this->subIdEdit = null;
-                $this->subSalutationEdit = null;
-                $this->subFirstNameEdit = null;
-                $this->subMiddleNameEdit = null;
-                $this->subLastNameEdit = null;
-                $this->subEmailAddressEdit = null;
-                $this->subMobileNumberEdit = null;
-                $this->subNationalityEdit = null;
-                $this->subJobTitleEdit = null;
-                $this->subPromoCodeEdit = null;
-                $this->subPromoCodeDiscountEdit = null;
-                $this->promoCodeSuccessSubEdit = null;
-                $this->promoCodeFailSubEdit = null;
-
+                $this->resetEditModalFields();
                 $this->showEditDelegateModal = false;
             }
         }
