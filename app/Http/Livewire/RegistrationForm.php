@@ -63,7 +63,7 @@ class RegistrationForm extends Component
     public $members, $event;
 
     public $finalEbEndDate, $finalStdStartDate;
-    public $currentStep = 4;
+    public $currentStep = 1;
     public $showAddDelegateModal = false;
     public $showEditDelegateModal = false;
     public $additionalDelegates = [];
@@ -96,7 +96,7 @@ class RegistrationForm extends Component
     public function mount($data)
     {
         $this->event = $data;
-        $this->currentStep = 4;
+        $this->currentStep = 1;
 
         $today = Carbon::today();
 
@@ -291,6 +291,11 @@ class RegistrationForm extends Component
             if ($this->paymentMethod == null) {
                 $this->paymentMethodError = "Please choose your payment method first";
             } else {
+
+                if($this->promoCode != null){
+                    PromoCodes::where('event_id', $this->event->id)->where('event_category', $this->event->category)->where('active', true)->where('promo_code', $this->promoCode)->where('badge_type', $this->badgeType)->increment('total_usage');
+                }
+
                 $newRegistrant = MainDelegates::create([
                     'event_id' => $this->event->id,
                     'pass_type' => $this->delegatePassType,
@@ -324,11 +329,16 @@ class RegistrationForm extends Component
                     'mode_of_payment' => $this->paymentMethod,
                     'status' => ($this->paymentMethod == "bankTransfer") ? "pending" : "paid",
                     'registered_date_time' => Carbon::now(),
-                    'paid_date' => ($this->paymentMethod == "creditCard") ? Carbon::now() : null,
+                    'paid_date' => ($this->paymentMethod == "bankTransfer") ? null : Carbon::now(),
                 ]);
 
                 if (!empty($this->additionalDelegates)) {
                     foreach ($this->additionalDelegates as $additionalDelegate) {
+                        
+                        if($additionalDelegate['subPromoCode'] != null){
+                            PromoCodes::where('event_id', $this->event->id)->where('event_category', $this->event->category)->where('active', true)->where('promo_code', $additionalDelegate['subPromoCode'])->where('badge_type', $additionalDelegate['subBadgeType'])->increment('total_usage');
+                        }
+                        
                         AdditionalDelegates::create([
                             'main_delegate_id' => $newRegistrant->id,
                             'salutation' => $additionalDelegate['subSalutation'],

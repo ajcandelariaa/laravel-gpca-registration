@@ -84,19 +84,6 @@ class EventController extends Controller
         }
     }
 
-    public function eventRegistrantsView($eventCategory, $eventId)
-    {
-        if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {
-            return view('admin.event.detail.registrants', [
-                "pageTitle" => "Event Registrants",
-                "eventCategory" => $eventCategory,
-                "eventId" => $eventId,
-            ]);
-        } else {
-            abort(404, 'The URL is incorrect');
-        }
-    }
-
     public function eventDelegateView($eventCategory, $eventId)
     {
         if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {

@@ -95,6 +95,7 @@
                         @endphp
                     </div>
                 @endforeach
+            </div>
         @endif
     </div>
 

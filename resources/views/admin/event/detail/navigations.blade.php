@@ -6,13 +6,13 @@
             </div>
             <div class="text-white font-semibold flex items-center gap-10">
                 <a href="{{ route('admin.event.detail.view', ['eventCategory' => $eventCategory, 'eventId' => $eventId]) }}"
-                    class="{{ request()->is('admin/event/detail*') ? 'underline' : 'hover:underline' }} text-registrationPrimaryColor">Event Detail</a>
+                    class="{{ request()->is('admin/event/*/*/detail*') ? 'underline' : 'hover:underline' }} text-registrationPrimaryColor">Event Detail</a>
                 <a href="{{ route('admin.event.promo-codes.view', ['eventCategory' => $eventCategory, 'eventId' => $eventId]) }}"
-                    class="{{ request()->is('admin/event/promo-codes*') ? 'underline' : 'hover:underline' }} text-registrationPrimaryColor">Promo Codes</a>
+                    class="{{ request()->is('admin/event/*/*/promo-code*') ? 'underline' : 'hover:underline' }} text-registrationPrimaryColor">Promo Codes</a>
                 <a href="{{ route('admin.event.registrants.view', ['eventCategory' => $eventCategory, 'eventId' => $eventId]) }}"
-                    class="{{ request()->is('admin/event/registrants*') ? 'underline' : 'hover:underline' }} text-registrationPrimaryColor">Registrants</a>
+                    class="{{ request()->is('admin/event/*/*/registrant*') ? 'underline' : 'hover:underline' }} text-registrationPrimaryColor">Registrants</a>
                 <a href="{{ route('admin.event.delegates.view', ['eventCategory' => $eventCategory, 'eventId' => $eventId]) }}"
-                    class="{{ request()->is('admin/event/delegates*') ? 'underline' : 'hover:underline' }} text-registrationPrimaryColor">Delegates</a>
+                    class="{{ request()->is('admin/event/*/*/delegate*') ? 'underline' : 'hover:underline' }} text-registrationPrimaryColor">Delegates</a>
             </div>
         </div>
     </div>

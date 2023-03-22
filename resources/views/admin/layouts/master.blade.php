@@ -57,7 +57,7 @@
         </div>
     </div>
 
-    @if (request()->is('admin/event/detail*') || request()->is('admin/event/promo-codes*') || request()->is('admin/event/registrants*') || request()->is('admin/event/delegates*'))
+    @if (request()->is('admin/event/*/*/detail*') || request()->is('admin/event/*/*/promo-code*') || request()->is('admin/event/*/*/registrant*') || request()->is('admin/event/*/*/delegate*'))
         @include('admin.event.detail.navigations')
     @endif
 
