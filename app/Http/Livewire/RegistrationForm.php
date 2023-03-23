@@ -299,12 +299,18 @@ class RegistrationForm extends Component
                     PromoCodes::where('event_id', $this->event->id)->where('event_category', $this->event->category)->where('active', true)->where('promo_code', $this->promoCode)->where('badge_type', $this->badgeType)->increment('total_usage');
                 }
                 
-                // if($this->finalTotal == 0){
-                //     $paymentStatus = "free"
-                //     $payment
-                // } else {
-
-                // }
+                if($this->finalTotal == 0){
+                    $paymentStatus = "free";
+                    $registrationStatus = "confirmed";
+                } else {
+                    if($this->paymentMethod == "bankTransfer"){
+                        $registrationStatus = "pending";
+                        $paymentStatus = "unpaid";
+                    } else {
+                        $paymentStatus = "paid";
+                        $registrationStatus = "confirmed";
+                    }
+                }
 
                 $newRegistrant = MainDelegates::create([
                     'event_id' => $this->event->id,
@@ -339,7 +345,8 @@ class RegistrationForm extends Component
                     'discount_price' => $this->finalDiscount,
                     'total_amount' => $this->finalTotal,
                     'mode_of_payment' => $this->paymentMethod,
-                    'payment_status' => ($this->paymentMethod == "bankTransfer") ? "pending" : "paid",
+                    'registration_status' => $registrationStatus,
+                    'payment_status' => $paymentStatus,
                     'registered_date_time' => Carbon::now(),
                     'paid_date_time' => ($this->paymentMethod == "bankTransfer") ? null : Carbon::now(),
                 ]);

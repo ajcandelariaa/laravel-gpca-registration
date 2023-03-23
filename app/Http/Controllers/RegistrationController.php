@@ -169,7 +169,8 @@ class RegistrationController extends Controller
                     'discount' => $mainDiscount,
 
                     'mode_of_payment' => $mainDelegate->mode_of_payment,
-                    'status' => $mainDelegate->status,
+                    'registration_status' => $mainDelegate->registration_status,
+                    'payment_status' => $mainDelegate->payment_status,
                     'registered_date_time' => Carbon::parse($mainDelegate->registered_date_time)->format('M j, Y g:i A'),
                     'paid_date_time' => Carbon::parse($mainDelegate->paid_date_time)->format('M j, Y g:i A'),
 
