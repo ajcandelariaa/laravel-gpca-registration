@@ -47,7 +47,7 @@ class RegistrationController extends Controller
                         'registrantCity' => $registrant->company_city,
                         'registrantPassType' => $registrant->pass_type,
                         'registrantQuantity' => $registrant->quantity,
-                        'registrantStatus' => $registrant->status,
+                        'registrantStatus' => $registrant->payment_status,
                         'registrantTotalAmount' => $registrant->total_amount,
                     ]);
                 }
@@ -67,21 +67,23 @@ class RegistrationController extends Controller
     public function registrantDetailView($eventCategory, $eventId, $registrantId){
         if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {
             if(MainDelegate::where('id', $registrantId)->where('event_id', $eventId)->exists()){
+                $event = Event::where('category', $eventCategory)->where('id', $eventId)->first();
+                
                 $finalData = array();
                 $subDelegatesArray = array();
                 $invoiceDetails = array();
 
                 $mainDelegate = MainDelegate::where('id', $registrantId)->where('event_id', $eventId)->first();
-                $mainDiscount = PromoCode::select('discount')->where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $mainDelegate->pcode_used)->where('badge_type', $mainDelegate->badge_type)->first();
-                
-                $promoCodeMainDiscountString = ($mainDiscount == null) ? '' : "- " . $mainDiscount . "% discount";
-                
+                $mainDiscount = PromoCode::where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $mainDelegate->pcode_used)->where('badge_type', $mainDelegate->badge_type)->value('discount');
+
+                $promoCodeMainDiscountString = ($mainDelegate->pcode_used == null) ? '' : "- " . $mainDiscount . "% discount";
+
                 array_push($invoiceDetails, [
-                    'delegateDescription' => "Delegate Registration Fee - {$mainDelegate->rate_type_string} - {$mainDelegate->badgeType} {$promoCodeMainDiscountString}",
+                    'delegateDescription' => "Delegate Registration Fee - {$mainDelegate->rate_type_string} - {$mainDelegate->badge_type} {$promoCodeMainDiscountString}",
                     'delegateNames' => [
                         $mainDelegate->salutation." ".$mainDelegate->first_name." ".$mainDelegate->middle_name." ".$mainDelegate->last_name,
                     ],
-                    'badgeType' => $mainDelegate->badgeType,
+                    'badgeType' => $mainDelegate->badge_type,
                     'quantity' => 1,
                     'totalDiscount' => $mainDelegate->unit_price * ($mainDiscount / 100),
                     'totalNetAmount' =>  $mainDelegate->unit_price - ($mainDelegate->unit_price * ($mainDiscount / 100)),
@@ -93,7 +95,7 @@ class RegistrationController extends Controller
                 if(!$subDelegates->isEmpty()){
                     foreach($subDelegates as $subDelegate){
 
-                        $subDiscount = PromoCode::select('discount')->where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $subDelegate->pcode_used)->where('badge_type', $subDelegate->badge_type)->first();
+                        $subDiscount = PromoCode::where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $subDelegate->pcode_used)->where('badge_type', $subDelegate->badge_type)->value('discount');
 
                         array_push($subDelegatesArray, [
                             'subDelegateId' => $subDelegate->id,
@@ -148,9 +150,16 @@ class RegistrationController extends Controller
                     }
                 }
 
-                array_push($finalData, [
+                $finalData = [
+                    'event' => $event,
+
+                    "finalEventStartDate" => Carbon::parse($event->event_start_date)->format('d M Y'),
+                    "finalEventEndDate" => Carbon::parse($event->event_end_date)->format('d M Y'),
+
                     'mainDelegateId' => $mainDelegate->id,
                     'pass_type' => $mainDelegate->pass_type,
+                    'rate_type' => $mainDelegate->rate_type,
+                    'rate_type_string' => $mainDelegate->rate_type_string,
                     'company_name' => $mainDelegate->company_name,
                     'company_sector' => $mainDelegate->company_sector,
                     'company_address' => $mainDelegate->company_address,
@@ -169,20 +178,20 @@ class RegistrationController extends Controller
                     'discount' => $mainDiscount,
 
                     'mode_of_payment' => $mainDelegate->mode_of_payment,
-                    'registration_status' => $mainDelegate->registration_status,
+                    'registration_status' => "$mainDelegate->registration_status",
                     'payment_status' => $mainDelegate->payment_status,
                     'registered_date_time' => Carbon::parse($mainDelegate->registered_date_time)->format('M j, Y g:i A'),
-                    'paid_date_time' => Carbon::parse($mainDelegate->paid_date_time)->format('M j, Y g:i A'),
+                    'paid_date_time' => ($mainDelegate->paid_date_time == null) ? "N/A" : Carbon::parse($mainDelegate->paid_date_time)->format('M j, Y g:i A'),
 
                     'subDelegates' => $subDelegatesArray,
                     'invoiceDetails' => $invoiceDetails,
 
+                    'unit_price' => $mainDelegate->unit_price,
                     'vat_price' => $mainDelegate->vat_price,
                     'total_amount' => $mainDelegate->total_amount,
                     'net_amount' => $mainDelegate->net_amount,
-                ]);
-        
-                dd($finalData);
+                ];
+
                 return view('admin.event.detail.registrants.registrants_detail', [
                     "pageTitle" => "Event Registrant Details",
                     "eventCategory" => $eventCategory,

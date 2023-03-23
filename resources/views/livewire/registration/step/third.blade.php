@@ -163,8 +163,10 @@
                     <div class="col-span-2 bg-white p-4">
                         @if ($count == 1)
                             <p>{{ $event->name }} – {{ $finalEventStartDate . ' - ' . $finalEventEndDate }} at {{ $event->location }}</p>
+                            <p class="mt-10">{{ $delegatInvoiceDetail['delegateDescription'] }}</p>
+                        @else
+                            <p>{{ $delegatInvoiceDetail['delegateDescription'] }}</p>
                         @endif
-                        <p class="mt-5">{{ $delegatInvoiceDetail['delegateDescription'] }}</p>
                         <ul class="mt-2 list-decimal ml-4">
                             @foreach ($delegatInvoiceDetail['delegateNames'] as $name)
                                 <li>{{ $name }}</li>

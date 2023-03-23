@@ -31,7 +31,7 @@
     </style>
 </head>
 
-<body class="bg-gray-100">
+<body class="bg-white">
     <div class="bg-registrationPrimaryColor">
         <div class="container mx-auto py-3 px-5">
             <div class="flex justify-between">
