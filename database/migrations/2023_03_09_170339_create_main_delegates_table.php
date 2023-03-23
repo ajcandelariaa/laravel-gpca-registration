@@ -17,6 +17,8 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('event_id');
             $table->string('pass_type');
+            $table->string('rate_type');
+            $table->string('rate_type_string');
 
             $table->string('company_name');
             $table->string('company_sector');
@@ -45,9 +47,10 @@ return new class extends Migration
             $table->string('discount_price');
             $table->string('total_amount');
             $table->string('mode_of_payment');
-            $table->string('status');
-            $table->string('registered_date_time');
-            $table->string('paid_date')->nullable();
+            $table->string('registration_status');
+            $table->string('payment_status');
+            $table->dateTime('registered_date_time');
+            $table->dateTime('paid_date_time')->nullable();
             $table->timestamps();
             $table->foreign('event_id')->references('id')->on('events')->onDelete('cascade');
         });

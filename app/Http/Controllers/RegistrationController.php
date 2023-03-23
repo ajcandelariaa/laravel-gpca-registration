@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AdditionalDelegate;
+use App\Models\PromoCode;
 use App\Models\Event;
 use App\Models\MainDelegate;
 use Carbon\Carbon;
@@ -65,12 +67,127 @@ class RegistrationController extends Controller
     public function registrantDetailView($eventCategory, $eventId, $registrantId){
         if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {
             if(MainDelegate::where('id', $registrantId)->where('event_id', $eventId)->exists()){
+                $finalData = array();
+                $subDelegatesArray = array();
+                $invoiceDetails = array();
+
+                $mainDelegate = MainDelegate::where('id', $registrantId)->where('event_id', $eventId)->first();
+                $mainDiscount = PromoCode::select('discount')->where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $mainDelegate->pcode_used)->where('badge_type', $mainDelegate->badge_type)->first();
                 
+                $promoCodeMainDiscountString = ($mainDiscount == null) ? '' : "- " . $mainDiscount . "% discount";
+                
+                array_push($invoiceDetails, [
+                    'delegateDescription' => "Delegate Registration Fee - {$mainDelegate->rate_type_string} - {$mainDelegate->badgeType} {$promoCodeMainDiscountString}",
+                    'delegateNames' => [
+                        $mainDelegate->salutation." ".$mainDelegate->first_name." ".$mainDelegate->middle_name." ".$mainDelegate->last_name,
+                    ],
+                    'badgeType' => $mainDelegate->badgeType,
+                    'quantity' => 1,
+                    'totalDiscount' => $mainDelegate->unit_price * ($mainDiscount / 100),
+                    'totalNetAmount' =>  $mainDelegate->unit_price - ($mainDelegate->unit_price * ($mainDiscount / 100)),
+                    'promoCodeDiscount' => $mainDiscount,
+                ]);
+
+
+                $subDelegates = AdditionalDelegate::where('main_delegate_id', $registrantId)->get();
+                if(!$subDelegates->isEmpty()){
+                    foreach($subDelegates as $subDelegate){
+
+                        $subDiscount = PromoCode::select('discount')->where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $subDelegate->pcode_used)->where('badge_type', $subDelegate->badge_type)->first();
+
+                        array_push($subDelegatesArray, [
+                            'subDelegateId' => $subDelegate->id,
+                            'name' => $subDelegate->salutation." ".$subDelegate->first_name." ".$subDelegate->middle_name." ".$subDelegate->last_name,
+                            'email_address' => $subDelegate->email_address,
+                            'mobile_number' => $subDelegate->mobile_number,
+                            'nationality' => $subDelegate->nationality,
+                            'job_title' => $subDelegate->job_title,
+                            'badge_type' => $subDelegate->badge_type,
+                            'pcode_used' => $subDelegate->pcode_used,
+                            'discount' => $subDiscount,
+                        ]);
+
+                        $checkIfExisting = false;
+                        $existingIndex = 0;
+
+                        for ($j = 0; $j < count($invoiceDetails); $j++) {
+                            if ($subDelegate->badge_type == $invoiceDetails[$j]['badgeType'] && $subDiscount == $invoiceDetails[$j]['promoCodeDiscount']) {
+                                $existingIndex = $j;
+                                $checkIfExisting = true;
+                                break;
+                            }
+                        }
+
+                        if ($checkIfExisting) {
+                            array_push(
+                                $invoiceDetails[$existingIndex]['delegateNames'],
+                                $subDelegate->salutation." ".$subDelegate->first_name." ".$subDelegate->middle_name." ".$subDelegate->last_name
+                            );
+        
+                            $quantityTemp = $invoiceDetails[$existingIndex]['quantity'] + 1;
+                            $totalDiscountTemp = ($mainDelegate->unit_price * ($invoiceDetails[$existingIndex]['promoCodeDiscount'] / 100)) * $quantityTemp;
+                            $totalNetAmountTemp = ($mainDelegate->unit_price * $quantityTemp) - $totalDiscountTemp;
+        
+                            $invoiceDetails[$existingIndex]['quantity'] = $quantityTemp;
+                            $invoiceDetails[$existingIndex]['totalDiscount'] = $totalDiscountTemp;
+                            $invoiceDetails[$existingIndex]['totalNetAmount'] = $totalNetAmountTemp;
+                        } else {
+                            $promoCodeSubDiscountString = ($subDiscount == null) ? '' : "- " . $subDiscount . "% discount";
+                            array_push($invoiceDetails, [
+                                'delegateDescription' => "Delegate Registration Fee - {$mainDelegate->rate_type_string} - {$subDelegate->badge_type}{$promoCodeSubDiscountString}",
+                                'delegateNames' => [
+                                    $subDelegate->salutation." ".$subDelegate->first_name." ".$subDelegate->middle_name." ".$subDelegate->last_name,
+                                ],
+                                'badgeType' => $subDelegate->badge_type,
+                                'quantity' => 1,
+                                'totalDiscount' => $mainDelegate->unit_price * ($subDiscount / 100),
+                                'totalNetAmount' =>  $mainDelegate->unit_price - ($mainDelegate->unit_price * ($subDiscount / 100)),
+                                'promoCodeDiscount' => $subDiscount,
+                            ]);
+                        }
+                    }
+                }
+
+                array_push($finalData, [
+                    'mainDelegateId' => $mainDelegate->id,
+                    'pass_type' => $mainDelegate->pass_type,
+                    'company_name' => $mainDelegate->company_name,
+                    'company_sector' => $mainDelegate->company_sector,
+                    'company_address' => $mainDelegate->company_address,
+                    'company_country' => $mainDelegate->company_country,
+                    'company_city' => $mainDelegate->company_city,
+                    'company_telephone_number' => $mainDelegate->company_telephone_number,
+                    'company_mobile_number' => $mainDelegate->company_mobile_number,
+
+                    'name' => $mainDelegate->salutation." ".$mainDelegate->first_name." ".$mainDelegate->middle_name." ".$mainDelegate->last_name,
+                    'email_address' => $mainDelegate->email_address,
+                    'mobile_number' => $mainDelegate->mobile_number,
+                    'nationality' => $mainDelegate->nationality,
+                    'job_title' => $mainDelegate->job_title,
+                    'badge_type' => $mainDelegate->badge_type,
+                    'pcode_used' => $mainDelegate->pcode_used,
+                    'discount' => $mainDiscount,
+
+                    'mode_of_payment' => $mainDelegate->mode_of_payment,
+                    'status' => $mainDelegate->status,
+                    'registered_date_time' => Carbon::parse($mainDelegate->registered_date_time)->format('M j, Y g:i A'),
+                    'paid_date_time' => Carbon::parse($mainDelegate->paid_date_time)->format('M j, Y g:i A'),
+
+                    'subDelegates' => $subDelegatesArray,
+                    'invoiceDetails' => $invoiceDetails,
+
+                    'vat_price' => $mainDelegate->vat_price,
+                    'total_amount' => $mainDelegate->total_amount,
+                    'net_amount' => $mainDelegate->net_amount,
+                ]);
+        
+                dd($finalData);
                 return view('admin.event.detail.registrants.registrants_detail', [
                     "pageTitle" => "Event Registrant Details",
                     "eventCategory" => $eventCategory,
                     "eventId" => $eventId,
                     "registrantId" => $registrantId,
+                    "finalData" => $finalData,
                 ]);
             } else {
                 abort(404, 'The URL is incorrect');

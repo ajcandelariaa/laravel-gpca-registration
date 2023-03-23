@@ -60,7 +60,7 @@
                     @endif
                     <td class="text-black">
                         <div class="bg-white py-4 mr-1">
-                            $ {{ $event->std_nmember_rate }} + {{ $event->event_vat }}%
+                            $ {{ $event->std_member_rate }} + {{ $event->event_vat }}%
                         </div>
                     </td>
                 </tr>

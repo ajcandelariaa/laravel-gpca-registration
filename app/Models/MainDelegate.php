@@ -12,6 +12,8 @@ class MainDelegate extends Model
     protected $fillable = [
         'event_id',
         'pass_type',
+        'rate_type',
+        'rate_type_string',
 
         'company_name',
         'company_sector',
@@ -40,8 +42,9 @@ class MainDelegate extends Model
         'discount_price',
         'total_amount',
         'mode_of_payment',
-        'status',
+        'registration_status',
+        'payment_status',
         'registered_date_time',
-        'paid_date',
+        'paid_date_time',
     ];
 }

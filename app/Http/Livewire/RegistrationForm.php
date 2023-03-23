@@ -69,7 +69,7 @@ class RegistrationForm extends Component
     public $additionalDelegates = [];
 
     // DELEGATE PASS TYPE
-    public $delegatePassType;
+    public $delegatePassType, $rateType;
 
     // COMPANY INFO
     public $companyName, $companySector, $companyAddress, $companyCountry, $companyCity, $companyLandlineNumber, $companyMobileNumber, $heardWhere;
@@ -88,7 +88,7 @@ class RegistrationForm extends Component
     public $delegatInvoiceDetails = array();
 
     // ERROR CHECKER
-    public $delegatePassTypeError, $paymentMethodError, $rateType;
+    public $delegatePassTypeError, $paymentMethodError, $rateTypeString;
     public $promoCodeFailMain, $promoCodeSuccessMain, $promoCodeFailSub, $promoCodeSuccessSub;
     public $promoCodeFailSubEdit, $promoCodeSuccessSubEdit;
 
@@ -128,29 +128,32 @@ class RegistrationForm extends Component
         if ($this->event->eb_end_date != null && $this->event->eb_member_rate != null && $this->event->eb_nmember_rate != null) {
             if ($today->lte(Carbon::parse($this->event->eb_end_date))) {
                 if ($this->delegatePassType == "member") {
-                    $this->rateType = "Early Bird Member Rate";
+                    $this->rateTypeString = "Early Bird Member Rate";
                     $this->finalUnitPrice = $this->event->eb_member_rate;
                 } else {
-                    $this->rateType = "Early Bird Non-Member Rate";
+                    $this->rateTypeString = "Early Bird Non-Member Rate";
                     $this->finalUnitPrice = $this->event->eb_nmember_rate;
                 }
+                $this->rateType = "Early Bird";
             } else {
                 if ($this->delegatePassType == "member") {
-                    $this->rateType = "Standard Member Rate";
+                    $this->rateTypeString = "Standard Member Rate";
                     $this->finalUnitPrice = $this->event->std_member_rate;
                 } else {
-                    $this->rateType = "Standard Non-Member Rate";
+                    $this->rateTypeString = "Standard Non-Member Rate";
                     $this->finalUnitPrice = $this->event->std_nmember_rate;
                 }
+                $this->rateType = "Standard";
             }
         } else {
             if ($this->delegatePassType == "member") {
-                $this->rateType = "Standard Member Rate";
+                $this->rateTypeString = "Standard Member Rate";
                 $this->finalUnitPrice = $this->event->std_member_rate;
             } else {
-                $this->rateType = "Standard Non-Member Rate";
+                $this->rateTypeString = "Standard Non-Member Rate";
                 $this->finalUnitPrice = $this->event->std_nmember_rate;
             }
+            $this->rateType = "Standard";
         }
     }
 
@@ -164,7 +167,7 @@ class RegistrationForm extends Component
         }
 
         array_push($this->delegatInvoiceDetails, [
-            'delegateDescription' => "Delegate Registration Fee - {$this->rateType} - {$this->badgeType} {$promoCodeMainDiscountString}",
+            'delegateDescription' => "Delegate Registration Fee - {$this->rateTypeString} - {$this->badgeType} {$promoCodeMainDiscountString}",
             'delegateNames' => [
                 $this->salutation . " " . $this->firstName . " " . $this->middleName . " " . $this->lastName,
             ],
@@ -204,7 +207,7 @@ class RegistrationForm extends Component
                 } else {
                     $promoCodeSubDiscountString = ($this->additionalDelegates[$i]['subPromoCodeDiscount'] == null) ? '' : "- " . $this->additionalDelegates[$i]['subPromoCodeDiscount'] . "% discount";
                     array_push($this->delegatInvoiceDetails, [
-                        'delegateDescription' => "Delegate Registration Fee - {$this->rateType} - {$this->additionalDelegates[$i]['subBadgeType']}{$promoCodeSubDiscountString}",
+                        'delegateDescription' => "Delegate Registration Fee - {$this->rateTypeString} - {$this->additionalDelegates[$i]['subBadgeType']}{$promoCodeSubDiscountString}",
                         'delegateNames' => [
                             $this->additionalDelegates[$i]['subSalutation'] . " " . $this->additionalDelegates[$i]['subFirstName'] . " " . $this->additionalDelegates[$i]['subMiddleName'] . " " . $this->additionalDelegates[$i]['subLastName'],
                         ],
@@ -295,10 +298,19 @@ class RegistrationForm extends Component
                 if($this->promoCode != null){
                     PromoCodes::where('event_id', $this->event->id)->where('event_category', $this->event->category)->where('active', true)->where('promo_code', $this->promoCode)->where('badge_type', $this->badgeType)->increment('total_usage');
                 }
+                
+                // if($this->finalTotal == 0){
+                //     $paymentStatus = "free"
+                //     $payment
+                // } else {
+
+                // }
 
                 $newRegistrant = MainDelegates::create([
                     'event_id' => $this->event->id,
                     'pass_type' => $this->delegatePassType,
+                    'rate_type' => $this->rateType,
+                    'rate_type_string' => $this->rateTypeString,
 
                     'company_name' => $this->companyName,
                     'company_sector' => $this->companySector,
@@ -327,9 +339,9 @@ class RegistrationForm extends Component
                     'discount_price' => $this->finalDiscount,
                     'total_amount' => $this->finalTotal,
                     'mode_of_payment' => $this->paymentMethod,
-                    'status' => ($this->paymentMethod == "bankTransfer") ? "pending" : "paid",
+                    'payment_status' => ($this->paymentMethod == "bankTransfer") ? "pending" : "paid",
                     'registered_date_time' => Carbon::now(),
-                    'paid_date' => ($this->paymentMethod == "bankTransfer") ? null : Carbon::now(),
+                    'paid_date_time' => ($this->paymentMethod == "bankTransfer") ? null : Carbon::now(),
                 ]);
 
                 if (!empty($this->additionalDelegates)) {
