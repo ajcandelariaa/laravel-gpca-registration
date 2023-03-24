@@ -72,6 +72,12 @@
                     <p>Payment Date:</p>
                     <p class="font-bold">{{ $finalData['paid_date_time'] }}</p>
                 </div>
+                
+                <div class="grid grid-cols-1 gap-3 mt-5">
+                    <button class="bg-registrationPrimaryColorHover hover:bg-registrationPrimaryColor text-white py-2 rounded-md text-lg">View Invoice</button>
+                    <button class="bg-green-800 hover:bg-green-900 text-white py-2 rounded-md text-lg">Download Invoice</button>
+                    <button class="bg-gray-800 hover:bg-gray-900 text-white py-2 rounded-md text-lg">Print Invoice</button>
+                </div>
             </div>
 
             <div class="col-span-7">

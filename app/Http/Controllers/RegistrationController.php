@@ -8,6 +8,7 @@ use App\Models\Event;
 use App\Models\MainDelegate;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class RegistrationController extends Controller
 {
@@ -205,5 +206,11 @@ class RegistrationController extends Controller
         } else {
             abort(404, 'The URL is incorrect');
         }
+    }
+
+    public function downloadInvoice(){
+        // $name = "AJ";
+        // $pdf = Pdf::loadView('admin.event.detail.registrants.invoices.paid_discount', $name);
+        // return $pdf->download('invoice.pdf');
     }
 }
