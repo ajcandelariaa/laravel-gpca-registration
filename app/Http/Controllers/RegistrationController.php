@@ -208,7 +208,7 @@ class RegistrationController extends Controller
         }
     }
 
-    public function downloadInvoice(){
+    public function registrantDownloadInvoice(){
         // $name = "AJ";
         // $pdf = Pdf::loadView('admin.event.detail.registrants.invoices.paid_discount', $name);
         // return $pdf->download('invoice.pdf');

@@ -29,11 +29,16 @@ Route::prefix('admin')->group(function () {
 
         Route::prefix('event')->group(function () {
             Route::get('/', [EventController::class, 'manageEventView'])->name('admin.event.view');
-            Route::get('/{eventCategory}/{eventId}/detail', [EventController::class, 'eventDetailView'])->name('admin.event.detail.view');
-            Route::get('/{eventCategory}/{eventId}/promo-code', [EventController::class, 'eventPromoCodeView'])->name('admin.event.promo-codes.view');
-            Route::get('/{eventCategory}/{eventId}/registrant', [RegistrationController::class, 'eventRegistrantsView'])->name('admin.event.registrants.view');
-            Route::get('/{eventCategory}/{eventId}/registrant/{registrantId}', [RegistrationController::class, 'registrantDetailView'])->name('admin.event.registrants.detail.view');
-            Route::get('/{eventCategory}/{eventId}/delegate', [EventController::class, 'eventDelegateView'])->name('admin.event.delegates.view');
+            Route::prefix('{eventCategory}/{eventId}')->group(function (){
+                Route::get('/detail', [EventController::class, 'eventDetailView'])->name('admin.event.detail.view');
+                Route::get('/promo-code', [EventController::class, 'eventPromoCodeView'])->name('admin.event.promo-codes.view');
+                Route::prefix('registrant')->group(function (){
+                    Route::get('/', [RegistrationController::class, 'eventRegistrantsView'])->name('admin.event.registrants.view');
+                    Route::get('/{registrantId}', [RegistrationController::class, 'registrantDetailView'])->name('admin.event.registrants.detail.view');
+                    Route::get('/{registrantId}/download-invoice', [RegistrationController::class, 'registrantDownloadInvoice'])->name('admin.event.registrants.download.invoice');
+                });
+                Route::get('/delegate', [EventController::class, 'eventDelegateView'])->name('admin.event.delegates.view');
+            });
             Route::get('/edit/{eventCategory}/{eventId}', [EventController::class, 'eventEditView'])->name('admin.event.edit.view');
             Route::get('/add', [EventController::class, 'addEventView'])->name('admin.event.add.view');
             Route::post('/add', [EventController::class, 'addEvent'])->name('admin.event.add.post');
