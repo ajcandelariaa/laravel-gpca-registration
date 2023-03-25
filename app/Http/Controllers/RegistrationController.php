@@ -152,11 +152,6 @@ class RegistrationController extends Controller
                 }
 
                 $finalData = [
-                    'event' => $event,
-
-                    "finalEventStartDate" => Carbon::parse($event->event_start_date)->format('d M Y'),
-                    "finalEventEndDate" => Carbon::parse($event->event_end_date)->format('d M Y'),
-
                     'mainDelegateId' => $mainDelegate->id,
                     'pass_type' => $mainDelegate->pass_type,
                     'rate_type' => $mainDelegate->rate_type,
@@ -185,12 +180,8 @@ class RegistrationController extends Controller
                     'paid_date_time' => ($mainDelegate->paid_date_time == null) ? "N/A" : Carbon::parse($mainDelegate->paid_date_time)->format('M j, Y g:i A'),
 
                     'subDelegates' => $subDelegatesArray,
-                    'invoiceDetails' => $invoiceDetails,
 
-                    'unit_price' => $mainDelegate->unit_price,
-                    'vat_price' => $mainDelegate->vat_price,
-                    'total_amount' => $mainDelegate->total_amount,
-                    'net_amount' => $mainDelegate->net_amount,
+                    'invoiceData' => $this->getInvoice($eventCategory, $eventId, $registrantId),
                 ];
 
                 return view('admin.event.detail.registrants.registrants_detail', [
@@ -208,9 +199,112 @@ class RegistrationController extends Controller
         }
     }
 
-    public function registrantDownloadInvoice(){
-        // $name = "AJ";
-        // $pdf = Pdf::loadView('admin.event.detail.registrants.invoices.paid_discount', $name);
-        // return $pdf->download('invoice.pdf');
+    public function getInvoice($eventCategory, $eventId, $registrantId){
+        if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {
+            if(MainDelegate::where('id', $registrantId)->where('event_id', $eventId)->exists()){
+                $event = Event::where('category', $eventCategory)->where('id', $eventId)->first();
+                
+                $finalData = array();
+                $invoiceDetails = array();
+
+                $mainDelegate = MainDelegate::where('id', $registrantId)->where('event_id', $eventId)->first();
+                $mainDiscount = PromoCode::where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $mainDelegate->pcode_used)->where('badge_type', $mainDelegate->badge_type)->value('discount');
+
+                $promoCodeMainDiscountString = ($mainDelegate->pcode_used == null) ? '' : "- " . $mainDiscount . "% discount";
+
+                array_push($invoiceDetails, [
+                    'delegateDescription' => "Delegate Registration Fee - {$mainDelegate->rate_type_string} - {$mainDelegate->badge_type} {$promoCodeMainDiscountString}",
+                    'delegateNames' => [
+                        $mainDelegate->salutation." ".$mainDelegate->first_name." ".$mainDelegate->middle_name." ".$mainDelegate->last_name,
+                    ],
+                    'badgeType' => $mainDelegate->badge_type,
+                    'quantity' => 1,
+                    'totalDiscount' => $mainDelegate->unit_price * ($mainDiscount / 100),
+                    'totalNetAmount' =>  $mainDelegate->unit_price - ($mainDelegate->unit_price * ($mainDiscount / 100)),
+                    'promoCodeDiscount' => $mainDiscount,
+                ]);
+
+
+                $subDelegates = AdditionalDelegate::where('main_delegate_id', $registrantId)->get();
+                if(!$subDelegates->isEmpty()){
+                    foreach($subDelegates as $subDelegate){
+                        $subDiscount = PromoCode::where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $subDelegate->pcode_used)->where('badge_type', $subDelegate->badge_type)->value('discount');
+
+                        $checkIfExisting = false;
+                        $existingIndex = 0;
+
+                        for ($j = 0; $j < count($invoiceDetails); $j++) {
+                            if ($subDelegate->badge_type == $invoiceDetails[$j]['badgeType'] && $subDiscount == $invoiceDetails[$j]['promoCodeDiscount']) {
+                                $existingIndex = $j;
+                                $checkIfExisting = true;
+                                break;
+                            }
+                        }
+
+                        if ($checkIfExisting) {
+                            array_push(
+                                $invoiceDetails[$existingIndex]['delegateNames'],
+                                $subDelegate->salutation." ".$subDelegate->first_name." ".$subDelegate->middle_name." ".$subDelegate->last_name
+                            );
+        
+                            $quantityTemp = $invoiceDetails[$existingIndex]['quantity'] + 1;
+                            $totalDiscountTemp = ($mainDelegate->unit_price * ($invoiceDetails[$existingIndex]['promoCodeDiscount'] / 100)) * $quantityTemp;
+                            $totalNetAmountTemp = ($mainDelegate->unit_price * $quantityTemp) - $totalDiscountTemp;
+        
+                            $invoiceDetails[$existingIndex]['quantity'] = $quantityTemp;
+                            $invoiceDetails[$existingIndex]['totalDiscount'] = $totalDiscountTemp;
+                            $invoiceDetails[$existingIndex]['totalNetAmount'] = $totalNetAmountTemp;
+                        } else {
+                            $promoCodeSubDiscountString = ($subDiscount == null) ? '' : "- " . $subDiscount . "% discount";
+                            array_push($invoiceDetails, [
+                                'delegateDescription' => "Delegate Registration Fee - {$mainDelegate->rate_type_string} - {$subDelegate->badge_type}{$promoCodeSubDiscountString}",
+                                'delegateNames' => [
+                                    $subDelegate->salutation." ".$subDelegate->first_name." ".$subDelegate->middle_name." ".$subDelegate->last_name,
+                                ],
+                                'badgeType' => $subDelegate->badge_type,
+                                'quantity' => 1,
+                                'totalDiscount' => $mainDelegate->unit_price * ($subDiscount / 100),
+                                'totalNetAmount' =>  $mainDelegate->unit_price - ($mainDelegate->unit_price * ($subDiscount / 100)),
+                                'promoCodeDiscount' => $subDiscount,
+                            ]);
+                        }
+                    }
+                }
+
+                $invoiceData = [
+                    "finalEventStartDate" => Carbon::parse($event->event_start_date)->format('d M Y'),
+                    "finalEventEndDate" => Carbon::parse($event->event_end_date)->format('d M Y'),
+                    "eventName" => $event->name,
+                    "eventLocation" => $event->location,
+                    "eventVat" => $event->event_vat,
+                    'vat_price' => $mainDelegate->vat_price,
+                    'net_amount' => $mainDelegate->net_amount,
+                    'total_amount' => $mainDelegate->total_amount,
+                    'unit_price' => $mainDelegate->unit_price,
+                    'invoiceDetails' => $invoiceDetails,
+                ];
+
+                return $invoiceData;
+            } else {
+                abort(404, 'The URL is incorrect');
+            }
+        } else {
+            abort(404, 'The URL is incorrect');
+        }
+    }
+
+    public function registrantViewInvoice($eventCategory, $eventId, $registrantId){
+        $finalData = $this->getInvoice($eventCategory, $eventId, $registrantId);
+        $pdf = Pdf::loadView('admin.event.detail.registrants.invoices.paid_discount', $finalData);
+        return $pdf->download('invoice.pdf');
+    }
+
+    public function registrantDownloadInvoice($eventCategory, $eventId, $registrantId){
+        $data = [
+            "name" => "AJ",
+            "age" => 18,
+        ];
+        $pdf = Pdf::loadView('admin.event.detail.registrants.invoices.paid_discount', $data);
+        return $pdf->download('invoice.pdf');
     }
 }

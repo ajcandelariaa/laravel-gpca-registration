@@ -36,6 +36,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('/', [RegistrationController::class, 'eventRegistrantsView'])->name('admin.event.registrants.view');
                     Route::get('/{registrantId}', [RegistrationController::class, 'registrantDetailView'])->name('admin.event.registrants.detail.view');
                     Route::get('/{registrantId}/download-invoice', [RegistrationController::class, 'registrantDownloadInvoice'])->name('admin.event.registrants.download.invoice');
+                    Route::get('/{registrantId}/view-invoice', [RegistrationController::class, 'registrantViewInvoice'])->name('admin.event.registrants.view.invoice');
                 });
                 Route::get('/delegate', [EventController::class, 'eventDelegateView'])->name('admin.event.delegates.view');
             });

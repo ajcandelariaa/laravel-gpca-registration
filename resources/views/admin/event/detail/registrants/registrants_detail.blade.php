@@ -193,13 +193,13 @@
                         $count = 1;
                     @endphp
 
-                    @foreach ($finalData['invoiceDetails'] as $delegatInvoiceDetail)
+                    @foreach ($finalData['invoiceData']['invoiceDetails'] as $delegatInvoiceDetail)
                         <div class="grid grid-cols-6 gap-x-2">
                             <div class="col-span-2 bg-white p-4">
                                 @if ($count == 1)
-                                    <p>{{ $finalData['event']->name }} –
-                                        {{ $finalData['finalEventStartDate'] . ' - ' . $finalData['finalEventEndDate'] }}
-                                        at {{ $finalData['event']->location }}</p>
+                                    <p>{{ $finalData['invoiceData']['eventName'] }} –
+                                        {{ $finalData['invoiceData']['finalEventStartDate'] . ' - ' . $finalData['invoiceData']['finalEventEndDate'] }}
+                                        at {{ $finalData['invoiceData']['eventLocation'] }}</p>
                                     <p class="mt-10">{{ $delegatInvoiceDetail['delegateDescription'] }}</p>
                                 @else
                                     <p>{{ $delegatInvoiceDetail['delegateDescription'] }}</p>
@@ -216,7 +216,7 @@
                             </div>
 
                             <div class="col-span-1 bg-white p-4 flex justify-center items-center">
-                                <p>$ {{ number_format($finalData['unit_price'], 2, '.', ',') }}</p>
+                                <p>$ {{ number_format($finalData['invoiceData']['unit_price'], 2, '.', ',') }}</p>
                             </div>
 
                             <div class="col-span-1 bg-white p-4 flex justify-center items-center">
@@ -239,15 +239,15 @@
                         </div>
 
                         <div class="col-span-1 bg-white p-4 text-right">
-                            <p>$ {{ number_format($finalData['net_amount'], 2, '.', ',') }}</p>
+                            <p>$ {{ number_format($finalData['invoiceData']['net_amount'], 2, '.', ',') }}</p>
                         </div>
 
                         <div class="col-span-4 bg-white p-4">
-                            <p>VAT {{ $finalData['event']->event_vat }}%</p>
+                            <p>VAT {{ $finalData['invoiceData']['eventVat'] }}%</p>
                         </div>
 
                         <div class="col-span-1 bg-white p-4 text-right">
-                            <p>$ {{ number_format($finalData['vat_price'], 2, '.', ',') }}</p>
+                            <p>$ {{ number_format($finalData['invoiceData']['vat_price'], 2, '.', ',') }}</p>
                         </div>
 
                         <div class="col-span-4 bg-white p-4 font-bold">
@@ -255,7 +255,7 @@
                         </div>
 
                         <div class="col-span-1 bg-white p-4 text-right font-bold">
-                            <p>$ {{ number_format($finalData['total_amount'], 2, '.', ',') }}</p>
+                            <p>$ {{ number_format($finalData['invoiceData']['total_amount'], 2, '.', ',') }}</p>
                         </div>
                     </div>
                 </div>

@@ -1,213 +1,99 @@
-<!DOCTYPE html>
-<html lang="en">
+ @extends('admin.event.detail.registrants.invoices.master')
 
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Invoice #6</title>
+ @section('content')
+     <div class="mt-10">
+         <div class="bg-registrationInputFieldsBGColor p-2 mt-5">
+             <div class="grid grid-cols-6 text-center font-bold text-registrationPrimaryColor text-lg pt-2 pb-4">
+                 <div class="col-span-2">
+                     <p>Description</p>
+                 </div>
 
-    <style>
-        html,
-        body {
-            margin: 10px;
-            padding: 10px;
-            font-family: sans-serif;
-        }
+                 <div class="col-span-1">
+                     <p>Qty</p>
+                 </div>
 
-        h1,
-        h2,
-        h3,
-        h4,
-        h5,
-        h6,
-        p,
-        span,
-        label {
-            font-family: sans-serif;
-        }
+                 <div class="col-span-1">
+                     <p>Unit price</p>
+                 </div>
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 0px !important;
-        }
+                 <div class="col-span-1">
+                     <p>Discount</p>
+                 </div>
 
-        table thead th {
-            height: 28px;
-            text-align: left;
-            font-size: 16px;
-            font-family: sans-serif;
-        }
+                 <div class="col-span-1">
+                     <p>Net amount</p>
+                 </div>
+             </div>
 
-        table,
-        th,
-        td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            font-size: 14px;
-        }
+             @php
+                 $count = 1;
+             @endphp
 
-        .heading {
-            font-size: 24px;
-            margin-top: 12px;
-            margin-bottom: 12px;
-            font-family: sans-serif;
-        }
+             @foreach ($invoiceDetails as $delegatInvoiceDetail)
+                 <div class="grid grid-cols-6 gap-x-2">
+                     <div class="col-span-2 bg-white p-4">
+                         @if ($count == 1)
+                             <p>{{ $eventName }} –
+                                 {{ $finalEventStartDate . ' - ' . $finalEventEndDate }}
+                                 at {{ $eventLocation }}</p>
+                             <p class="mt-10">{{ $delegatInvoiceDetail['delegateDescription'] }}</p>
+                         @else
+                             <p>{{ $delegatInvoiceDetail['delegateDescription'] }}</p>
+                         @endif
+                         <ul class="mt-2 list-decimal ml-4">
+                             @foreach ($delegatInvoiceDetail['delegateNames'] as $name)
+                                 <li>{{ $name }}</li>
+                             @endforeach
+                         </ul>
+                     </div>
 
-        .small-heading {
-            font-size: 18px;
-            font-family: sans-serif;
-        }
+                     <div class="col-span-1 bg-white p-4 flex justify-center items-center">
+                         <p>{{ $delegatInvoiceDetail['quantity'] }}</p>
+                     </div>
 
-        .total-heading {
-            font-size: 18px;
-            font-weight: 700;
-            font-family: sans-serif;
-        }
+                     <div class="col-span-1 bg-white p-4 flex justify-center items-center">
+                         <p>$ {{ number_format($unit_price, 2, '.', ',') }}</p>
+                     </div>
 
-        .order-details tbody tr td:nth-child(1) {
-            width: 20%;
-        }
+                     <div class="col-span-1 bg-white p-4 flex justify-center items-center">
+                         <p>$ {{ number_format($delegatInvoiceDetail['totalDiscount'], 2, '.', ',') }}</p>
+                     </div>
 
-        .order-details tbody tr td:nth-child(3) {
-            width: 20%;
-        }
+                     <div class="col-span-1 bg-white p-4 flex justify-center items-center">
+                         <p>$ {{ number_format($delegatInvoiceDetail['totalNetAmount'], 2, '.', ',') }}</p>
+                     </div>
+                 </div>
 
-        .text-start {
-            text-align: left;
-        }
+                 @php
+                     $count += 1;
+                 @endphp
+             @endforeach
 
-        .text-end {
-            text-align: right;
-        }
+             <div class="grid grid-cols-5 gap-2 mt-2">
+                 <div class="col-span-4 bg-white p-4">
+                     <p>Total (before VAT)</p>
+                 </div>
 
-        .text-center {
-            text-align: center;
-        }
+                 <div class="col-span-1 bg-white p-4 text-right">
+                     <p>$ {{ number_format($net_amount, 2, '.', ',') }}</p>
+                 </div>
 
-        .company-data span {
-            margin-bottom: 4px;
-            display: inline-block;
-            font-family: sans-serif;
-            font-size: 14px;
-            font-weight: 400;
-        }
+                 <div class="col-span-4 bg-white p-4">
+                     <p>VAT {{ $eventVat }}%</p>
+                 </div>
 
-        .no-border {
-            border: 1px solid #fff !important;
-        }
+                 <div class="col-span-1 bg-white p-4 text-right">
+                     <p>$ {{ number_format($vat_price, 2, '.', ',') }}</p>
+                 </div>
 
-        .bg-blue {
-            background-color: #414ab1;
-            color: #fff;
-        }
-    </style>
-</head>
+                 <div class="col-span-4 bg-white p-4 font-bold">
+                     <p>TOTAL</p>
+                 </div>
 
-<body>
-
-    <table class="order-details">
-        <thead>
-            <tr>
-                <th width="50%" colspan="2">
-                    <h2 class="text-start">Funda Ecommerce</h2>
-                </th>
-                <th width="50%" colspan="2" class="text-end company-data">
-                    <span>Invoice Id: #6</span> <br>
-                    <span>Date: 24 / 09 / 2022</span> <br>
-                    <span>Zip code : 560077</span> <br>
-                    <span>Address: #555, Main road, shivaji nagar, Bangalore, India</span> <br>
-                </th>
-            </tr>
-            <tr class="bg-blue">
-                <th width="50%" colspan="2">Order Details</th>
-                <th width="50%" colspan="2">User Details</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>Order Id:</td>
-                <td>6</td>
-
-                <td>Full Name:</td>
-                <td>Ved Prakash</td>
-            </tr>
-            <tr>
-                <td>Tracking Id/No.:</td>
-                <td>funda-CRheOqspbA</td>
-
-                <td>Email Id:</td>
-                <td>ved@gmail.com</td>
-            </tr>
-            <tr>
-                <td>Ordered Date:</td>
-                <td>22-09-2022 10:54 AM</td>
-
-                <td>Phone:</td>
-                <td>8889997775</td>
-            </tr>
-            <tr>
-                <td>Payment Mode:</td>
-                <td>Cash on Delivery</td>
-
-                <td>Address:</td>
-                <td>asda asdad asdad adsasd</td>
-            </tr>
-            <tr>
-                <td>Order Status:</td>
-                <td>completed</td>
-
-                <td>Pin code:</td>
-                <td>566999</td>
-            </tr>
-        </tbody>
-    </table>
-
-    <table>
-        <thead>
-            <tr>
-                <th class="no-border text-start heading" colspan="5">
-                    Order Items
-                </th>
-            </tr>
-            <tr class="bg-blue">
-                <th>ID</th>
-                <th>Product</th>
-                <th>Price</th>
-                <th>Quantity</th>
-                <th>Total</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td width="10%">16</td>
-                <td>
-                    Mi Note 7
-                </td>
-                <td width="10%">$14000</td>
-                <td width="10%">1</td>
-                <td width="15%" class="fw-bold">$14000</td>
-            </tr>
-            <tr>
-                <td width="10%">17</td>
-                <td>
-                    Vivo V19
-                </td>
-                <td width="10%">$699</td>
-                <td width="10%">1</td>
-                <td width="15%" class="fw-bold">$699</td>
-            </tr>
-            <tr>
-                <td colspan="4" class="total-heading">Total Amount - <small>Inc. all vat/tax</small> :</td>
-                <td colspan="1" class="total-heading">$14699</td>
-            </tr>
-        </tbody>
-    </table>
-
-    <br>
-    <p class="text-center">
-        Thank your for shopping with Funda of Web IT
-    </p>
-
-</body>
-
-</html>
+                 <div class="col-span-1 bg-white p-4 text-right font-bold">
+                     <p>$ {{ number_format($total_amount, 2, '.', ',') }}</p>
+                 </div>
+             </div>
+         </div>
+     </div>
+ @endsection
