@@ -74,9 +74,8 @@
                 </div>
                 
                 <div class="grid grid-cols-1 gap-3 mt-5">
-                    <button class="bg-registrationPrimaryColorHover hover:bg-registrationPrimaryColor text-white py-2 rounded-md text-lg">View Invoice</button>
-                    <button class="bg-green-800 hover:bg-green-900 text-white py-2 rounded-md text-lg">Download Invoice</button>
-                    <button class="bg-gray-800 hover:bg-gray-900 text-white py-2 rounded-md text-lg">Print Invoice</button>
+                    <a href="{{ route('admin.event.registrants.view.invoice', ['eventCategory' => $eventCategory, 'eventId' => $eventId, 'registrantId' => $registrantId]) }}" class="bg-registrationPrimaryColorHover hover:bg-registrationPrimaryColor text-white py-2 rounded-md text-lg text-center" target="_blank">View Invoice</a>
+                    <a href="{{ route('admin.event.registrants.download.invoice', ['eventCategory' => $eventCategory, 'eventId' => $eventId, 'registrantId' => $registrantId]) }}" class="bg-green-800 hover:bg-green-900 text-white py-2 rounded-md text-lg text-center" target="_blank">Download Invoice</a>
                 </div>
             </div>
 

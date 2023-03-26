@@ -9,6 +9,7 @@ use App\Models\MainDelegate;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
+use NumberFormatter;
 
 class RegistrationController extends Controller
 {
@@ -282,6 +283,7 @@ class RegistrationController extends Controller
                     'total_amount' => $mainDelegate->total_amount,
                     'unit_price' => $mainDelegate->unit_price,
                     'invoiceDetails' => $invoiceDetails,
+                    'total_amount_string' => ucwords($this->numberToWords($mainDelegate->total_amount)),
                 ];
 
                 return $invoiceData;
@@ -295,16 +297,19 @@ class RegistrationController extends Controller
 
     public function registrantViewInvoice($eventCategory, $eventId, $registrantId){
         $finalData = $this->getInvoice($eventCategory, $eventId, $registrantId);
+        // return view('admin.event.detail.registrants.invoices.paid_discount', $finalData);
+        $pdf = Pdf::loadView('admin.event.detail.registrants.invoices.paid_discount', $finalData);
+        return $pdf->stream('invoice.pdf');
+    }
+
+    public function registrantDownloadInvoice($eventCategory, $eventId, $registrantId){
+        $finalData = $this->getInvoice($eventCategory, $eventId, $registrantId);
         $pdf = Pdf::loadView('admin.event.detail.registrants.invoices.paid_discount', $finalData);
         return $pdf->download('invoice.pdf');
     }
 
-    public function registrantDownloadInvoice($eventCategory, $eventId, $registrantId){
-        $data = [
-            "name" => "AJ",
-            "age" => 18,
-        ];
-        $pdf = Pdf::loadView('admin.event.detail.registrants.invoices.paid_discount', $data);
-        return $pdf->download('invoice.pdf');
+    public function numberToWords($number){
+        $formatter = new NumberFormatter('en', NumberFormatter::SPELLOUT);
+        return $formatter->format($number);
     }
 }
