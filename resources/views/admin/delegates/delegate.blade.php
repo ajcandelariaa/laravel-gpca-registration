@@ -55,11 +55,12 @@
                         </div>
 
                         <div class="col-span-2">
-                            <a href="" class="cursor-pointer hover:text-gray-600 text-gray-500 mr-2">
+                            <a href="{{ route('admin.event.delegates.detail.view', ['eventCategory' => $finalListsOfDelegate['eventCategory'], 'eventId' => $finalListsOfDelegate['eventId'], 'delegateType' => $finalListsOfDelegate['delegateType'], 'delegateId' => $finalListsOfDelegate['delegateId']]) }}"
+                                class="cursor-pointer hover:text-gray-600 text-gray-500 mr-2">
                                 <i class="fa-solid fa-eye"></i> View
                             </a>
-                            <a href=""
-                                class="bg-green-800 hover:bg-green-900 text-white py-1 px-2 rounded-md text-xs text-center">
+                            <a href="{{ route('admin.event.delegates.detail.printBadge', ['eventCategory' => $finalListsOfDelegate['eventCategory'], 'eventId' => $finalListsOfDelegate['eventId'], 'delegateType' => $finalListsOfDelegate['delegateType'], 'delegateId' => $finalListsOfDelegate['delegateId']]) }}"
+                                class="bg-green-800 hover:bg-green-900 text-white py-1 px-2 rounded-md text-xs text-center" target="_blank">
                                 Print Badge
                             </a>
                         </div>

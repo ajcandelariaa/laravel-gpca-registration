@@ -38,7 +38,11 @@ Route::prefix('admin')->group(function () {
                     Route::get('/{registrantId}/download-invoice', [RegistrationController::class, 'registrantDownloadInvoice'])->name('admin.event.registrants.download.invoice');
                     Route::get('/{registrantId}/view-invoice', [RegistrationController::class, 'registrantViewInvoice'])->name('admin.event.registrants.view.invoice');
                 });
-                Route::get('/delegate', [DelegateController::class, 'eventDelegateView'])->name('admin.event.delegates.view');
+                Route::prefix('delegate')->group(function () {
+                    Route::get('/', [DelegateController::class, 'eventDelegateView'])->name('admin.event.delegates.view');
+                    Route::get('/{delegateType}/{delegateId}', [DelegateController::class, 'delegateDetailView'])->name('admin.event.delegates.detail.view');
+                    Route::get('/{delegateType}/{delegateId}/print-badge', [DelegateController::class, 'delegateDetailPrintBadge'])->name('admin.event.delegates.detail.printBadge');
+                });
             });
             Route::get('/edit/{eventCategory}/{eventId}', [EventController::class, 'eventEditView'])->name('admin.event.edit.view');
             Route::get('/add', [EventController::class, 'addEventView'])->name('admin.event.add.view');

@@ -18,6 +18,7 @@ module.exports = {
       },
       gridTemplateColumns: {
         addDelegateGrid: '250px auto',
+        delegateDetailGrid: '200px auto',
       },
       backgroundImage: {
         loginBg: "url('/public/assets/images/loginbg.png')",
