@@ -85,10 +85,10 @@
                                 class="cursor-pointer hover:text-yellow-600 text-yellow-500">
                                 <i class="fa-solid fa-pen-to-square"></i> Edit
                             </a>
-                            <div class="cursor-pointer hover:text-red-600 text-red-500">
+                            {{-- <div class="cursor-pointer hover:text-red-600 text-red-500">
                                 <i class="fa-solid fa-trash"></i>
                                 Delete
-                            </div>
+                            </div> --}}
                         </div>
                         @php
                             $count++;

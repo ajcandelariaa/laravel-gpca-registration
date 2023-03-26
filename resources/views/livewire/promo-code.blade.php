@@ -20,7 +20,7 @@
                 <div class="col-span-1">Number of Codes</div>
                 <div class="col-span-1">Validity</div>
                 <div class="col-span-1">Status</div>
-                <div class="col-span-1">Actions</div>
+                <div class="col-span-1">Action</div>
             </div>
 
             @php
@@ -52,11 +52,11 @@
                             <i class="fa-solid fa-pen-to-square"></i>
                             Edit
                         </div>
-                        <div onclick="deletepromoCodeScript({{ $promoCode->id }})"
+                        {{-- <div onclick="deletepromoCodeScript({{ $promoCode->id }})"
                             class="cursor-pointer hover:text-red-600 text-red-500">
                             <i class="fa-solid fa-trash"></i>
                             Delete
-                        </div>
+                        </div> --}}
                     </div>
                     @php
                         $count++;
@@ -72,10 +72,10 @@
         </div>
     @endif
 
-    <script>
+    {{-- <script>
         function deletepromoCodeScript(promoCodeId) {
             if (confirm("Are you sure you want to delete this code?"))
                 window.livewire.emit('deletePromoCodeScript', promoCodeId);
         }
-    </script>
+    </script> --}}
 </div>

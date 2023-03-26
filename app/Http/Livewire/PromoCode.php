@@ -31,9 +31,9 @@ class PromoCode extends Component
     public $total_usage;
     public $validity;
     
-    protected $listeners = [
-        'deletePromoCodeScript' => 'deletePromoCode'
-    ];
+    // protected $listeners = [
+    //     'deletePromoCodeScript' => 'deletePromoCode'
+    // ];
 
     public function mount($eventCategory, $eventId)
     {
@@ -182,8 +182,8 @@ class PromoCode extends Component
     }
 
 
-    public function deletePromoCode($promoCodeId)
-    {
-        PromoCodes::find($promoCodeId)->delete();
-    }
+    // public function deletePromoCode($promoCodeId)
+    // {
+    //     PromoCodes::find($promoCodeId)->delete();
+    // }
 }

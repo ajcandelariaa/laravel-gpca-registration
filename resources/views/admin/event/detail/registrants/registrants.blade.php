@@ -20,7 +20,7 @@
                     <div class="col-span-1">Quantity</div>
                     <div class="col-span-1">Total Amount</div>
                     <div class="col-span-1">Status</div>
-                    <div class="col-span-1">View</div>
+                    <div class="col-span-1">Action</div>
                 </div>
 
                 @php
@@ -68,7 +68,6 @@
                             <a href="{{ route('admin.event.registrants.detail.view', ['eventCategory' => $eventCategory, 'eventId' => $eventId, 'registrantId' => $finalListOfRegistrant['registrantId']]) }}"
                                 class="cursor-pointer hover:text-gray-600 text-gray-500">
                                 <i class="fa-solid fa-eye"></i> View
-                            </a>
                             </a>
                         </div>
                         @php
