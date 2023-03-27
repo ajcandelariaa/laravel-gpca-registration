@@ -69,6 +69,10 @@ class RegistrationForm extends Component
         $this->event = $data;
         $this->currentStep = 1;
 
+        $this->badgeType = "Delegate";
+        $this->subBadgeType = "Delegate";
+        $this->subBadgeTypeEdit = "Delegate";
+
         $today = Carbon::today();
 
         if ($this->event->eb_end_date != null && $this->event->eb_member_rate != null && $this->event->eb_nmember_rate != null) {
@@ -414,7 +418,6 @@ class RegistrationForm extends Component
         $this->subMobileNumber = null;
         $this->subNationality = null;
         $this->subJobTitle = null;
-        $this->subBadgeType = null;
         $this->promoCodeSuccessSub = null;
         $this->promoCodeFailSub = null;
         $this->subPromoCode = null;

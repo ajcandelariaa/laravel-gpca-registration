@@ -138,34 +138,7 @@
                         </div>
 
 
-                        {{-- ROW 6 --}}
-                        <div class="space-y-2 col-span-1">
-                            <div class="text-registrationPrimaryColor">
-                                Registration type
-                            </div>
-
-                            @if ($promoCodeSuccessSubEdit != null)
-                                <input readonly wire:model="subBadgeTypeEdit" type="text"
-                                    class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-none cursor-not-allowed">
-                            @else
-                                <select wire:model="subBadgeTypeEdit"
-                                    class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                                    <option value=""></option>
-                                    @foreach ($badgeTypes as $badgeType)
-                                        <option value="{{ $badgeType }}"
-                                            {{ $subBadgeTypeEdit == $badgeType ? 'selected' : '' }}>
-                                            {{ $badgeType }}</option>
-                                    @endforeach
-                                </select>
-                            @endif
-
-                            @error('subBadgeTypeEdit')
-                                <div class="text-red-500 text-xs italic mt-1">
-                                    {{ $message }}
-                                </div>
-                            @enderror
-                        </div>
-                        <div class="space-y-2 col-span-1">
+                        <div class="space-y-2 col-span-2">
                             <div class="text-registrationPrimaryColor">
                                 Promo Code
                             </div>

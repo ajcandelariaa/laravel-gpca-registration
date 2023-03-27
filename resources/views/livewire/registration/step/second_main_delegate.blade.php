@@ -69,7 +69,7 @@
 
         {{-- ROW 2 --}}
         <div class="space-y-2 col-span-2">
-            <div class="grid grid-cols-3 gap-x-5">
+            <div class="grid grid-cols-2 gap-x-5">
                 <div class="col-span-1">
                     <div class="text-registrationPrimaryColor">
                         Email Address <span class="text-red-500">*</span>
@@ -101,7 +101,13 @@
                         @enderror
                     </div>
                 </div>
+            </div>
+        </div>
 
+
+        {{-- ROW 3 --}}
+        <div class="space-y-2 col-span-2">
+            <div class="grid grid-cols-3 gap-x-5">
                 <div class="col-span-1">
                     <div class="text-registrationPrimaryColor">
                         Nationality <span class="text-red-500">*</span>
@@ -117,13 +123,6 @@
                         @enderror
                     </div>
                 </div>
-            </div>
-        </div>
-
-
-        {{-- ROW 3 --}}
-        <div class="space-y-2 col-span-2">
-            <div class="grid grid-cols-3 gap-x-5">
 
                 <div class="col-span-1">
                     <div class="text-registrationPrimaryColor">
@@ -134,33 +133,6 @@
                             class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
 
                         @error('jobTitle')
-                            <div class="text-red-500 text-xs italic mt-1">
-                                {{ $message }}
-                            </div>
-                        @enderror
-                    </div>
-                </div>
-
-                <div class="col-span-1">
-                    <div class="text-registrationPrimaryColor">
-                        Registration type <span class="text-red-500">*</span>
-                    </div>
-                    <div>
-                        @if ($promoCodeSuccessMain != null)
-                            <input readonly wire:model="badgeType" type="text"
-                                class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-none cursor-not-allowed">
-                        @else
-                            <select wire:model="badgeType"
-                                class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                                <option value=""></option>
-                                @foreach ($badgeTypes as $badgeType)
-                                    <option value="{{ $badgeType }}">
-                                        {{ $badgeType }}</option>
-                                @endforeach
-                            </select>
-                        @endif
-
-                        @error('badgeType')
                             <div class="text-red-500 text-xs italic mt-1">
                                 {{ $message }}
                             </div>
