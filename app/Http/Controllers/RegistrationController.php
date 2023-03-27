@@ -300,6 +300,12 @@ class RegistrationController extends Controller
         }
     }
 
+    public function generatePublicInvoice($eventCategory, $eventId, $registrantId){
+        $finalData = $this->getInvoice($eventCategory, $eventId, $registrantId);
+        $pdf = Pdf::loadView('admin.event.detail.registrants.invoices.paid_discount', $finalData);
+        return $pdf->download('invoice.pdf');
+    }
+
     public function registrantViewInvoice($eventCategory, $eventId, $registrantId){
         $finalData = $this->getInvoice($eventCategory, $eventId, $registrantId);
         // return view('admin.event.detail.registrants.invoices.paid_discount', $finalData);
@@ -324,7 +330,7 @@ class RegistrationController extends Controller
             'job_title' => "IT Coordinator",
             'company_name' => "GPCA",
         ];
-        Mail::to("aj@gpca.org.ae")
+        Mail::to("ajajcandelaria@gmail.com")
         // ->bcc('analee@gpca.org.ae')
         ->send(new RegistrationConfirmation($details));
     }

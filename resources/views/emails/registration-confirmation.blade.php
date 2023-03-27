@@ -24,8 +24,17 @@ GPCA
 <body>
     <p>Dear {{ $details['name'] }}</p>
     <p>Greetings from GPCA!</p>
-    <p>Thank you for registering to attend the 16th GPCA Annual Forum to be held from Tuesday 6 December to Thursday 8 December 2022 at the Hilton Riyadh hotel in Riyadh KSA.</p>
+    <p>Thank you for registering to attend the {{ $details['eventName'] }} to be held from {{ $details['startDate'] }} to {{ $details['endDate'] }} {{ $details['year'] }} at the {{ $details['location'] }}.</p>
     <p>Please note that your registration is confirmed but admission to the forum will only be granted upon confirmation of payment receipt. Payment can be made via credit card or bank transfer.</p>
     <p>A summary of your booking confirmation is given below. Please collect your badge from the FAST-TRACK DELEGATE COUNTER that will be clearly sign posted in the registration area when you arrive at the event. </p>
+
+    <a href="{{ $details['invoiceLink'] }}" target="_blank">Download Invoice</a>
+
+    <p>Scan the QR Code below for your badge or click this <a href="{{ $details['badgeLink'] }}" target="_blank">link</a></p>
+    {!! QrCode::size(400)->generate($details['badgeLink']); !!}
+    <br>
+    
+    <p>Kind Regards,</p>
+    <p>GPCA Team</p>
 </body>
 </html>

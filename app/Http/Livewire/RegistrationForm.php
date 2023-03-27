@@ -2,12 +2,14 @@
 
 namespace App\Http\Livewire;
 
+use App\Mail\RegistrationConfirmation;
 use Livewire\Component;
 use App\Models\Member as Members;
 use App\Models\PromoCode as PromoCodes;
 use App\Models\MainDelegate as MainDelegates;
 use App\Models\AdditionalDelegate as AdditionalDelegates;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 
@@ -329,6 +331,19 @@ class RegistrationForm extends Component
                     'paid_date_time' => ($this->paymentMethod == "bankTransfer") ? null : Carbon::now(),
                 ]);
 
+                $details = [
+                    'name' => $this->salutation." ".$this->firstName." ".$this->middleName." ".$this->lastName,
+                    'eventName' => $this->event->name,
+                    'startDate' => Carbon::createFromFormat('Y-m-d', $this->event->event_start_date)->format('l j F'),
+                    'endDate' => Carbon::createFromFormat('Y-m-d', $this->event->event_end_date)->format('l j F'),
+                    'year' => $this->event->year,
+                    'location' => $this->event->location,
+                    'badgeLink' => env('APP_URL')."/".$this->event->category."/".$this->event->id."/view-badge"."/"."main"."/".$newRegistrant->id,
+                    'invoiceLink' => env('APP_URL')."/".$this->event->category."/".$this->event->id."/view-invoice"."/".$newRegistrant->id,
+                ];
+
+                Mail::to($this->emailAddress)->send(new RegistrationConfirmation($details));
+
                 if (!empty($this->additionalDelegates)) {
                     foreach ($this->additionalDelegates as $additionalDelegate) {
                         
@@ -336,7 +351,7 @@ class RegistrationForm extends Component
                             PromoCodes::where('event_id', $this->event->id)->where('event_category', $this->event->category)->where('active', true)->where('promo_code', $additionalDelegate['subPromoCode'])->where('badge_type', $additionalDelegate['subBadgeType'])->increment('total_usage');
                         }
                         
-                        AdditionalDelegates::create([
+                        $newAdditionDelegate = AdditionalDelegates::create([
                             'main_delegate_id' => $newRegistrant->id,
                             'salutation' => $additionalDelegate['subSalutation'],
                             'first_name' => $additionalDelegate['subFirstName'],
@@ -349,6 +364,19 @@ class RegistrationForm extends Component
                             'badge_type' => $additionalDelegate['subBadgeType'],
                             'pcode_used' => $additionalDelegate['subPromoCode'],
                         ]);
+
+                        
+                        $details = [
+                            'name' => $additionalDelegate['subSalutation']." ".$additionalDelegate['subFirstName']." ".$additionalDelegate['subMiddleName']." ".$additionalDelegate['subLastName'],
+                            'eventName' => $this->event->name,
+                            'startDate' => Carbon::createFromFormat('Y-m-d', $this->event->event_start_date)->format('l j F'),
+                            'endDate' => Carbon::createFromFormat('Y-m-d', $this->event->event_end_date)->format('l j F'),
+                            'year' => $this->event->year,
+                            'location' => $this->event->location,
+                            'badgeLink' => env('APP_URL')."/".$this->event->category."/".$this->event->id."/view-badge"."/"."sub"."/".$newAdditionDelegate->id,
+                            'invoiceLink' => env('APP_URL')."/".$this->event->category."/".$this->event->id."/view-invoice"."/".$newRegistrant->id,
+                        ];
+                        Mail::to($additionalDelegate['subEmailAddress'])->send(new RegistrationConfirmation($details));
                     }
                 }
                 

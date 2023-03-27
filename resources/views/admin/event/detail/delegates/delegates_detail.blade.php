@@ -199,6 +199,10 @@
                 <div class="flex mt-10 justify-center">
                     {!! QrCode::size(400)->generate(Request::url().'/print-badge'); !!}
                 </div>
+
+                <div class="mt-10">
+                    <img src="data:image/png;base64, {!! base64_encode(QrCode::format('png')->size(100)->generate(Request::url().'/print-badge')) !!}" />
+                </div>
             </div>
         </div>
     </div>
