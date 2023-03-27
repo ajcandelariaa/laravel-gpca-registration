@@ -7,6 +7,9 @@
                 There are no registrants yet.
             </div>
         @else
+        <div>
+            <button class="bg-green-600 hover:bg-green-700 text-white py-2 px-5 rounded-md text-lg text-center">Export Data to Excel</button>
+        </div>
             <div class="shadow-lg my-5 pt-5 bg-white rounded-md">
                 <h1 class="text-center text-2xl">List of Transactions</h1>
 
@@ -49,7 +52,11 @@
                         </div>
 
                         <div class="col-span-1">
-                            {{ $finalListOfRegistrant['registrantPassType'] }}
+                            @if ($finalListOfRegistrant['registrantPassType'] == "member")
+                                Member
+                            @else
+                                Non-Member
+                            @endif
                         </div>
 
                         <div class="col-span-1">
@@ -61,7 +68,13 @@
                         </div>
 
                         <div class="col-span-1">
-                            {{ $finalListOfRegistrant['registrantStatus'] }}
+                            @if ($finalListOfRegistrant['registrantStatus'] == "paid")
+                                Paid
+                            @elseif ($finalListOfRegistrant['registrantStatus'] == "free")
+                                Free
+                            @else 
+                                Unpaid
+                            @endif
                         </div>
 
                         <div class="col-span-1">

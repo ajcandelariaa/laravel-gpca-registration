@@ -78,13 +78,13 @@
             <div class="grid grid-cols-2 gap-3 mt-5">
                 @if ($finalData['registration_status'] == 'confirmed')
                     <button disabled class="bg-gray-400 cursor-not-allowed text-white py-2 rounded-md text-lg text-center"
-                    target="_blank">Mark as Paid</button>
+                    >Mark as Paid</button>
                 @else
                     <button wire:click="markAsPaid" class="bg-green-600 hover:bg-green-700 text-white py-2 rounded-md text-lg text-center"
-                    target="_blank">Mark as Paid</button>
+                    >Mark as Paid</button>
                 @endif
                 <button wire:click="calculateTotal" class="bg-registrationPrimaryColorHover hover:bg-registrationPrimaryColor text-white py-2 rounded-md text-lg text-center"
-                    target="_blank">Calculate Total</button>
+                    >Calculate Total</button>
 
                 <a href="{{ route('admin.event.registrants.view.invoice', ['eventCategory' => $eventCategory, 'eventId' => $eventId, 'registrantId' => $registrantId]) }}"
                     class="bg-orange-800 hover:bg-orange-900 text-white py-2 rounded-md text-lg text-center"
