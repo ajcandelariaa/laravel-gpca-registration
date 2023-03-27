@@ -241,6 +241,7 @@ class RegistrationForm extends Component
 
     public function increaseStep()
     {
+        $this->emit('stepChanges');
         if ($this->currentStep == 1) {
             if ($this->delegatePassType != null) {
                 $this->members = Members::where('active', true)->get();
@@ -277,6 +278,7 @@ class RegistrationForm extends Component
 
     public function decreaseStep()
     {
+        $this->emit('stepChanges');
         if ($this->currentStep == 3) {
             $this->members = Members::where('active', true)->get();
         }
@@ -290,6 +292,7 @@ class RegistrationForm extends Component
 
     public function submit()
     {
+        $this->emit('stepChanges');
         if ($this->currentStep == 3) {
             if ($this->paymentMethod == null) {
                 $this->paymentMethodError = "Please choose your payment method first";

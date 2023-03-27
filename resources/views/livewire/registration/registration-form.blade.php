@@ -38,4 +38,16 @@
             </div>
         </form>
     </div>
+    
+    <script>
+        document.addEventListener('livewire:load', function () {
+            Livewire.on('stepChanges', function () {
+                window.scrollTo(0, 0);
+            });
+            
+            Livewire.on('stepChanges', function () {
+                window.scrollTo(0, 0);
+            });
+        });
+    </script>
 </div>
