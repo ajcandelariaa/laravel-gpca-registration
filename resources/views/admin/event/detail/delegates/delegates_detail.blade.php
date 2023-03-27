@@ -187,9 +187,17 @@
                     <p class="text-center font-bold mb-32">{{ $finalDelegate['companyName'] }}</p>
                     <p class="text-white bg-black text-center py-4 font-bold">{{ $finalDelegate['badge_type'] }}</p>
                 </div>
-                
-                <div class="mt-10 text-center">
+
+                <div class="mt-5 text-center">
                     <a href="{{ route('admin.event.delegates.detail.printBadge', ['eventCategory' => $eventCategory, 'eventId' => $eventId, 'delegateType' => $finalDelegate['delegateType'], 'delegateId' => $finalDelegate['delegateId']]) }}" class="bg-registrationPrimaryColorHover hover:bg-registrationPrimaryColor text-white py-2 px-20 mx-auto rounded-md text-lg" target="_blank">Print Badge</a>
+                </div>
+
+                <div class="mt-10 text-center">
+                    Or Scan the below QR Code
+                </div>
+                
+                <div class="flex mt-10 justify-center">
+                    {!! QrCode::size(400)->generate(Request::url().'/print-badge'); !!}
                 </div>
             </div>
         </div>

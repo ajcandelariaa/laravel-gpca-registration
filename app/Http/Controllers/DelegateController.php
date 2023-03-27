@@ -10,6 +10,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
+
 class DelegateController extends Controller
 {
     // RENDER VIEWS
@@ -115,7 +116,7 @@ class DelegateController extends Controller
         }
     }
 
-    public function delegateDetailView($eventCategory, $eventId, $delegateType, $delegateId){
+    public function delegateDetailView($eventCategory, $eventId, $delegateType, $delegateId, Request $request){
         if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {
             $finalDelegate = array();
             $tempDelegate = array();

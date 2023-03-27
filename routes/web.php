@@ -58,5 +58,5 @@ Route::prefix('admin')->group(function () {
     Route::get('/login', [AdminController::class, 'loginView'])->name('admin.login.view');
     Route::post('/login', [AdminController::class, 'login'])->name('admin.login.post');
 });
-
+Route::get('/test', [RegistrationController::class, 'testEmail'])->name('test-email');
 Route::get('/register/{eventYear}/{eventCategory}/{eventId}', [RegistrationController::class, 'registrationView'])->name('register.view');

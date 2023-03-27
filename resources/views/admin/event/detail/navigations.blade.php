@@ -10,7 +10,7 @@
                 <a href="{{ route('admin.event.promo-codes.view', ['eventCategory' => $eventCategory, 'eventId' => $eventId]) }}"
                     class="{{ request()->is('admin/event/*/*/promo-code*') ? 'underline' : 'hover:underline' }} text-registrationPrimaryColor">Promo Codes</a>
                 <a href="{{ route('admin.event.registrants.view', ['eventCategory' => $eventCategory, 'eventId' => $eventId]) }}"
-                    class="{{ request()->is('admin/event/*/*/registrant*') ? 'underline' : 'hover:underline' }} text-registrationPrimaryColor">Registrants</a>
+                    class="{{ request()->is('admin/event/*/*/registrant*') ? 'underline' : 'hover:underline' }} text-registrationPrimaryColor">Transactions</a>
                 <a href="{{ route('admin.event.delegates.view', ['eventCategory' => $eventCategory, 'eventId' => $eventId]) }}"
                     class="{{ request()->is('admin/event/*/*/delegate*') ? 'underline' : 'hover:underline' }} text-registrationPrimaryColor">Delegates</a>
             </div>

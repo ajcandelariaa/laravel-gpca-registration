@@ -8,19 +8,22 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Mail\Mailables\Address;
+
 
 class RegistrationConfirmation extends Mailable
 {
     use Queueable, SerializesModels;
 
+    public $details;
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($details)
     {
-        //
+        $this->details = $details;
     }
 
     /**
@@ -31,7 +34,8 @@ class RegistrationConfirmation extends Mailable
     public function envelope()
     {
         return new Envelope(
-            subject: 'Registration Confirmation',
+            from: new Address('forumregistration@gpca.org.ae', 'GPCA Registration'),
+            subject: 'Registration Confirmation [This is a test]',
         );
     }
 

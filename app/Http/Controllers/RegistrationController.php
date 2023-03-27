@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\RegistrationConfirmation;
 use App\Models\AdditionalDelegate;
 use App\Models\PromoCode;
 use App\Models\Event;
@@ -9,6 +10,7 @@ use App\Models\MainDelegate;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Mail;
 use NumberFormatter;
 
 class RegistrationController extends Controller
@@ -69,8 +71,6 @@ class RegistrationController extends Controller
     public function registrantDetailView($eventCategory, $eventId, $registrantId){
         if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {
             if(MainDelegate::where('id', $registrantId)->where('event_id', $eventId)->exists()){
-                $event = Event::where('category', $eventCategory)->where('id', $eventId)->first();
-                
                 $finalData = array();
                 $subDelegatesArray = array();
                 $invoiceDetails = array();
@@ -204,8 +204,6 @@ class RegistrationController extends Controller
         if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {
             if(MainDelegate::where('id', $registrantId)->where('event_id', $eventId)->exists()){
                 $event = Event::where('category', $eventCategory)->where('id', $eventId)->first();
-                
-                $finalData = array();
                 $invoiceDetails = array();
 
                 $mainDelegate = MainDelegate::where('id', $registrantId)->where('event_id', $eventId)->first();
@@ -311,5 +309,16 @@ class RegistrationController extends Controller
     public function numberToWords($number){
         $formatter = new NumberFormatter('en', NumberFormatter::SPELLOUT);
         return $formatter->format($number);
+    }
+
+    public function testEmail(){
+        $details = [
+            'name' => "AJ Candelaria",
+            'job_title' => "IT Coordinator",
+            'company_name' => "GPCA",
+        ];
+        Mail::to("aj@gpca.org.ae")
+        // ->bcc('analee@gpca.org.ae')
+        ->send(new RegistrationConfirmation($details));
     }
 }

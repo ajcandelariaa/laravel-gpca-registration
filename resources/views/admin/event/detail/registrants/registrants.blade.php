@@ -8,7 +8,7 @@
             </div>
         @else
             <div class="shadow-lg my-5 pt-5 bg-white rounded-md">
-                <h1 class="text-center text-2xl">List of Registrants</h1>
+                <h1 class="text-center text-2xl">List of Transactions</h1>
 
                 <div class="grid grid-cols-12 pt-4 pb-2 place-items-center">
                     <div class="col-span-1">No.</div>
