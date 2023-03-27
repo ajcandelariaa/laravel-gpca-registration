@@ -102,6 +102,10 @@ class RegistrationController extends Controller
                         array_push($subDelegatesArray, [
                             'subDelegateId' => $subDelegate->id,
                             'name' => $subDelegate->salutation." ".$subDelegate->first_name." ".$subDelegate->middle_name." ".$subDelegate->last_name,
+                            'salutation' => $subDelegate->salutation,
+                            'first_name' => $subDelegate->first_name,
+                            'middle_name' => $subDelegate->middle_name,
+                            'last_name' => $subDelegate->last_name,
                             'email_address' => $subDelegate->email_address,
                             'mobile_number' => $subDelegate->mobile_number,
                             'nationality' => $subDelegate->nationality,
@@ -166,6 +170,10 @@ class RegistrationController extends Controller
                     'company_mobile_number' => $mainDelegate->company_mobile_number,
 
                     'name' => $mainDelegate->salutation." ".$mainDelegate->first_name." ".$mainDelegate->middle_name." ".$mainDelegate->last_name,
+                    'salutation' => $mainDelegate->salutation,
+                    'first_name' => $mainDelegate->first_name,
+                    'middle_name' => $mainDelegate->middle_name,
+                    'last_name' => $mainDelegate->last_name,
                     'email_address' => $mainDelegate->email_address,
                     'mobile_number' => $mainDelegate->mobile_number,
                     'nationality' => $mainDelegate->nationality,
@@ -184,7 +192,6 @@ class RegistrationController extends Controller
 
                     'invoiceData' => $this->getInvoice($eventCategory, $eventId, $registrantId),
                 ];
-
                 return view('admin.event.detail.registrants.registrants_detail', [
                     "pageTitle" => "Event Registrant Details",
                     "eventCategory" => $eventCategory,

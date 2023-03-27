@@ -44,10 +44,6 @@
             Livewire.on('stepChanges', function () {
                 window.scrollTo(0, 0);
             });
-            
-            Livewire.on('stepChanges', function () {
-                window.scrollTo(0, 0);
-            });
         });
     </script>
 </div>

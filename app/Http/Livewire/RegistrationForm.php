@@ -13,41 +13,9 @@ use Illuminate\Support\Str;
 
 class RegistrationForm extends Component
 {
-    public $companySectors = [
-        'Academia / Educational & Research Institutes / Universities',
-        'Brand owners',
-        'Catalyst or Additive Manufacturers ',
-        'Chemical / Petrochemical Producers    ',
-        'Chemical Traders / Distributors ',
-        'Engineering Company / EPC Contractors',
-        'Equipment Manufacturers',
-        'Governments & Regulators',
-        'Industry Associations',
-        'Investment / Financial / Audit / Insurance Firms',
-        'Legal firms',
-        'Logistics Service Providers',
-        'NGOs',
-        'Oil & Gas (Upstream) ',
-        'Petroleum Producers / Refineries / Gas processing plants',
-        'Plastics Convertors',
-        'Power & Utilities',
-        'Press/media ',
-        'Retailers',
-        'Shipping Lines',
-        'Strategy Consultancies ',
-        'Technology Consultancies',
-        'Technology Services Providers',
-        'Terminal Operators',
-        'Venture Capitalists ',
-        'Waste Management & Recycling',
-    ];
-    public $salutations = [
-        'Mr.',
-        'Mrs.',
-        'Ms.',
-        'Dr.',
-        'Eng.',
-    ];
+    public $countries;
+    public $companySectors;
+    public $salutations;
     public $badgeTypes = [
         'VVIP',
         'VIP',
@@ -95,6 +63,9 @@ class RegistrationForm extends Component
 
     public function mount($data)
     {
+        $this->countries = config('app.countries');
+        $this->companySectors = config('app.companySectors');
+        $this->salutations = config('app.salutations');
         $this->event = $data;
         $this->currentStep = 1;
 

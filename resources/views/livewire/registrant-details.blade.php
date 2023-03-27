@@ -15,9 +15,9 @@
             <div class="mt-3 bg-registrationInputFieldsBGColor py-1 px-1">
                 <div class="flex items-center gap-3">
                     <p class="text-xl text-registrationPrimaryColor font-bold italic py-2 px-3">Company Details</p>
-                    <a href="" class="cursor-pointer hover:text-yellow-600 text-yellow-500">
+                    <button wire:click="openEditCompanyDetailsModal" class="cursor-pointer hover:text-yellow-600 text-yellow-500">
                         <i class="fa-solid fa-pen-to-square"></i> Edit
-                    </a>
+                    </button>
                 </div>
 
                 <div class="grid grid-cols-2 mt-3 bg-white py-3 px-4 gap-4">
@@ -75,12 +75,22 @@
                 <p class="font-bold">{{ $finalData['paid_date_time'] }}</p>
             </div>
 
-            <div class="grid grid-cols-1 gap-3 mt-5">
+            <div class="grid grid-cols-2 gap-3 mt-5">
+                @if ($finalData['registration_status'] == 'confirmed')
+                    <button disabled class="bg-gray-400 cursor-not-allowed text-white py-2 rounded-md text-lg text-center"
+                    target="_blank">Mark as Paid</button>
+                @else
+                    <button wire:click="markAsPaid" class="bg-green-600 hover:bg-green-700 text-white py-2 rounded-md text-lg text-center"
+                    target="_blank">Mark as Paid</button>
+                @endif
+                <button wire:click="calculateTotal" class="bg-registrationPrimaryColorHover hover:bg-registrationPrimaryColor text-white py-2 rounded-md text-lg text-center"
+                    target="_blank">Calculate Total</button>
+
                 <a href="{{ route('admin.event.registrants.view.invoice', ['eventCategory' => $eventCategory, 'eventId' => $eventId, 'registrantId' => $registrantId]) }}"
-                    class="bg-registrationPrimaryColorHover hover:bg-registrationPrimaryColor text-white py-2 rounded-md text-lg text-center"
+                    class="bg-orange-800 hover:bg-orange-900 text-white py-2 rounded-md text-lg text-center"
                     target="_blank">View Invoice</a>
                 <a href="{{ route('admin.event.registrants.download.invoice', ['eventCategory' => $eventCategory, 'eventId' => $eventId, 'registrantId' => $registrantId]) }}"
-                    class="bg-green-800 hover:bg-green-900 text-white py-2 rounded-md text-lg text-center"
+                    class="bg-gray-800 hover:bg-black text-white py-2 rounded-md text-lg text-center"
                     target="_blank">Download Invoice</a>
             </div>
         </div>
@@ -89,9 +99,9 @@
             <div class="bg-registrationInputFieldsBGColor py-1 px-1">
                 <div class="flex items-center gap-3">
                     <p class="text-xl text-registrationPrimaryColor font-bold italic py-2 px-3">Delegate Details</p>
-                    <a href="" class="cursor-pointer hover:text-yellow-600 text-yellow-500">
+                    <button wire:click="openEditMainDelegateModal" class="cursor-pointer hover:text-yellow-600 text-yellow-500">
                         <i class="fa-solid fa-pen-to-square"></i> Edit
-                    </a>
+                    </button>
                 </div>
 
                 <div class="grid grid-cols-2 mt-3 bg-white py-3 px-4 gap-2">
@@ -140,9 +150,9 @@
                                     <span
                                         class="col-span-2 text-registrationPrimaryColor py-1 rounded-full border border-registrationPrimaryColor px-4 font-bold text-sm">
                                         Delegate {{ $count }}</span>
-                                    <a href="" class="cursor-pointer hover:text-yellow-600 text-yellow-500">
-                                        <i class="fa-solid fa-pen-to-square"></i> Edit
-                                    </a>
+                                        <button wire:click.prevent="openEditSubDelegateModal('{{ $subDelegate['subDelegateId'] }}')" class="cursor-pointer hover:text-yellow-600 text-yellow-500">
+                                            <i class="fa-solid fa-pen-to-square"></i> Edit
+                                        </button>
                                 </div>
 
                                 <div class="grid grid-cols-2 mt-5 gap-2 px-6">
@@ -278,4 +288,12 @@
             </div>
         </div>
     </div>
+
+    @if ($showDelegateModal)
+        @include('livewire.registrants.edit_delegate_form')
+    @endif
+    
+    @if ($showCompanyModal)
+        @include('livewire.registrants.edit_company_form')
+    @endif
 </div>

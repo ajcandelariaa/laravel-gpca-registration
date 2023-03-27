@@ -79,10 +79,10 @@
                 <select wire:model="companyCountry"
                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                     <option value=""></option>
-                    <option value="Country 1">Country 1</option>
-                    <option value="Country 2">Country 2</option>
-                    <option value="Country 3">Country 3</option>
-                    <option value="Country 4">Country 4</option>
+                    @foreach ($countries as $country)
+                        <option value="{{ $country }}">
+                            {{ $country }}</option>
+                    @endforeach
                 </select>
 
                 @error('companyCountry')
@@ -98,14 +98,8 @@
                 City <span class="text-red-500">*</span>
             </div>
             <div>
-                <select wire:model="companyCity"
+                <input placeholder="City" type="text" wire:model="companyCity"
                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                    <option value=""></option>
-                    <option value="City 1">City 1</option>
-                    <option value="City 2">City 2</option>
-                    <option value="City 3">City 3</option>
-                    <option value="City 4">City 4</option>
-                </select>
 
                 @error('companyCity')
                     <div class="text-red-500 text-xs italic mt-1">
