@@ -1,10 +1,10 @@
 <div>
     <div class="container mx-auto my-10">
-        <a href="{{ url()->previous() }}"
+        {{-- <a href="{{ url()->previous() }}"
             class="bg-red-500 hover:bg-red-400 text-white font-medium py-2 px-5 rounded inline-flex items-center text-sm">
             <span class="mr-2"><i class="fa-sharp fa-solid fa-arrow-left"></i></span>
             <span>List of Delegates</span>
-        </a>
+        </a> --}}
 
         <div class="grid grid-cols-12 gap-20 mt-10">
             <div class="col-span-8 grid grid-cols-2 items-start">
@@ -111,7 +111,11 @@
                             Pass Type
                         </div>
                         <div>
-                            {{ $finalDelegate['pass_type'] }}
+                            @if ($finalDelegate['pass_type'] == "member")
+                                Member
+                            @else
+                                Non-Member
+                            @endif
                         </div>
     
     
@@ -196,9 +200,9 @@
                     {!! QrCode::size(400)->generate(Request::url().'/print-badge'); !!}
                 </div>
 
-                {{-- <div class="mt-10">
+                <div class="mt-10">
                     <img src="data:image/png;base64, {!! base64_encode(QrCode::format('png')->size(100)->generate(Request::url().'/print-badge')) !!}" />
-                </div> --}}
+                </div>
             </div>
         </div>
     </div>

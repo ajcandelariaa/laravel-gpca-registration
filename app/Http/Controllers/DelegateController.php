@@ -241,4 +241,8 @@ class DelegateController extends Controller
             abort(404, 'The URL is incorrect');
         }
     }
+
+    public function checkPhpInfo(){
+        phpinfo();
+    }
 }

@@ -56,7 +56,7 @@
 
                         <div class="col-span-2">
                             <a href="{{ route('admin.event.delegates.detail.view', ['eventCategory' => $finalListsOfDelegate['eventCategory'], 'eventId' => $finalListsOfDelegate['eventId'], 'delegateType' => $finalListsOfDelegate['delegateType'], 'delegateId' => $finalListsOfDelegate['delegateId']]) }}"
-                                class="cursor-pointer hover:text-gray-600 text-gray-500 mr-2">
+                                class="cursor-pointer hover:text-gray-600 text-gray-500 mr-2" target="_blank">
                                 <i class="fa-solid fa-eye"></i> View
                             </a>
                             <a href="{{ route('admin.event.delegates.detail.printBadge', ['eventCategory' => $finalListsOfDelegate['eventCategory'], 'eventId' => $finalListsOfDelegate['eventId'], 'delegateType' => $finalListsOfDelegate['delegateType'], 'delegateId' => $finalListsOfDelegate['delegateId']]) }}"

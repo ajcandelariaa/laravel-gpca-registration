@@ -13,7 +13,7 @@
             <div class="shadow-lg my-5 pt-5 bg-white rounded-md">
                 <h1 class="text-center text-2xl">List of Transactions</h1>
 
-                <div class="grid grid-cols-12 pt-4 pb-2 place-items-center">
+                <div class="grid grid-cols-12 pt-4 pb-2 text-center items-center ">
                     <div class="col-span-1">No.</div>
                     <div class="col-span-2">Registered Date & Time</div>
                     <div class="col-span-2">Company</div>
@@ -32,7 +32,7 @@
 
                 @foreach ($finalListOfRegistrants as $finalListOfRegistrant)
                     <div
-                        class="grid grid-cols-12 pt-2 pb-2 mb-1 place-items-center {{ $count % 2 == 0 ? 'bg-registrationInputFieldsBGColor' : 'bg-registrationCardBGColor' }}">
+                        class="grid grid-cols-12 pt-2 pb-2 mb-1 text-center items-center {{ $count % 2 == 0 ? 'bg-registrationInputFieldsBGColor' : 'bg-registrationCardBGColor' }}">
                         <div class="col-span-1">{{ $count }}</div>
 
                         <div class="col-span-2">

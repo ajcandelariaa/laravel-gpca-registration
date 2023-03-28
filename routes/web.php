@@ -63,5 +63,7 @@ Route::prefix('admin')->group(function () {
 Route::get('/{eventCategory}/{eventId}/view-invoice/{registrantId}', [RegistrationController::class, 'generatePublicInvoice'])->name('generate-public-invoice');
 Route::get('/{eventCategory}/{eventId}/view-badge/{delegateType}/{delegateId}', [DelegateController::class, 'delegateDetailPrintBadge'])->name('generate-public-badge');
 
+Route::get('/check', [DelegateController::class, 'checkPhpInfo']);
+
 Route::get('/test', [RegistrationController::class, 'testEmail'])->name('test-email');
 Route::get('/register/{eventYear}/{eventCategory}/{eventId}', [RegistrationController::class, 'registrationView'])->name('register.view');

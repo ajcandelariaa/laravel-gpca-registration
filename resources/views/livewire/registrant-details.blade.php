@@ -54,7 +54,13 @@
 
             <div class="grid grid-cols-2 bg-registrationCardBGColor py-3 px-4 gap-4 mt-3">
                 <p>Mode of Payment:</p>
-                <p class="font-bold">{{ $finalData['mode_of_payment'] }}</p>
+                <p class="font-bold">
+                    @if ($finalData['mode_of_payment'] == "bankTransfer")
+                        Bank Transfer
+                    @else
+                        Credit Card
+                    @endif
+                </p>
 
                 <p>Registration Status:</p>
                 @if ($finalData['registration_status'] == 'confirmed')
@@ -66,7 +72,15 @@
                 @endif
 
                 <p>Payment Status:</p>
-                <p class="font-bold">{{ $finalData['payment_status'] }}</p>
+                <p class="font-bold">
+                    @if ($finalData['payment_status'] == "paid")
+                        Paid
+                    @elseif ($finalData['payment_status'] == 'free')
+                        Free 
+                    @else
+                        Unpaid
+                    @endif
+                </p>
 
                 <p>Registered:</p>
                 <p class="font-bold">{{ $finalData['registered_date_time'] }}</p>
