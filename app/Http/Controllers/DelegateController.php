@@ -134,6 +134,7 @@ class DelegateController extends Controller
                         'eventId' => $eventId,
                         'delegateType' => $delegateType,
                         'delegateId' => $delegateId,
+                        'mainDelegateId' => $delegateId,
 
                         'salutation' => $tempDelegate->salutation,
                         'first_name' => $tempDelegate->first_name,
@@ -160,6 +161,7 @@ class DelegateController extends Controller
                     $finalDelegate = [
                         'delegateType' => $delegateType,
                         'delegateId' => $delegateId,
+                        'mainDelegateId' => $mainDelegateInfo->id,
 
                         'salutation' => $tempDelegate->salutation,
                         'first_name' => $tempDelegate->first_name,
