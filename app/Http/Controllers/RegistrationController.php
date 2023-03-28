@@ -308,9 +308,9 @@ class RegistrationController extends Controller
 
     public function registrantViewInvoice($eventCategory, $eventId, $registrantId){
         $finalData = $this->getInvoice($eventCategory, $eventId, $registrantId);
-        // return view('admin.event.detail.registrants.invoices.paid_discount', $finalData);
-        $pdf = Pdf::loadView('admin.event.detail.registrants.invoices.paid_discount', $finalData);
-        return $pdf->stream('invoice.pdf');
+        return view('admin.event.detail.registrants.invoices.paid_discount', $finalData);
+        // $pdf = Pdf::loadView('admin.event.detail.registrants.invoices.paid_discount', $finalData);
+        // return $pdf->stream('invoice.pdf');
     }
 
     public function registrantDownloadInvoice($eventCategory, $eventId, $registrantId){

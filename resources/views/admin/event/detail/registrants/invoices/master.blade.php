@@ -12,6 +12,10 @@
             padding: 10px;
             font-family: sans-serif;
         }
+        p{
+            margin: 0;
+            padding: 0;
+        }
 
 
 
@@ -67,45 +71,75 @@
             border-collapse: collapse;
             font-size: 11px;
         }
-        .invoice-body .tr-head{
+        .invoice-body .first-col{
+            width: 60%;
+        }
+        .invoice-body .second-col, .invoice-body .third-col, .invoice-body .fourth-col, .invoice-body .fifth-col{
+            text-align: center;
+        }
+
+
+        .invoice-body .tr-header{
             vertical-align: bottom;
             text-align: center;
             font-weight: bold;
             background-color: #cfcfcf;
         }
-        .invoice-body .tr-body tr{
-            vertical-align: top;
-        }
-        .invoice-body td{
+        .invoice-body .tr-header td{
             padding: 8px;
-        }
-        .invoice-body .tr-head td{
             border: 1px solid black;
         }
-        .invoice-body .tr-body-main:nth-child(2) td, 
-        .invoice-body .tr-body-main:nth-child(3) td, 
-        .invoice-body .tr-body-main:nth-child(4) td, 
-        .invoice-body .tr-body-main:nth-child(5) td,
-        .invoice-body .tr-body-main:nth-child(6) td,
-        .invoice-body .tr-body-main:nth-child(7) td,
-        .invoice-body .tr-body-main:nth-child(8) td{
+
+
+        .invoice-body .tr-description td{
             border-left: 1px solid black;
             border-right: 1px solid black;
         }
-        .invoice-body .first-col{
-            width: 60%;
+        .invoice-body .tr-description{
+            border-left: 1px solid black;
+            border-right: 1px solid black;
         }
-        .invoice-body .second-col, .invoice-body .third-col, .invoice-body .fourth-col, .invoice-body .fifth-col{
-            /* width: 8%; */
-            text-align: center;
+        .invoice-body .tr-description .first-col{
+            padding-top: 5px;
+            padding-bottom: 10px;
         }
-        .invoice-body .first-col ol{
-            margin: 0px;
+
+
+        .invoice-body .tr-delegates td{
+            border-left: 1px solid black;
+            border-right: 1px solid black;
+            vertical-align: top;
+        }
+        .invoice-body .tr-delegates .first-col ol{
+            margin-top: 5px;
             padding-left: 15px;
         }
 
 
-        
+        .invoice-body .tr-note td{
+            border-left: 1px solid black;
+            border-right: 1px solid black;
+        }
+        .invoice-body .tr-note .first-col{
+            padding-bottom: 5px;
+        }
+
+
+        .tr-description td,
+        .tr-delegates td,
+        .tr-note td{
+            padding-left: 5px;
+            padding-right: 5px;
+        }
+
+
+
+        .invoice-body .tr-totals .third-col{
+            border: 1px solid black;
+        }
+        .invoice-body .totals-first-row td{
+            border-top:  1px solid black;
+        }
 
 
         /* INVOICE FOOTER DETAILS */
@@ -157,10 +191,6 @@
             font-weight: bold;
             text-decoration: underline;
             margin: 2px 0px;
-        }
-        .terms-and-condition .note{
-            text-decoration: none;
-            margin: 10px 0px;
         }
         .terms-and-condition ol{
             margin: 0px;

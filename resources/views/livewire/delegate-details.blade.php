@@ -196,12 +196,12 @@
                     Or Scan the below QR Code
                 </div>
                 
-                <div class="flex mt-10 justify-center">
+                {{-- <div class="flex mt-10 justify-center">
                     {!! QrCode::size(400)->generate(Request::url().'/print-badge'); !!}
-                </div>
+                </div> --}}
 
-                <div class="mt-10">
-                    <img src="data:image/png;base64, {!! base64_encode(QrCode::format('png')->size(100)->generate(Request::url().'/print-badge')) !!}" />
+                <div class="flex mt-10 justify-center">
+                    <img src="data:image/png;base64, {!! base64_encode(QrCode::format('png')->size(400)->generate(Request::url().'/print-badge')) !!}" />
                 </div>
             </div>
         </div>

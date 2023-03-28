@@ -30,8 +30,11 @@ GPCA
 
     <a href="{{ $details['invoiceLink'] }}" target="_blank">Download Invoice</a>
 
-    <p>Scan the QR Code below for your badge or click this <a href="{{ $details['badgeLink'] }}" target="_blank">link</a></p>
-    {!! QrCode::size(400)->generate($details['badgeLink']); !!}
+    {{-- <p>Scan the QR Code below for your badge or click this <a href="{{ $details['badgeLink'] }}" target="_blank">link</a></p>
+    <br>
+    
+    <img src="data:image/png;base64, {!! base64_encode(QrCode::format('png')->size(400)->generate($details['badgeLink'])) !!}" />
+     --}}
     <br>
     
     <p>Kind Regards,</p>
