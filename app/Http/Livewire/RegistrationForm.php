@@ -8,6 +8,7 @@ use App\Models\Member as Members;
 use App\Models\PromoCode as PromoCodes;
 use App\Models\MainDelegate as MainDelegates;
 use App\Models\AdditionalDelegate as AdditionalDelegates;
+use App\Models\Transaction as Transactions;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
@@ -58,6 +59,7 @@ class RegistrationForm extends Component
     public $delegatInvoiceDetails = array();
 
     // ERROR CHECKER
+    public $emailMainExistingError, $emailSubExistingError, $emailMainAlreadyUsedError, $emailSubAlreadyUsedError;
     public $delegatePassTypeError, $paymentMethodError, $rateTypeString;
     public $promoCodeFailMain, $promoCodeSuccessMain, $promoCodeFailSub, $promoCodeSuccessSub;
     public $promoCodeFailSubEdit, $promoCodeSuccessSubEdit;
@@ -246,10 +248,22 @@ class RegistrationForm extends Component
                 'jobTitle' => 'required',
                 'badgeType' => 'required',
             ]);
+            
 
-            $this->checkUnitPrice();
-            $this->calculateAmount();
-            $this->currentStep += 1;
+            if($this->checkEmailIfUsedAlreadyMain($this->emailAddress)){
+                $this->emailMainAlreadyUsedError = "You already used this email!";
+            } else {
+                if($this->checkEmailIfExistsInDatabase($this->emailAddress)){
+                    $this->emailMainAlreadyUsedError = null;
+                    $this->emailMainExistingError = "Email is already registered, please use another email!";
+                } else {
+                    $this->emailMainAlreadyUsedError = null;
+                    $this->emailMainExistingError = null;
+                    $this->checkUnitPrice();
+                    $this->calculateAmount();
+                    $this->currentStep += 1;
+                }
+            }
         }
     }
 
@@ -331,6 +345,11 @@ class RegistrationForm extends Component
                     'paid_date_time' => ($this->paymentMethod == "bankTransfer") ? null : Carbon::now(),
                 ]);
 
+                Transactions::create([
+                    'delegate_id' => $newRegistrant->id,
+                    'delegate_type' => "main",
+                ]);
+
                 $details = [
                     'name' => $this->salutation." ".$this->firstName." ".$this->middleName." ".$this->lastName,
                     'eventName' => $this->event->name,
@@ -365,6 +384,10 @@ class RegistrationForm extends Component
                             'pcode_used' => $additionalDelegate['subPromoCode'],
                         ]);
 
+                        Transactions::create([
+                            'delegate_id' => $newAdditionDelegate->id,
+                            'delegate_type' => "sub",
+                        ]);
                         
                         $details = [
                             'name' => $additionalDelegate['subSalutation']." ".$additionalDelegate['subFirstName']." ".$additionalDelegate['subMiddleName']." ".$additionalDelegate['subLastName'],
@@ -450,6 +473,9 @@ class RegistrationForm extends Component
         $this->promoCodeFailSub = null;
         $this->subPromoCode = null;
         $this->subPromoCodeDiscount = null;
+
+        $this->emailSubExistingError = null;
+        $this->emailSubAlreadyUsedError = null;
     }
 
     public function closeAddModal()
@@ -495,6 +521,9 @@ class RegistrationForm extends Component
         $this->subPromoCodeDiscountEdit = null;
         $this->promoCodeSuccessSubEdit = null;
         $this->promoCodeFailSubEdit = null;
+
+        $this->emailSubExistingError = null;
+        $this->emailSubAlreadyUsedError = null;
     }
 
     public function closeEditModal()
@@ -515,26 +544,39 @@ class RegistrationForm extends Component
             'subBadgeType' => 'required',
         ]);
 
-        $uuid = Str::uuid();
-        array_push($this->additionalDelegates, [
-            'subDelegateId' => $uuid->toString(),
-            'subSalutation' => $this->subSalutation,
-            'subFirstName' => $this->subFirstName,
-            'subMiddleName' => $this->subMiddleName,
-            'subLastName' => $this->subLastName,
-            'subEmailAddress' => $this->subEmailAddress,
-            'subMobileNumber' => $this->subMobileNumber,
-            'subNationality' => $this->subNationality,
-            'subJobTitle' => $this->subJobTitle,
-            'subBadgeType' => $this->subBadgeType,
-            'subPromoCode' => ($this->promoCodeSuccessSub != null) ? $this->subPromoCode : null,
-            'subPromoCodeDiscount' => $this->subPromoCodeDiscount,
-            'promoCodeSuccessSub' => $this->promoCodeSuccessSub,
-            'promoCodeFailSub' => $this->promoCodeFailSub,
-        ]);
+        
+        if($this->checkEmailIfUsedAlreadySub($this->subEmailAddress)){
+            $this->emailSubAlreadyUsedError = "You already used this email!";
+        } else {
+            if($this->checkEmailIfExistsInDatabase($this->subEmailAddress)){
+                $this->emailSubAlreadyUsedError = null;
+                $this->emailSubExistingError = "Email is already registered, please use another email!";
+            } else {
+                $this->emailSubAlreadyUsedError = null;
+                $this->emailSubExistingError = null;
 
-        $this->resetAddModalFields();
-        $this->showAddDelegateModal = false;
+                $uuid = Str::uuid();
+                array_push($this->additionalDelegates, [
+                    'subDelegateId' => $uuid->toString(),
+                    'subSalutation' => $this->subSalutation,
+                    'subFirstName' => $this->subFirstName,
+                    'subMiddleName' => $this->subMiddleName,
+                    'subLastName' => $this->subLastName,
+                    'subEmailAddress' => $this->subEmailAddress,
+                    'subMobileNumber' => $this->subMobileNumber,
+                    'subNationality' => $this->subNationality,
+                    'subJobTitle' => $this->subJobTitle,
+                    'subBadgeType' => $this->subBadgeType,
+                    'subPromoCode' => ($this->promoCodeSuccessSub != null) ? $this->subPromoCode : null,
+                    'subPromoCodeDiscount' => $this->subPromoCodeDiscount,
+                    'promoCodeSuccessSub' => $this->promoCodeSuccessSub,
+                    'promoCodeFailSub' => $this->promoCodeFailSub,
+                ]);
+
+                $this->resetAddModalFields();
+                $this->showAddDelegateModal = false;
+            }
+        }
     }
 
     public function removeAdditionalDelegate($subDelegateId)
@@ -552,24 +594,46 @@ class RegistrationForm extends Component
 
     public function editAdditionalDelegate($subDelegateId)
     {
-        for ($i = 0; $i < count($this->additionalDelegates); $i++) {
-            if ($this->additionalDelegates[$i]['subDelegateId'] == $subDelegateId) {
-                $this->additionalDelegates[$i]['subSalutation'] = $this->subSalutationEdit;
-                $this->additionalDelegates[$i]['subFirstName'] = $this->subFirstNameEdit;
-                $this->additionalDelegates[$i]['subMiddleName'] = $this->subMiddleNameEdit;
-                $this->additionalDelegates[$i]['subLastName'] = $this->subLastNameEdit;
-                $this->additionalDelegates[$i]['subEmailAddress'] = $this->subEmailAddressEdit;
-                $this->additionalDelegates[$i]['subMobileNumber'] = $this->subMobileNumberEdit;
-                $this->additionalDelegates[$i]['subNationality'] = $this->subNationalityEdit;
-                $this->additionalDelegates[$i]['subJobTitle'] = $this->subJobTitleEdit;
-                $this->additionalDelegates[$i]['subBadgeType'] = $this->subBadgeTypeEdit;
-                $this->additionalDelegates[$i]['subPromoCode'] = ($this->promoCodeSuccessSubEdit != null) ? $this->subPromoCodeEdit : null;
-                $this->additionalDelegates[$i]['subPromoCodeDiscount'] = $this->subPromoCodeDiscountEdit;
-                $this->additionalDelegates[$i]['promoCodeSuccessSub'] = $this->promoCodeSuccessSubEdit;
-                $this->additionalDelegates[$i]['promoCodeFailSub'] = $this->promoCodeFailSubEdit;
+        $tempCheckEmail = false;
 
-                $this->resetEditModalFields();
-                $this->showEditDelegateModal = false;
+        foreach ($this->additionalDelegates as $additionalDelegate){
+            if($additionalDelegate['subDelegateId'] != $subDelegateId){
+                if($additionalDelegate['subEmailAddress'] == $this->subEmailAddressEdit || $this->subEmailAddressEdit == $this->emailAddress){
+                    $tempCheckEmail = true;
+                }
+            }
+        }
+
+        if($tempCheckEmail){
+            $this->emailSubAlreadyUsedError = "You already used this email!";
+        } else {
+            if($this->checkEmailIfExistsInDatabase($this->subEmailAddressEdit)){
+                $this->emailSubAlreadyUsedError = null;
+                $this->emailSubExistingError = "Email is already registered, please use another email!";
+            } else {
+                $this->emailSubAlreadyUsedError = null;
+                $this->emailSubExistingError = null;
+
+                for ($i = 0; $i < count($this->additionalDelegates); $i++) {
+                    if ($this->additionalDelegates[$i]['subDelegateId'] == $subDelegateId) {
+                        $this->additionalDelegates[$i]['subSalutation'] = $this->subSalutationEdit;
+                        $this->additionalDelegates[$i]['subFirstName'] = $this->subFirstNameEdit;
+                        $this->additionalDelegates[$i]['subMiddleName'] = $this->subMiddleNameEdit;
+                        $this->additionalDelegates[$i]['subLastName'] = $this->subLastNameEdit;
+                        $this->additionalDelegates[$i]['subEmailAddress'] = $this->subEmailAddressEdit;
+                        $this->additionalDelegates[$i]['subMobileNumber'] = $this->subMobileNumberEdit;
+                        $this->additionalDelegates[$i]['subNationality'] = $this->subNationalityEdit;
+                        $this->additionalDelegates[$i]['subJobTitle'] = $this->subJobTitleEdit;
+                        $this->additionalDelegates[$i]['subBadgeType'] = $this->subBadgeTypeEdit;
+                        $this->additionalDelegates[$i]['subPromoCode'] = ($this->promoCodeSuccessSubEdit != null) ? $this->subPromoCodeEdit : null;
+                        $this->additionalDelegates[$i]['subPromoCodeDiscount'] = $this->subPromoCodeDiscountEdit;
+                        $this->additionalDelegates[$i]['promoCodeSuccessSub'] = $this->promoCodeSuccessSubEdit;
+                        $this->additionalDelegates[$i]['promoCodeFailSub'] = $this->promoCodeFailSubEdit;
+        
+                        $this->resetEditModalFields();
+                        $this->showEditDelegateModal = false;
+                    }
+                }
             }
         }
     }
@@ -683,5 +747,46 @@ class RegistrationForm extends Component
         $this->subPromoCodeDiscountEdit = null;
         $this->promoCodeFailSubEdit = null;
         $this->promoCodeSuccessSubEdit = null;
+    }
+
+    public function checkEmailIfExistsInDatabase($emailAddress){
+        $mainDelegate = MainDelegates::where('email_address', $emailAddress)->first();
+        $subDelegate = AdditionalDelegates::where('email_address', $emailAddress)->first();
+
+        if($mainDelegate == null && $subDelegate == null){
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public function checkEmailIfUsedAlreadyMain($emailAddress){
+        if(count($this->additionalDelegates) == 0){
+            return false;
+        } else {
+            foreach($this->additionalDelegates as $additionalDelegate){
+                if($emailAddress == $additionalDelegate['subEmailAddress']){
+                    return true;
+                    break;
+                }
+            }
+        }
+    }
+
+    public function checkEmailIfUsedAlreadySub($emailAddress){
+        if($this->emailAddress == $emailAddress){
+            return true;
+        } else {
+            if(count($this->additionalDelegates) == 0){
+                return false;
+            } else {
+                foreach($this->additionalDelegates as $additionalDelegate){
+                    if($emailAddress == $additionalDelegate['subEmailAddress']){
+                        return true;
+                        break;
+                    }
+                }
+            }
+        }
     }
 }

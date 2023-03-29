@@ -87,6 +87,19 @@
                                         {{ $message }}
                                     </div>
                                 @enderror
+
+                                
+                                @if ($emailSubExistingError != null)
+                                    <div class="text-red-500 text-xs italic mt-1">
+                                        {{ $emailSubExistingError }}
+                                    </div>
+                                @endif
+
+                                @if ($emailSubAlreadyUsedError != null)
+                                    <div class="text-red-500 text-xs italic mt-1">
+                                        {{ $emailSubAlreadyUsedError }}
+                                    </div>
+                                @endif
                             </div>
                         </div>
 

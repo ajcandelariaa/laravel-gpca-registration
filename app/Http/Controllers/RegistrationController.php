@@ -7,6 +7,7 @@ use App\Models\AdditionalDelegate;
 use App\Models\PromoCode;
 use App\Models\Event;
 use App\Models\MainDelegate;
+use App\Models\Transaction;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -219,7 +220,7 @@ class RegistrationController extends Controller
                 $promoCodeMainDiscountString = ($mainDelegate->pcode_used == null) ? '' : "- " . $mainDiscount . "% discount";
 
                 array_push($invoiceDetails, [
-                    'delegateDescription' => "Delegate Registration Fee - {$mainDelegate->rate_type_string} - {$mainDelegate->badge_type} {$promoCodeMainDiscountString}",
+                    'delegateDescription' => "Delegate Registration Fee - {$mainDelegate->rate_type_string} {$promoCodeMainDiscountString}",
                     'delegateNames' => [
                         $mainDelegate->salutation." ".$mainDelegate->first_name." ".$mainDelegate->middle_name." ".$mainDelegate->last_name,
                     ],
@@ -263,7 +264,7 @@ class RegistrationController extends Controller
                         } else {
                             $promoCodeSubDiscountString = ($subDiscount == null) ? '' : "- " . $subDiscount . "% discount";
                             array_push($invoiceDetails, [
-                                'delegateDescription' => "Delegate Registration Fee - {$mainDelegate->rate_type_string} - {$subDelegate->badge_type}{$promoCodeSubDiscountString}",
+                                'delegateDescription' => "Delegate Registration Fee - {$mainDelegate->rate_type_string} {$promoCodeSubDiscountString}",
                                 'delegateNames' => [
                                     $subDelegate->salutation." ".$subDelegate->first_name." ".$subDelegate->middle_name." ".$subDelegate->last_name,
                                 ],
@@ -277,9 +278,25 @@ class RegistrationController extends Controller
                     }
                 }
 
+                $transactionId = Transaction::where('delegate_id', $mainDelegate->id)->where('delegate_type', "main")->value('id');
+
+                $tempYear = Carbon::parse($mainDelegate->registered_date_time)->format('y');
+                $lastDigit = 1000 + intval($transactionId);
+
+                $tempInvoiceNumber = "$event->category"."$tempYear"."/"."$lastDigit";
+                $tempBookReference = "$tempYear"."$lastDigit";
+
                 $invoiceData = [
                     "finalEventStartDate" => Carbon::parse($event->event_start_date)->format('d M Y'),
                     "finalEventEndDate" => Carbon::parse($event->event_end_date)->format('d M Y'),
+                    "companyName" => $mainDelegate->company_name,
+                    "companyAddress" => $mainDelegate->company_address,
+                    "companyCity" => $mainDelegate->company_city,
+                    "companyCountry" => $mainDelegate->company_country,
+                    "invoiceDate" => Carbon::parse($mainDelegate->registered_date_time)->format('d/m/Y'),
+                    "invoiceNumber" => $tempInvoiceNumber,
+                    "bookRefNumber" => $tempBookReference,
+                    "paymentStatus" => $mainDelegate->payment_status,
                     "eventName" => $event->name,
                     "eventLocation" => $event->location,
                     "eventVat" => $event->event_vat,
@@ -302,20 +319,34 @@ class RegistrationController extends Controller
 
     public function generatePublicInvoice($eventCategory, $eventId, $registrantId){
         $finalData = $this->getInvoice($eventCategory, $eventId, $registrantId);
-        $pdf = Pdf::loadView('admin.event.detail.registrants.invoices.paid_discount', $finalData);
-        return $pdf->download('invoice.pdf');
+
+        if($finalData['paymentStatus'] == "unpaid"){
+            $pdf = Pdf::loadView('admin.event.detail.registrants.invoices.unpaid', $finalData);
+        } else {
+            $pdf = Pdf::loadView('admin.event.detail.registrants.invoices.paid', $finalData);
+        }
+        return $pdf->stream('invoice.pdf');
     }
 
     public function registrantViewInvoice($eventCategory, $eventId, $registrantId){
         $finalData = $this->getInvoice($eventCategory, $eventId, $registrantId);
-        return view('admin.event.detail.registrants.invoices.paid_discount', $finalData);
-        // $pdf = Pdf::loadView('admin.event.detail.registrants.invoices.paid_discount', $finalData);
-        // return $pdf->stream('invoice.pdf');
+        
+        if($finalData['paymentStatus'] == "unpaid"){
+            $pdf = Pdf::loadView('admin.event.detail.registrants.invoices.unpaid', $finalData);
+        } else {
+            $pdf = Pdf::loadView('admin.event.detail.registrants.invoices.paid', $finalData);
+        }
+        return $pdf->stream('invoice.pdf');
     }
 
     public function registrantDownloadInvoice($eventCategory, $eventId, $registrantId){
         $finalData = $this->getInvoice($eventCategory, $eventId, $registrantId);
-        $pdf = Pdf::loadView('admin.event.detail.registrants.invoices.paid_discount', $finalData);
+
+        if($finalData['paymentStatus'] == "unpaid"){
+            $pdf = Pdf::loadView('admin.event.detail.registrants.invoices.unpaid', $finalData);
+        } else {
+            $pdf = Pdf::loadView('admin.event.detail.registrants.invoices.paid', $finalData);
+        }
         return $pdf->download('invoice.pdf');
     }
 

@@ -137,41 +137,22 @@
         .invoice-body .tr-totals .third-col{
             border: 1px solid black;
         }
-        .invoice-body .totals-first-row td{
+        .invoice-body .totals-first-row{
             border-top:  1px solid black;
         }
-
-
-        /* INVOICE FOOTER DETAILS */
-        .invoice-footer td{
-            border: none;
-        }
-        .first-tr-footer td{
-            border-top: 1px solid black;
-        }
-        .invoice-footer .second-col{
+        .invoice-body .tr-totals .second-col{
             text-align: right;
+            padding: 5px 8px;
         }
-        .invoice-footer .third-col{
-            /* width: 8%; */
+        .invoice-body .tr-totals .exchange-rate{
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+        .invoice-body .tr-totals .exchange-rate p{
             border: 1px solid black;
+            padding: 3px 10px;
+            display: inline-block;
         }
-        .invoice-footer .first-col p{
-            margin: 2px;
-        }
-        .invoice-footer .second-col p{
-            margin: 2px;
-        }
-        .invoice-footer .third-col p{
-            margin: 2px;
-        }
-        .invoice-footer p{
-            font-weight: bold;
-        }
-        .invoice-footer .word-amount{
-            padding: 8px 0px;
-        }
-
 
         /* PAYMENT INSTRUCTION */
         .payment-instruction p{
@@ -179,7 +160,6 @@
             font-weight: bold;
             font-size: 10px;
         }
-
 
 
         /* TERMS AND CONDITION */
@@ -205,6 +185,7 @@
 
         /* INVOICE MAIN FOOTER */
         .invoice-main-footer{
+            margin-top: 20px;
             width: 100%;
             font-size: 9px;
             color: #0804fc;
@@ -218,6 +199,12 @@
         .invoice-main-footer .right{
             text-align: right;
             font-family: DejaVu Sans, sans-serif;
+        }
+
+
+        /* Others */
+        .tr-totals-unpaid .third-col{
+            border: none;
         }
     </style>
 </head>

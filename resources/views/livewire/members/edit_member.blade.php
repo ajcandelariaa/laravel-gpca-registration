@@ -33,7 +33,6 @@
                         @foreach ($companySectors as $companySector)
                             <option value="{{ $companySector }}">{{ $companySector }}</option>
                         @endforeach
-                        <option value="Others">Others</option>
                     </select>
                 </div>
             </div>
