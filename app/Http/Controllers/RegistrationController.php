@@ -391,39 +391,209 @@ class RegistrationController extends Controller
                         'pass_type' => $mainDelegate->pass_type,
                         'rate_type' => $mainDelegate->rate_type,
 
-                        'company_name' => $mainDelegate->total_amount,
-                        'company_sector' => $mainDelegate->total_amount,
-                        'company_address' => $mainDelegate->total_amount,
-                        'company_city' => $mainDelegate->total_amount,
-                        'company_country' => $mainDelegate->total_amount,
-                        'company_telephone_number' => $mainDelegate->total_amount,
-                        'company_mobile_number' => $mainDelegate->total_amount,
-                        'assistant_email_address' => $mainDelegate->total_amount,
+                        'company_name' => $mainDelegate->company_name,
+                        'company_sector' => $mainDelegate->company_sector,
+                        'company_address' => $mainDelegate->company_address,
+                        'company_city' => $mainDelegate->company_city,
+                        'company_country' => $mainDelegate->company_country,
+                        'company_telephone_number' => $mainDelegate->company_telephone_number,
+                        'company_mobile_number' => $mainDelegate->company_mobile_number,
+                        'assistant_email_address' => $mainDelegate->assistant_email_address,
 
-                        'salutation' => $mainDelegate->total_amount,
-                        'first_name' => $mainDelegate->total_amount,
-                        'middle_name' => $mainDelegate->total_amount,
-                        'last_name' => $mainDelegate->total_amount,
-                        'email_address' => $mainDelegate->total_amount,
-                        'mobile_number' => $mainDelegate->total_amount,
-                        'job_title' => $mainDelegate->total_amount,
-                        'nationality' => $mainDelegate->total_amount,
-                        'badge_type' => $mainDelegate->total_amount,
-                        'pcode_used' => $mainDelegate->total_amount,
+                        'salutation' => $mainDelegate->salutation,
+                        'first_name' => $mainDelegate->first_name,
+                        'middle_name' => $mainDelegate->middle_name,
+                        'last_name' => $mainDelegate->last_name,
+                        'email_address' => $mainDelegate->email_address,
+                        'mobile_number' => $mainDelegate->mobile_number,
+                        'job_title' => $mainDelegate->job_title,
+                        'nationality' => $mainDelegate->nationality,
+                        'badge_type' => $mainDelegate->badge_type,
+                        'pcode_used' => $mainDelegate->pcode_used,
 
                         // PLEASE CONTINUE HERE
-                        
                         'total_amount' => $mainDelegate->total_amount,
                         'payment_status' => $mainDelegate->payment_status,
                         'registration_status' => $mainDelegate->registration_status,
                         'mode_of_payment' => $mainDelegate->mode_of_payment,
-                        
                         'invoice_number' => $tempInvoiceNumber,
                         'reference_number' => $tempBookReference,
                         'registration_date_time' => $mainDelegate->registered_date_time,
+                        'paid_date_time' => $mainDelegate->paid_date_time,
                     ]);
+
+                    $subDelegates = AdditionalDelegate::where('main_delegate_id', $mainDelegate->id)->get();
+                    
+                    if(!$subDelegates->isEmpty()){
+                        foreach($subDelegates as $subDelegate){
+                            $subTransactionId = Transaction::where('delegate_id', $subDelegate->id)->where('delegate_type', "sub")->value('id');
+
+                            array_push($finalExcelData, [
+                                'transaction_id' => $subTransactionId,
+                                'event' => $eventCategory,
+                                'pass_type' => $mainDelegate->pass_type,
+                                'rate_type' => $mainDelegate->rate_type,
+
+                                'company_name' => $mainDelegate->company_name,
+                                'company_sector' => $mainDelegate->company_sector,
+                                'company_address' => $mainDelegate->company_address,
+                                'company_city' => $mainDelegate->company_city,
+                                'company_country' => $mainDelegate->company_country,
+                                'company_telephone_number' => $mainDelegate->company_telephone_number,
+                                'company_mobile_number' => $mainDelegate->company_mobile_number,
+                                'assistant_email_address' => $mainDelegate->assistant_email_address,
+
+                                'salutation' => $subDelegate->salutation,
+                                'first_name' => $subDelegate->first_name,
+                                'middle_name' => $subDelegate->middle_name,
+                                'last_name' => $subDelegate->last_name,
+                                'email_address' => $subDelegate->email_address,
+                                'mobile_number' => $subDelegate->mobile_number,
+                                'job_title' => $subDelegate->job_title,
+                                'nationality' => $subDelegate->nationality,
+                                'badge_type' => $subDelegate->badge_type,
+                                'pcode_used' => $subDelegate->pcode_used,
+
+                                // PLEASE CONTINUE HERE
+                                'total_amount' => $mainDelegate->total_amount,
+                                'payment_status' => $mainDelegate->payment_status,
+                                'registration_status' => $mainDelegate->registration_status,
+                                'mode_of_payment' => $mainDelegate->mode_of_payment,
+                                'invoice_number' => $tempInvoiceNumber,
+                                'reference_number' => $tempBookReference,
+                                'registration_date_time' => $mainDelegate->registered_date_time,
+                                'paid_date_time' => $mainDelegate->paid_date_time,
+                            ]);
+                        }
+                    }
                 }
             }
+
+            $fileName = 'transactions.csv';
+            $headers = array(
+                "Content-type"        => "text/csv",
+                "Content-Disposition" => "attachment; filename=$fileName",
+                "Pragma"              => "no-cache",
+                "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+                "Expires"             => "0"
+            );
+    
+            $columns = array(
+                'Transaction Id',
+                'Event',
+                'Pass Type',
+                'Rate Type',
+
+                'Company Name',
+                'Company Sector',
+                'Company Address',
+                'Company City',
+                'Company Country',
+                'Company Telephone Number',
+                'Company Mobile Number',
+                'Assistant Email Address',
+
+                'Salutation',
+                'First Name',
+                'Middle Name',
+                'Last Name',
+                'Email Address',
+                'Mobile Number',
+                'Job Title',
+                'Nationality',
+                'Badge Type',
+                'Promo Code used',
+
+                'Total Amount',
+                'Payment Status',
+                'Registration Status',
+                'Payment method',
+                'Invoice Number',
+                'Reference Number',
+                'Registered Date & Time',
+                'Paid Date & Time',
+            );
+    
+            $callback = function() use($finalExcelData, $columns) {
+                $file = fopen('php://output', 'w');
+                fputcsv($file, $columns);
+    
+                foreach ($finalExcelData as $data) {
+                    $row['transaction_id']  = $data->transaction_id;
+                    $row['event']  = $data->event;
+                    $row['pass_type']  = $data->pass_type;
+                    $row['rate_type']  = $data->rate_type;
+
+                    $row['company_name']  = $data->company_name;
+                    $row['company_sector']  = $data->company_sector;
+                    $row['company_address']  = $data->company_address;
+                    $row['company_city']  = $data->company_city;
+                    $row['company_country']  = $data->company_country;
+                    $row['company_telephone_number']  = $data->company_telephone_number;
+                    $row['company_mobile_number']  = $data->company_mobile_number;
+                    $row['assistant_email_address']  = $data->assistant_email_address;
+
+                    $row['salutation']  = $data->salutation;
+                    $row['first_name']  = $data->first_name;
+                    $row['middle_name']  = $data->middle_name;
+                    $row['last_name']  = $data->last_name;
+                    $row['email_address']  = $data->email_address;
+                    $row['mobile_number']  = $data->mobile_number;
+                    $row['job_title']  = $data->job_title;
+                    $row['nationality']  = $data->nationality;
+                    $row['badge_type']  = $data->badge_type;
+                    $row['pcode_used']  = $data->pcode_used;
+
+                    $row['total_amount']  = $data->total_amount;
+                    $row['payment_status']  = $data->payment_status;
+                    $row['registration_status']  = $data->registration_status;
+                    $row['mode_of_payment']  = $data->mode_of_payment;
+                    $row['invoice_number']  = $data->invoice_number;
+                    $row['reference_number']  = $data->reference_number;
+                    $row['registration_date_time']  = $data->registration_date_time;
+                    $row['paid_date_time']  = $data->paid_date_time;
+
+    
+                    fputcsv($file, array(
+                            $row['transaction_id'],
+                            $row['event'],
+                            $row['pass_type'],
+                            $row['rate_type'],
+
+                            $row['company_name'],
+                            $row['company_sector'],
+                            $row['company_address'],
+                            $row['company_city'],
+                            $row['company_country'],
+                            $row['company_telephone_number'],
+                            $row['company_mobile_number'],
+                            $row['assistant_email_address'],
+
+                            $row['salutation'],
+                            $row['first_name'],
+                            $row['middle_name'],
+                            $row['last_name'],
+                            $row['email_address'],
+                            $row['mobile_number'],
+                            $row['job_title'],
+                            $row['nationality'],
+                            $row['badge_type'],
+                            $row['pcode_used'],
+                            
+                            $row['total_amount'],
+                            $row['payment_status'],
+                            $row['mode_of_payment'],
+                            $row['invoice_number'],
+                            $row['reference_number'],
+                            $row['registration_date_time'],
+                            $row['paid_date_time'],
+                        )
+                    );
+                }
+                fclose($file);
+            };
+            return response()->stream($callback, 200, $headers);
+            dd($finalExcelData);
         } else {
             abort(404, 'The URL is incorrect');
         }
