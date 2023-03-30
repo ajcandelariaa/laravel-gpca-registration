@@ -10,25 +10,8 @@
                 Company Name <span class="text-red-500">*</span>
             </div>
             <div>
-                @if ($delegatePassType == 'member')
-                    <select wire:model="companyName"
-                        class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                        <option value=""></option>
-                        @foreach ($members as $member)
-                            <option value="{{ $member->name }}" data-icon="{{ Storage::url($member->logo) }}">
-                                {{ $member->name }}</option>
-                        @endforeach
-                    </select>
-                @else
-                    <input placeholder="Company Name" type="text" wire:model="companyName"
-                        class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                @endif
-
-                @error('companyName')
-                    <div class="text-red-500 text-xs italic mt-1">
-                        {{ $message }}
-                    </div>
-                @enderror
+                <input readonly placeholder="Company Name" type="text" wire:model="companyName"
+                    class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-none">
             </div>
         </div>
 
@@ -142,7 +125,17 @@
 
         {{-- ROW 5 --}}
 
-        <div class="space-y-2 col-span-2">
+        <div class="space-y-2">
+            <div class="text-registrationPrimaryColor">
+                Assistant's email address
+            </div>
+            <div>
+                <input placeholder="Email Address" type="text" wire:model="assistantEmailAddress"
+                    class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+            </div>
+        </div>
+
+        <div class="space-y-2">
             <div class="text-registrationPrimaryColor">
                 Where did you hear about us?
             </div>

@@ -15,6 +15,8 @@ return new class extends Migration
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('event_id');
+            $table->string('event_category');
             $table->unsignedBigInteger('delegate_id');
             $table->string('delegate_type');
             $table->timestamps();

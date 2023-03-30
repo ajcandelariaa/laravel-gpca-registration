@@ -141,7 +141,7 @@
                         {{-- ROW 6 --}}
                         <div class="space-y-2 col-span-1">
                             <div class="text-registrationPrimaryColor">
-                                Registration type
+                                Registration type <span class="text-red-500">*</span>
                             </div>
 
                             @if ($promoCodeSuccess != null)

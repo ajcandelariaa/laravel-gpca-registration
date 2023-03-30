@@ -469,4 +469,13 @@ return [
     'salutations' => [
         'Mr.', 'Mrs.', 'Ms.', 'Dr.', 'Eng.'
     ],
+
+    'eventCategories' => [
+        'SCC' => "01",
+        'PC' => "02",
+        'ANC' => "03",
+        'RIC' => "04",
+        'RC' => "05",
+        'AF' => "06",
+    ]
 ];

@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire;
 
+use App\Mail\RegistrationReminder;
 use Livewire\Component;
 use App\Models\Member as Members;
 use App\Models\PromoCode as PromoCodes;
@@ -9,6 +10,7 @@ use App\Models\MainDelegate as MainDelegates;
 use App\Models\Event as Events;
 use App\Models\AdditionalDelegate as AdditionalDelegates;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Mail;
 use NumberFormatter;
 
 class RegistrantDetails extends Component
@@ -36,7 +38,7 @@ class RegistrantDetails extends Component
     public $rateType, $finalUnitPrice;
 
     // COMPANY INFO
-    public $delegatePassType, $rateTypeString, $companyName, $companySector, $companyAddress, $companyCountry, $companyCity, $companyLandlineNumber, $companyMobileNumber;
+    public $delegatePassType, $rateTypeString, $companyName, $companySector, $companyAddress, $companyCountry, $companyCity, $companyLandlineNumber, $assistantEmailAddress, $companyMobileNumber;
 
     // DELEGATE DETAILS
     public $delegateId, $salutation, $firstName, $middleName, $lastName, $emailAddress, $mobileNumber, $nationality, $jobTitle, $badgeType, $promoCode, $promoCodeDiscount, $promoCodeSuccess, $promoCodeFail, $type;
@@ -291,6 +293,7 @@ class RegistrantDetails extends Component
             'company_city' => $this->companyCity,
             'company_telephone_number' => $this->companyLandlineNumber,
             'company_mobile_number' => $this->companyMobileNumber,
+            'assistant_email_address' => $this->assistantEmailAddress,
         ])->save();
 
         $this->finalData['rate_type_string'] = $this->rateTypeString;
@@ -302,6 +305,7 @@ class RegistrantDetails extends Component
         $this->finalData['company_city'] = $this->companyCity;
         $this->finalData['company_telephone_number'] = $this->companyLandlineNumber;
         $this->finalData['company_mobile_number'] = $this->companyMobileNumber;
+        $this->finalData['assistant_email_address'] = $this->assistantEmailAddress;
 
         $this->resetEditCompanyModalFields();
         $this->showCompanyModal = false;
@@ -319,6 +323,7 @@ class RegistrantDetails extends Component
         $this->companyCity = $this->finalData['company_city'];
         $this->companyLandlineNumber = $this->finalData['company_telephone_number'];
         $this->companyMobileNumber = $this->finalData['company_mobile_number'];
+        $this->assistantEmailAddress = $this->finalData['assistant_email_address'];
 
         $this->showCompanyModal = true;
     }
@@ -340,6 +345,7 @@ class RegistrantDetails extends Component
         $this->companyCity = null;
         $this->companyLandlineNumber = null;
         $this->companyMobileNumber = null;
+        $this->assistantEmailAddress = null;
     }
 
 
@@ -391,10 +397,10 @@ class RegistrantDetails extends Component
         $mainDelegate = MainDelegates::where('id', $this->finalData['mainDelegateId'])->where('event_id', $this->eventId)->first();
         $mainDiscount = PromoCodes::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->where('promo_code', $mainDelegate->pcode_used)->where('badge_type', $mainDelegate->badge_type)->value('discount');
 
-        $promoCodeMainDiscountString = ($mainDelegate->pcode_used == null) ? '' : "- " . $mainDiscount . "% discount";
+        $promoCodeMainDiscountString = ($mainDelegate->pcode_used == null) ? '' : "(" . $mainDiscount . "% discount)";
 
         array_push($invoiceDetails, [
-            'delegateDescription' => "Delegate Registration Fee - {$mainDelegate->rate_type_string} - {$mainDelegate->badge_type} {$promoCodeMainDiscountString}",
+            'delegateDescription' => "Delegate Registration Fee - {$mainDelegate->rate_type_string} {$promoCodeMainDiscountString}",
             'delegateNames' => [
                 $mainDelegate->salutation . " " . $mainDelegate->first_name . " " . $mainDelegate->middle_name . " " . $mainDelegate->last_name,
             ],
@@ -435,9 +441,9 @@ class RegistrantDetails extends Component
                     $invoiceDetails[$existingIndex]['totalDiscount'] = $totalDiscountTemp;
                     $invoiceDetails[$existingIndex]['totalNetAmount'] = $totalNetAmountTemp;
                 } else {
-                    $promoCodeSubDiscountString = ($subDiscount == null) ? '' : "- " . $subDiscount . "% discount";
+                    $promoCodeSubDiscountString = ($subDiscount == null) ? '' : "(" . $subDiscount . "% discount)";
                     array_push($invoiceDetails, [
-                        'delegateDescription' => "Delegate Registration Fee - {$mainDelegate->rate_type_string} - {$subDelegate->badge_type}{$promoCodeSubDiscountString}",
+                        'delegateDescription' => "Delegate Registration Fee - {$mainDelegate->rate_type_string} {$promoCodeSubDiscountString}",
                         'delegateNames' => [
                             $subDelegate->salutation . " " . $subDelegate->first_name . " " . $subDelegate->middle_name . " " . $subDelegate->last_name,
                         ],
@@ -490,5 +496,39 @@ class RegistrantDetails extends Component
     public function numberToWords($number){
         $formatter = new NumberFormatter('en', NumberFormatter::SPELLOUT);
         return $formatter->format($number);
+    }
+
+    public function sendEmailReminder(){
+        $event = Events::where('id', $this->eventId)->where('category', $this->eventCategory)->first();
+        
+        $details = [
+            'name' => $this->finalData['name'],
+            'eventName' => $event->name,
+            'startDate' => Carbon::createFromFormat('Y-m-d', $event->event_start_date)->format('l j F'),
+            'endDate' => Carbon::createFromFormat('Y-m-d', $event->event_end_date)->format('l j F'),
+            'year' => $event->year,
+            'location' => $event->location,
+        ];
+
+        Mail::to($this->finalData['email_address'])->send(new RegistrationReminder($details));
+
+        if($this->finalData['assistant_email_address'] != null){
+            Mail::to($this->finalData['assistant_email_address'])->send(new RegistrationReminder($details));
+        }
+
+        if (count($this->finalData['subDelegates']) > 0) {
+            foreach ($this->finalData['subDelegates'] as $subDelegate) {
+                $details = [
+                    'name' => $subDelegate['name'],
+                    'eventName' => $event->name,
+                    'startDate' => Carbon::createFromFormat('Y-m-d', $event->event_start_date)->format('l j F'),
+                    'endDate' => Carbon::createFromFormat('Y-m-d', $event->event_end_date)->format('l j F'),
+                    'year' => $event->year,
+                    'location' => $event->location,
+                ];
+
+                Mail::to($subDelegate['email_address'])->send(new RegistrationReminder($details));
+            }
+        }
     }
 }

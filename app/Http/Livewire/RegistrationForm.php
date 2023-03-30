@@ -43,7 +43,7 @@ class RegistrationForm extends Component
     public $delegatePassType, $rateType;
 
     // COMPANY INFO
-    public $companyName, $companySector, $companyAddress, $companyCountry, $companyCity, $companyLandlineNumber, $companyMobileNumber, $heardWhere;
+    public $companyName, $companySector, $companyAddress, $companyCountry, $companyCity, $companyLandlineNumber, $companyMobileNumber, $assistantEmailAddress, $heardWhere;
 
     // MAIN DELEGATE
     public $salutation, $firstName, $middleName, $lastName, $emailAddress, $mobileNumber, $nationality, $jobTitle, $badgeType, $promoCode, $promoCodeDiscount;
@@ -76,6 +76,8 @@ class RegistrationForm extends Component
         $this->badgeType = "Delegate";
         $this->subBadgeType = "Delegate";
         $this->subBadgeTypeEdit = "Delegate";
+
+        $this->members = Members::where('active', true)->get();
 
         $today = Carbon::today();
 
@@ -223,8 +225,10 @@ class RegistrationForm extends Component
         $this->emit('stepChanges');
         if ($this->currentStep == 1) {
             if ($this->delegatePassType != null) {
-                $this->members = Members::where('active', true)->get();
                 $this->delegatePassTypeError = null;
+                $this->validate([
+                    'companyName' => 'required',
+                ]);
                 $this->currentStep += 1;
             } else {
                 $this->delegatePassTypeError = "Delegate pass type is required";
@@ -233,7 +237,6 @@ class RegistrationForm extends Component
             $this->resetCalculations();
             
             $this->validate([
-                'companyName' => 'required',
                 'companySector' => 'required',
                 'companyAddress' => 'required',
                 'companyCountry' => 'required',
@@ -270,7 +273,7 @@ class RegistrationForm extends Component
     public function decreaseStep()
     {
         $this->emit('stepChanges');
-        if ($this->currentStep == 3) {
+        if ($this->currentStep == 2) {
             $this->members = Members::where('active', true)->get();
         }
 
@@ -319,6 +322,7 @@ class RegistrationForm extends Component
                     'company_city' => $this->companyCity,
                     'company_telephone_number' => $this->companyLandlineNumber,
                     'company_mobile_number' => $this->companyMobileNumber,
+                    'assistant_email_address' => $this->assistantEmailAddress,
 
                     'salutation' => $this->salutation,
                     'first_name' => $this->firstName,
@@ -346,6 +350,8 @@ class RegistrationForm extends Component
                 ]);
 
                 Transactions::create([
+                    'event_id' => $this->event->id,
+                    'event_category' => $this->event->category,
                     'delegate_id' => $newRegistrant->id,
                     'delegate_type' => "main",
                 ]);
@@ -362,6 +368,10 @@ class RegistrationForm extends Component
                 ];
 
                 Mail::to($this->emailAddress)->send(new RegistrationConfirmation($details));
+
+                if($this->assistantEmailAddress != null){
+                    Mail::to($this->assistantEmailAddress)->send(new RegistrationConfirmation($details));
+                }
 
                 if (!empty($this->additionalDelegates)) {
                     foreach ($this->additionalDelegates as $additionalDelegate) {
@@ -385,6 +395,8 @@ class RegistrationForm extends Component
                         ]);
 
                         Transactions::create([
+                            'event_id' => $this->event->id,
+                            'event_category' => $this->event->category,
                             'delegate_id' => $newAdditionDelegate->id,
                             'delegate_type' => "sub",
                         ]);

@@ -9,15 +9,6 @@ use Illuminate\Support\Facades\Storage;
 
 class EventController extends Controller
 {
-    public $eventCategories = [
-        'SCC',
-        'PC',
-        'ANC',
-        'RIC',
-        'RC',
-        'AF',
-    ];
-
     // RENDER VIEWS
     public function manageEventView()
     {
@@ -32,7 +23,7 @@ class EventController extends Controller
     {
         return view('admin.event.add.add_event', [
             "pageTitle" => "Add Event",
-            "eventCategories" => $this->eventCategories,
+            "eventCategories" => config('app.eventCategories'),
         ]);
     }
 
@@ -91,7 +82,7 @@ class EventController extends Controller
 
             return view('admin.event.edit.edit_event', [
                 "pageTitle" => "Edit Event",
-                "eventCategories" => $this->eventCategories,
+                "eventCategories" => config('app.eventCategories'),
                 "event" => $event,
             ]);
         } else {

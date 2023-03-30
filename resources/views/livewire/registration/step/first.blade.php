@@ -102,7 +102,7 @@
             <div class="bg-gray-200 py-4 px-2">
                 <h1 class="text-2xl text-registrationPrimaryColor font-bold text-center">DELEGATE PASS TYPE</h1>
                 <div class="bg-white mx-1 mt-5 p-5">
-                    <div class="flex flex-col justify-center items-center gap-5">
+                    <div class="flex flex-row justify-center items-center gap-5">
                         <button wire:click.prevent="memberClicked"
                             class="{{ $delegatePassType == 'member' ? 'bg-registrationPrimaryColor text-white' : 'hover:bg-registrationPrimaryColor hover:text-white border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor' }} w-48 py-2 rounded-md">Member</button>
                         <button wire:click.prevent="nonMemberClicked"
@@ -112,6 +112,34 @@
                     @if ($delegatePassTypeError != null)
                         <div class="text-red-500 text-sm italic mt-2 text-center">
                             {{ $delegatePassTypeError }}
+                        </div>
+                    @endif
+
+                    @if ($delegatePassType != null)
+                        <div class="mt-10">
+                            <div class="text-registrationPrimaryColor">
+                                Company Name <span class="text-red-500">*</span>
+                            </div>
+                            <div>
+                                @if ($delegatePassType == 'member')
+                                    <select wire:model="companyName"
+                                        class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                                        <option value=""></option>
+                                        @foreach ($members as $member)
+                                            <option value="{{ $member->name }}" data-icon="{{ Storage::url($member->logo) }}">
+                                                {{ $member->name }}</option>
+                                        @endforeach
+                                    </select>
+                                @else
+                                    <input placeholder="Company Name" type="text" wire:model="companyName"
+                                        class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                                @endif
+                
+                                @error('companyName')
+                                    <div class="text-red-500 text-xs italic mt-1">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
                         </div>
                     @endif
                 </div>

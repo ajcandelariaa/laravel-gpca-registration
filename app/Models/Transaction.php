@@ -10,6 +10,8 @@ class Transaction extends Model
     use HasFactory;
     
     protected $fillable = [
+        'event_id',
+        'event_category',
         'delegate_id',
         'delegate_type',
     ];

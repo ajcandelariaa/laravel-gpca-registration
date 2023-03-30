@@ -79,7 +79,7 @@
 
                         <div class="col-span-1">
                             <a href="{{ route('admin.event.registrants.detail.view', ['eventCategory' => $eventCategory, 'eventId' => $eventId, 'registrantId' => $finalListOfRegistrant['registrantId']]) }}"
-                                class="cursor-pointer hover:text-gray-600 text-gray-500">
+                                class="cursor-pointer hover:text-gray-600 text-gray-500" target="_blank">
                                 <i class="fa-solid fa-eye"></i> View
                             </a>
                         </div>

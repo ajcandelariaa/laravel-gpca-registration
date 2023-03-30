@@ -8,7 +8,7 @@
             <select required name="category"
                 class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                 <option value="" disabled selected hidden>Please select...</option>
-                @foreach ($eventCategories as $eventCategory)
+                @foreach ($eventCategories as $eventCategory => $code)
                     <option value="{{ $eventCategory }}" @if (old('category') == $eventCategory) selected @endif>
                         {{ $eventCategory }}</option>
                 @endforeach

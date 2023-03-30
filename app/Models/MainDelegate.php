@@ -22,6 +22,7 @@ class MainDelegate extends Model
         'company_city',
         'company_telephone_number',
         'company_mobile_number',
+        'assistant_email_address',
         
         'salutation',
         'first_name',

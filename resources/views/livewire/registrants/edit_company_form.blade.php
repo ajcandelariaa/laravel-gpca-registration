@@ -17,7 +17,7 @@
                         {{-- ROW 1 --}}
                         <div class="space-y-2">
                             <div class="text-registrationPrimaryColor">
-                                Pass Type
+                                Pass Type <span class="text-red-500">*</span>
                             </div>
                             <div>
                                 <select wire:model="delegatePassType"
@@ -58,7 +58,7 @@
                         {{-- ROW 2 --}}
                         <div class="space-y-2">
                             <div class="text-registrationPrimaryColor">
-                                Company Sector
+                                Company Sector <span class="text-red-500">*</span>
                             </div>
                             <div>
                                 <select wire:model="companySector"
@@ -137,7 +137,7 @@
                         {{-- ROW 4 --}}
                         <div class="space-y-2">
                             <div class="text-registrationPrimaryColor">
-                                Landline Number 
+                                Landline Number
                             </div>
                             <div>
                                 <input placeholder="xxxxxxx" type="text" wire:model="companyLandlineNumber"
@@ -166,6 +166,16 @@
                             </div>
                         </div>
 
+
+                        <div class="space-y-2">
+                            <div class="text-registrationPrimaryColor">
+                                Assistant's email address
+                            </div>
+                            <div>
+                                <input placeholder="Email Address" type="text" wire:model="assistantEmailAddress"
+                                    class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -19,7 +19,7 @@ GPCA
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>Registration Confirmation</title>
 </head>
 <body>
     <p>Dear {{ $details['name'] }}</p>
@@ -28,6 +28,7 @@ GPCA
     <p>Please note that your registration is confirmed but admission to the forum will only be granted upon confirmation of payment receipt. Payment can be made via credit card or bank transfer.</p>
     <p>A summary of your booking confirmation is given below. Please collect your badge from the FAST-TRACK DELEGATE COUNTER that will be clearly sign posted in the registration area when you arrive at the event. </p>
 
+    
     <a href="{{ $details['invoiceLink'] }}" target="_blank">Download Invoice</a>
 
     {{-- <p>Scan the QR Code below for your badge or click this <a href="{{ $details['badgeLink'] }}" target="_blank">link</a></p>

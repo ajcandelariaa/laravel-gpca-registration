@@ -49,6 +49,24 @@
 
                     <p>Mobile Number:</p>
                     <p class="font-bold">{{ $finalData['company_mobile_number'] }}</p>
+
+                    <p>Assistant's email address:</p>
+                    <p class="font-bold">
+                        @if ($finalData['assistant_email_address'] != null)
+                            {{ $finalData['assistant_email_address'] }}
+                        @else
+                            N/A
+                        @endif
+                    </p>
+
+                    <p>Where did you hear about us?</p>
+                    <p class="font-bold">
+                        @if ($finalData['heard_where'] != null)
+                            {{ $finalData['heard_where'] }}
+                        @else
+                            N/A
+                        @endif
+                    </p>
                 </div>
             </div>
 
@@ -106,6 +124,14 @@
                 <a href="{{ route('admin.event.registrants.download.invoice', ['eventCategory' => $eventCategory, 'eventId' => $eventId, 'registrantId' => $registrantId]) }}"
                     class="bg-gray-800 hover:bg-black text-white py-2 rounded-md text-lg text-center"
                     target="_blank">Download Invoice</a>
+                    
+                @if ($finalData['registration_status'] == 'confirmed')
+                <button disabled class="col-span-2 mt-10 bg-gray-400 cursor-not-allowed text-white py-2 rounded-md text-lg text-center"
+                >Send Email Reminder</button>
+                @else
+                    <button wire:click="sendEmailReminder" class="col-span-2 mt-10 bg-sky-600 hover:bg-sky-700 text-white py-2 rounded-md text-lg text-center"
+                    >Send Email Reminder</button>
+                @endif
             </div>
         </div>
 
