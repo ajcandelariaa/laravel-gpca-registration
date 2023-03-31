@@ -12,7 +12,8 @@
             {{-- <span data-href="{{ route('admin.event.registrants.exportData', ['eventCategory' => $eventCategory, 'eventId' => $eventId]) }}" id="export"
                 class="bg-green-600 hover:bg-green-700 text-white py-2 px-5 rounded-md text-lg text-center"
                 onclick="exportTasks(event.target);">Export Data to Excel</span> --}}
-            <button class="bg-green-600 hover:bg-green-700 text-white py-2 px-5 rounded-md text-lg text-center">Export Data to Excel</button>
+            <a href="{{ route('admin.event.registrants.exportData', ['eventCategory' => $eventCategory, 'eventId' => $eventId]) }}" target="_blank" class="bg-green-600 hover:bg-green-700 text-white py-2 px-5 rounded-md text-lg text-center">Export Data to Excel</a>
+            <a href="" target="_blank" class="bg-sky-600 hover:bg-sky-700 text-white py-2 px-5 rounded-md text-lg text-center">Import Data</a>
         </div>
             <div class="shadow-lg my-5 pt-5 bg-white rounded-md">
                 <h1 class="text-center text-2xl">List of Transactions</h1>

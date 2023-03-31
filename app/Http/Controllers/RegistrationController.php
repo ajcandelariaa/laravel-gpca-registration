@@ -468,7 +468,7 @@ class RegistrationController extends Controller
                     }
                 }
             }
-
+            
             $fileName = 'transactions.csv';
             $headers = array(
                 "Content-type"        => "text/csv",
@@ -519,81 +519,46 @@ class RegistrationController extends Controller
                 fputcsv($file, $columns);
     
                 foreach ($finalExcelData as $data) {
-                    $row['transaction_id']  = $data->transaction_id;
-                    $row['event']  = $data->event;
-                    $row['pass_type']  = $data->pass_type;
-                    $row['rate_type']  = $data->rate_type;
-
-                    $row['company_name']  = $data->company_name;
-                    $row['company_sector']  = $data->company_sector;
-                    $row['company_address']  = $data->company_address;
-                    $row['company_city']  = $data->company_city;
-                    $row['company_country']  = $data->company_country;
-                    $row['company_telephone_number']  = $data->company_telephone_number;
-                    $row['company_mobile_number']  = $data->company_mobile_number;
-                    $row['assistant_email_address']  = $data->assistant_email_address;
-
-                    $row['salutation']  = $data->salutation;
-                    $row['first_name']  = $data->first_name;
-                    $row['middle_name']  = $data->middle_name;
-                    $row['last_name']  = $data->last_name;
-                    $row['email_address']  = $data->email_address;
-                    $row['mobile_number']  = $data->mobile_number;
-                    $row['job_title']  = $data->job_title;
-                    $row['nationality']  = $data->nationality;
-                    $row['badge_type']  = $data->badge_type;
-                    $row['pcode_used']  = $data->pcode_used;
-
-                    $row['total_amount']  = $data->total_amount;
-                    $row['payment_status']  = $data->payment_status;
-                    $row['registration_status']  = $data->registration_status;
-                    $row['mode_of_payment']  = $data->mode_of_payment;
-                    $row['invoice_number']  = $data->invoice_number;
-                    $row['reference_number']  = $data->reference_number;
-                    $row['registration_date_time']  = $data->registration_date_time;
-                    $row['paid_date_time']  = $data->paid_date_time;
-
-    
                     fputcsv($file, array(
-                            $row['transaction_id'],
-                            $row['event'],
-                            $row['pass_type'],
-                            $row['rate_type'],
+                            $data['transaction_id'],
+                            $data['event'],
+                            $data['pass_type'],
+                            $data['rate_type'],
 
-                            $row['company_name'],
-                            $row['company_sector'],
-                            $row['company_address'],
-                            $row['company_city'],
-                            $row['company_country'],
-                            $row['company_telephone_number'],
-                            $row['company_mobile_number'],
-                            $row['assistant_email_address'],
+                            $data['company_name'],
+                            $data['company_sector'],
+                            $data['company_address'],
+                            $data['company_city'],
+                            $data['company_country'],
+                            $data['company_telephone_number'],
+                            $data['company_mobile_number'],
+                            $data['assistant_email_address'],
 
-                            $row['salutation'],
-                            $row['first_name'],
-                            $row['middle_name'],
-                            $row['last_name'],
-                            $row['email_address'],
-                            $row['mobile_number'],
-                            $row['job_title'],
-                            $row['nationality'],
-                            $row['badge_type'],
-                            $row['pcode_used'],
+                            $data['salutation'],
+                            $data['first_name'],
+                            $data['middle_name'],
+                            $data['last_name'],
+                            $data['email_address'],
+                            $data['mobile_number'],
+                            $data['job_title'],
+                            $data['nationality'],
+                            $data['badge_type'],
+                            $data['pcode_used'],
                             
-                            $row['total_amount'],
-                            $row['payment_status'],
-                            $row['mode_of_payment'],
-                            $row['invoice_number'],
-                            $row['reference_number'],
-                            $row['registration_date_time'],
-                            $row['paid_date_time'],
+                            $data['total_amount'],
+                            $data['payment_status'],
+                            $data['registration_status'],
+                            $data['mode_of_payment'],
+                            $data['invoice_number'],
+                            $data['reference_number'],
+                            $data['registration_date_time'],
+                            $data['paid_date_time'],
                         )
                     );
                 }
                 fclose($file);
             };
             return response()->stream($callback, 200, $headers);
-            dd($finalExcelData);
         } else {
             abort(404, 'The URL is incorrect');
         }
