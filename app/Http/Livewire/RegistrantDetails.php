@@ -397,7 +397,11 @@ class RegistrantDetails extends Component
         $mainDelegate = MainDelegates::where('id', $this->finalData['mainDelegateId'])->where('event_id', $this->eventId)->first();
         $mainDiscount = PromoCodes::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->where('promo_code', $mainDelegate->pcode_used)->where('badge_type', $mainDelegate->badge_type)->value('discount');
 
-        $promoCodeMainDiscountString = ($mainDelegate->pcode_used == null) ? '' : "(" . $mainDiscount . "% discount)";
+        if($mainDiscount == 100){
+            $promoCodeMainDiscountString = "($mainDelegate->badge_type Complimentary)";
+        } else {
+            $promoCodeMainDiscountString = ($mainDelegate->pcode_used == null) ? '' : "(" . $mainDiscount . "% discount)";
+        }
 
         array_push($invoiceDetails, [
             'delegateDescription' => "Delegate Registration Fee - {$mainDelegate->rate_type_string} {$promoCodeMainDiscountString}",
@@ -441,7 +445,13 @@ class RegistrantDetails extends Component
                     $invoiceDetails[$existingIndex]['totalDiscount'] = $totalDiscountTemp;
                     $invoiceDetails[$existingIndex]['totalNetAmount'] = $totalNetAmountTemp;
                 } else {
-                    $promoCodeSubDiscountString = ($subDiscount == null) ? '' : "(" . $subDiscount . "% discount)";
+                    
+                    if($subDiscount == 100){
+                        $promoCodeSubDiscountString = "($subDelegate->badge_type Complimentary)";
+                    } else {
+                        $promoCodeSubDiscountString = ($subDelegate->pcode_used == null) ? '' : "(" . $subDiscount . "% discount)";
+                    }
+
                     array_push($invoiceDetails, [
                         'delegateDescription' => "Delegate Registration Fee - {$mainDelegate->rate_type_string} {$promoCodeSubDiscountString}",
                         'delegateNames' => [

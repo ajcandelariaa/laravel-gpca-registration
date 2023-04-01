@@ -145,10 +145,11 @@ class RegistrationController extends Controller
                             $invoiceDetails[$existingIndex]['totalDiscount'] = $totalDiscountTemp;
                             $invoiceDetails[$existingIndex]['totalNetAmount'] = $totalNetAmountTemp;
                         } else {
+
                             if($subDiscount == 100){
                                 $promoCodeSubDiscountString = "($subDelegate->badge_type Complimentary)";
                             } else {
-                                $promoCodeSubDiscountString = ($mainDelegate->pcode_used == null) ? '' : "(" . $subDiscount . "% discount)";
+                                $promoCodeSubDiscountString = ($subDelegate->pcode_used == null) ? '' : "(" . $subDiscount . "% discount)";
                             }
 
                             array_push($invoiceDetails, [
@@ -204,6 +205,7 @@ class RegistrationController extends Controller
 
                     'invoiceData' => $this->getInvoice($eventCategory, $eventId, $registrantId),
                 ];
+                
                 return view('admin.event.detail.registrants.registrants_detail', [
                     "pageTitle" => "Event Registrant Details",
                     "eventCategory" => $eventCategory,
@@ -280,7 +282,7 @@ class RegistrationController extends Controller
                             if($subDiscount == 100){
                                 $promoCodeSubDiscountString = "($subDelegate->badge_type Complimentary)";
                             } else {
-                                $promoCodeSubDiscountString = ($mainDelegate->pcode_used == null) ? '' : "(" . $subDiscount . "% discount)";
+                                $promoCodeSubDiscountString = ($subDelegate->pcode_used == null) ? '' : "(" . $subDiscount . "% discount)";
                             }
 
                             array_push($invoiceDetails, [
@@ -421,7 +423,7 @@ class RegistrationController extends Controller
                         'transaction_id' => $mainTransactionId,
                         'event' => $eventCategory,
                         'pass_type' => $mainDelegate->pass_type,
-                        'rate_type' => $mainDelegate->rate_type,
+                        'rate_type' => ($netAMount == 0) ? 'Complementary' : $mainDelegate->rate_type,
 
                         'company_name' => $mainDelegate->company_name,
                         'company_sector' => $mainDelegate->company_sector,
@@ -525,8 +527,6 @@ class RegistrationController extends Controller
                 }
             }
 
-            dd($finalExcelData);
-            
             $fileName = 'transactions.csv';
             $headers = array(
                 "Content-type"        => "text/csv",
@@ -542,26 +542,28 @@ class RegistrationController extends Controller
                 'Pass Type',
                 'Rate Type',
 
-                'Company Name',
-                'Company Sector',
-                'Company Address',
-                'Company City',
-                'Company Country',
-                'Company Telephone Number',
-                'Company Mobile Number',
-                'Assistant Email Address',
-
+                'Promo Code used',
+                'Badge Type',
                 'Salutation',
                 'First Name',
-                'Middle Name',
                 'Last Name',
                 'Email Address',
-                'Mobile Number',
+                'Mobile Number 1',
                 'Job Title',
                 'Nationality',
-                'Badge Type',
-                'Promo Code used',
 
+                'Company Name',
+                'Company Address',
+                'City',
+                'Country',
+                'Telephone Number',
+                'Mobile Number 2',
+                'Assistant Email Address',
+                
+                'Middle Name',
+
+                'Unit Price',
+                'Discount Price',
                 'Total Amount',
                 'Payment Status',
                 'Registration Status',
@@ -570,6 +572,9 @@ class RegistrationController extends Controller
                 'Reference Number',
                 'Registered Date & Time',
                 'Paid Date & Time',
+                'Printed badge',
+                
+                'Company Sector',
             );
     
             $callback = function() use($finalExcelData, $columns) {
@@ -583,8 +588,18 @@ class RegistrationController extends Controller
                             $data['pass_type'],
                             $data['rate_type'],
 
+                            $data['pcode_used'],
+                            $data['badge_type'],
+
+                            $data['salutation'],
+                            $data['first_name'],
+                            $data['last_name'],
+                            $data['email_address'],
+                            $data['mobile_number'],
+                            $data['job_title'],
+                            $data['nationality'],
+
                             $data['company_name'],
-                            $data['company_sector'],
                             $data['company_address'],
                             $data['company_city'],
                             $data['company_country'],
@@ -592,18 +607,11 @@ class RegistrationController extends Controller
                             $data['company_mobile_number'],
                             $data['assistant_email_address'],
 
-                            $data['salutation'],
-                            $data['first_name'],
                             $data['middle_name'],
-                            $data['last_name'],
-                            $data['email_address'],
-                            $data['mobile_number'],
-                            $data['job_title'],
-                            $data['nationality'],
-                            $data['badge_type'],
-                            $data['pcode_used'],
                             
-                            $data['total_amount'],
+                            $data['unit_price'],
+                            $data['discount_price'],
+                            $data['net_amount'],
                             $data['payment_status'],
                             $data['registration_status'],
                             $data['mode_of_payment'],
@@ -611,6 +619,9 @@ class RegistrationController extends Controller
                             $data['reference_number'],
                             $data['registration_date_time'],
                             $data['paid_date_time'],
+                            $data['printed_badge_date'],
+
+                            $data['company_sector'],
                         )
                     );
                 }
