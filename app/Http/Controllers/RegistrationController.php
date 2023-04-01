@@ -403,6 +403,20 @@ class RegistrationController extends Controller
                     $tempInvoiceNumber = "$event->category"."$tempYear"."/"."$lastDigit";
                     $tempBookReference = "$event->year"."$getEventcode"."$lastDigit";
 
+                    $promoCodeDiscount = null;
+                    $discountPrice = 0.0;
+                    $netAMount = 0.0;
+
+                    $promoCodeDiscount = PromoCode::where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $mainDelegate->pcode_used)->value('discount');
+
+                    if($promoCodeDiscount  != null){
+                        $discountPrice = $mainDelegate->unit_price * ($promoCodeDiscount / 100);
+                        $netAMount = $mainDelegate->unit_price - $discountPrice;
+                    } else {
+                        $discountPrice = 0.0;
+                        $netAMount = $mainDelegate->unit_price;
+                    }
+
                     array_push($finalExcelData, [
                         'transaction_id' => $mainTransactionId,
                         'event' => $eventCategory,
@@ -430,8 +444,8 @@ class RegistrationController extends Controller
                         'pcode_used' => $mainDelegate->pcode_used,
 
                         'unit_price' => $mainDelegate->unit_price,
-                        'discount_price' => $mainDelegate->pcode_used,
-                        'net_amount' => $mainDelegate->pcode_used,
+                        'discount_price' => $discountPrice,
+                        'net_amount' => $netAMount,
                         'printed_badge_date' => null,
 
                         // PLEASE CONTINUE HERE
@@ -450,6 +464,20 @@ class RegistrationController extends Controller
                     if(!$subDelegates->isEmpty()){
                         foreach($subDelegates as $subDelegate){
                             $subTransactionId = Transaction::where('delegate_id', $subDelegate->id)->where('delegate_type', "sub")->value('id');
+
+                            $promoCodeDiscount = null;
+                            $discountPrice = 0.0;
+                            $netAMount = 0.0;
+
+                            $promoCodeDiscount = PromoCode::where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $subDelegate->pcode_used)->value('discount');
+
+                            if($promoCodeDiscount  != null){
+                                $discountPrice = $mainDelegate->unit_price * ($promoCodeDiscount / 100);
+                                $netAMount = $mainDelegate->unit_price - $discountPrice;
+                            } else {
+                                $discountPrice = 0.0;
+                                $netAMount = $mainDelegate->unit_price;
+                            }
 
                             array_push($finalExcelData, [
                                 'transaction_id' => $subTransactionId,
@@ -477,9 +505,10 @@ class RegistrationController extends Controller
                                 'badge_type' => $subDelegate->badge_type,
                                 'pcode_used' => $subDelegate->pcode_used,
 
-                                'unit_price' => $subDelegate->pcode_used,
-                                'discount_price' => $subDelegate->pcode_used,
-                                'net_amount' => $subDelegate->pcode_used,
+                                'unit_price' => $mainDelegate->unit_price,
+                                'discount_price' => $discountPrice,
+                                'net_amount' => $netAMount,
+                                'printed_badge_date' => null,
 
                                 // PLEASE CONTINUE HERE
                                 'total_amount' => $mainDelegate->total_amount,
