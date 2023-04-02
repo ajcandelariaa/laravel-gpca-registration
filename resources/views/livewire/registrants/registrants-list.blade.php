@@ -8,9 +8,9 @@
                 target="_blank"
                 class="bg-green-600 hover:bg-green-700 text-white py-2 px-5 rounded-md text-lg text-center">Export
                 Data to Excel</a>
-            <a href="" target="_blank"
+            <button type="button" wire:click="openImportModal" wire:key="openImportModal"
                 class="bg-sky-600 hover:bg-sky-700 text-white py-2 px-5 rounded-md text-lg text-center">Import
-                Data</a>
+                Data</button>
         </div>
         <form>
             <div class="relative">
@@ -106,6 +106,9 @@
                     @endphp
                 </div>
             @endforeach
+        @endif
     </div>
+    @if ($showImportModal)
+        @include('livewire.registrants.import_registrants_form')
     @endif
 </div>

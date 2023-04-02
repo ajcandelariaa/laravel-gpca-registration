@@ -762,8 +762,18 @@ class RegistrationForm extends Component
     }
 
     public function checkEmailIfExistsInDatabase($emailAddress){
-        $mainDelegate = MainDelegates::where('email_address', $emailAddress)->first();
-        $subDelegate = AdditionalDelegates::where('email_address', $emailAddress)->first();
+        $allDelegates = Transactions::where('event_id', $this->event->id)->where('event_category', $this->event->category)->get();
+
+        $mainDelegate = null;
+        $subDelegate = null;
+        
+        foreach ($allDelegates as $delegate){
+            if($delegate->delegate_type == "main"){
+                $mainDelegate = MainDelegates::where('id', $delegate->delegate_id)->where('email_address', $emailAddress)->first();
+            } else {
+                $subDelegate = AdditionalDelegates::where('id', $delegate->delegate_id)->where('email_address', $emailAddress)->first();
+            }
+        }
 
         if($mainDelegate == null && $subDelegate == null){
             return false;
