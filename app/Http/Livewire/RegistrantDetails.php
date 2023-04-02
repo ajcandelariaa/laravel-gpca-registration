@@ -62,7 +62,7 @@ class RegistrantDetails extends Component
 
     public function render()
     {
-        return view('livewire.registrant-details');
+        return view('livewire.registrants.registrant-details');
     }
 
     public function updateMainDelegate()

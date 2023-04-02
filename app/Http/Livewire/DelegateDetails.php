@@ -52,7 +52,7 @@ class DelegateDetails extends Component
 
     public function render()
     {
-        return view('livewire.delegate-details');
+        return view('livewire.delegates.delegate-details');
     }
 
     
