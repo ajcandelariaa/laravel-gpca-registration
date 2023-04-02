@@ -34,35 +34,10 @@ class RegistrationController extends Controller
     public function eventRegistrantsView($eventCategory, $eventId)
     {
         if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {
-            $finalListOfRegistrants = array();
-
-            $registrants = MainDelegate::where('event_id', $eventId)->get();
-
-            if(!$registrants->isEmpty()){
-                foreach($registrants as $registrant){
-                    $date_time_value = $registrant->registered_date_time;
-                    $date = Carbon::parse($date_time_value);
-                    $formatted_date = $date->format('M j, Y g:i A');
-
-                    array_push($finalListOfRegistrants, [
-                        'registrantId' => $registrant->id,
-                        'registeredDateTime' => $formatted_date,
-                        'registrantCompany' => $registrant->company_name,
-                        'registrantCountry' => $registrant->company_country,
-                        'registrantCity' => $registrant->company_city,
-                        'registrantPassType' => $registrant->pass_type,
-                        'registrantQuantity' => $registrant->quantity,
-                        'registrantStatus' => $registrant->payment_status,
-                        'registrantTotalAmount' => $registrant->total_amount,
-                    ]);
-                }
-            }
-
             return view('admin.event.detail.registrants.registrants', [
                 "pageTitle" => "Event Registrants",
                 "eventCategory" => $eventCategory,
                 "eventId" => $eventId,
-                "finalListOfRegistrants" => $finalListOfRegistrants,
             ]);
         } else {
             abort(404, 'The URL is incorrect');
