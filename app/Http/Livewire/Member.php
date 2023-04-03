@@ -20,12 +20,9 @@ class Member extends Component
         'deleteMemberScript' => 'deleteMember'
     ];
 
-    public function mount(){
-        $this->companySectors = config('app.companySectors');
-    }
-
     public function render()
     {
+        $this->companySectors = config('app.companySectors');
         if (empty($this->searchTerm)) {
             $this->members = Members::orderBy('name', 'ASC')->get();
         } else {

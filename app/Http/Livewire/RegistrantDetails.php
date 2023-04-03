@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire;
 
+use App\Mail\RegistrationMarkPaid;
 use App\Mail\RegistrationReminder;
 use Livewire\Component;
 use App\Models\Member as Members;
@@ -351,14 +352,38 @@ class RegistrantDetails extends Component
 
     public function markAsPaid()
     {
+        if($this->finalData['invoiceData']['total_amount'] == 0){
+            $paymentStatus = "free";
+        } else {
+            $paymentStatus = "paid";
+        }
         MainDelegates::find($this->finalData['mainDelegateId'])->fill([
             'registration_status' => "confirmed",
-            'payment_status' => "paid",
+            'payment_status' => $paymentStatus,
             'paid_date_time' => Carbon::now(),
         ])->save();
 
+        $details = [
+            'name' => $this->finalData['name'],
+        ];
+        
+        Mail::to($this->finalData['email_address'])->send(new RegistrationMarkPaid($details));
+
+        if($this->finalData['assistant_email_address'] != null){
+        Mail::to($this->finalData['assistant_email_address'])->send(new RegistrationMarkPaid($details));
+        }
+
+        if(count($this->finalData['subDelegates']) > 0){
+            foreach($this->finalData['subDelegates'] as $subDelegate){
+                $details = [
+                    'name' => $subDelegate['name'],
+                ];
+                Mail::to($subDelegate['email_address'])->send(new RegistrationMarkPaid($details));
+            }
+        }
+
         $this->finalData['registration_status'] = "confirmed";
-        $this->finalData['payment_status'] = "paid";
+        $this->finalData['payment_status'] = $paymentStatus;
         $this->finalData['paid_date_time'] = Carbon::parse(Carbon::now())->format('M j, Y g:i A');
     }
 
