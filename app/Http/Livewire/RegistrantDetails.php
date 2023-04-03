@@ -516,15 +516,32 @@ class RegistrantDetails extends Component
             'total_amount_string' => ucwords($this->numberToWords($totalAmount)),
         ];
 
+        $this->finalData['invoiceData'] = $invoiceData;
+        
+        if($this->finalData['registration_status'] == "confirmed"){
+            if($this->finalData['invoiceData']['total_amount'] == 0){
+                $this->finalData['payment_status'] = "free";
+            } else {
+                $this->finalData['payment_status'] = "paid";
+            }
+        } else {
+            if($this->finalData['invoiceData']['total_amount'] == 0){
+                $this->finalData['payment_status'] = "free";
+            } else {
+                $this->finalData['payment_status'] = "unpaid";
+            }
+        }
+
         MainDelegates::find($this->finalData['mainDelegateId'])->fill([
             'unit_price' => $this->checkUnitPrice(),
             'net_amount' => $net_amount,
             'vat_price' => $totalVat,
             'discount_price' => $discount_price,
             'total_amount' => $totalAmount,
+            'payment_status' => $this->finalData['payment_status'],
         ])->save();
 
-        $this->finalData['invoiceData'] = $invoiceData;
+
     }
 
     
