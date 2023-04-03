@@ -68,3 +68,5 @@ Route::get('/check', [DelegateController::class, 'checkPhpInfo']);
 
 Route::get('/test', [RegistrationController::class, 'testEmail'])->name('test-email');
 Route::get('/register/{eventYear}/{eventCategory}/{eventId}', [RegistrationController::class, 'registrationView'])->name('register.view');
+Route::get('/test-card-payment', [RegistrationController::class, 'testCreditCardView'])->name('register.test-card-payment');
+Route::post('/test-card-payment-post', [RegistrationController::class, 'testCreditCardSbumit'])->name('register.test-card-payment');

@@ -618,4 +618,12 @@ class RegistrationController extends Controller
         // ->bcc('analee@gpca.org.ae')
         ->send(new RegistrationConfirmation($details));
     }
+    
+    public function testCreditCardSbumit(Request $request){
+        dd($request);
+    }
+    
+    public function testCreditCardView(){
+        return view('registration.test-registration');
+    }
 }
