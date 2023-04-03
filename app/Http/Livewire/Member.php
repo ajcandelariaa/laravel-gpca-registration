@@ -13,42 +13,27 @@ class Member extends Component
     public $members, $name, $logo, $sector;
     public $updateMember = false;
     public $oldImage, $memberId;
-    public $companySectors = [
-        'Academia / Educational & Research Institutes / Universities',
-        'Brand owners',
-        'Catalyst or Additive Manufacturers ',
-        'Chemical / Petrochemical Producers    ',
-        'Chemical Traders / Distributors ',
-        'Engineering Company / EPC Contractors',
-        'Equipment Manufacturers',
-        'Governments & Regulators',
-        'Industry Associations',
-        'Investment / Financial / Audit / Insurance Firms',
-        'Legal firms',
-        'Logistics Service Providers',
-        'NGOs',
-        'Oil & Gas (Upstream) ',
-        'Petroleum Producers / Refineries / Gas processing plants',
-        'Plastics Convertors',
-        'Power & Utilities',
-        'Press/media ',
-        'Retailers',
-        'Shipping Lines',
-        'Strategy Consultancies ',
-        'Technology Consultancies',
-        'Technology Services Providers',
-        'Terminal Operators',
-        'Venture Capitalists ',
-        'Waste Management & Recycling',
-    ];
-
+    public $searchTerm;
+    public $companySectors;
+    
     protected $listeners = [
         'deleteMemberScript' => 'deleteMember'
     ];
 
+    public function mount(){
+        $this->companySectors = config('app.companySectors');
+    }
+
     public function render()
     {
-        $this->members = Members::orderBy('name', 'ASC')->get();
+        if (empty($this->searchTerm)) {
+            $this->members = Members::orderBy('name', 'ASC')->get();
+        } else {
+            $this->members = Members::where('name', 'like', '%' . $this->searchTerm . '%')
+                ->orWhere('sector', 'like', '%' . $this->searchTerm . '%')
+                ->orderBy('name', 'ASC')
+                ->get();
+        }
         return view('livewire.members.member');
     }
 
