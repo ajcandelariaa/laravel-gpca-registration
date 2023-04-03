@@ -20,6 +20,10 @@
     {{-- LIVEWIRE --}}
     @livewireStyles()
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+
     <style>
         .add-event-form select:required:invalid {
             color: #afafaf;
@@ -57,7 +61,10 @@
         </div>
     </div>
 
-    @if (request()->is('admin/event/*/*/detail*') || request()->is('admin/event/*/*/promo-code*') || request()->is('admin/event/*/*/registrant*') || request()->is('admin/event/*/*/delegate*'))
+    @if (request()->is('admin/event/*/*/detail*') ||
+            request()->is('admin/event/*/*/promo-code*') ||
+            request()->is('admin/event/*/*/registrant*') ||
+            request()->is('admin/event/*/*/delegate*'))
         @include('admin.event.detail.navigations')
     @endif
 
@@ -74,6 +81,8 @@
     @else
     @endif
     <script src="{{ asset('js/manageEvents/imagePreview.js') }}"></script>
+    <script src="{{ asset('js/allswal.js') }}"></script>
+    
 </body>
 
 </html>

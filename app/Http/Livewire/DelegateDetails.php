@@ -25,7 +25,7 @@ class DelegateDetails extends Component
         'Organizer',
     ];
 
-    
+
     public $eventCategory, $eventId, $finalDelegate, $members;
 
     // COMPANY INFO
@@ -55,8 +55,9 @@ class DelegateDetails extends Component
         return view('livewire.delegates.delegate-details');
     }
 
-    
-    public function updateDelegate(){
+
+    public function updateDelegate()
+    {
         $this->validate([
             'firstName' => 'required',
             'lastName' => 'required',
@@ -105,6 +106,12 @@ class DelegateDetails extends Component
 
         $this->showDelegateModal = false;
         $this->resetEditDelegateFields();
+
+        $this->dispatchBrowserEvent('swal:delegate-update', [
+            'type' => 'success',  
+            'message' => 'Delegate Updated Successfully!', 
+            'text' => ''
+        ]);
     }
 
     public function openEditDelegateModal()
@@ -124,7 +131,7 @@ class DelegateDetails extends Component
         $this->showDelegateModal = true;
     }
 
-    
+
     public function closeEditDelegateModal()
     {
         $this->showDelegateModal = false;
@@ -147,7 +154,7 @@ class DelegateDetails extends Component
     }
 
 
-    
+
     public function updateCompanyDetails()
     {
         $this->validate([
@@ -182,9 +189,15 @@ class DelegateDetails extends Component
 
         $this->resetEditCompanyModalFields();
         $this->showCompanyModal = false;
+
+        $this->dispatchBrowserEvent('swal:company-update', [
+            'type' => 'success',  
+            'message' => 'Company Updated Successfully!', 
+            'text' => ''
+        ]);
     }
 
-    
+
     public function openEditCompanyDetailsModal()
     {
         $this->members = Members::where('active', true)->get();

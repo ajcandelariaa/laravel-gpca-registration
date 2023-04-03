@@ -12,6 +12,7 @@
         "laravel/sanctum": "^3.0",
         "laravel/tinker": "^2.7",
         "livewire/livewire": "^2.12",
+        "realrashid/sweet-alert": "^6.0",
         "simplesoftwareio/simple-qrcode": "^4.2"
     },
     "require-dev": {
