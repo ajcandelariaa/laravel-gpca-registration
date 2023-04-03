@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire;
 
+use App\Mail\RegistrationConfirmation;
 use App\Models\MainDelegate as MainDelegates;
 use App\Models\AdditionalDelegate as AdditionalDelegates;
 use App\Models\Transaction as Transactions;
@@ -9,6 +10,7 @@ use App\Models\Event as Events;
 use App\Models\Member as Members;
 use App\Models\PromoCode as PromoCodes;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Mail;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -77,13 +79,13 @@ class RegistrantsList extends Component
         $this->promoCodeErrors = array();
 
         $this->validate([
-            // 'delegatePassType' => 'required',
-            // 'companyName' => 'required',
-            // 'companySector' => 'required',
-            // 'companyAddress' => 'required',
-            // 'companyCountry' => 'required',
-            // 'companyCity' => 'required',
-            // 'companyMobileNumber' => 'required',
+            'delegatePassType' => 'required',
+            'companyName' => 'required',
+            'companySector' => 'required',
+            'companyAddress' => 'required',
+            'companyCountry' => 'required',
+            'companyCity' => 'required',
+            'companyMobileNumber' => 'required',
             'csvFile' => 'required',
         ]);
 
@@ -94,7 +96,7 @@ class RegistrantsList extends Component
         }
         fclose($file);
 
-        
+
         for ($i = 0; $i < count($rows); $i++) {
             if ($i == 0) {
                 continue;
@@ -168,7 +170,7 @@ class RegistrantsList extends Component
                     }
                 }
 
-                if(count($this->promoCodeErrors) == 0){
+                if (count($this->promoCodeErrors) == 0) {
                     $this->emailYouAlreadyUsed = array();
                     $this->emailAlreadyExisting = array();
                     $this->promoCodeErrors = array();
@@ -189,15 +191,15 @@ class RegistrantsList extends Component
                             // calculate 
                             $promoCodeUsed = $rows[$i][0];
                             $delegateType = $rows[$i][1];
-    
+
                             if ($promoCodeUsed != null) {
                                 $promoCode = PromoCodes::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->where('active', true)->where('promo_code', $promoCodeUsed)->where('badge_type', $delegateType)->first();
-                                
+
                                 $tempDiscount = $this->finalUnitPrice * ($promoCode->discount / 100);
                                 $tempNetAmount = $this->finalUnitPrice - $tempDiscount;
 
-                                $finalNetAmount +=  $tempDiscount;
-                                $finalDiscountPrice +=  $tempNetAmount;
+                                $finalNetAmount +=  $tempNetAmount;
+                                $finalDiscountPrice +=  $tempDiscount;
                             } else {
                                 $finalNetAmount +=  $this->finalUnitPrice;
                                 $finalDiscountPrice +=  0;
@@ -206,16 +208,16 @@ class RegistrantsList extends Component
                     }
 
                     $finalVatPrice = $finalNetAmount * ($this->event->event_vat / 100);
-                    $totalAmount = $finalNetAmount - $finalVatPrice;
-                    
-                    if($totalAmount == 0){
+                    $totalAmount = $finalNetAmount + $finalVatPrice;
+
+                    if ($totalAmount == 0) {
                         $paymentStatus = "free";
                         $registrationStatus = "confirmed";
                     } else {
                         $registrationStatus = "pending";
                         $paymentStatus = "unpaid";
                     }
-                    
+
                     for ($i = 0; $i < count($rows); $i++) {
                         if ($i == 0) {
                             continue;
@@ -226,7 +228,7 @@ class RegistrantsList extends Component
                                 'pass_type' => $this->delegatePassType,
                                 'rate_type' => $this->rateType,
                                 'rate_type_string' => $this->rateTypeString,
-            
+
                                 'company_name' => $this->companyName,
                                 'company_sector' => $this->companySector,
                                 'company_address' => $this->companyAddress,
@@ -235,7 +237,7 @@ class RegistrantsList extends Component
                                 'company_telephone_number' => $this->companyLandlineNumber,
                                 'company_mobile_number' => $this->companyMobileNumber,
                                 'assistant_email_address' => $this->assistantEmailAddress,
-            
+
                                 'salutation' => $rows[$i][2],
                                 'first_name' => $rows[$i][3],
                                 'middle_name' => $rows[$i][4],
@@ -246,7 +248,7 @@ class RegistrantsList extends Component
                                 'job_title' => $rows[$i][9],
                                 'badge_type' => $rows[$i][1],
                                 'pcode_used' => $rows[$i][0],
-            
+
                                 'heard_where' => $this->heardWhere,
                                 'quantity' => $quantity,
                                 'unit_price' => $this->finalUnitPrice,
@@ -271,6 +273,22 @@ class RegistrantsList extends Component
                             $mainDelegateId = $newRegistrant->id;
 
                             // EMAIL NOTIFICATION HERE
+                            $details = [
+                                'name' => $rows[$i][2] . " " . $rows[$i][3] . " " . $rows[$i][4] . " " . $rows[$i][5],
+                                'eventName' => $this->event->name,
+                                'startDate' => Carbon::createFromFormat('Y-m-d', $this->event->event_start_date)->format('l j F'),
+                                'endDate' => Carbon::createFromFormat('Y-m-d', $this->event->event_end_date)->format('l j F'),
+                                'year' => $this->event->year,
+                                'location' => $this->event->location,
+                                'badgeLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-badge" . "/" . "main" . "/" . $newRegistrant->id,
+                                'invoiceLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-invoice" . "/" . $newRegistrant->id,
+                            ];
+
+                            Mail::to($rows[$i][6])->send(new RegistrationConfirmation($details));
+
+                            if ($this->assistantEmailAddress != null) {
+                                Mail::to($this->assistantEmailAddress)->send(new RegistrationConfirmation($details));
+                            }
                         } else {
                             // add sub delegate
                             $newAdditionDelegate = AdditionalDelegates::create([
@@ -294,11 +312,23 @@ class RegistrantsList extends Component
                                 'delegate_type' => "sub",
                             ]);
 
-                            
+
                             // EMAIL NOTIFICATION HERE
+                            $details = [
+                                'name' => $rows[$i][2] . " " . $rows[$i][3] . " " . $rows[$i][4] . " " . $rows[$i][5],
+                                'eventName' => $this->event->name,
+                                'startDate' => Carbon::createFromFormat('Y-m-d', $this->event->event_start_date)->format('l j F'),
+                                'endDate' => Carbon::createFromFormat('Y-m-d', $this->event->event_end_date)->format('l j F'),
+                                'year' => $this->event->year,
+                                'location' => $this->event->location,
+                                'badgeLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-badge" . "/" . "main" . "/" . $newAdditionDelegate->id,
+                                'invoiceLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-invoice" . "/" . $mainDelegateId,
+                            ];
+
+                            Mail::to($rows[$i][6])->send(new RegistrationConfirmation($details));
                         }
                     }
-                    
+
                     $this->resetImportFields();
                     $this->showImportModal = false;
                 }
