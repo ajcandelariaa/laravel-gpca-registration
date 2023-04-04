@@ -1,27 +1,4 @@
 <div class="px-5">
-    {{-- @if (session()->has('member_updated'))
-        <div class="bg-green-300 py-2 px-4 text-center">
-            {{ session()->get('member_updated') }}
-        </div>
-    @endif
-    @if (session()->has('error_updating_member'))
-        <div class="bg-red-300 py-2 px-4 text-center">
-            {{ session()->get('error_updating_member') }}
-        </div>
-    @endif
-
-
-    @if (session()->has('added'))
-        <div class="bg-green-300 py-2 px-4 text-center">
-            {{ session()->get('added') }}
-        </div>
-    @endif
-    @if (session()->has('error_added'))
-        <div class="bg-red-300 py-2 px-4 text-center">
-            {{ session()->get('error_added') }}
-        </div>
-    @endif --}}
-
     <div class="float-left">
         @if ($updateMember)
             @include('livewire.members.edit_member')
@@ -31,39 +8,27 @@
     </div>
 
     <div class="shadow-lg my-5 pt-5 bg-white rounded-md" style="margin-left: 320px; ">
-        {{-- @if (session()->has('updated_status'))
-            <div class="bg-green-300 py-2 px-4 text-center">
-                {{ session()->get('updated_status') }}
+        <div class="flex gap-5 items-center">
+            <div>
+                {{-- <a href="{{ route('admin.event.registrants.exportData', ['eventCategory' => $eventCategory, 'eventId' => $eventId]) }}"
+                    target="_blank"
+                    class="bg-green-600 hover:bg-green-700 text-white py-2 px-5 rounded-md text-lg text-center">Export
+                    Data to Excel</a> --}}
+                <button type="button" wire:click="openImportModal" wire:key="openImportModal"
+                    class="bg-sky-600 hover:bg-sky-700 text-white py-2 px-5 rounded-md text-lg text-center">Import
+                    Members</button>
             </div>
-        @endif
-        @if (session()->has('error_updating_status'))
-            <div class="bg-red-300 py-2 px-4 text-center">
-                {{ session()->get('error_updating_status') }}
-            </div>
-        @endif
-
-
-        @if (session()->has('member_deleted'))
-            <div class="bg-green-300 py-2 px-4 text-center">
-                {{ session()->get('member_deleted') }}
-            </div>
-        @endif
-        @if (session()->has('error_deleting_member'))
-            <div class="bg-red-300 py-2 px-4 text-center">
-                {{ session()->get('error_deleting_member') }}
-            </div>
-        @endif --}}
-
-        <form>
-            <div class="relative">
-                <input type="text" wire:model="searchTerm"
-                    class="border border-gray-300 bg-white rounded-md py-2 pl-10 pr-4 block transition duration-150 ease-in-out sm:text-sm sm:leading-5"
-                    placeholder="Search...">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <i class="fas fa-search text-gray-400"></i>
+            <form>
+                <div class="relative">
+                    <input type="text" wire:model="searchTerm"
+                        class="border border-gray-300 bg-white rounded-md py-2 pl-10 pr-4 block transition duration-150 ease-in-out sm:text-sm sm:leading-5"
+                        placeholder="Search...">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-search text-gray-400"></i>
+                    </div>
                 </div>
-            </div>
-        </form>
+            </form>
+        </div>
 
         <h1 class="text-center text-2xl mt-4">List of members</h1>
         <div class="grid grid-cols-11 pt-4 pb-2 place-items-center">
@@ -88,9 +53,6 @@
                     <div class="col-span-3 flex justify-start items-center gap-2">
                         @if ($member->logo != null)
                             <img src="{{ Storage::url($member->logo) }}" alt="logo" class="object-cover w-10">
-                        @else
-                            <img src="{{ asset('assets/images/logo-placeholder-image.png') }}" alt="logo"
-                                class="object-cover w-10">
                         @endif
                         <div>
                             {{ $member->name }}
@@ -118,7 +80,7 @@
                             <i class="fa-solid fa-pen-to-square"></i>
                             Edit
                         </div>
-                        <div onclick="deleteMemberScript({{ $member->id }})"
+                        <div wire:click="deleteMemberConfirmation({{ $member->id }})"
                             class="cursor-pointer hover:text-red-600 text-red-500">
                             <i class="fa-solid fa-trash"></i>
                             Delete
@@ -131,11 +93,8 @@
             @endforeach
         @endif
     </div>
-
-    <script>
-        function deleteMemberScript(memberId) {
-            if (confirm("Are you sure you want to delete this member?"))
-                window.livewire.emit('deleteMemberScript', memberId);
-        }
-    </script>
+    
+    @if ($showImportModal)
+        @include('livewire.members.import_member_form')
+    @endif
 </div>

@@ -32,6 +32,23 @@
         .add-event-form option {
             color: #000;
         }
+
+        .swal-button--confirm {
+            background-color: #034889;
+            color: #fff;
+        }
+        .swal-button--cancel {
+            background-color: #dd3333;
+            color: #fff;
+        }
+
+        
+        .swal-button--confirm:hover {
+            background-color: #033e75 !important;
+        }
+        .swal-button--cancel:hover {
+            background-color: #cb2e2e !important;
+        }
     </style>
 </head>
 
@@ -82,7 +99,7 @@
     @endif
     <script src="{{ asset('js/manageEvents/imagePreview.js') }}"></script>
     <script src="{{ asset('js/allswal.js') }}"></script>
-    
+
 </body>
 
 </html>
