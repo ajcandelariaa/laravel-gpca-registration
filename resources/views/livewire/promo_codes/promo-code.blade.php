@@ -52,11 +52,6 @@
                             <i class="fa-solid fa-pen-to-square"></i>
                             Edit
                         </div>
-                        {{-- <div onclick="deletepromoCodeScript({{ $promoCode->id }})"
-                            class="cursor-pointer hover:text-red-600 text-red-500">
-                            <i class="fa-solid fa-trash"></i>
-                            Delete
-                        </div> --}}
                     </div>
                     @php
                         $count++;
@@ -71,11 +66,4 @@
             There are no create codes yet.
         </div>
     @endif
-
-    {{-- <script>
-        function deletepromoCodeScript(promoCodeId) {
-            if (confirm("Are you sure you want to delete this code?"))
-                window.livewire.emit('deletePromoCodeScript', promoCodeId);
-        }
-    </script> --}}
 </div>

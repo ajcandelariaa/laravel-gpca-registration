@@ -110,7 +110,7 @@
             </div>
 
             <div class="text-center mt-10">
-                <button wire:click.prevent="addPromoCode()"
+                <button wire:click.prevent="addPromoCodeConfirmation"
                     class="bg-registrationPrimaryColor hover:bg-registrationPrimaryColorHover text-white font-medium py-2 px-5 rounded inline-flex items-center text-sm">
                     <span class="mr-2"><i class="fas fa-plus"></i></span>
                     <span>Add Promo Code</span>

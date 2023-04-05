@@ -111,9 +111,9 @@
             </div>
 
             <div class="text-center mt-10 flex gap-4">
-                <button wire:click.prevent="hideEditPromoCode()"
+                <button wire:click.prevent="hideEditPromoCode"
                     class="bg-red-500 rounded-md text-white py-1 w-full hover:cursor-pointer hover:bg-red-700">Cancel</button>
-                <button wire:click.prevent="updatePromoCode()"
+                <button wire:click.prevent="updatePromoCodeConfirmation"
                     class="bg-registrationPrimaryColor rounded-md text-white py-1 w-full hover:cursor-pointer hover:bg-registrationPrimaryColorHover">Update</button>
             </div>
         </div>

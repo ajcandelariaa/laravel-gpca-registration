@@ -1,3 +1,83 @@
+// PROMO CODE ADD CONFIRMATION
+window.addEventListener("swal:add-promo-code-confirmation", (event) => {
+    swal({
+        title: event.detail.message,
+        text: event.detail.text,
+        icon: event.detail.type,
+        buttons: {
+            confirm: {
+                text: "Yes, add it!",
+                value: true,
+                visible: true,
+                closeModal: true,
+            },
+            cancel: {
+                text: "Cancel",
+                value: null,
+                visible: true,
+                closeModal: true,
+            },
+        }
+      }).then((result) => {
+        console.log(result);
+        if (result) {
+            Livewire.emit('addPromoCodeConfirmed')
+        }
+      });
+});
+// PROMO CODE UPDATE DETAILS
+window.addEventListener("swal:add-promo-code", (event) => {
+    swal({
+        title: event.detail.message,
+        text: event.detail.text,
+        icon: event.detail.type,
+    });
+});
+
+// PROMO CODE UPDATE CONFIRMATION
+window.addEventListener("swal:update-promo-code-confirmation", (event) => {
+    swal({
+        title: event.detail.message,
+        text: event.detail.text,
+        icon: event.detail.type,
+        buttons: {
+            confirm: {
+                text: "Yes, update it!",
+                value: true,
+                visible: true,
+                closeModal: true,
+            },
+            cancel: {
+                text: "Cancel",
+                value: null,
+                visible: true,
+                closeModal: true,
+            },
+        }
+      }).then((result) => {
+        console.log(result);
+        if (result) {
+            Livewire.emit('updatePromoCodeConfirmed')
+        }
+      });
+});
+// PROMO CODE UPDATE DETAILS
+window.addEventListener("swal:update-promo-code", (event) => {
+    swal({
+        title: event.detail.message,
+        text: event.detail.text,
+        icon: event.detail.type,
+    });
+});
+
+
+
+
+
+
+
+
+
 
 // DELEGATE IMPORt CONFIRMATION
 window.addEventListener("swal:import-delegate-confirmation", (event) => {
@@ -27,7 +107,7 @@ window.addEventListener("swal:import-delegate-confirmation", (event) => {
       });
 });
 
-// MEMBER ADD DETAILS
+// DELEGATE ADD DETAILS
 window.addEventListener("swal:import-delegate", (event) => {
     swal({
         title: event.detail.message,
@@ -35,6 +115,12 @@ window.addEventListener("swal:import-delegate", (event) => {
         icon: event.detail.type,
     });
 });
+
+
+
+
+
+
 
 // MEMBER ADD DETAILS
 window.addEventListener("swal:add-member", (event) => {

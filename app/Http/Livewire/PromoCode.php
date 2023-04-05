@@ -31,10 +31,9 @@ class PromoCode extends Component
     public $total_usage;
     public $validity;
     
-    // protected $listeners = [
-    //     'deletePromoCodeScript' => 'deletePromoCode'
-    // ];
-
+    
+    protected $listeners = ['updatePromoCodeConfirmed' => 'updatePromoCode', 'addPromoCodeConfirmed' => 'addPromoCode'];
+    
     public function mount($eventCategory, $eventId)
     {
         $this->eventCategory = $eventCategory;
@@ -47,7 +46,7 @@ class PromoCode extends Component
         return view('livewire.promo_codes.promo-code');
     }
 
-    public function addPromoCode()
+    public function addPromoCodeConfirmation()
     {
         $this->validate(
             [
@@ -75,6 +74,15 @@ class PromoCode extends Component
             ]
         );
 
+        
+        $this->dispatchBrowserEvent('swal:add-promo-code-confirmation', [
+            'type' => 'warning',
+            'message' => 'Are you sure?',
+            'text' => "",
+        ]);
+    }
+
+    public function addPromoCode(){
         PromoCodes::create([
             'event_id' => $this->eventId,
             'event_category' => $this->eventCategory,
@@ -94,6 +102,13 @@ class PromoCode extends Component
         $this->discount = null;
         $this->number_of_codes = null;
         $this->validity = null;
+
+        $this->dispatchBrowserEvent('swal:add-promo-code', [
+            'type' => 'success',
+            'message' => 'Promo Code added Successfully!',
+            'text' => ''
+        ]);
+
     }
 
 
@@ -133,7 +148,7 @@ class PromoCode extends Component
         $this->validity = null;
     }
 
-    public function updatePromoCode()
+    public function updatePromoCodeConfirmation()
     {
         $this->validate(
             [
@@ -161,6 +176,16 @@ class PromoCode extends Component
             ]
         );
 
+        $this->dispatchBrowserEvent('swal:update-promo-code-confirmation', [
+            'type' => 'warning',
+            'message' => 'Are you sure?',
+            'text' => "",
+        ]);
+
+    }
+
+    public function updatePromoCode(){
+
         PromoCodes::find($this->promo_code_id)->fill([
             'description' => $this->description,
             'badge_type' => $this->badge_type,
@@ -179,11 +204,12 @@ class PromoCode extends Component
         $this->number_of_codes = null;
         $this->total_usage = null;
         $this->validity = null;
+
+        
+        $this->dispatchBrowserEvent('swal:update-promo-code', [
+            'type' => 'success',
+            'message' => 'Promo Code Updated Successfully!',
+            'text' => ''
+        ]);
     }
-
-
-    // public function deletePromoCode($promoCodeId)
-    // {
-    //     PromoCodes::find($promoCodeId)->delete();
-    // }
 }
