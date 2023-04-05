@@ -27,6 +27,12 @@
                                         {{ $message }}
                                     </div>
                                 @enderror
+
+                                @if($csvFileError != null)
+                                    <div class="text-red-500 text-xs italic mt-1">
+                                        {{ $csvFileError }}
+                                    </div>
+                                @endif
                             </div>
                         </div>
                     </div>

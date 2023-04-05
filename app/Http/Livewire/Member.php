@@ -19,6 +19,8 @@ class Member extends Component
     public $showImportModal = false;
     public $csvFile;
 
+    public $csvFileError;
+
     protected $listeners = ['deleteConfirmed' => 'deleteMember', 'importConfirmed' => 'submitImportMember'];
 
     public function render()
@@ -197,9 +199,12 @@ class Member extends Component
                 'message' => 'Are you sure?',
                 'text' => "",
             ]);
+            $this->csvFileError = null;
+        } else {
+            // PUT ERROR
+            $this->csvFileError = "File is not valid, please make sure you have the correct format.";
         }
 
-        // PUT ERROR
     }
 
     public function submitImportMember()

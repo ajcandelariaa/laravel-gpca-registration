@@ -96,6 +96,7 @@ class RegistrantsList extends Component
         }
         fclose($file);
 
+        // PUT ERROR CHECKER ALSO JUST LIKE IMPORTING MEMBERS
 
         for ($i = 0; $i < count($rows); $i++) {
             if ($i == 0) {
