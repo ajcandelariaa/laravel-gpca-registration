@@ -293,6 +293,8 @@ class EventController extends Controller
 
             $event->save();
 
+            
+            
             return redirect()->route('admin.event.view')->with('success', 'Event updated successfully.');
         } else {
             abort(404, 'The URL is incorrect');

@@ -212,6 +212,20 @@
                                     </div>
                                 @enderror
 
+                                @if($csvFileError != null)
+                                    <div class="text-red-500 text-xs italic mt-1">
+                                        {{ $csvFileError }}
+                                    </div>
+                                @endif
+                                
+                                @if(count($incompleDetails) > 0)
+                                    <div class="text-red-500 text-xs italic mt-1">
+                                        @foreach ($incompleDetails as $error)
+                                            <p>{{ $error }}</p>
+                                            
+                                        @endforeach
+                                    </div>
+                                @endif
                                 
                                 @if(count($emailYouAlreadyUsed) > 0)
                                     <div class="text-red-500 text-xs italic mt-1">

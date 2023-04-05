@@ -10,7 +10,9 @@
     </div>
 
     <div class="shadow-lg bg-white rounded-md container mx-auto mt-5 mb-10">
-        <form id="edit_form" class="edit-event-form" action="{{ route('admin.event.edit.post', ['eventCategory' => $event->category, 'eventId' => $event->id]) }}" method="POST" enctype="multipart/form-data">
+        <form id="edit_form" class="edit-event-form"
+            action="{{ route('admin.event.edit.post', ['eventCategory' => $event->category, 'eventId' => $event->id]) }}"
+            method="POST" enctype="multipart/form-data">
             @csrf
             <div class="p-5">
 
@@ -24,38 +26,25 @@
 
                     @include('admin.event.edit.event_details')
 
-                    <div class="space-y-2 col-span-2 mt-6"><hr></div>
+                    <div class="space-y-2 col-span-2 mt-6">
+                        <hr>
+                    </div>
 
                     @include('admin.event.edit.eb_details')
 
 
-                    <div class="space-y-2 col-span-2 mt-6"><hr></div>
+                    <div class="space-y-2 col-span-2 mt-6">
+                        <hr>
+                    </div>
 
                     @include('admin.event.edit.std_details')
                 </div>
 
                 <div class="text-center mt-10">
-                    <button id="update_btn" type="submit" 
+                    <button id="update_btn" type="submit"
                         class="bg-registrationPrimaryColor hover:bg-registrationPrimaryColorHover text-white font-medium py-2 px-10 rounded inline-flex items-center text-sm cursor-pointer">Update</button>
                 </div>
             </div>
         </form>
-
-        {{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <script>
-            $(document).ready(function() {
-                $('#add-more').click(function() {
-                    var html = '<div class="form-group">' +
-                        '<label for="name">Name</label>' +
-                        '<input type="text" class="form-control" name="name[]" id="name">' +
-                        '</div>' +
-                        '<div class="form-group">' +
-                        '<label for="price">Price</label>' +
-                        '<input type="number" class="form-control" name="price[]" id="price">' +
-                        '</div>';
-                    $('form').append(html);
-                });
-            });
-        </script> --}}
     </div>
 @endsection

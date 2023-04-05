@@ -167,6 +167,7 @@ class Member extends Component
     public function closeImportModal()
     {
         $this->csvFile = null;
+        $this->csvFileError = null;
         $this->showImportModal = false;
     }
 
@@ -186,7 +187,11 @@ class Member extends Component
         $checkIfCorrectFormat = true;
         for ($i = 0; $i < count($rows); $i++) {
             if ($i == 0) {
-                if($rows[$i][0] != "Company Name" && $rows[$i][1] != "Company Sectors"){
+                if (count($rows[$i]) == 2) {
+                    if($rows[$i][0] != "Company Name" || $rows[$i][1] != "Company Sectors"){
+                        $checkIfCorrectFormat = false;
+                    }
+                } else {
                     $checkIfCorrectFormat = false;
                 }
                 break;
@@ -204,7 +209,6 @@ class Member extends Component
             // PUT ERROR
             $this->csvFileError = "File is not valid, please make sure you have the correct format.";
         }
-
     }
 
     public function submitImportMember()
