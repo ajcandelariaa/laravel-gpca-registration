@@ -41,6 +41,9 @@ class RegistrantsList extends Component
     public $incompleDetails = array(), $emailYouAlreadyUsed = array(), $emailAlreadyExisting = array(), $promoCodeErrors = array();
     public $csvFileError;
 
+
+    protected $listeners = ['importDelegateConfirmed' => 'submitImportRegistrants'];
+
     public function mount($eventId, $eventCategory)
     {
         $this->event = Events::where('id', $eventId)->where('category', $eventCategory)->first();
@@ -73,7 +76,7 @@ class RegistrantsList extends Component
         return view('livewire.registrants.registrants-list');
     }
 
-    public function submitImportRegistrants()
+    public function submitImportRegistrantsConfirmation()
     {
         $this->csvFileError = null;
         $this->incompleDetails = array();
@@ -164,7 +167,7 @@ class RegistrantsList extends Component
                         }
                     }
                 }
-    
+
                 if (count($this->emailYouAlreadyUsed) == 0) {
                     $this->csvFileError = null;
                     $this->incompleDetails = array();
@@ -174,7 +177,7 @@ class RegistrantsList extends Component
                             continue;
                         } else {
                             $allDelegates = Transactions::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->get();
-    
+
                             $mainDelegate = null;
                             $subDelegate = null;
                             foreach ($allDelegates as $delegate) {
@@ -184,20 +187,20 @@ class RegistrantsList extends Component
                                     $subDelegate = AdditionalDelegates::where('id', $delegate->delegate_id)->where('email_address', $rows[$i][6])->first();
                                 }
                             }
-    
+
                             if ($mainDelegate != null || $subDelegate != null) {
                                 $lineNumber = $i + 1;
                                 array_push($this->emailAlreadyExisting, "Line $lineNumber email address is already registered!");
                             }
                         }
                     }
-    
+
                     if (count($this->emailAlreadyExisting) == 0) {
                         $this->csvFileError = null;
                         $this->incompleDetails = array();
                         $this->emailYouAlreadyUsed = array();
                         $this->emailAlreadyExisting = array();
-    
+
                         for ($i = 0; $i < count($rows); $i++) {
                             if ($i == 0) {
                                 continue;
@@ -206,7 +209,7 @@ class RegistrantsList extends Component
                                 $promoCodeUsed = $rows[$i][0];
                                 $delegateType = $rows[$i][1];
                                 $lineNumber = $i + 1;
-    
+
                                 if ($promoCodeUsed != null) {
                                     $promoCode = PromoCodes::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->where('active', true)->where('promo_code', $promoCodeUsed)->where('badge_type', $delegateType)->first();
                                     if ($promoCode == null) {
@@ -225,178 +228,200 @@ class RegistrantsList extends Component
                                 }
                             }
                         }
-    
+
                         if (count($this->promoCodeErrors) == 0) {
                             $this->csvFileError = null;
                             $this->incompleDetails = array();
                             $this->emailYouAlreadyUsed = array();
                             $this->emailAlreadyExisting = array();
                             $this->promoCodeErrors = array();
-    
-                            $this->checkUnitPrice();
-    
-                            $quantity = count($rows) - 1;
-                            $finalNetAmount = 0;
-                            $finalVatPrice = 0;
-                            $finalDiscountPrice = 0;
-                            $totalAmount = 0;
-                            $mainDelegateId = 0;
-    
-                            for ($i = 0; $i < count($rows); $i++) {
-                                if ($i == 0) {
-                                    continue;
-                                } else {
-                                    // calculate 
-                                    $promoCodeUsed = $rows[$i][0];
-                                    $delegateType = $rows[$i][1];
-    
-                                    if ($promoCodeUsed != null) {
-                                        $promoCode = PromoCodes::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->where('active', true)->where('promo_code', $promoCodeUsed)->where('badge_type', $delegateType)->first();
-    
-                                        $tempDiscount = $this->finalUnitPrice * ($promoCode->discount / 100);
-                                        $tempNetAmount = $this->finalUnitPrice - $tempDiscount;
-    
-                                        $finalNetAmount +=  $tempNetAmount;
-                                        $finalDiscountPrice +=  $tempDiscount;
-                                    } else {
-                                        $finalNetAmount +=  $this->finalUnitPrice;
-                                        $finalDiscountPrice +=  0;
-                                    }
-                                }
-                            }
-    
-                            $finalVatPrice = $finalNetAmount * ($this->event->event_vat / 100);
-                            $totalAmount = $finalNetAmount + $finalVatPrice;
-    
-                            if ($totalAmount == 0) {
-                                $paymentStatus = "free";
-                                $registrationStatus = "confirmed";
-                            } else {
-                                $registrationStatus = "pending";
-                                $paymentStatus = "unpaid";
-                            }
-    
-                            for ($i = 0; $i < count($rows); $i++) {
-                                if ($i == 0) {
-                                    continue;
-                                } else if ($i == 1) {
-                                    // add main delegate
-                                    $newRegistrant = MainDelegates::create([
-                                        'event_id' => $this->event->id,
-                                        'pass_type' => $this->delegatePassType,
-                                        'rate_type' => $this->rateType,
-                                        'rate_type_string' => $this->rateTypeString,
-    
-                                        'company_name' => $this->companyName,
-                                        'company_sector' => $this->companySector,
-                                        'company_address' => $this->companyAddress,
-                                        'company_country' => $this->companyCountry,
-                                        'company_city' => $this->companyCity,
-                                        'company_telephone_number' => $this->companyLandlineNumber,
-                                        'company_mobile_number' => $this->companyMobileNumber,
-                                        'assistant_email_address' => $this->assistantEmailAddress,
-    
-                                        'salutation' => $rows[$i][2],
-                                        'first_name' => $rows[$i][3],
-                                        'middle_name' => $rows[$i][4],
-                                        'last_name' => $rows[$i][5],
-                                        'email_address' => $rows[$i][6],
-                                        'mobile_number' => $rows[$i][7],
-                                        'nationality' => $rows[$i][8],
-                                        'job_title' => $rows[$i][9],
-                                        'badge_type' => $rows[$i][1],
-                                        'pcode_used' => $rows[$i][0],
-    
-                                        'heard_where' => $this->heardWhere,
-                                        'quantity' => $quantity,
-                                        'unit_price' => $this->finalUnitPrice,
-                                        'net_amount' => $finalNetAmount,
-                                        'vat_price' => $finalVatPrice,
-                                        'discount_price' => $finalDiscountPrice,
-                                        'total_amount' => $totalAmount,
-                                        'mode_of_payment' => "bankTransfer",
-                                        'registration_status' => $registrationStatus,
-                                        'payment_status' => $paymentStatus,
-                                        'registered_date_time' => Carbon::now(),
-                                        'paid_date_time' => null,
-                                    ]);
-    
-                                    Transactions::create([
-                                        'event_id' => $this->event->id,
-                                        'event_category' => $this->event->category,
-                                        'delegate_id' => $newRegistrant->id,
-                                        'delegate_type' => "main",
-                                    ]);
-    
-                                    $mainDelegateId = $newRegistrant->id;
-    
-                                    // EMAIL NOTIFICATION HERE
-                                    $details = [
-                                        'name' => $rows[$i][2] . " " . $rows[$i][3] . " " . $rows[$i][4] . " " . $rows[$i][5],
-                                        'eventName' => $this->event->name,
-                                        'startDate' => Carbon::createFromFormat('Y-m-d', $this->event->event_start_date)->format('l j F'),
-                                        'endDate' => Carbon::createFromFormat('Y-m-d', $this->event->event_end_date)->format('l j F'),
-                                        'year' => $this->event->year,
-                                        'location' => $this->event->location,
-                                        'badgeLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-badge" . "/" . "main" . "/" . $newRegistrant->id,
-                                        'invoiceLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-invoice" . "/" . $newRegistrant->id,
-                                    ];
-    
-                                    Mail::to($rows[$i][6])->send(new RegistrationConfirmation($details));
-    
-                                    if ($this->assistantEmailAddress != null) {
-                                        Mail::to($this->assistantEmailAddress)->send(new RegistrationConfirmation($details));
-                                    }
-                                } else {
-                                    // add sub delegate
-                                    $newAdditionDelegate = AdditionalDelegates::create([
-                                        'main_delegate_id' => $mainDelegateId,
-                                        'salutation' => $rows[$i][2],
-                                        'first_name' => $rows[$i][3],
-                                        'middle_name' => $rows[$i][4],
-                                        'last_name' => $rows[$i][5],
-                                        'email_address' => $rows[$i][6],
-                                        'mobile_number' => $rows[$i][7],
-                                        'nationality' => $rows[$i][8],
-                                        'job_title' => $rows[$i][9],
-                                        'badge_type' => $rows[$i][1],
-                                        'pcode_used' => $rows[$i][0],
-                                    ]);
-    
-                                    Transactions::create([
-                                        'event_id' => $this->event->id,
-                                        'event_category' => $this->event->category,
-                                        'delegate_id' => $newAdditionDelegate->id,
-                                        'delegate_type' => "sub",
-                                    ]);
-    
-    
-                                    // EMAIL NOTIFICATION HERE
-                                    $details = [
-                                        'name' => $rows[$i][2] . " " . $rows[$i][3] . " " . $rows[$i][4] . " " . $rows[$i][5],
-                                        'eventName' => $this->event->name,
-                                        'startDate' => Carbon::createFromFormat('Y-m-d', $this->event->event_start_date)->format('l j F'),
-                                        'endDate' => Carbon::createFromFormat('Y-m-d', $this->event->event_end_date)->format('l j F'),
-                                        'year' => $this->event->year,
-                                        'location' => $this->event->location,
-                                        'badgeLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-badge" . "/" . "main" . "/" . $newAdditionDelegate->id,
-                                        'invoiceLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-invoice" . "/" . $mainDelegateId,
-                                    ];
-    
-                                    Mail::to($rows[$i][6])->send(new RegistrationConfirmation($details));
-                                }
-                            }
-    
-                            $this->resetImportFields();
-                            $this->showImportModal = false;
+
+                            $this->dispatchBrowserEvent('swal:import-delegate-confirmation', [
+                                'type' => 'warning',
+                                'message' => 'Are you sure?',
+                                'text' => "",
+                            ]);
                         }
                     }
                 }
             }
-
         } else {
             $this->csvFileError = "File is not valid, please make sure you have the correct format.";
         }
+    }
+
+    public function submitImportRegistrants()
+    {
+        
+        $file = fopen($this->csvFile->getRealPath(), "r");
+        $rows = [];
+        while (($row = fgetcsv($file, 0, ",")) !== FALSE) {
+            $rows[] = $row;
+        }
+        fclose($file);
+
+        $this->checkUnitPrice();
+
+        $quantity = count($rows) - 1;
+        $finalNetAmount = 0;
+        $finalVatPrice = 0;
+        $finalDiscountPrice = 0;
+        $totalAmount = 0;
+        $mainDelegateId = 0;
+
+        for ($i = 0; $i < count($rows); $i++) {
+            if ($i == 0) {
+                continue;
+            } else {
+                // calculate 
+                $promoCodeUsed = $rows[$i][0];
+                $delegateType = $rows[$i][1];
+
+                if ($promoCodeUsed != null) {
+                    $promoCode = PromoCodes::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->where('active', true)->where('promo_code', $promoCodeUsed)->where('badge_type', $delegateType)->first();
+
+                    $tempDiscount = $this->finalUnitPrice * ($promoCode->discount / 100);
+                    $tempNetAmount = $this->finalUnitPrice - $tempDiscount;
+
+                    $finalNetAmount +=  $tempNetAmount;
+                    $finalDiscountPrice +=  $tempDiscount;
+                } else {
+                    $finalNetAmount +=  $this->finalUnitPrice;
+                    $finalDiscountPrice +=  0;
+                }
+            }
+        }
+
+        $finalVatPrice = $finalNetAmount * ($this->event->event_vat / 100);
+        $totalAmount = $finalNetAmount + $finalVatPrice;
+
+        if ($totalAmount == 0) {
+            $paymentStatus = "free";
+            $registrationStatus = "confirmed";
+        } else {
+            $registrationStatus = "pending";
+            $paymentStatus = "unpaid";
+        }
+
+        for ($i = 0; $i < count($rows); $i++) {
+            if ($i == 0) {
+                continue;
+            } else if ($i == 1) {
+                // add main delegate
+                $newRegistrant = MainDelegates::create([
+                    'event_id' => $this->event->id,
+                    'pass_type' => $this->delegatePassType,
+                    'rate_type' => $this->rateType,
+                    'rate_type_string' => $this->rateTypeString,
+
+                    'company_name' => $this->companyName,
+                    'company_sector' => $this->companySector,
+                    'company_address' => $this->companyAddress,
+                    'company_country' => $this->companyCountry,
+                    'company_city' => $this->companyCity,
+                    'company_telephone_number' => $this->companyLandlineNumber,
+                    'company_mobile_number' => $this->companyMobileNumber,
+                    'assistant_email_address' => $this->assistantEmailAddress,
+
+                    'salutation' => $rows[$i][2],
+                    'first_name' => $rows[$i][3],
+                    'middle_name' => $rows[$i][4],
+                    'last_name' => $rows[$i][5],
+                    'email_address' => $rows[$i][6],
+                    'mobile_number' => $rows[$i][7],
+                    'nationality' => $rows[$i][8],
+                    'job_title' => $rows[$i][9],
+                    'badge_type' => $rows[$i][1],
+                    'pcode_used' => $rows[$i][0],
+
+                    'heard_where' => $this->heardWhere,
+                    'quantity' => $quantity,
+                    'unit_price' => $this->finalUnitPrice,
+                    'net_amount' => $finalNetAmount,
+                    'vat_price' => $finalVatPrice,
+                    'discount_price' => $finalDiscountPrice,
+                    'total_amount' => $totalAmount,
+                    'mode_of_payment' => "bankTransfer",
+                    'registration_status' => $registrationStatus,
+                    'payment_status' => $paymentStatus,
+                    'registered_date_time' => Carbon::now(),
+                    'paid_date_time' => null,
+                ]);
+
+                Transactions::create([
+                    'event_id' => $this->event->id,
+                    'event_category' => $this->event->category,
+                    'delegate_id' => $newRegistrant->id,
+                    'delegate_type' => "main",
+                ]);
+
+                $mainDelegateId = $newRegistrant->id;
+
+                // EMAIL NOTIFICATION HERE
+                $details = [
+                    'name' => $rows[$i][2] . " " . $rows[$i][3] . " " . $rows[$i][4] . " " . $rows[$i][5],
+                    'eventName' => $this->event->name,
+                    'startDate' => Carbon::createFromFormat('Y-m-d', $this->event->event_start_date)->format('l j F'),
+                    'endDate' => Carbon::createFromFormat('Y-m-d', $this->event->event_end_date)->format('l j F'),
+                    'year' => $this->event->year,
+                    'location' => $this->event->location,
+                    'badgeLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-badge" . "/" . "main" . "/" . $newRegistrant->id,
+                    'invoiceLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-invoice" . "/" . $newRegistrant->id,
+                ];
+
+                Mail::to($rows[$i][6])->send(new RegistrationConfirmation($details));
+
+                if ($this->assistantEmailAddress != null) {
+                    Mail::to($this->assistantEmailAddress)->send(new RegistrationConfirmation($details));
+                }
+            } else {
+                // add sub delegate
+                $newAdditionDelegate = AdditionalDelegates::create([
+                    'main_delegate_id' => $mainDelegateId,
+                    'salutation' => $rows[$i][2],
+                    'first_name' => $rows[$i][3],
+                    'middle_name' => $rows[$i][4],
+                    'last_name' => $rows[$i][5],
+                    'email_address' => $rows[$i][6],
+                    'mobile_number' => $rows[$i][7],
+                    'nationality' => $rows[$i][8],
+                    'job_title' => $rows[$i][9],
+                    'badge_type' => $rows[$i][1],
+                    'pcode_used' => $rows[$i][0],
+                ]);
+
+                Transactions::create([
+                    'event_id' => $this->event->id,
+                    'event_category' => $this->event->category,
+                    'delegate_id' => $newAdditionDelegate->id,
+                    'delegate_type' => "sub",
+                ]);
+
+
+                // EMAIL NOTIFICATION HERE
+                $details = [
+                    'name' => $rows[$i][2] . " " . $rows[$i][3] . " " . $rows[$i][4] . " " . $rows[$i][5],
+                    'eventName' => $this->event->name,
+                    'startDate' => Carbon::createFromFormat('Y-m-d', $this->event->event_start_date)->format('l j F'),
+                    'endDate' => Carbon::createFromFormat('Y-m-d', $this->event->event_end_date)->format('l j F'),
+                    'year' => $this->event->year,
+                    'location' => $this->event->location,
+                    'badgeLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-badge" . "/" . "main" . "/" . $newAdditionDelegate->id,
+                    'invoiceLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-invoice" . "/" . $mainDelegateId,
+                ];
+
+                Mail::to($rows[$i][6])->send(new RegistrationConfirmation($details));
+            }
+        }
+
+        $this->resetImportFields();
+        $this->showImportModal = false;
+
+        $this->dispatchBrowserEvent('swal:import-delegate', [
+            'type' => 'success',
+            'message' => 'Delegate Imported Successfully!',
+            'text' => ''
+        ]);
     }
 
     public function openImportModal()

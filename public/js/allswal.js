@@ -1,3 +1,41 @@
+
+// DELEGATE IMPORt CONFIRMATION
+window.addEventListener("swal:import-delegate-confirmation", (event) => {
+    swal({
+        title: event.detail.message,
+        text: event.detail.text,
+        icon: event.detail.type,
+        buttons: {
+            confirm: {
+                text: "Yes, import it!",
+                value: true,
+                visible: true,
+                closeModal: true,
+            },
+            cancel: {
+                text: "Cancel",
+                value: null,
+                visible: true,
+                closeModal: true,
+            },
+        }
+      }).then((result) => {
+        console.log(result);
+        if (result) {
+            Livewire.emit('importDelegateConfirmed')
+        }
+      });
+});
+
+// MEMBER ADD DETAILS
+window.addEventListener("swal:import-delegate", (event) => {
+    swal({
+        title: event.detail.message,
+        text: event.detail.text,
+        icon: event.detail.type,
+    });
+});
+
 // MEMBER ADD DETAILS
 window.addEventListener("swal:add-member", (event) => {
     swal({
@@ -39,7 +77,7 @@ window.addEventListener("swal:delete-member-confirmation", (event) => {
       }).then((result) => {
         console.log(result);
         if (result) {
-            Livewire.emit('deleteConfirmed')
+            Livewire.emit('deleteMemberConfirmed')
         }
       });
 });
@@ -76,7 +114,7 @@ window.addEventListener("swal:import-member-confirmation", (event) => {
       }).then((result) => {
         console.log(result);
         if (result) {
-            Livewire.emit('importConfirmed')
+            Livewire.emit('importMemberConfirmed')
         }
       });
 });

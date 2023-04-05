@@ -21,7 +21,7 @@ class Member extends Component
 
     public $csvFileError;
 
-    protected $listeners = ['deleteConfirmed' => 'deleteMember', 'importConfirmed' => 'submitImportMember'];
+    protected $listeners = ['deleteMemberConfirmed' => 'deleteMember', 'importMemberConfirmed' => 'submitImportMember'];
 
     public function render()
     {
