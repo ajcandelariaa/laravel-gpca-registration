@@ -2,7 +2,7 @@
 
 <head>
     <!-- INCLUDE SESSION.JS JAVASCRIPT LIBRARY -->
-    <script src="https://test-gateway.mastercard.com/form/version/71/merchant/TEST28102022/session.js"></script>
+    <script src="https://test-gateway.mastercard.com/form/version/71/merchant/TEST900755/session.js"></script>
     <!-- APPLY CLICK-JACKING STYLING AND HIDE CONTENTS OF THE PAGE -->
     <style id="antiClickjack">
         body {
@@ -16,7 +16,6 @@
     <!-- CREATE THE HTML FOR THE PAYMENT PAGE -->
 
     <div>Please enter your payment details:</div>
-    <input type="hidden" id="session-id" value="{{ old('sessionId', session('sessionId')) }}">
     <h3>Credit Card</h3>
     <div>Card Number: <input type="text" id="card-number" class="input-field" title="card number"
             aria-label="enter your card number" value="" tabindex="1" readonly></div>
@@ -40,7 +39,7 @@
         }
 
         PaymentSession.configure({
-            session: "#session-id",
+            session: "<your_session_ID>",
             fields: {
                 // ATTACH HOSTED FIELDS TO YOUR PAYMENT PAGE FOR A CREDIT CARD
                 card: {

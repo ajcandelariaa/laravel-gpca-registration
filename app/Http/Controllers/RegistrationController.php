@@ -624,7 +624,11 @@ class RegistrationController extends Controller
     }
     
     public function testCreditCardView(){
-        // session(['sessionId' => "test1234"]);
+        session(['sessionId' => "test1234"]);
         return view('registration.test-registration');
+    }
+    
+    public function testSessionRequest(){
+        return view('registration.test-create-session');
     }
 }
