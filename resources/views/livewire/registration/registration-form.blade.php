@@ -1,10 +1,11 @@
 <div class="container mx-auto my-10">
 
-    <div class="float-left mt-20">
-        @include('livewire.registration.progress_bar')
+    <div class="xl:float-left">
+        @include('livewire.registration.progress_bar_vertical')
+        @include('livewire.registration.progress_bar_horizontal')
     </div>
 
-    <div style="margin-left: 360px;">
+    <div class="form-container">
         <form wire:submit.prevent="submit">
             @if ($currentStep == 1)
                 @include('livewire.registration.step.first')

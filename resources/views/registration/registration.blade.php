@@ -29,14 +29,39 @@
         option {
             color: #000;
         }
+
+        .form-container {
+            margin-left: 0px;
+        }
+
+        .vertical-progress {
+            display: none;
+        }
+
+        .horizontal-progress {
+            display: block;
+        }
+
+        @media only screen and (min-width: 1280px) {
+            .form-container {
+                margin-left: 360px;
+            }
+
+            .vertical-progress {
+                display: block;
+            }
+
+            .horizontal-progress {
+                display: none;
+            }
+        }
     </style>
 </head>
 
 
 <body class="min-h-screen flex flex-col">
     <div class="container mx-auto">
-        <img src="{{ Storage::url($event->banner) }}" alt=""
-            class="h-52 w-full object-fill object-center">
+        <img src="{{ Storage::url($event->banner) }}" alt="" class="h-52 w-full object-fill object-center">
     </div>
 
     @livewire('registration-form', ['data' => $event])
