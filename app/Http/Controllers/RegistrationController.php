@@ -11,6 +11,7 @@ use App\Models\Transaction;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
+use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Mail;
 use NumberFormatter;
 use Illuminate\Support\Str;
@@ -625,12 +626,90 @@ class RegistrationController extends Controller
     }
     
     public function testCreditCardView(){
-        $session_id = Str::uuid()->toString();
-        session(['session_id' => $session_id]);
+        // $session_id = substr(md5(uniqid(Str::random(10), true)), 0, 31);
+        // session(['session_id' => $session_id]);
         return view('registration.test-registration');
     }
     
     public function testSessionRequest(){
         return view('registration.test-create-session');
     }
+
+    
+    // public function payWithMastercard(Request $request)
+    // {
+    //     // Set up the API endpoint and authentication headers
+    //     $endpoint = 'https://api.mastercard.com/merchants/v1/payment';
+    //     $consumerKey = 'YOUR_CONSUMER_KEY';
+    //     $keyFile = 'PATH_TO_PRIVATE_KEY_FILE';
+    //     $keyPassword = 'YOUR_KEY_PASSWORD';
+    //     $certFile = 'PATH_TO_CERTIFICATE_FILE';
+
+    //     // Prepare the payment data
+    //     $data = [
+    //         'amount' => $request->input('amount'),
+    //         'currency' => 'USD',
+    //         'card' => [
+    //             'number' => $request->input('card_number'),
+    //             'expiryMonth' => $request->input('expiry_month'),
+    //             'expiryYear' => $request->input('expiry_year'),
+    //             'cvv' => $request->input('cvv'),
+    //         ],
+    //     ];
+
+    //     // Set up the HTTP client
+    //     $client = new Client([
+    //         'verify' => $certFile,
+    //         'headers' => [
+    //             'Content-Type' => 'application/json',
+    //             'Authorization' => 'OAuth oauth_consumer_key="' . $consumerKey . '",oauth_signature="' . $this->generateSignature($endpoint, $consumerKey, $keyFile, $keyPassword) . '"',
+    //         ],
+    //     ]);
+
+    //     // Send the payment request
+    //     $response = $client->post($endpoint, [
+    //         'body' => json_encode($data),
+    //     ]);
+
+    //     // Check if the payment was successful
+    //     if ($response->getStatusCode() == 200) {
+    //         // Payment was successful, do something here
+    //     } else {
+    //         // Payment failed, do something here
+    //     }
+    // }
+
+    // private function generateSignature($url, $consumerKey, $keyFile, $keyPassword)
+    // {
+    //     $timestamp = time();
+    //     $nonce = md5(mt_rand());
+
+    //     $baseString = 'POST&' . urlencode($url) . '&';
+    //     $params = [
+    //         'oauth_consumer_key' => $consumerKey,
+    //         'oauth_nonce' => $nonce,
+    //         'oauth_signature_method' => 'RSA-SHA256',
+    //         'oauth_timestamp' => $timestamp,
+    //         'oauth_version' => '1.0',
+    //     ];
+    //     $paramsString = '';
+
+    //     ksort($params);
+    //     foreach ($params as $key => $value) {
+    //         $paramsString .= urlencode($key) . '=' . urlencode($value) . '&';
+    //     }
+    //     $paramsString = rtrim($paramsString, '&');
+
+    //     $baseString .= urlencode($paramsString);
+
+    //     $privateKey = file_get_contents($keyFile);
+    //     openssl_pkcs12_read($privateKey, $certs, $keyPassword);
+    //     $privateKey = $certs['pkey'];
+
+    //     $signature = '';
+    //     openssl_sign($baseString, $signature, $privateKey, OPENSSL_ALGO_SHA256);
+    //     $signature = base64_encode($signature);
+
+    //     return urlencode($signature);
+    // }
 }
