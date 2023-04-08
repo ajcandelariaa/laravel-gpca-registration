@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Mail;
 use NumberFormatter;
+use Illuminate\Support\Str;
 
 class RegistrationController extends Controller
 {
@@ -624,7 +625,8 @@ class RegistrationController extends Controller
     }
     
     public function testCreditCardView(){
-        session(['sessionId' => "test1234"]);
+        $session_id = Str::uuid()->toString();
+        session(['session_id' => $session_id]);
         return view('registration.test-registration');
     }
     

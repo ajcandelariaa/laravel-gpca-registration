@@ -2,7 +2,9 @@
 
 <head>
     <!-- INCLUDE SESSION.JS JAVASCRIPT LIBRARY -->
-    <script src="https://test-gateway.mastercard.com/form/version/71/merchant/TEST900755/session.js"></script>
+    {{-- <script src="https://test-gateway.mastercard.com/form/version/71/merchant/TEST900755/session.js"></script> --}}
+    <script src="https://test-gateway.mastercard.com/form/version/71/merchant/TEST28102022/session.js"></script>
+    {{-- <script src="https://ap-gateway.mastercard.com/api/rest/version/70/merchant/TEST28102022/session"></script> --}}
     <!-- APPLY CLICK-JACKING STYLING AND HIDE CONTENTS OF THE PAGE -->
     <style id="antiClickjack">
         body {
@@ -17,6 +19,7 @@
 
     <div>Please enter your payment details:</div>
     <h3>Credit Card</h3>
+    <input type="hidden" id="session-id" value="{{ session('session_id') }}">
     <div>Card Number: <input type="text" id="card-number" class="input-field" title="card number"
             aria-label="enter your card number" value="" tabindex="1" readonly></div>
     <div>Expiry Month:<input type="text" id="expiry-month" class="input-field" title="expiry month"
@@ -39,7 +42,7 @@
         }
 
         PaymentSession.configure({
-            session: "<your_session_ID>",
+            session: "#session-id",
             fields: {
                 // ATTACH HOSTED FIELDS TO YOUR PAYMENT PAGE FOR A CREDIT CARD
                 card: {
@@ -108,6 +111,8 @@
         function pay() {
             // UPDATE THE SESSION WITH THE INPUT FROM HOSTED FIELDS
             PaymentSession.updateSessionFromForm('card');
+            console.log('clicked');
+            console.log(document.getElementById('session-id').value);
         }
     </script>
 </body>
