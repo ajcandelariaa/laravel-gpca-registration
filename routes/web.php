@@ -85,4 +85,6 @@ Route::post('/test-card-payment-post', [RegistrationController::class, 'testCred
 Route::get('/getSessionId', [GatewayController::class, 'getSessionId']);
 Route::get('/updateSession', [GatewayController::class, 'updateSession']);
 Route::get('/cardDetails', [GatewayController::class, 'cardDetails']);
+// Route::get('/retrieveSession', [GatewayController::class, 'retrieveSession']);
+Route::get('/getToken', [GatewayController::class, 'getToken']);
 Route::get('/payNow', [GatewayController::class, 'payNow']);
