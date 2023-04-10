@@ -4,6 +4,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\DelegateController;
+use App\Http\Controllers\GatewayController;
 use App\Http\Controllers\RegistrationController;
 use Illuminate\Support\Facades\Route;
 
@@ -78,3 +79,10 @@ Route::get('/register/{eventYear}/{eventCategory}/{eventId}', [RegistrationContr
 Route::get('/test-sesion-request', [RegistrationController::class, 'testSessionRequest'])->name('register.test-sesion-request');
 Route::get('/test-card-payment', [RegistrationController::class, 'testCreditCardView'])->name('register.test-card-payment');
 Route::post('/test-card-payment-post', [RegistrationController::class, 'testCreditCardSbumit'])->name('register.test-card-payment');
+
+
+
+Route::get('/getSessionId', [GatewayController::class, 'getSessionId']);
+Route::get('/updateSession', [GatewayController::class, 'updateSession']);
+Route::get('/cardDetails', [GatewayController::class, 'cardDetails']);
+Route::get('/payNow', [GatewayController::class, 'payNow']);
