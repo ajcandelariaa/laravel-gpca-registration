@@ -96,7 +96,39 @@ class GatewayController extends Controller
         $data = json_decode($body, true);
         $request->session()->put('token', $data['token']);
         $request->session()->put('repositoryId', $data['repositoryId']);
-        return redirect('/payNow');
+        return redirect('/authorizePayment');
+    }
+
+    public function authorizePayment(Request $request)
+    {
+        $client = new Client();
+        $sessionId = session('sessionId');
+        $token = session('token');
+        $response = $client->request('PUT', 'https://ap-gateway.mastercard.com/api/rest/version/70/merchant/TEST900755/order/8/transaction/9', [
+            'auth' => [
+                'merchant.TEST900755',
+                '3b41414705a08d0fa159a77316aba3b3'
+            ],
+            'headers' => [
+                'Content-Type' => 'application/json'
+            ],
+            'json' => [
+                'apiOperation' => "AUTHORIZE",
+                "order" => [
+                    'amount' => '100.00',
+                    'currency' => 'USD',
+                ],
+                "session" => [
+                    "id" => $sessionId,
+                ],
+                "sourceOfFunds" => [
+                    "token" => $token,
+                ]
+            ]
+        ]);
+        $body = $response->getBody()->getContents();
+        $data = json_decode($body, true);
+        dd($data);
     }
 
     public function payNow(Request $request)
