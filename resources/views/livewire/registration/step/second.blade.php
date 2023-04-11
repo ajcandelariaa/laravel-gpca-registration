@@ -1,37 +1,9 @@
-<div>
+<div class="mx-5">
     {{-- COMPANY INFORMATION --}}
     @include('livewire.registration.step.second_company')
 
     {{-- MAIN DELEGATE --}}
     @include('livewire.registration.step.second_main_delegate')
-
-    {{-- <div class="bg-registrationCardBGColor px-5 py-2 mt-5 flex justify-between rounded-md">
-        <div>
-            <div class="font-bold text-2xl flex items-center gap-2 mt-1">
-                <p>Mr. Albert Joseph Malda Candelaria</p>
-                <p class="border-2 border-registrationPrimaryColor rounded-full text-registrationPrimaryColor py-1 px-3 text-sm">Speaker</p>
-            </div>
-            <p class="mt-2">aj@gpca.org.ae, 0965123123</p>
-            <p>Nationality: Filipino</p>
-            <p>Promo code used: XXXX</p>
-        </div>
-        <div class="flex flex-col justify-between items-end">
-            
-            <p class="text-registrationPrimaryColor font-bold">Delegate 2</p>
-            <div class="flex gap-3">
-                <div class="cursor-pointer hover:text-yellow-600 text-yellow-500">
-                    <i class="fa-solid fa-pen-to-square"></i>
-                    Edit
-                </div>
-    
-                <div 
-                    class="cursor-pointer hover:text-red-600 text-red-500">
-                    <i class="fa-solid fa-trash"></i>
-                    Remove
-                </div>
-            </div>
-        </div>
-    </div> --}}
 
     @if (!empty($additionalDelegates))
         <div class="mt-10">
@@ -81,7 +53,7 @@
         </div>
     @endif
 
-    <div class="mt-10 grid grid-addDelegateGrid grid-flow-col gap-x-10 items-center">
+    <div class="mt-10 flex flex-col sm:flex-row gap-10">
         <div class="col-span-1">
 
             @if ($showAddDelegateModal)
@@ -116,7 +88,7 @@
                 Do you wish to invite more delegates?
             </div>
 
-            <div class="text-registrationPrimaryColor italic text-sm mt-2 w-3/5">
+            <div class="text-registrationPrimaryColor italic text-sm mt-2 w-full sm:w-3/5">
                 If you wish to register more than 5 delegates, please contact our sales team at
                 forumregistration@gpca.org.ae or call +971 4 5106666 ext. 153
             </div>

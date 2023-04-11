@@ -1,4 +1,4 @@
-<div>
+<div class="mx-5">
     <div>
         <div class="text-registrationPrimaryColor font-bold text-2xl">
             Package Summary

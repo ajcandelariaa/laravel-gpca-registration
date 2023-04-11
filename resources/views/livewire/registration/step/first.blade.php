@@ -1,4 +1,4 @@
-<div>
+<div class="mx-5">
     <table class="w-full bg-registrationPrimaryColor text-white text-center mt-10" cellspacing="1" cellpadding="2">
         <thead>
             <tr>
@@ -58,7 +58,7 @@
     </table>
 
     <div class="grid grid-cols-2 gap-5 mt-10">
-        <div>
+        <div class="col-span-2 lg:col-span-1">
             <div class="bg-gray-200 py-4 px-2">
                 <h1 class="text-2xl text-registrationPrimaryColor font-bold text-center">DELEGATE FEE INCLUDES:</h1>
                 <div class="bg-white mx-1 mt-5 px-14 py-5">
@@ -89,7 +89,7 @@
             </div>
         </div>
 
-        <div class="flex flex-col gap-5">
+        <div class="col-span-2 lg:col-span-1 flex flex-col gap-5">
             <div class="bg-gray-200 py-4 px-2">
                 <h1 class="text-2xl text-registrationPrimaryColor font-bold text-center">DO YOU WISH TO BECOME A MEMBER?
                 </h1>

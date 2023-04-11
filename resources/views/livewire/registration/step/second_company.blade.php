@@ -5,7 +5,7 @@
 
     <div class="mt-5 grid grid-cols-2 gap-y-3 gap-x-5 items-start">
         {{-- ROW 1 --}}
-        <div class="space-y-2">
+        <div class="col-span-2 sm:col-span-1 space-y-2">
             <div class="text-registrationPrimaryColor">
                 Company Name <span class="text-red-500">*</span>
             </div>
@@ -15,7 +15,7 @@
             </div>
         </div>
 
-        <div class="space-y-2">
+        <div class="col-span-2 sm:col-span-1 space-y-2">
             <div class="text-registrationPrimaryColor">
                 Company Sector <span class="text-red-500">*</span>
             </div>
@@ -53,7 +53,7 @@
         </div>
 
         {{-- ROW 3 --}}
-        <div class="space-y-2">
+        <div class="col-span-2 sm:col-span-1 space-y-2">
             <div class="text-registrationPrimaryColor">
                 Country <span class="text-red-500">*</span>
             </div>
@@ -75,7 +75,7 @@
             </div>
         </div>
 
-        <div class="space-y-2">
+        <div class="col-span-2 sm:col-span-1 space-y-2">
             <div class="text-registrationPrimaryColor">
                 City <span class="text-red-500">*</span>
             </div>
@@ -92,7 +92,7 @@
         </div>
 
         {{-- ROW 4 --}}
-        <div class="space-y-2">
+        <div class="col-span-2 sm:col-span-1 space-y-2">
             <div class="text-registrationPrimaryColor">
                 Landline Number <span class="italic">(optional)</span>
             </div>
@@ -108,7 +108,7 @@
             </div>
         </div>
 
-        <div class="space-y-2">
+        <div class="col-span-2 sm:col-span-1 space-y-2">
             <div class="text-registrationPrimaryColor">
                 Mobile Number <span class="text-red-500">*</span>
             </div>
@@ -125,7 +125,7 @@
 
         {{-- ROW 5 --}}
 
-        <div class="space-y-2">
+        <div class="col-span-2 sm:col-span-1 space-y-2">
             <div class="text-registrationPrimaryColor">
                 Assistant's email address
             </div>
@@ -135,7 +135,7 @@
             </div>
         </div>
 
-        <div class="space-y-2">
+        <div class="col-span-2 sm:col-span-1 space-y-2">
             <div class="text-registrationPrimaryColor">
                 Where did you hear about us?
             </div>

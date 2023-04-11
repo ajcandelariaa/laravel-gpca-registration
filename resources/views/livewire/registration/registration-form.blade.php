@@ -1,11 +1,11 @@
 <div class="container mx-auto my-10">
 
-    <div class="xl:float-left">
+    <div class="xl:float-left mx-5">
         @include('livewire.registration.progress_bar_vertical')
         @include('livewire.registration.progress_bar_horizontal')
     </div>
 
-    <div class="form-container">
+    <div class="form-container mt-10 xl:mt-0">
         <form wire:submit.prevent="submit">
             @if ($currentStep == 1)
                 @include('livewire.registration.step.first')
@@ -17,7 +17,7 @@
                 @include('livewire.registration.step.fourth')
             @endif
 
-            <div class="w-full mt-20 flex justify-between gap-5">
+            <div class="w-full mt-20 mx-5 flex justify-between gap-5">
                 @if ($currentStep == 1)
                     <div></div>
                 @endif

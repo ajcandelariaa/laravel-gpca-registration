@@ -7,7 +7,7 @@
         {{-- ROW 1 --}}
         <div class="space-y-2 col-span-2">
             <div class="grid grid-cols-10 gap-x-5">
-                <div class="col-span-1">
+                <div class="col-span-10 sm:col-span-2">
                     <div class="text-registrationPrimaryColor">
                         Salutation
                     </div>
@@ -22,7 +22,7 @@
                     </div>
                 </div>
 
-                <div class="col-span-3">
+                <div class="col-span-10 sm:col-span-3">
                     <div class="text-registrationPrimaryColor">
                         First Name <span class="text-red-500">*</span>
                     </div>
@@ -38,7 +38,7 @@
                     </div>
                 </div>
 
-                <div class="col-span-3">
+                <div class="col-span-10 sm:col-span-3">
                     <div class="text-registrationPrimaryColor">
                         Middle Name
                     </div>
@@ -48,7 +48,7 @@
                     </div>
                 </div>
 
-                <div class="col-span-3">
+                <div class="col-span-10 sm:col-span-3">
                     <div class="text-registrationPrimaryColor">
                         Last Name <span class="text-red-500">*</span>
                     </div>
@@ -70,7 +70,7 @@
         {{-- ROW 2 --}}
         <div class="space-y-2 col-span-2">
             <div class="grid grid-cols-2 gap-x-5">
-                <div class="col-span-1">
+                <div class="col-span-2 sm:col-span-1">
                     <div class="text-registrationPrimaryColor">
                         Email Address <span class="text-red-500">*</span>
                     </div>
@@ -98,7 +98,7 @@
                     </div>
                 </div>
 
-                <div class="col-span-1">
+                <div class="col-span-2 sm:col-span-1">
                     <div class="text-registrationPrimaryColor">
                         Mobile Number <span class="text-red-500">*</span>
                     </div>
@@ -120,7 +120,7 @@
         {{-- ROW 3 --}}
         <div class="space-y-2 col-span-2">
             <div class="grid grid-cols-3 gap-x-5">
-                <div class="col-span-1">
+                <div class="col-span-3 sm:col-span-1">
                     <div class="text-registrationPrimaryColor">
                         Nationality <span class="text-red-500">*</span>
                     </div>
@@ -136,7 +136,7 @@
                     </div>
                 </div>
 
-                <div class="col-span-1">
+                <div class="col-span-3 sm:col-span-1">
                     <div class="text-registrationPrimaryColor">
                         Job Title <span class="text-red-500">*</span>
                     </div>
@@ -152,7 +152,7 @@
                     </div>
                 </div>
 
-                <div class="col-span-1">
+                <div class="col-span-3 sm:col-span-1">
                     <div class="text-registrationPrimaryColor">
                         Promo Code
                     </div>
