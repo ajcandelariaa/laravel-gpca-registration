@@ -39,6 +39,7 @@
             </div>
         </form>
     </div>
+
     
     <script>
         document.addEventListener('livewire:load', function () {

@@ -20,7 +20,7 @@
 
     {{-- LIVEWIRE --}}
     @livewireStyles()
-
+    @include('helpers.intlTelInput')
     <style>
         select:required:invalid {
             color: #afafaf;

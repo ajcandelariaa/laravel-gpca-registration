@@ -4,7 +4,6 @@
 
     {{-- MAIN DELEGATE --}}
     @include('livewire.registration.step.second_main_delegate')
-
     @if (!empty($additionalDelegates))
         <div class="mt-10">
             <div class="text-registrationPrimaryColor italic font-bold text-xl">

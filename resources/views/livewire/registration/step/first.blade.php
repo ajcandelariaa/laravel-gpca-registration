@@ -1,4 +1,5 @@
 <div class="mx-5">
+    @include('livewire.registration.phone')
     <table class="w-full bg-registrationPrimaryColor text-white text-center mt-10" cellspacing="1" cellpadding="2">
         <thead>
             <tr>

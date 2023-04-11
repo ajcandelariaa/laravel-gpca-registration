@@ -70,17 +70,6 @@ Route::get('/check', [DelegateController::class, 'checkPhpInfo']);
 Route::get('/test', [RegistrationController::class, 'testEmail'])->name('test-email');
 Route::get('/register/{eventYear}/{eventCategory}/{eventId}', [RegistrationController::class, 'registrationView'])->name('register.view');
 
-// Route::middleware(['throttle:25', 1])->group(function () {
-//     Route::get('/test-sesion-request', [RegistrationController::class, 'testSessionRequest'])->name('register.test-sesion-request');
-//     Route::get('/test-card-payment', [RegistrationController::class, 'testCreditCardView'])->name('register.test-card-payment');
-//     Route::post('/test-card-payment-post', [RegistrationController::class, 'testCreditCardSbumit'])->name('register.test-card-payment');
-// });
-
-Route::get('/test-sesion-request', [RegistrationController::class, 'testSessionRequest'])->name('register.test-sesion-request');
-Route::get('/test-card-payment', [RegistrationController::class, 'testCreditCardView'])->name('register.test-card-payment');
-Route::post('/test-card-payment-post', [RegistrationController::class, 'testCreditCardSbumit'])->name('register.test-card-payment');
-
-
 
 Route::get('/getSessionId', [GatewayController::class, 'getSessionId']);
 Route::get('/updateSession', [GatewayController::class, 'updateSession']);

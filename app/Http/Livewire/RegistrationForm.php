@@ -39,6 +39,7 @@ class RegistrationForm extends Component
     public $showEditDelegateModal = false;
     public $additionalDelegates = [];
 
+
     // DELEGATE PASS TYPE
     public $delegatePassType, $rateType;
 
