@@ -181,7 +181,7 @@
                     Delegate Badge
                 </div>
                 <div class="flex gap-10">
-                    <div style="width: 321px; height: 491px;">
+                    <div style="width: 321px; height: 492px;">
                         <div class="border border-black mt-10 flex flex-col justify-between h-full">
                             <div>
                                 <img src="{{ asset('assets/images/sc_badge_banner.png') }}">
@@ -204,7 +204,7 @@
                         </div>
                     </div>
 
-                    <div style="width: 321px; height: 491px;">
+                    <div style="width: 321px; height: 492px;">
                         <div class="border border-black mt-10 flex flex-col justify-between h-full">
                             <div>
                                 <img src="{{ asset('assets/images/sc_badge_banner.png') }}">

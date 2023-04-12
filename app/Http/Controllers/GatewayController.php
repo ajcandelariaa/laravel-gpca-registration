@@ -96,7 +96,7 @@ class GatewayController extends Controller
         $data = json_decode($body, true);
         $request->session()->put('token', $data['token']);
         $request->session()->put('repositoryId', $data['repositoryId']);
-        return redirect('/authorizePayment');
+        return redirect('/payNow');
     }
 
     public function authorizePayment(Request $request)
@@ -104,7 +104,7 @@ class GatewayController extends Controller
         $client = new Client();
         $sessionId = session('sessionId');
         $token = session('token');
-        $response = $client->request('PUT', 'https://ap-gateway.mastercard.com/api/rest/version/70/merchant/TEST900755/order/8/transaction/9', [
+        $response = $client->request('PUT', 'https://ap-gateway.mastercard.com/api/rest/version/70/merchant/TEST900755/order/10/transaction/11', [
             'auth' => [
                 'merchant.TEST900755',
                 '3b41414705a08d0fa159a77316aba3b3'
@@ -136,7 +136,7 @@ class GatewayController extends Controller
         $client = new Client();
         $sessionId = session('sessionId');
         $token = session('token');
-        $response = $client->request('PUT', 'https://ap-gateway.mastercard.com/api/rest/version/70/merchant/TEST900755/order/3/transaction/4', [
+        $response = $client->request('PUT', 'https://ap-gateway.mastercard.com/api/rest/version/70/merchant/TEST900755/order/14/transaction/15', [
             'auth' => [
                 'merchant.TEST900755',
                 '3b41414705a08d0fa159a77316aba3b3'
@@ -162,26 +162,4 @@ class GatewayController extends Controller
         $data = json_decode($body, true);
         dd($data);
     }
-
-
-    // public function retrieveSession(Request $request)
-    // {
-    //     $client = new Client();
-    //     $sessionId = session('sessionId');
-    //     $response = $client->request('GET', 'https://ap-gateway.mastercard.com/api/rest/version/70/merchant/TEST900755/session/' . $sessionId, [
-    //         'auth' => [
-    //             'merchant.TEST900755',
-    //             '3b41414705a08d0fa159a77316aba3b3'
-    //         ],
-    //         'headers' => [
-    //             'Content-Type' => 'application/json'
-    //         ],
-    //     ]);
-    //     $body = $response->getBody()->getContents();
-    //     $data = json_decode($body, true);
-    //     $request->session()->put('allSessions', $data);
-    //     return redirect('/payNow');
-    // }
-
-
 }

@@ -7,10 +7,7 @@ use App\Models\AdditionalDelegate;
 use App\Models\Event;
 use App\Models\MainDelegate;
 use Barryvdh\DomPDF\Facade\Pdf;
-use Carbon\Carbon;
-use Dompdf\Dompdf;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\View;
 
 class DelegateController extends Controller
 {
@@ -139,6 +136,10 @@ class DelegateController extends Controller
                         'job_title' => $tempDelegate->job_title,
                         'badge_type' => $tempDelegate->badge_type,
                         'companyName' => $tempDelegate->company_name,
+                        'frontBanner' => asset('assets/images/sc_badge_banner.png'),
+                        'backBanner' => asset('assets/images/sc_badge_banner.png'),
+                        'textColor' => "#284c5c",
+                        'link' => "www.gpcasupplaychain.com",
                     ];
                 } else {
                     $mainDelegateInfo = MainDelegate::where('id', $tempDelegate->main_delegate_id)->first();
@@ -150,18 +151,23 @@ class DelegateController extends Controller
                         'job_title' => $tempDelegate->job_title,
                         'badge_type' => $tempDelegate->badge_type,
                         'companyName' => $mainDelegateInfo->company_name,
+                        'frontBanner' => asset('assets/images/sc_badge_banner.png'),
+                        'backBanner' => asset('assets/images/sc_badge_banner.png'),
+                        'textColor' => "#284c5c",
+                        'link' => "www.gpcasupplaychain.com",
                     ];
                 }
-                // $html = View::make('admin.event.detail.delegates.delegate_badge', $finalDelegate)->render();
-                // $pdf = new Dompdf();
-                // $pdf->setPaper('letter', 'portrait'); // set custom page size and orientation
-                // $pdf->loadHtml($html);
-                // $pdf->render();
-                // return $pdf->stream('badge.pdf');
                 
-                $pdf = Pdf::loadView('admin.event.detail.delegates.delegate_badge', $finalDelegate);
-                // $pdf->setPaper([0, 0, 84.982, 130.158], 'landscape'); for 1 page only
-                $pdf->setPaper([0, 0, 169.8625, 259.82083333], 'landscape'); //for back to back 
+                $pdf = Pdf::loadView('admin.event.detail.delegates.delegate_badge', $finalDelegate, [
+                    'margin_top' => 0,
+                    'margin_right' => 0,
+                    'margin_bottom' => 0,
+                    'margin_left' => 0,
+                ]);
+
+                $pdf->setPaper(array(0, 0, 481, 369), 'portrait');  //fixed based on the view
+                // $pdf->setPaper(array(0, 0, 642, 492), 'portrait'); original
+                
                 return $pdf->stream('badge.pdf');
             } else {
                 abort(404, 'The URL is incorrect');

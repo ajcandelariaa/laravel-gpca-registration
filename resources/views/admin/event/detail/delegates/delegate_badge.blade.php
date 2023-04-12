@@ -7,86 +7,120 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>Delegate Badge Type</title>
 
-    <style>
-        /* html,
+    <style type="text/css">
         body {
-            margin: 15px;
-            padding: 10px;
-            font-family: sans-serif;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            width: 642px;
+            height: 492px;
+        }
+
+        @page {
+            margin: 0;
+            padding: 0;
         }
 
         .badge{
-            width: 450px;
-            margin: 0 auto;
-            border: 1px solid black;
+            width: 321px;
+            height: 492px;
             text-align: center;
         }
 
-        img {
-            width: 100%;
+        .front{
+            float: left;
+        }
+        .back{
+            float: right;
+        }
+
+        img{
+            width: 321px;
         }
 
         .name{
             font-weight: bold;
-            margin-top: 128px;
             font-size: 18px;
-            line-height: 28px;
         }
 
         .job-title{
+            margin-top: -5px;
             font-style: italic;
-            margin-top: 20px;
         }
 
         .company-name{
+            margin-top: -15px;
             font-weight: bold
         }
-
+        
         .badge-type{
             color: #fff;
             background-color: #000;
             padding: 16px 0px;
             font-weight: bold;
-            margin-top: 128px;
             margin-bottom: 0px;
-        } */
+            text-align: center;
+        } 
 
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: sans-serif;
-            width: 642px;
-            height: 982px;
-        }
-        @page {
-            margin: 0;
+        .link{
+            padding: 16px 0px;
+            font-weight: bold;
+            margin-bottom: 0px;
+            text-align: center;
         }
 
-        .badge{
-
-        }
-        img{
+        .header{
             width: 321px;
-            height: ;
+            position: absolute;
+            top: 0%;
+        }
+
+        .middle{
+            width: 321px;
+            position: relative;
+            top: 64%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .footer{
+            width: 321px;
+            position: absolute;
+            bottom: 0%;
         }
     </style>
 </head>
 
 <body>
-    <div class="badge front">
-        <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('/assets/images/sc_badge_banner.png'))) }}" alt="banners">
-        <p class="name">{{ $salutation }} {{ $first_name }} {{ $middle_name }} {{ $last_name }}</p>
-        <p class="job-title">{{ $job_title }}</p>
-        <p class="company-name">{{ $companyName }}</p>
-        <p class="badge-type">{{ $badge_type }}</p>
-    </div>
+    <div class="badges">
+        <div class="badge front">
+            <div class="header">
+                <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('/assets/images/sc_badge_banner.png'))) }}" alt="banners">
+            </div>
+            <div class="middle">
+                <p class="name">{{ $salutation }} {{ $first_name }} {{ $middle_name }} {{ $last_name }}</p>
+                <p class="job-title">{{ $job_title }}</p>
+                <p class="company-name">{{ $companyName }}</p>
+            </div>
+            <div class="footer">
+                <p class="badge-type">{{ $badge_type }}</p>
+            </div>
+        </div>
     
-    <div class="badge back">
-        <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('/assets/images/sc_badge_banner.png'))) }}" alt="banners">
-        <p class="name">{{ $salutation }} {{ $first_name }} {{ $middle_name }} {{ $last_name }}</p>
-        <p class="job-title">{{ $job_title }}</p>
-        <p class="company-name">{{ $companyName }}</p>
-        <p class="badge-type">{{ $badge_type }}</p>
+        <div class="badge back">
+            <div class="header">
+                <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('/assets/images/sc_badge_banner.png'))) }}" alt="banners">
+            </div>
+            <div class="middle">
+                <p class="name">{{ $salutation }} {{ $first_name }} {{ $middle_name }} {{ $last_name }}</p>
+                <p class="job-title">{{ $job_title }}</p>
+                <p class="company-name">{{ $companyName }}</p>
+            </div>
+            <div class="footer">
+                <p class="link" style="color: {{ $textColor }};">{{ $link }}</p>
+            </div>
+        </div>
     </div>
 </body>
 
