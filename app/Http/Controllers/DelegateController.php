@@ -8,8 +8,9 @@ use App\Models\Event;
 use App\Models\MainDelegate;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
+use Dompdf\Dompdf;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\View;
 
 class DelegateController extends Controller
 {
@@ -151,7 +152,16 @@ class DelegateController extends Controller
                         'companyName' => $mainDelegateInfo->company_name,
                     ];
                 }
+                // $html = View::make('admin.event.detail.delegates.delegate_badge', $finalDelegate)->render();
+                // $pdf = new Dompdf();
+                // $pdf->setPaper('letter', 'portrait'); // set custom page size and orientation
+                // $pdf->loadHtml($html);
+                // $pdf->render();
+                // return $pdf->stream('badge.pdf');
+                
                 $pdf = Pdf::loadView('admin.event.detail.delegates.delegate_badge', $finalDelegate);
+                // $pdf->setPaper([0, 0, 84.982, 130.158], 'landscape'); for 1 page only
+                $pdf->setPaper([0, 0, 169.8625, 259.82083333], 'landscape'); //for back to back 
                 return $pdf->stream('badge.pdf');
             } else {
                 abort(404, 'The URL is incorrect');

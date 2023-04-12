@@ -8,7 +8,7 @@
     <title>Delegate Badge Type</title>
 
     <style>
-        html,
+        /* html,
         body {
             margin: 15px;
             padding: 10px;
@@ -49,14 +49,40 @@
             font-weight: bold;
             margin-top: 128px;
             margin-bottom: 0px;
+        } */
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: sans-serif;
+            width: 642px;
+            height: 982px;
+        }
+        @page {
+            margin: 0;
         }
 
+        .badge{
+
+        }
+        img{
+            width: 321px;
+            height: ;
+        }
     </style>
 </head>
 
 <body>
-    <div class="badge">
-        <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('/assets/images/reg-banner.png'))) }}" alt="banners">
+    <div class="badge front">
+        <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('/assets/images/sc_badge_banner.png'))) }}" alt="banners">
+        <p class="name">{{ $salutation }} {{ $first_name }} {{ $middle_name }} {{ $last_name }}</p>
+        <p class="job-title">{{ $job_title }}</p>
+        <p class="company-name">{{ $companyName }}</p>
+        <p class="badge-type">{{ $badge_type }}</p>
+    </div>
+    
+    <div class="badge back">
+        <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('/assets/images/sc_badge_banner.png'))) }}" alt="banners">
         <p class="name">{{ $salutation }} {{ $first_name }} {{ $middle_name }} {{ $last_name }}</p>
         <p class="job-title">{{ $job_title }}</p>
         <p class="company-name">{{ $companyName }}</p>
