@@ -83,4 +83,6 @@ Route::get('/initiateAuthentication', [GatewayController::class, 'initiateAuthen
 Route::get('/initiateAuthenticationPayerRequest', [GatewayController::class, 'initiateAuthenticationPayerRequest']);
 Route::get('/testViewOTP', [GatewayController::class, 'testViewOTP']);
 
+Route::post('/authentcatedDone', [GatewayController::class, 'authentcatedDone']);
+
 Route::get('/payNow', [GatewayController::class, 'payNow']);
