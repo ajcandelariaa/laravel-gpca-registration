@@ -4,11 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use GuzzleHttp\Client;
-use Svg\Tag\Rect;
+use Illuminate\Support\Facades\Session;
+
 
 class GatewayController extends Controller
 {
-    public function getSessionId(Request $request)
+    public function getSessionId()
     {
         $client = new Client();
 
@@ -21,20 +22,64 @@ class GatewayController extends Controller
                 'Content-Type' => 'application/json'
             ],
         ]);
-        // retrieve the response body as a string
         $body = $response->getBody()->getContents();
-
-        // parse the JSON response into a PHP array
         $data = json_decode($body, true);
-        $request->session()->put('sessionId', $data['session']['id']);
-        return redirect('/updateSession');
+
+        if ($data['result'] == "SUCCESS") {
+            Session::put('sessionId', $data['session']['id']);
+            Session::put('updateStatus', $data['session']['updateStatus']);
+            return redirect('/updateSession');
+        }
     }
 
-    public function updateSession(Request $request)
+    public function updateSession()
     {
+        if (Session::has('sessionId') && Session::has('updateStatus')) {
+            if (Session::get('updateStatus') == "NO_UPDATE") {
+                $sessionId = Session::get('sessionId');
+                $client = new Client();
+
+                $response = $client->request('PUT', 'https://ap-gateway.mastercard.com/api/rest/version/70/merchant/TEST900755/session/' . $sessionId, [
+                    'auth' => [
+                        'merchant.TEST900755',
+                        '3b41414705a08d0fa159a77316aba3b3'
+                    ],
+                    'headers' => [
+                        'Content-Type' => 'application/json'
+                    ],
+                    'json' => [
+                        "order" => [
+                            'amount' => '100.00',
+                            'currency' => 'USD',
+                        ],
+                    ]
+                ]);
+
+                $body = $response->getBody()->getContents();
+                $data = json_decode($body, true);
+
+                if ($data['session']['updateStatus'] == "SUCCESS") {
+                    Session::put('updateStatus', $data['session']['updateStatus']);
+                    Session::put('order', $data['order']);
+                    return redirect('/cardDetails');
+                }
+            }
+        }
+    }
+
+    public function cardDetails()
+    {
+        if (Session::has('sessionId') && Session::has('updateStatus') && Session::has('order')) {
+            if (Session::get('updateStatus') == "SUCCESS") {
+                return view('card_details');
+            }
+        }
+    }
+
+    public function retrieveSession(){
         $client = new Client();
-        $sessionId = session('sessionId');
-        $response = $client->request('PUT', 'https://ap-gateway.mastercard.com/api/rest/version/70/merchant/TEST900755/session/' . $sessionId, [
+        $sessionId = Session::get('sessionId');
+        $response = $client->request('GET', 'https://ap-gateway.mastercard.com/api/rest/version/70/merchant/TEST900755/session/'.$sessionId, [
             'auth' => [
                 'merchant.TEST900755',
                 '3b41414705a08d0fa159a77316aba3b3'
@@ -42,30 +87,17 @@ class GatewayController extends Controller
             'headers' => [
                 'Content-Type' => 'application/json'
             ],
-            'json' => [
-                "order" => [
-                    'amount' => '100.00',
-                    'currency' => 'USD',
-                ],
-            ]
         ]);
-        // retrieve the response body as a string
         $body = $response->getBody()->getContents();
-
-        // parse the JSON response into a PHP array
         $data = json_decode($body, true);
-        $request->session()->put('sessionId', $data['session']['id']);
-        return redirect('/cardDetails');
-    }
-    public function cardDetails()
-    {
-        return view('card_details');
+        Session::put('sourceOfFunds', $data['sourceOfFunds']);
+        return redirect('/getToken');
     }
 
-    public function getToken(Request $request)
+    public function getToken()
     {
         $client = new Client();
-        $sessionId = session('sessionId');
+        $sessionId = Session::get('sessionId');
         $response = $client->request('POST', 'https://ap-gateway.mastercard.com/api/rest/version/70/merchant/TEST900755/token', [
             'auth' => [
                 'merchant.TEST900755',
@@ -78,88 +110,48 @@ class GatewayController extends Controller
                 "session" => [
                     'id' => $sessionId,
                 ],
-                "sourceOfFunds" =>  [
-                    "provided" =>  [
-                        "card" =>  [
-                            "expiry" =>  [
-                                "month" =>  "05",
-                                "year" =>  "23"
-                            ],
-                            "number" =>  "4242424242424242"
-                        ]
+            ],
+        ]);
+        $body = $response->getBody()->getContents();
+        $data = json_decode($body, true);
+
+        if($data['result'] == "SUCCESS" && $data['status'] == "VALID"){
+            Session::put('token', $data['token']);
+            Session::put('tokenResult', $data['result']);
+            Session::put('tokenStatus', $data['status']);
+            return redirect('/payNow');
+        }
+    }
+
+    public function payNow()
+    {
+        if (Session::has('token') && Session::has('tokenResult') && Session::has('tokenStatus')) {
+            if (Session::get('tokenResult') == "SUCCESS" && Session::get('tokenStatus') == "VALID") {
+                $client = new Client();
+                $sessionId = Session::get('sessionId');
+                $sourceOfFunds = Session::get('sourceOfFunds');
+                $token = Session::get('token');
+
+                $response = $client->request('PUT', 'https://ap-gateway.mastercard.com/api/rest/version/70/merchant/TEST900755/order/23/transaction/24', [
+                    'auth' => [
+                        'merchant.TEST900755',
+                        '3b41414705a08d0fa159a77316aba3b3'
                     ],
-                    "type" =>  "CARD"
-                ]
-            ]
-        ]);
-        $body = $response->getBody()->getContents();
-        $data = json_decode($body, true);
-        $request->session()->put('token', $data['token']);
-        $request->session()->put('repositoryId', $data['repositoryId']);
-        return redirect('/payNow');
+                    'headers' => [
+                        'Content-Type' => 'application/json'
+                    ],
+                    'json' => [
+                        'apiOperation' => "PAY",
+                        "session" => [
+                            "id" => $sessionId,
+                        ],
+                    ]
+                ]);
+                $body = $response->getBody()->getContents();
+                $data = json_decode($body, true);
+                dd($data);
+            }
+        }
     }
 
-    public function authorizePayment(Request $request)
-    {
-        $client = new Client();
-        $sessionId = session('sessionId');
-        $token = session('token');
-        $response = $client->request('PUT', 'https://ap-gateway.mastercard.com/api/rest/version/70/merchant/TEST900755/order/10/transaction/11', [
-            'auth' => [
-                'merchant.TEST900755',
-                '3b41414705a08d0fa159a77316aba3b3'
-            ],
-            'headers' => [
-                'Content-Type' => 'application/json'
-            ],
-            'json' => [
-                'apiOperation' => "AUTHORIZE",
-                "order" => [
-                    'amount' => '100.00',
-                    'currency' => 'USD',
-                ],
-                "session" => [
-                    "id" => $sessionId,
-                ],
-                "sourceOfFunds" => [
-                    "token" => $token,
-                ]
-            ]
-        ]);
-        $body = $response->getBody()->getContents();
-        $data = json_decode($body, true);
-        dd($data);
-    }
-
-    public function payNow(Request $request)
-    {
-        $client = new Client();
-        $sessionId = session('sessionId');
-        $token = session('token');
-        $response = $client->request('PUT', 'https://ap-gateway.mastercard.com/api/rest/version/70/merchant/TEST900755/order/14/transaction/15', [
-            'auth' => [
-                'merchant.TEST900755',
-                '3b41414705a08d0fa159a77316aba3b3'
-            ],
-            'headers' => [
-                'Content-Type' => 'application/json'
-            ],
-            'json' => [
-                'apiOperation' => "PAY",
-                "order" => [
-                    'amount' => '100.00',
-                    'currency' => 'USD',
-                ],
-                "session" => [
-                    "id" => $sessionId,
-                ],
-                "sourceOfFunds" => [
-                    "token" => $token,
-                ]
-            ]
-        ]);
-        $body = $response->getBody()->getContents();
-        $data = json_decode($body, true);
-        dd($data);
-    }
 }
