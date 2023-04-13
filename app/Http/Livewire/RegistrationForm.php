@@ -141,7 +141,7 @@ class RegistrationForm extends Component
 
     public function calculateAmount()
     {
-        if($this->promoCodeDiscount == null){
+        if ($this->promoCodeDiscount == null) {
             $this->promoCode = null;
             $promoCodeMainDiscountString = "";
         } else {
@@ -212,7 +212,8 @@ class RegistrationForm extends Component
         $this->finalTotal = $this->finalNetAmount + $this->finalVat;
     }
 
-    public function resetCalculations(){
+    public function resetCalculations()
+    {
         $this->delegatInvoiceDetails = array();
         $this->finalQuantity = 0;
         $this->finalDiscount = 0;
@@ -236,7 +237,7 @@ class RegistrationForm extends Component
             }
         } else if ($this->currentStep == 2) {
             $this->resetCalculations();
-            
+
             $this->validate([
                 'companySector' => 'required',
                 'companyAddress' => 'required',
@@ -252,12 +253,12 @@ class RegistrationForm extends Component
                 'jobTitle' => 'required',
                 'badgeType' => 'required',
             ]);
-            
 
-            if($this->checkEmailIfUsedAlreadyMain($this->emailAddress)){
+
+            if ($this->checkEmailIfUsedAlreadyMain($this->emailAddress)) {
                 $this->emailMainAlreadyUsedError = "You already used this email!";
             } else {
-                if($this->checkEmailIfExistsInDatabase($this->emailAddress)){
+                if ($this->checkEmailIfExistsInDatabase($this->emailAddress)) {
                     $this->emailMainAlreadyUsedError = null;
                     $this->emailMainExistingError = "Email is already registered, please use another email!";
                 } else {
@@ -293,129 +294,239 @@ class RegistrationForm extends Component
                 $this->paymentMethodError = "Please choose your payment method first";
             } else {
 
-                if($this->promoCode != null){
+                if ($this->promoCode != null) {
                     PromoCodes::where('event_id', $this->event->id)->where('event_category', $this->event->category)->where('active', true)->where('promo_code', $this->promoCode)->where('badge_type', $this->badgeType)->increment('total_usage');
                 }
-                
-                if($this->finalTotal == 0){
+
+                if ($this->finalTotal == 0) {
                     $paymentStatus = "free";
                     $registrationStatus = "confirmed";
                 } else {
-                    if($this->paymentMethod == "bankTransfer"){
+                    if ($this->paymentMethod == "bankTransfer") {
                         $registrationStatus = "pending";
                         $paymentStatus = "unpaid";
-                    } else {
-                        $paymentStatus = "paid";
-                        $registrationStatus = "confirmed";
-                    }
-                }
 
-                $newRegistrant = MainDelegates::create([
-                    'event_id' => $this->event->id,
-                    'pass_type' => $this->delegatePassType,
-                    'rate_type' => $this->rateType,
-                    'rate_type_string' => $this->rateTypeString,
+                        // FOR BANK TRANSFER
+                        $newRegistrant = MainDelegates::create([
+                            'event_id' => $this->event->id,
+                            'pass_type' => $this->delegatePassType,
+                            'rate_type' => $this->rateType,
+                            'rate_type_string' => $this->rateTypeString,
 
-                    'company_name' => $this->companyName,
-                    'company_sector' => $this->companySector,
-                    'company_address' => $this->companyAddress,
-                    'company_country' => $this->companyCountry,
-                    'company_city' => $this->companyCity,
-                    'company_telephone_number' => $this->companyLandlineNumber,
-                    'company_mobile_number' => $this->companyMobileNumber,
-                    'assistant_email_address' => $this->assistantEmailAddress,
+                            'company_name' => $this->companyName,
+                            'company_sector' => $this->companySector,
+                            'company_address' => $this->companyAddress,
+                            'company_country' => $this->companyCountry,
+                            'company_city' => $this->companyCity,
+                            'company_telephone_number' => $this->companyLandlineNumber,
+                            'company_mobile_number' => $this->companyMobileNumber,
+                            'assistant_email_address' => $this->assistantEmailAddress,
 
-                    'salutation' => $this->salutation,
-                    'first_name' => $this->firstName,
-                    'middle_name' => $this->middleName,
-                    'last_name' => $this->lastName,
-                    'email_address' => $this->emailAddress,
-                    'mobile_number' => $this->mobileNumber,
-                    'nationality' => $this->nationality,
-                    'job_title' => $this->jobTitle,
-                    'badge_type' => $this->badgeType,
-                    'pcode_used' => $this->promoCode,
+                            'salutation' => $this->salutation,
+                            'first_name' => $this->firstName,
+                            'middle_name' => $this->middleName,
+                            'last_name' => $this->lastName,
+                            'email_address' => $this->emailAddress,
+                            'mobile_number' => $this->mobileNumber,
+                            'nationality' => $this->nationality,
+                            'job_title' => $this->jobTitle,
+                            'badge_type' => $this->badgeType,
+                            'pcode_used' => $this->promoCode,
 
-                    'heard_where' => $this->heardWhere,
-                    'quantity' => $this->finalQuantity,
-                    'unit_price' => $this->finalUnitPrice,
-                    'net_amount' => $this->finalNetAmount,
-                    'vat_price' => $this->finalVat,
-                    'discount_price' => $this->finalDiscount,
-                    'total_amount' => $this->finalTotal,
-                    'mode_of_payment' => $this->paymentMethod,
-                    'registration_status' => $registrationStatus,
-                    'payment_status' => $paymentStatus,
-                    'registered_date_time' => Carbon::now(),
-                    'paid_date_time' => ($this->paymentMethod == "bankTransfer") ? null : Carbon::now(),
-                ]);
-
-                Transactions::create([
-                    'event_id' => $this->event->id,
-                    'event_category' => $this->event->category,
-                    'delegate_id' => $newRegistrant->id,
-                    'delegate_type' => "main",
-                ]);
-
-                $details = [
-                    'name' => $this->salutation." ".$this->firstName." ".$this->middleName." ".$this->lastName,
-                    'eventName' => $this->event->name,
-                    'startDate' => Carbon::createFromFormat('Y-m-d', $this->event->event_start_date)->format('l j F'),
-                    'endDate' => Carbon::createFromFormat('Y-m-d', $this->event->event_end_date)->format('l j F'),
-                    'year' => $this->event->year,
-                    'location' => $this->event->location,
-                    'badgeLink' => env('APP_URL')."/".$this->event->category."/".$this->event->id."/view-badge"."/"."main"."/".$newRegistrant->id,
-                    'invoiceLink' => env('APP_URL')."/".$this->event->category."/".$this->event->id."/view-invoice"."/".$newRegistrant->id,
-                ];
-
-                Mail::to($this->emailAddress)->send(new RegistrationConfirmation($details));
-
-                if($this->assistantEmailAddress != null){
-                    Mail::to($this->assistantEmailAddress)->send(new RegistrationConfirmation($details));
-                }
-
-                if (!empty($this->additionalDelegates)) {
-                    foreach ($this->additionalDelegates as $additionalDelegate) {
-                        
-                        if($additionalDelegate['subPromoCode'] != null){
-                            PromoCodes::where('event_id', $this->event->id)->where('event_category', $this->event->category)->where('active', true)->where('promo_code', $additionalDelegate['subPromoCode'])->where('badge_type', $additionalDelegate['subBadgeType'])->increment('total_usage');
-                        }
-                        
-                        $newAdditionDelegate = AdditionalDelegates::create([
-                            'main_delegate_id' => $newRegistrant->id,
-                            'salutation' => $additionalDelegate['subSalutation'],
-                            'first_name' => $additionalDelegate['subFirstName'],
-                            'middle_name' => $additionalDelegate['subMiddleName'],
-                            'last_name' => $additionalDelegate['subLastName'],
-                            'job_title' => $additionalDelegate['subJobTitle'],
-                            'email_address' => $additionalDelegate['subEmailAddress'],
-                            'nationality' => $additionalDelegate['subNationality'],
-                            'mobile_number' => $additionalDelegate['subMobileNumber'],
-                            'badge_type' => $additionalDelegate['subBadgeType'],
-                            'pcode_used' => $additionalDelegate['subPromoCode'],
+                            'heard_where' => $this->heardWhere,
+                            'quantity' => $this->finalQuantity,
+                            'unit_price' => $this->finalUnitPrice,
+                            'net_amount' => $this->finalNetAmount,
+                            'vat_price' => $this->finalVat,
+                            'discount_price' => $this->finalDiscount,
+                            'total_amount' => $this->finalTotal,
+                            'mode_of_payment' => $this->paymentMethod,
+                            'registration_status' => $registrationStatus,
+                            'payment_status' => $paymentStatus,
+                            'registered_date_time' => Carbon::now(),
+                            'paid_date_time' => null,
                         ]);
 
                         Transactions::create([
                             'event_id' => $this->event->id,
                             'event_category' => $this->event->category,
-                            'delegate_id' => $newAdditionDelegate->id,
-                            'delegate_type' => "sub",
+                            'delegate_id' => $newRegistrant->id,
+                            'delegate_type' => "main",
                         ]);
-                        
+
                         $details = [
-                            'name' => $additionalDelegate['subSalutation']." ".$additionalDelegate['subFirstName']." ".$additionalDelegate['subMiddleName']." ".$additionalDelegate['subLastName'],
+                            'name' => $this->salutation . " " . $this->firstName . " " . $this->middleName . " " . $this->lastName,
                             'eventName' => $this->event->name,
                             'startDate' => Carbon::createFromFormat('Y-m-d', $this->event->event_start_date)->format('l j F'),
                             'endDate' => Carbon::createFromFormat('Y-m-d', $this->event->event_end_date)->format('l j F'),
                             'year' => $this->event->year,
                             'location' => $this->event->location,
-                            'badgeLink' => env('APP_URL')."/".$this->event->category."/".$this->event->id."/view-badge"."/"."sub"."/".$newAdditionDelegate->id,
-                            'invoiceLink' => env('APP_URL')."/".$this->event->category."/".$this->event->id."/view-invoice"."/".$newRegistrant->id,
+                            'badgeLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-badge" . "/" . "main" . "/" . $newRegistrant->id,
+                            'invoiceLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-invoice" . "/" . $newRegistrant->id,
                         ];
-                        Mail::to($additionalDelegate['subEmailAddress'])->send(new RegistrationConfirmation($details));
+
+                        Mail::to($this->emailAddress)->send(new RegistrationConfirmation($details));
+
+                        if ($this->assistantEmailAddress != null) {
+                            Mail::to($this->assistantEmailAddress)->send(new RegistrationConfirmation($details));
+                        }
+
+                        if (!empty($this->additionalDelegates)) {
+                            foreach ($this->additionalDelegates as $additionalDelegate) {
+
+                                if ($additionalDelegate['subPromoCode'] != null) {
+                                    PromoCodes::where('event_id', $this->event->id)->where('event_category', $this->event->category)->where('active', true)->where('promo_code', $additionalDelegate['subPromoCode'])->where('badge_type', $additionalDelegate['subBadgeType'])->increment('total_usage');
+                                }
+
+                                $newAdditionDelegate = AdditionalDelegates::create([
+                                    'main_delegate_id' => $newRegistrant->id,
+                                    'salutation' => $additionalDelegate['subSalutation'],
+                                    'first_name' => $additionalDelegate['subFirstName'],
+                                    'middle_name' => $additionalDelegate['subMiddleName'],
+                                    'last_name' => $additionalDelegate['subLastName'],
+                                    'job_title' => $additionalDelegate['subJobTitle'],
+                                    'email_address' => $additionalDelegate['subEmailAddress'],
+                                    'nationality' => $additionalDelegate['subNationality'],
+                                    'mobile_number' => $additionalDelegate['subMobileNumber'],
+                                    'badge_type' => $additionalDelegate['subBadgeType'],
+                                    'pcode_used' => $additionalDelegate['subPromoCode'],
+                                ]);
+
+                                Transactions::create([
+                                    'event_id' => $this->event->id,
+                                    'event_category' => $this->event->category,
+                                    'delegate_id' => $newAdditionDelegate->id,
+                                    'delegate_type' => "sub",
+                                ]);
+
+                                $details = [
+                                    'name' => $additionalDelegate['subSalutation'] . " " . $additionalDelegate['subFirstName'] . " " . $additionalDelegate['subMiddleName'] . " " . $additionalDelegate['subLastName'],
+                                    'eventName' => $this->event->name,
+                                    'startDate' => Carbon::createFromFormat('Y-m-d', $this->event->event_start_date)->format('l j F'),
+                                    'endDate' => Carbon::createFromFormat('Y-m-d', $this->event->event_end_date)->format('l j F'),
+                                    'year' => $this->event->year,
+                                    'location' => $this->event->location,
+                                    'badgeLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-badge" . "/" . "sub" . "/" . $newAdditionDelegate->id,
+                                    'invoiceLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-invoice" . "/" . $newRegistrant->id,
+                                ];
+                                Mail::to($additionalDelegate['subEmailAddress'])->send(new RegistrationConfirmation($details));
+                            }
+                        }
+                    } else {
+                        $paymentStatus = "paid";
+                        $registrationStatus = "confirmed";
+
+                        // FOR CREDIT CARD
+                        $newRegistrant = MainDelegates::create([
+                            'event_id' => $this->event->id,
+                            'pass_type' => $this->delegatePassType,
+                            'rate_type' => $this->rateType,
+                            'rate_type_string' => $this->rateTypeString,
+
+                            'company_name' => $this->companyName,
+                            'company_sector' => $this->companySector,
+                            'company_address' => $this->companyAddress,
+                            'company_country' => $this->companyCountry,
+                            'company_city' => $this->companyCity,
+                            'company_telephone_number' => $this->companyLandlineNumber,
+                            'company_mobile_number' => $this->companyMobileNumber,
+                            'assistant_email_address' => $this->assistantEmailAddress,
+
+                            'salutation' => $this->salutation,
+                            'first_name' => $this->firstName,
+                            'middle_name' => $this->middleName,
+                            'last_name' => $this->lastName,
+                            'email_address' => $this->emailAddress,
+                            'mobile_number' => $this->mobileNumber,
+                            'nationality' => $this->nationality,
+                            'job_title' => $this->jobTitle,
+                            'badge_type' => $this->badgeType,
+                            'pcode_used' => $this->promoCode,
+
+                            'heard_where' => $this->heardWhere,
+                            'quantity' => $this->finalQuantity,
+                            'unit_price' => $this->finalUnitPrice,
+                            'net_amount' => $this->finalNetAmount,
+                            'vat_price' => $this->finalVat,
+                            'discount_price' => $this->finalDiscount,
+                            'total_amount' => $this->finalTotal,
+                            'mode_of_payment' => $this->paymentMethod,
+                            'registration_status' => $registrationStatus,
+                            'payment_status' => $paymentStatus,
+                            'registered_date_time' => Carbon::now(),
+                            'paid_date_time' => Carbon::now(),
+                        ]);
+
+                        Transactions::create([
+                            'event_id' => $this->event->id,
+                            'event_category' => $this->event->category,
+                            'delegate_id' => $newRegistrant->id,
+                            'delegate_type' => "main",
+                        ]);
+
+                        $details = [
+                            'name' => $this->salutation . " " . $this->firstName . " " . $this->middleName . " " . $this->lastName,
+                            'eventName' => $this->event->name,
+                            'startDate' => Carbon::createFromFormat('Y-m-d', $this->event->event_start_date)->format('l j F'),
+                            'endDate' => Carbon::createFromFormat('Y-m-d', $this->event->event_end_date)->format('l j F'),
+                            'year' => $this->event->year,
+                            'location' => $this->event->location,
+                            'badgeLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-badge" . "/" . "main" . "/" . $newRegistrant->id,
+                            'invoiceLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-invoice" . "/" . $newRegistrant->id,
+                        ];
+
+                        Mail::to($this->emailAddress)->send(new RegistrationConfirmation($details));
+
+                        if ($this->assistantEmailAddress != null) {
+                            Mail::to($this->assistantEmailAddress)->send(new RegistrationConfirmation($details));
+                        }
+
+                        if (!empty($this->additionalDelegates)) {
+                            foreach ($this->additionalDelegates as $additionalDelegate) {
+
+                                if ($additionalDelegate['subPromoCode'] != null) {
+                                    PromoCodes::where('event_id', $this->event->id)->where('event_category', $this->event->category)->where('active', true)->where('promo_code', $additionalDelegate['subPromoCode'])->where('badge_type', $additionalDelegate['subBadgeType'])->increment('total_usage');
+                                }
+
+                                $newAdditionDelegate = AdditionalDelegates::create([
+                                    'main_delegate_id' => $newRegistrant->id,
+                                    'salutation' => $additionalDelegate['subSalutation'],
+                                    'first_name' => $additionalDelegate['subFirstName'],
+                                    'middle_name' => $additionalDelegate['subMiddleName'],
+                                    'last_name' => $additionalDelegate['subLastName'],
+                                    'job_title' => $additionalDelegate['subJobTitle'],
+                                    'email_address' => $additionalDelegate['subEmailAddress'],
+                                    'nationality' => $additionalDelegate['subNationality'],
+                                    'mobile_number' => $additionalDelegate['subMobileNumber'],
+                                    'badge_type' => $additionalDelegate['subBadgeType'],
+                                    'pcode_used' => $additionalDelegate['subPromoCode'],
+                                ]);
+
+                                Transactions::create([
+                                    'event_id' => $this->event->id,
+                                    'event_category' => $this->event->category,
+                                    'delegate_id' => $newAdditionDelegate->id,
+                                    'delegate_type' => "sub",
+                                ]);
+
+                                $details = [
+                                    'name' => $additionalDelegate['subSalutation'] . " " . $additionalDelegate['subFirstName'] . " " . $additionalDelegate['subMiddleName'] . " " . $additionalDelegate['subLastName'],
+                                    'eventName' => $this->event->name,
+                                    'startDate' => Carbon::createFromFormat('Y-m-d', $this->event->event_start_date)->format('l j F'),
+                                    'endDate' => Carbon::createFromFormat('Y-m-d', $this->event->event_end_date)->format('l j F'),
+                                    'year' => $this->event->year,
+                                    'location' => $this->event->location,
+                                    'badgeLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-badge" . "/" . "sub" . "/" . $newAdditionDelegate->id,
+                                    'invoiceLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-invoice" . "/" . $newRegistrant->id,
+                                ];
+                                Mail::to($additionalDelegate['subEmailAddress'])->send(new RegistrationConfirmation($details));
+                            }
+                        }
                     }
                 }
-                
+
+
+
                 $this->currentStep = 4;
             }
         }
@@ -473,7 +584,8 @@ class RegistrationForm extends Component
         $this->showAddDelegateModal = true;
     }
 
-    public function resetAddModalFields(){
+    public function resetAddModalFields()
+    {
         $this->subSalutation = null;
         $this->subFirstName = null;
         $this->subMiddleName = null;
@@ -520,7 +632,8 @@ class RegistrationForm extends Component
         }
     }
 
-    public function resetEditModalFields(){
+    public function resetEditModalFields()
+    {
         $this->subIdEdit = null;
         $this->subSalutationEdit = null;
         $this->subFirstNameEdit = null;
@@ -557,11 +670,11 @@ class RegistrationForm extends Component
             'subBadgeType' => 'required',
         ]);
 
-        
-        if($this->checkEmailIfUsedAlreadySub($this->subEmailAddress)){
+
+        if ($this->checkEmailIfUsedAlreadySub($this->subEmailAddress)) {
             $this->emailSubAlreadyUsedError = "You already used this email!";
         } else {
-            if($this->checkEmailIfExistsInDatabase($this->subEmailAddress)){
+            if ($this->checkEmailIfExistsInDatabase($this->subEmailAddress)) {
                 $this->emailSubAlreadyUsedError = null;
                 $this->emailSubExistingError = "Email is already registered, please use another email!";
             } else {
@@ -609,18 +722,18 @@ class RegistrationForm extends Component
     {
         $tempCheckEmail = false;
 
-        foreach ($this->additionalDelegates as $additionalDelegate){
-            if($additionalDelegate['subDelegateId'] != $subDelegateId){
-                if($additionalDelegate['subEmailAddress'] == $this->subEmailAddressEdit || $this->subEmailAddressEdit == $this->emailAddress){
+        foreach ($this->additionalDelegates as $additionalDelegate) {
+            if ($additionalDelegate['subDelegateId'] != $subDelegateId) {
+                if ($additionalDelegate['subEmailAddress'] == $this->subEmailAddressEdit || $this->subEmailAddressEdit == $this->emailAddress) {
                     $tempCheckEmail = true;
                 }
             }
         }
 
-        if($tempCheckEmail){
+        if ($tempCheckEmail) {
             $this->emailSubAlreadyUsedError = "You already used this email!";
         } else {
-            if($this->checkEmailIfExistsInDatabase($this->subEmailAddressEdit)){
+            if ($this->checkEmailIfExistsInDatabase($this->subEmailAddressEdit)) {
                 $this->emailSubAlreadyUsedError = null;
                 $this->emailSubExistingError = "Email is already registered, please use another email!";
             } else {
@@ -642,7 +755,7 @@ class RegistrationForm extends Component
                         $this->additionalDelegates[$i]['subPromoCodeDiscount'] = $this->subPromoCodeDiscountEdit;
                         $this->additionalDelegates[$i]['promoCodeSuccessSub'] = $this->promoCodeSuccessSubEdit;
                         $this->additionalDelegates[$i]['promoCodeFailSub'] = $this->promoCodeFailSubEdit;
-        
+
                         $this->resetEditModalFields();
                         $this->showEditDelegateModal = false;
                     }
@@ -762,33 +875,35 @@ class RegistrationForm extends Component
         $this->promoCodeSuccessSubEdit = null;
     }
 
-    public function checkEmailIfExistsInDatabase($emailAddress){
+    public function checkEmailIfExistsInDatabase($emailAddress)
+    {
         $allDelegates = Transactions::where('event_id', $this->event->id)->where('event_category', $this->event->category)->get();
 
         $mainDelegate = null;
         $subDelegate = null;
-        
-        foreach ($allDelegates as $delegate){
-            if($delegate->delegate_type == "main"){
+
+        foreach ($allDelegates as $delegate) {
+            if ($delegate->delegate_type == "main") {
                 $mainDelegate = MainDelegates::where('id', $delegate->delegate_id)->where('email_address', $emailAddress)->first();
             } else {
                 $subDelegate = AdditionalDelegates::where('id', $delegate->delegate_id)->where('email_address', $emailAddress)->first();
             }
         }
 
-        if($mainDelegate == null && $subDelegate == null){
+        if ($mainDelegate == null && $subDelegate == null) {
             return false;
         } else {
             return true;
         }
     }
 
-    public function checkEmailIfUsedAlreadyMain($emailAddress){
-        if(count($this->additionalDelegates) == 0){
+    public function checkEmailIfUsedAlreadyMain($emailAddress)
+    {
+        if (count($this->additionalDelegates) == 0) {
             return false;
         } else {
-            foreach($this->additionalDelegates as $additionalDelegate){
-                if($emailAddress == $additionalDelegate['subEmailAddress']){
+            foreach ($this->additionalDelegates as $additionalDelegate) {
+                if ($emailAddress == $additionalDelegate['subEmailAddress']) {
                     return true;
                     break;
                 }
@@ -796,15 +911,16 @@ class RegistrationForm extends Component
         }
     }
 
-    public function checkEmailIfUsedAlreadySub($emailAddress){
-        if($this->emailAddress == $emailAddress){
+    public function checkEmailIfUsedAlreadySub($emailAddress)
+    {
+        if ($this->emailAddress == $emailAddress) {
             return true;
         } else {
-            if(count($this->additionalDelegates) == 0){
+            if (count($this->additionalDelegates) == 0) {
                 return false;
             } else {
-                foreach($this->additionalDelegates as $additionalDelegate){
-                    if($emailAddress == $additionalDelegate['subEmailAddress']){
+                foreach ($this->additionalDelegates as $additionalDelegate) {
+                    if ($emailAddress == $additionalDelegate['subEmailAddress']) {
                         return true;
                         break;
                     }

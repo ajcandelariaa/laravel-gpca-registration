@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Session;
 
 
 class GatewayController extends Controller
 {
+    public $orderId = 52;
+    public $transactionId = 54;
+
     public function getSessionId()
     {
         $client = new Client();
@@ -67,6 +69,15 @@ class GatewayController extends Controller
         }
     }
 
+    public function initializeAPIConfiguration()
+    {
+        if (Session::has('sessionId') && Session::has('updateStatus') && Session::has('order')) {
+            if (Session::get('updateStatus') == "SUCCESS") {
+                return view('intialize_api_config');
+            }
+        }
+    }
+
     public function cardDetails()
     {
         if (Session::has('sessionId') && Session::has('updateStatus') && Session::has('order')) {
@@ -76,10 +87,11 @@ class GatewayController extends Controller
         }
     }
 
-    public function retrieveSession(){
+    public function retrieveSession()
+    {
         $client = new Client();
         $sessionId = Session::get('sessionId');
-        $response = $client->request('GET', 'https://ap-gateway.mastercard.com/api/rest/version/70/merchant/TEST900755/session/'.$sessionId, [
+        $response = $client->request('GET', 'https://ap-gateway.mastercard.com/api/rest/version/70/merchant/TEST900755/session/' . $sessionId, [
             'auth' => [
                 'merchant.TEST900755',
                 '3b41414705a08d0fa159a77316aba3b3'
@@ -115,12 +127,88 @@ class GatewayController extends Controller
         $body = $response->getBody()->getContents();
         $data = json_decode($body, true);
 
-        if($data['result'] == "SUCCESS" && $data['status'] == "VALID"){
+        if ($data['result'] == "SUCCESS" && $data['status'] == "VALID") {
             Session::put('token', $data['token']);
             Session::put('tokenResult', $data['result']);
             Session::put('tokenStatus', $data['status']);
-            return redirect('/payNow');
+            return redirect('/initiateAuthentication');
         }
+    }
+
+    public function initiateAuthentication()
+    {
+        $client = new Client();
+        $sessionId = Session::get('sessionId');
+        $response = $client->request('PUT', 'https://ap-gateway.mastercard.com/api/rest/version/70/merchant/TEST900755/order/'.$this->orderId.'/transaction/'.$this->transactionId, [
+            'auth' => [
+                'merchant.TEST900755',
+                '3b41414705a08d0fa159a77316aba3b3'
+            ],
+            'headers' => [
+                'Content-Type' => 'application/json'
+            ],
+            'json' => [
+                "session" => [
+                    'id' => $sessionId,
+                ],
+                "authentication" => [
+                    "acceptVersions" => "3DS1,3DS2",
+                    "channel" => "PAYER_BROWSER",
+                    "purpose" => "PAYMENT_TRANSACTION"
+                ],
+                "correlationId" => "test",
+                "apiOperation" => "INITIATE_AUTHENTICATION"
+            ],
+        ]);
+        $body = $response->getBody()->getContents();
+        $data = json_decode($body, true);
+        return redirect('/initiateAuthenticationPayerRequest');
+    }
+
+    public function initiateAuthenticationPayerRequest()
+    {
+        $client = new Client();
+        $sessionId = Session::get('sessionId');
+        $response = $client->request('PUT', 'https://ap-gateway.mastercard.com/api/rest/version/70/merchant/TEST900755/order/'.$this->orderId.'/transaction/'.$this->transactionId, [
+            'auth' => [
+                'merchant.TEST900755',
+                '3b41414705a08d0fa159a77316aba3b3'
+            ],
+            'headers' => [
+                'Content-Type' => 'application/json'
+            ],
+            'json' => [
+                "session" => [
+                    'id' => $sessionId,
+                ],
+                "authentication" => [
+                  "redirectResponseUrl" => "http://127.0.0.1:8000/payNow"
+                ],
+                "correlationId" => "test",
+                "device" =>  [
+                    "browser" =>  "MOZILLA",
+                    "browserDetails" =>  [
+                        "3DSecureChallengeWindowSize" =>  "FULL_SCREEN",
+                        "acceptHeaders" =>  "application/json",
+                        "colorDepth" =>  24,
+                        "javaEnabled" =>  true,
+                        "language" =>  "en-US",
+                        "screenHeight" =>  1640,
+                        "screenWidth" =>  1480,
+                        "timeZone" =>  273
+                    ],
+                    "ipAddress" =>  "127.0.0.1"
+                ],
+                "apiOperation" => "AUTHENTICATE_PAYER",
+            ],
+        ]);
+        $body = $response->getBody()->getContents();
+        $data = json_decode($body, true);
+        $htmlCode = $data['authentication']['redirect']['html'];
+        return view('testOtp', [
+            'htmlCode' => $htmlCode,
+        ]);
+        // return redirect('/payNow');
     }
 
     public function payNow()
@@ -131,8 +219,7 @@ class GatewayController extends Controller
                 $sessionId = Session::get('sessionId');
                 $sourceOfFunds = Session::get('sourceOfFunds');
                 $token = Session::get('token');
-
-                $response = $client->request('PUT', 'https://ap-gateway.mastercard.com/api/rest/version/70/merchant/TEST900755/order/23/transaction/24', [
+                $response = $client->request('PUT', 'https://ap-gateway.mastercard.com/api/rest/version/70/merchant/TEST900755/order/'.$this->orderId.'/transaction/'.$this->transactionId, [
                     'auth' => [
                         'merchant.TEST900755',
                         '3b41414705a08d0fa159a77316aba3b3'
@@ -153,5 +240,4 @@ class GatewayController extends Controller
             }
         }
     }
-
 }

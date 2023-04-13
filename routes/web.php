@@ -73,8 +73,14 @@ Route::get('/register/{eventYear}/{eventCategory}/{eventId}', [RegistrationContr
 
 Route::get('/getSessionId', [GatewayController::class, 'getSessionId']);
 Route::get('/updateSession', [GatewayController::class, 'updateSession']);
+Route::get('/initializeAPIConfiguration', [GatewayController::class, 'initializeAPIConfiguration']);
+
 Route::get('/cardDetails', [GatewayController::class, 'cardDetails']);
 Route::get('/retrieveSession', [GatewayController::class, 'retrieveSession']);
 Route::get('/getToken', [GatewayController::class, 'getToken']);
-Route::get('/authorizePayment', [GatewayController::class, 'authorizePayment']);
+
+Route::get('/initiateAuthentication', [GatewayController::class, 'initiateAuthentication']);
+Route::get('/initiateAuthenticationPayerRequest', [GatewayController::class, 'initiateAuthenticationPayerRequest']);
+Route::get('/testViewOTP', [GatewayController::class, 'testViewOTP']);
+
 Route::get('/payNow', [GatewayController::class, 'payNow']);
