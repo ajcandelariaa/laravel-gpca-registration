@@ -3,13 +3,14 @@
 namespace App\Http\Controllers;
 
 use GuzzleHttp\Client;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 
 
 class GatewayController extends Controller
 {
-    public $orderId = 64;
-    public $transactionId = 66;
+    public $orderId = 102;
+    public $transactionId = 104;
 
     public function getSessionId()
     {
@@ -182,7 +183,7 @@ class GatewayController extends Controller
                     'id' => $sessionId,
                 ],
                 "authentication" => [
-                    "redirectResponseUrl" => "http://127.0.0.1:8000/authentcatedDone"
+                "redirectResponseUrl" => "http://127.0.0.1:8000/payNow?sessionId=$sessionId&token=$token",
                 ],
                 "correlationId" => "test",
                 "device" =>  [
@@ -204,25 +205,18 @@ class GatewayController extends Controller
         ]);
         $body = $response->getBody()->getContents();
         $data = json_decode($body, true);
-        dd($token);
         $htmlCode = $data['authentication']['redirect']['html'];
+
         return view('testOtp', [
             'htmlCode' => $htmlCode,
         ]);
     }
 
-    public function authentcatedDone()
-    {
-        return redirect('/payNow');
-    }
-
     public function payNow()
     {
         $client = new Client();
-        $sessionId = Session::get('sessionId');
-        $sourceOfFunds = Session::get('sourceOfFunds');
-        $token = Session::get('token');
-        dd($token);
+        $sessionId = request()->query('sessionId');
+        $token = request()->query('token');
         $response = $client->request('PUT', 'https://ap-gateway.mastercard.com/api/rest/version/70/merchant/TEST900755/order/' . $this->orderId . '/transaction/' . $this->transactionId, [
             'auth' => [
                 'merchant.TEST900755',

@@ -12,6 +12,6 @@
     }
 </style>
 <body>
-    {!! $htmlCode !!}
+        {!! $htmlCode !!}
 </body>
 </html>
