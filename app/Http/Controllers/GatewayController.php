@@ -9,8 +9,8 @@ use RealRashid\SweetAlert\Storage\SessionStore;
 
 class GatewayController extends Controller
 {
-    public $orderId = 122;
-    public $transactionId = 124;
+    public $orderId = 126;
+    public $transactionId = 128;
 
     public function getSessionId()
     {
@@ -38,34 +38,32 @@ class GatewayController extends Controller
     public function updateSession()
     {
         if (Session::has('sessionId') && Session::has('updateStatus')) {
-            if (Session::get('updateStatus') == "NO_UPDATE") {
-                $sessionId = Session::get('sessionId');
-                $client = new Client();
+            $sessionId = Session::get('sessionId');
+            $client = new Client();
 
-                $response = $client->request('PUT', 'https://ap-gateway.mastercard.com/api/rest/version/70/merchant/TEST900755/session/' . $sessionId, [
-                    'auth' => [
-                        'merchant.TEST900755',
-                        '3b41414705a08d0fa159a77316aba3b3'
+            $response = $client->request('PUT', 'https://ap-gateway.mastercard.com/api/rest/version/70/merchant/TEST900755/session/' . $sessionId, [
+                'auth' => [
+                    'merchant.TEST900755',
+                    '3b41414705a08d0fa159a77316aba3b3'
+                ],
+                'headers' => [
+                    'Content-Type' => 'application/json'
+                ],
+                'json' => [
+                    "order" => [
+                        'amount' => '100.00',
+                        'currency' => 'USD',
                     ],
-                    'headers' => [
-                        'Content-Type' => 'application/json'
-                    ],
-                    'json' => [
-                        "order" => [
-                            'amount' => '100.00',
-                            'currency' => 'USD',
-                        ],
-                    ]
-                ]);
+                ]
+            ]);
 
-                $body = $response->getBody()->getContents();
-                $data = json_decode($body, true);
+            $body = $response->getBody()->getContents();
+            $data = json_decode($body, true);
 
-                if ($data['session']['updateStatus'] == "SUCCESS") {
-                    Session::put('updateStatus', $data['session']['updateStatus']);
-                    Session::put('order', $data['order']);
-                    return redirect('/cardDetails');
-                }
+            if ($data['session']['updateStatus'] == "SUCCESS") {
+                Session::put('updateStatus', $data['session']['updateStatus']);
+                Session::put('order', $data['order']);
+                return redirect('/cardDetails');
             }
         }
     }
@@ -174,7 +172,7 @@ class GatewayController extends Controller
                     'id' => $sessionId,
                 ],
                 "authentication" => [
-                "redirectResponseUrl" => "http://127.0.0.1:8000/payNow?sessionId=$sessionId&token=$token",
+                    "redirectResponseUrl" => "http://127.0.0.1:8000/payNow?sessionId=$sessionId&token=$token",
                 ],
                 "correlationId" => "test",
                 "device" =>  [
@@ -205,6 +203,7 @@ class GatewayController extends Controller
 
     public function payNow(Request $request)
     {
+        // dd($request->all());
         $client = new Client();
         $sessionId = request()->query('sessionId');
         $token = request()->query('token');
@@ -226,23 +225,19 @@ class GatewayController extends Controller
         ]);
         $body = $response->getBody()->getContents();
         $data = json_decode($body, true);
-        dd($data);
-        // Session::put('authTransId', $data['authentication']['3ds']['transactionId']);
+        Session::put('authTransId', $data['authentication']['3ds']['transactionId']);
         // Session::put('sofExpiry', $data['sourceOfFunds']['provided']['card']['expiry']);
         // Session::put('sofExpiry', $data['sourceOfFunds']['provided']['card']['expiry']);
-        // Session::put('sofType', $data['sourceOfFunds']['type']);
-        // Session::put('sessionId', $sessionId);
-        // Session::put('token', $token);
-        // return redirect('/payNow2');
+        Session::put('sofType', $data['sourceOfFunds']['type']);
+        Session::put('sessionId', $sessionId);
+        Session::put('token', $token);
+        return redirect('/payNow2');
     }
 
     public function payNow2(Request $request)
     {
         $authTransId = Session::get('authTransId');
-        $sofType = Session::get('sofType');
-        $sourceOfFunds = Session::get('sourceOfFunds');
         $sessionId = Session::get('sessionId');
-        $token = Session::get('token');
         $client = new Client();
         $response = $client->request('PUT', 'https://ap-gateway.mastercard.com/api/rest/version/70/merchant/TEST900755/order/' . $this->orderId . '/transaction/' . $this->transactionId, [
             'auth' => [
@@ -253,41 +248,37 @@ class GatewayController extends Controller
                 'Content-Type' => 'application/json'
             ],
             'json' => [
-                'apiOperation' => "AUTHORIZE",
-                // "authentication" => [
-                //     "transactionId" => $authTransId,
-                // ],
+                'apiOperation' => "PAY",
+                "authentication" => [
+                    "transactionId" => $authTransId,
+                ],
+                "session" => [
+                    'id' => $sessionId,
+                ],
                 "order" => [
                     "amount" => '100.0',
                     "currency" => 'USD',
-                    // "reference" => $this->orderId,
+                    "reference" => $this->orderId,
                 ],
                 "sourceOfFunds" => [
-                    "token" => $token,
-                    "type" => $sofType,
+                    "provided" => [
+                        "card" => [
+                            "number" => '4242424242424242',
+                            "expiry" => [
+                                "month" => '05',
+                                "year" => '23',
+                            ],
+                        ],
+                    ],
+                    "type" => 'CARD',
                 ],
-                // "sourceOfFunds" => [
-                //     "provided" => [
-                //         "card" => [
-                //             "number" => '5123450000000008',
-                //             "expiry" => [
-                //                 "month" => '1',
-                //                 "year" => '39',
-                //             ],
-                //         ],
-                //     ],
-                //     "type" => 'CARD',
-                // ],
-                // "transaction" => [
-                //     "reference" => $this->orderId,
-                // ],
+                "transaction" => [
+                    "reference" => $this->orderId,
+                ],
             ]
         ]);
         $body = $response->getBody()->getContents();
         $data = json_decode($body, true);
         dd($data);
     }
-
-    
-
 }
