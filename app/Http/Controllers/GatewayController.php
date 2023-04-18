@@ -5,12 +5,11 @@ namespace App\Http\Controllers;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
-use RealRashid\SweetAlert\Storage\SessionStore;
 
 class GatewayController extends Controller
 {
-    public $orderId = 126;
-    public $transactionId = 128;
+    public $orderId = 146;
+    public $transactionId = 148;
 
     public function getSessionId()
     {
@@ -77,24 +76,24 @@ class GatewayController extends Controller
         }
     }
 
-    public function retrieveSession()
-    {
-        $client = new Client();
-        $sessionId = Session::get('sessionId');
-        $response = $client->request('GET', 'https://ap-gateway.mastercard.com/api/rest/version/70/merchant/TEST900755/session/' . $sessionId, [
-            'auth' => [
-                'merchant.TEST900755',
-                '3b41414705a08d0fa159a77316aba3b3'
-            ],
-            'headers' => [
-                'Content-Type' => 'application/json'
-            ],
-        ]);
-        $body = $response->getBody()->getContents();
-        $data = json_decode($body, true);
-        Session::put('sourceOfFunds', $data['sourceOfFunds']);
-        return redirect('/getToken');
-    }
+    // public function retrieveSession()
+    // {
+    //     $client = new Client();
+    //     $sessionId = Session::get('sessionId');
+    //     $response = $client->request('GET', 'https://ap-gateway.mastercard.com/api/rest/version/70/merchant/TEST900755/session/' . $sessionId, [
+    //         'auth' => [
+    //             'merchant.TEST900755',
+    //             '3b41414705a08d0fa159a77316aba3b3'
+    //         ],
+    //         'headers' => [
+    //             'Content-Type' => 'application/json'
+    //         ],
+    //     ]);
+    //     $body = $response->getBody()->getContents();
+    //     $data = json_decode($body, true);
+    //     Session::put('sourceOfFunds', $data['sourceOfFunds']);
+    //     return redirect('/getToken');
+    // }
 
     public function getToken()
     {
@@ -201,9 +200,8 @@ class GatewayController extends Controller
         ]);
     }
 
-    public function payNow(Request $request)
+    public function payNow()
     {
-        // dd($request->all());
         $client = new Client();
         $sessionId = request()->query('sessionId');
         $token = request()->query('token');
@@ -225,60 +223,52 @@ class GatewayController extends Controller
         ]);
         $body = $response->getBody()->getContents();
         $data = json_decode($body, true);
-        Session::put('authTransId', $data['authentication']['3ds']['transactionId']);
-        // Session::put('sofExpiry', $data['sourceOfFunds']['provided']['card']['expiry']);
-        // Session::put('sofExpiry', $data['sourceOfFunds']['provided']['card']['expiry']);
-        Session::put('sofType', $data['sourceOfFunds']['type']);
-        Session::put('sessionId', $sessionId);
-        Session::put('token', $token);
-        return redirect('/payNow2');
-    }
 
-    public function payNow2(Request $request)
-    {
-        $authTransId = Session::get('authTransId');
-        $sessionId = Session::get('sessionId');
-        $client = new Client();
-        $response = $client->request('PUT', 'https://ap-gateway.mastercard.com/api/rest/version/70/merchant/TEST900755/order/' . $this->orderId . '/transaction/' . $this->transactionId, [
-            'auth' => [
-                'merchant.TEST900755',
-                '3b41414705a08d0fa159a77316aba3b3'
-            ],
-            'headers' => [
-                'Content-Type' => 'application/json'
-            ],
-            'json' => [
-                'apiOperation' => "PAY",
-                "authentication" => [
-                    "transactionId" => $authTransId,
+        if($data != null){
+            $transactionId2 = $this->transactionId + 1;
+            $authTransId = $data['authentication']['3ds']['transactionId'];
+            $authData = $data['authentication'];
+            $client = new Client();
+            $response = $client->request('PUT', 'https://ap-gateway.mastercard.com/api/rest/version/70/merchant/TEST900755/order/' . $this->orderId . '/transaction/' . $transactionId2, [
+                'auth' => [
+                    'merchant.TEST900755',
+                    '3b41414705a08d0fa159a77316aba3b3'
                 ],
-                "session" => [
-                    'id' => $sessionId,
+                'headers' => [
+                    'Content-Type' => 'application/json'
                 ],
-                "order" => [
-                    "amount" => '100.0',
-                    "currency" => 'USD',
-                    "reference" => $this->orderId,
-                ],
-                "sourceOfFunds" => [
-                    "provided" => [
-                        "card" => [
-                            "number" => '4242424242424242',
-                            "expiry" => [
-                                "month" => '05',
-                                "year" => '23',
-                            ],
-                        ],
+                'json' => [
+                    'apiOperation' => "PAY",
+                    "authentication" => [
+                        "transactionId" => $this->transactionId,
                     ],
-                    "type" => 'CARD',
-                ],
-                "transaction" => [
-                    "reference" => $this->orderId,
-                ],
-            ]
-        ]);
-        $body = $response->getBody()->getContents();
-        $data = json_decode($body, true);
-        dd($data);
+                    "order" => [
+                        "amount" => '100.0',
+                        "currency" => 'USD',
+                        "reference" => $this->orderId,
+                    ],
+                    "sourceOfFunds" => [
+                        // "provided" => [
+                        //     "card" => [
+                        //         "number" => '5123450000000008',
+                        //         "expiry" => [
+                        //             "month" => '01',
+                        //             "year" => '39',
+                        //         ],
+                        //         "securityCode" => '100',
+                        //     ],
+                        // ],
+                        // "type" => 'CARD',
+                        "token" => $token,
+                    ],
+                    "transaction" => [
+                        "reference" => $this->orderId,
+                    ],
+                ]
+            ]);
+            $body = $response->getBody()->getContents();
+            $data = json_decode($body, true);
+            dd($data);
+        }
     }
 }

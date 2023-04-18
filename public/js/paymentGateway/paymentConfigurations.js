@@ -5,8 +5,8 @@ if (self === top) {
     top.location = self.location;
 }
 
-let sessionId = document.getElementById('session-id').value;
-
+let sessionId = "{{ session('sessionId') }}";
+console.log(sessionId);
 PaymentSession.configure({
     session: sessionId,
     merchantId: 'TEST900755',
@@ -43,7 +43,7 @@ PaymentSession.configure({
                     if (response.sourceOfFunds.provided.card.scheme == 'MASTERCARD') {
                         console.log("The user entered a Mastercard credit card.")
                     }
-                    window.location.replace("http://127.0.0.1:8000/retrieveSession");
+                    window.location.replace("http://127.0.0.1:8000/getToken");
                 } else if ("fields_in_error" == response.status) {
                     console.log("Session update failed with field errors.");
                     if (response.errors.cardNumber) {
