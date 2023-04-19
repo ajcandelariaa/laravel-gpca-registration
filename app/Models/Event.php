@@ -14,6 +14,7 @@ class Event extends Model
         'name',
         'location',
         'description',
+        'link',
         'event_start_date',
         'event_end_date',
         'event_vat',
@@ -28,6 +29,12 @@ class Event extends Model
         'std_member_rate',
         'std_nmember_rate',
         
+        'badge_footer_link',
+        'badge_footer_link_color',
+        'badge_footer_bg_color',
+        'badge_front_banner',
+        'badge_back_banner',
+
         'year',
         'active',
     ];

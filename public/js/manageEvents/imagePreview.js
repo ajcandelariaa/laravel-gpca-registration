@@ -1,4 +1,4 @@
-// ADD EVENT
+// ADD & EDIT EVENT LOGO & BANNER
 function previewLogo(event) {
     var reader = new FileReader();
     reader.onload = function () {
@@ -15,3 +15,23 @@ function previewBanner(event) {
     };
     reader.readAsDataURL(event.target.files[0]);
 }
+
+
+// ADD & EDIT BADGE BANNERS
+function previewBadgeFrontBanner(event) {
+    var reader = new FileReader();
+    reader.onload = function () {
+        var output = document.getElementById('badgeFrontBanner');
+        output.src = reader.result;
+    };
+    reader.readAsDataURL(event.target.files[0]);
+}
+function previewBadgeBackBanner(event) {
+    var reader = new FileReader();
+    reader.onload = function () {
+        var output = document.getElementById('badgeBackBanner');
+        output.src = reader.result;
+    };
+    reader.readAsDataURL(event.target.files[0]);
+}
+

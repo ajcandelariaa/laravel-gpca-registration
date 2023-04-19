@@ -72,6 +72,24 @@
 </div>
 
 {{-- ROW 3 --}}
+<div class="space-y-2 col-span-2">
+    <div class="text-registrationPrimaryColor">
+        Event Link <span class="text-red-500">*</span>
+    </div>
+    <div>
+        <input placeholder="https://www.gpcasupplychain.com/" type="text" name="link"
+            value="{{ $event->link }}"
+            class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+
+        @error('link')
+            <div class="text-red-500 text-xs italic mt-1">
+                {{ $message }}
+            </div>
+        @enderror
+    </div>
+</div>
+
+{{-- ROW 4 --}}
 <div class="space-y-2 col-span-2 grid grid-cols-3 gap-5 items-start">
     <div class="space-y-2">
         <div class="text-registrationPrimaryColor">
@@ -153,7 +171,6 @@
     <div class="text-registrationPrimaryColor">
         Event Banner <span class="text-red-500">*</span>
     </div>
-
     <div class="flex gap-3 flex-col">
         <div>
             <input type="file" accept="image/*" name="banner" onchange="previewBanner(event)"

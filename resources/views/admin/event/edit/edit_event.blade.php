@@ -38,6 +38,13 @@
                     </div>
 
                     @include('admin.event.edit.std_details')
+
+
+                    <div class="space-y-2 col-span-2 mt-6">
+                        <hr>
+                    </div>
+
+                    @include('admin.event.edit.badge_details')
                 </div>
 
                 <div class="text-center mt-10">

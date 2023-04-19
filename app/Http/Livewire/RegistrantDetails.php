@@ -556,10 +556,7 @@ class RegistrantDetails extends Component
         $details = [
             'name' => $this->finalData['name'],
             'eventName' => $event->name,
-            'startDate' => Carbon::createFromFormat('Y-m-d', $event->event_start_date)->format('l j F'),
-            'endDate' => Carbon::createFromFormat('Y-m-d', $event->event_end_date)->format('l j F'),
-            'year' => $event->year,
-            'location' => $event->location,
+            'eventLink' => $event->link,
         ];
 
         Mail::to($this->finalData['email_address'])->send(new RegistrationReminder($details));
@@ -573,10 +570,7 @@ class RegistrantDetails extends Component
                 $details = [
                     'name' => $subDelegate['name'],
                     'eventName' => $event->name,
-                    'startDate' => Carbon::createFromFormat('Y-m-d', $event->event_start_date)->format('l j F'),
-                    'endDate' => Carbon::createFromFormat('Y-m-d', $event->event_end_date)->format('l j F'),
-                    'year' => $event->year,
-                    'location' => $event->location,
+                    'eventLink' => $event->link,
                 ];
 
                 Mail::to($subDelegate['email_address'])->send(new RegistrationReminder($details));

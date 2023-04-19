@@ -1,19 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Registration Reminder</title>
-</head>
-<body>
-    <p>Dear {{ $details['name'] }}</p>
-    <p>Greetings from GPCA!</p>
-    <p>This is to remind your payment for your registration to attend the {{ $details['eventName'] }} to be held from {{ $details['startDate'] }} to {{ $details['endDate'] }} {{ $details['year'] }} at the {{ $details['location'] }}.</p>
+<x-mail::message>
+<p>Dear {{ $details['name'] }},</p>
 
-    <br>
-    
-    <p>Kind Regards,</p>
-    <p>GPCA Team</p>
-</body>
-</html>
+<p>Greetings from GPCA!</p>
+
+<p>We are delighted that you have started your registration to attend the <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a>.</p>
+
+<p>Please note that no badge will be issued without prior payment for registration. Kindly ensure that you either make the payment before the event or make the payment onsite. Onsite mode of payment is cash only.</p>
+
+<p>Kindly contact Analee Candelaria at <a href="mailto:analee@gpca.org.ae">analee@gpca.org.ae</a> +971 4 451 0666 ext. 116 for more information on how to settle your payment.</p>
+
+Kind regards,<br>
+GPCA Team
+</x-mail::message>

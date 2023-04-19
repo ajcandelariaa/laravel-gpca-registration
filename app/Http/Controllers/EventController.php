@@ -100,6 +100,7 @@ class EventController extends Controller
                 'name' => 'required',
                 'location' => 'required',
                 'description' => 'required',
+                'link' => 'required',
                 'event_start_date' => 'required|date',
                 'event_end_date' => 'required|date',
                 'event_vat' => 'required|numeric|min:0|max:100',
@@ -113,12 +114,19 @@ class EventController extends Controller
                 'std_start_date' => 'required|date',
                 'std_member_rate' => 'required|numeric|min:0|max:99999.99',
                 'std_nmember_rate' => 'required|numeric|min:0|max:99999.99',
+
+                'badge_footer_link' => 'required',
+                'badge_footer_link_color' => 'required',
+                'badge_footer_bg_color' => 'required',
+                'badge_front_banner' => 'required|mimes:jpeg,png,jpg,gif',
+                'badge_back_banner' => 'required|mimes:jpeg,png,jpg,gif',
             ],
             [
                 'category.required' => 'Event Category is required',
                 'name.required' => 'Event Name is required',
                 'location.required' => 'Event Location is required',
                 'description.required' => 'Event Description is required',
+                'link.required' => 'Event Link is required',
                 'event_start_date.required' => 'Event Start Date is required',
                 'event_start_date.date' => 'Event Start Date must be a date',
                 'event_end_date.required' => 'Event End Date is required',
@@ -157,18 +165,31 @@ class EventController extends Controller
                 'std_nmember_rate.numeric' => 'Standard Non-Member Rate must be a number.',
                 'std_nmember_rate.min' => 'Standard Non-Member Rate must be at least :min.',
                 'std_nmember_rate.max' => 'Standard Non-Member Rate may not be greater than :max.',
+
+                    
+                'badge_footer_link.required' => 'Badge Footer Link is required',
+                'badge_footer_link_color.required' => 'Badge Footer Link Color is required',
+                'badge_footer_bg_color.required' => 'Badge Footer Link Background Color is required',
+                'badge_front_banner.required' => 'Badge Front Banner is required',
+                'badge_front_banner.mimes' => 'Badge Front Banner must be in jpeg, png, jpg, gif format',
+                'badge_back_banner.required' => 'Badge Back Banner is required',
+                'badge_back_banner.mimes' => 'Badge Back Banner must be in jpeg, png, jpg, gif format',
             ]
         );
 
         $currentYear = date('Y');
         $logoPath = $request->file('logo')->store('public/event/' . $currentYear . '/logos');
         $bannerPath = $request->file('banner')->store('public/event/' . $currentYear . '/banners');
+        $badgeFrontBannerPath = $request->file('badge_front_banner')->store('public/event/' . $currentYear . '/badges/front');
+        $badgeBackBannerPath = $request->file('badge_back_banner')->store('public/event/' . $currentYear . '/badges/back');
 
+        
         Event::create([
             'category' => $request->category,
             'name' => $request->name,
             'location' => $request->location,
             'description' => $request->description,
+            'link' => $request->link,
             'event_start_date' => $request->event_start_date,
             'event_end_date' => $request->event_end_date,
             'event_vat' => $request->event_vat,
@@ -182,6 +203,12 @@ class EventController extends Controller
             'std_start_date' => $request->std_start_date,
             'std_member_rate' => $request->std_member_rate,
             'std_nmember_rate' => $request->std_nmember_rate,
+
+            'badge_footer_link' => $request->badge_footer_link,
+            'badge_footer_link_color' => $request->badge_footer_link_color,
+            'badge_footer_bg_color' => $request->badge_footer_bg_color,
+            'badge_front_banner' => $badgeFrontBannerPath,
+            'badge_back_banner' => $badgeBackBannerPath,
 
             'year' => $currentYear,
             'active' => true,
@@ -200,6 +227,7 @@ class EventController extends Controller
                     'name' => 'required',
                     'location' => 'required',
                     'description' => 'required',
+                    'link' => 'required',
                     'event_start_date' => 'required|date',
                     'event_end_date' => 'required|date',
                     'event_vat' => 'required|numeric|min:0|max:100',
@@ -213,12 +241,19 @@ class EventController extends Controller
                     'std_start_date' => 'required|date',
                     'std_member_rate' => 'required|numeric|min:0|max:99999.99',
                     'std_nmember_rate' => 'required|numeric|min:0|max:99999.99',
+
+                    'badge_footer_link' => 'required',
+                    'badge_footer_link_color' => 'required',
+                    'badge_footer_bg_color' => 'required',
+                    'badge_front_banner' => 'nullable|image|mimes:jpeg,png,jpg,gif',
+                    'badge_back_banner' => 'nullable|image|mimes:jpeg,png,jpg,gif',
                 ],
                 [
                     'category.required' => 'Event Category is required',
                     'name.required' => 'Event Name is required',
                     'location.required' => 'Event Location is required',
                     'description.required' => 'Event Description is required',
+                    'link.required' => 'Event Link is required',
                     'event_start_date.required' => 'Event Start Date is required',
                     'event_start_date.date' => 'Event Start Date must be a date',
                     'event_end_date.required' => 'Event End Date is required',
@@ -257,6 +292,15 @@ class EventController extends Controller
                     'std_nmember_rate.numeric' => 'Standard Non-Member Rate must be a number.',
                     'std_nmember_rate.min' => 'Standard Non-Member Rate must be at least :min.',
                     'std_nmember_rate.max' => 'Standard Non-Member Rate may not be greater than :max.',
+
+                    
+                    'badge_footer_link.required' => 'Badge Footer Link is required',
+                    'badge_footer_link_color.required' => 'Badge Footer Link Color is required',
+                    'badge_footer_bg_color.required' => 'Badge Footer Link Background Color is required',
+                    'badge_front_banner.image' => 'Badge Front Banner must be an image',
+                    'badge_front_banner.mimes' => 'Badge Front Banner must be in jpeg, png, jpg, gif format',
+                    'badge_back_banner.image' => 'Badge Back Banner must be an image',
+                    'badge_back_banner.mimes' => 'Badge Back Banner must be in jpeg, png, jpg, gif format',
                 ]
             );
 
@@ -265,6 +309,7 @@ class EventController extends Controller
             $event->category = $validatedData['category'];
             $event->name = $validatedData['name'];
             $event->location = $validatedData['location'];
+            $event->link = $validatedData['link'];
             $event->event_start_date = $validatedData['event_start_date'];
             $event->event_end_date = $validatedData['event_end_date'];
             $event->event_vat = $validatedData['event_vat'];
@@ -277,6 +322,9 @@ class EventController extends Controller
             $event->std_member_rate = $validatedData['std_member_rate'];
             $event->std_nmember_rate = $validatedData['std_nmember_rate'];
 
+            $event->badge_footer_link = $validatedData['badge_footer_link'];
+            $event->badge_footer_link_color = $validatedData['badge_footer_link_color'];
+            $event->badge_footer_bg_color = $validatedData['badge_footer_bg_color'];
 
             $currentYear = date('Y');
             if ($request->hasFile('logo')) {
@@ -291,10 +339,20 @@ class EventController extends Controller
                 $event->banner = $bannerPath;
             }
 
+            if ($request->hasFile('badge_front_banner')) {
+                Storage::delete($event->badge_front_banner);
+                $badgeFrontBannerPath = $request->file('badge_front_banner')->store('public/event/' . $currentYear . '/badges/front');
+                $event->badge_front_banner = $badgeFrontBannerPath;
+            }
+
+            if ($request->hasFile('badge_back_banner')) {
+                Storage::delete($event->badge_back_banner);
+                $badgeBackBannerPath = $request->file('badge_back_banner')->store('public/event/' . $currentYear . '/badges/back');
+                $event->badge_back_banner = $badgeBackBannerPath;
+            }
+
             $event->save();
 
-            
-            
             return redirect()->route('admin.event.view')->with('success', 'Event updated successfully.');
         } else {
             abort(404, 'The URL is incorrect');

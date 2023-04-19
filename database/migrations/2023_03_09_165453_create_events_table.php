@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('category');
             $table->string('name');
             $table->string('location');
+            $table->string('link');
             $table->mediumText('description');
             $table->date('event_start_date');
             $table->date('event_end_date');
@@ -32,6 +33,12 @@ return new class extends Migration
             $table->date('std_start_date');
             $table->decimal('std_member_rate', 10, 2);
             $table->decimal('std_nmember_rate', 10, 2);
+
+            $table->string('badge_footer_link');
+            $table->string('badge_footer_link_color');
+            $table->string('badge_footer_bg_color');
+            $table->string('badge_front_banner');
+            $table->string('badge_back_banner');
             
             $table->string('year');
             $table->boolean('active');
