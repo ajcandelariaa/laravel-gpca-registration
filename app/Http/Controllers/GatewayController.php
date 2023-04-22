@@ -7,8 +7,8 @@ use Illuminate\Support\Facades\Session;
 
 class GatewayController extends Controller
 {
-    public $orderId = 162;
-    public $transactionId = 164;
+    public $orderId = 170;
+    public $transactionId = 172;
 
     public function getSessionId()
     {
