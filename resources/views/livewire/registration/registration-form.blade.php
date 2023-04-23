@@ -33,12 +33,103 @@
                         wire:click.prevent="increaseStep">NEXT</button>
                 @endif
                 @if ($currentStep == 3)
-                    <button type="submit" wire:key="btnSubmit"
-                        class="hover:bg-registrationPrimaryColorHover font-bold bg-registrationPrimaryColor text-white w-52 rounded-md py-2">SUBMIT</button>
+                    @if ($sessionId && $cardDetails)
+                        <button type="button"
+                            class="hover:bg-registrationPrimaryColorHover font-bold bg-registrationPrimaryColor text-white w-52 rounded-md py-2"
+                            id="payButton">PAY</button>
+                    @else
+                        <button type="submit" wire:key="btnSubmitBank"
+                            class="hover:bg-registrationPrimaryColorHover font-bold bg-registrationPrimaryColor text-white w-52 rounded-md py-2">SUBMIT</button>
+                    @endif
                 @endif
             </div>
         </form>
     </div>
+
+    <script src="https://ap-gateway.mastercard.com/form/version/70/merchant/{{ env('MERCHANT_ID') }}/session.js"></script>
+
+    @if ($sessionId && $cardDetails)
+        <script>
+            $(document).ready(function() {
+                let sessionId = "{{ $sessionId }}";
+                console.log("Test")
+                PaymentSession.configure({
+                    session: sessionId,
+                    merchantId: 'TEST900755',
+                    apiKey: '3b41414705a08d0fa159a77316aba3b3',
+                    fields: {
+                        card: {
+                            number: "#card-number",
+                            securityCode: "#security-code",
+                            expiryMonth: "#expiry-month",
+                            expiryYear: "#expiry-year",
+                            nameOnCard: "#cardholder-name"
+                        },
+                    },
+                    frameEmbeddingMitigation: ["javascript"],
+                    callbacks: {
+                        initialized: function(response) {
+                            console.log(response);
+                        },
+                        formSessionUpdate: function(response) {
+                            if (response.status) {
+                                if ("ok" == response.status) {
+                                    console.log("Session updated with data: " + response.session.id);
+
+                                    if (response.sourceOfFunds.provided.card.securityCode) {
+                                        console.log("Security code was provided.");
+                                    }
+
+                                    if (response.sourceOfFunds.provided.card.scheme == 'MASTERCARD') {
+                                        console.log("The user entered a Mastercard credit card.")
+                                    }
+                                    window.Livewire.emit('emitInitiateAuthentication');
+                                } else if ("fields_in_error" == response.status) {
+                                    console.log("Session update failed with field errors.");
+                                    if (response.errors.cardNumber) {
+                                        console.log("Card number invalid or missing.");
+                                    }
+                                    if (response.errors.expiryYear) {
+                                        console.log("Expiry year invalid or missing.");
+                                    }
+                                    if (response.errors.expiryMonth) {
+                                        console.log("Expiry month invalid or missing.");
+                                    }
+                                    if (response.errors.securityCode) {
+                                        console.log("Security code invalid.");
+                                    }
+                                } else if ("request_timeout" == response.status) {
+                                    console.log("Session update failed with request timeout: " + response
+                                        .errors
+                                        .message);
+                                } else if ("system_error" == response.status) {
+                                    console.log("Session update failed with system error: " + response
+                                        .errors.message);
+                                }
+                            } else {
+                                console.log("Session update failed: " + response);
+                            }
+                        }
+                    },
+                    interaction: {
+                        displayControl: {
+                            formatCard: "EMBOSSED",
+                            invalidFieldCharacters: "REJECT"
+                        }
+                    }
+                });
+
+                function pay() {
+                    console.log('clicked');
+                    PaymentSession.updateSessionFromForm('card');
+                }
+
+                $('#payButton').click(function() {
+                    pay();
+                });
+            });
+        </script>
+    @endif
 
     <script>
         document.addEventListener('livewire:load', function() {

@@ -7,8 +7,8 @@ use Illuminate\Support\Facades\Session;
 
 class GatewayController extends Controller
 {
-    public $orderId = 170;
-    public $transactionId = 172;
+    public $orderId = 300;
+    public $transactionId = 302;
 
     public function getSessionId()
     {
@@ -147,7 +147,6 @@ class GatewayController extends Controller
         $body = $response->getBody()->getContents();
         $data = json_decode($body, true);
         $htmlCode = $data['authentication']['redirect']['html'];
-
         return view('testOtp', [
             'htmlCode' => $htmlCode,
         ]);

@@ -60,7 +60,7 @@ class RegistrationForm extends Component
     // 3RD PAGE
     public $paymentMethod, $finalEventStartDate, $finalEventEndDate, $finalQuantity, $finalUnitPrice, $finalNetAmount, $finalDiscount, $finalVat, $finalTotal;
     public $delegatInvoiceDetails = array();
-    public $sessionId, $cardDetails;
+    public $sessionId, $cardDetails, $orderId, $transactionId, $htmlCodeOTP;
 
     // ERROR CHECKER
     public $emailMainExistingError, $emailSubExistingError, $emailMainAlreadyUsedError, $emailSubAlreadyUsedError;
@@ -69,6 +69,7 @@ class RegistrationForm extends Component
     public $promoCodeFailSubEdit, $promoCodeSuccessSubEdit;
 
 
+    protected $listeners = ['emitInitiateAuthentication' => 'initiateAuthenticationCC'];
 
     public function mount($data)
     {
@@ -593,6 +594,7 @@ class RegistrationForm extends Component
 
         if ($dataGetSession['result'] == "SUCCESS") {
             $this->sessionId =  $dataGetSession['session']['id'];
+            Session::put('sessionId', $dataGetSession['session']['id']);
 
             // UPDATE SESSION
             $clientUpdateSession = new Client();
@@ -623,10 +625,88 @@ class RegistrationForm extends Component
         }
     }
 
+    public function initiateAuthenticationCC()
+    {
+        $this->orderId = 212;
+        $this->transactionId = substr(uniqid(), -8);
+        $apiEndpoint = env('MERCHANT_API_URL');
+        $merchantId = env('MERCHANT_ID');
+        $authPass = env('MERCHANT_AUTH_PASSWORD');
+
+        $clientInitiateAuth = new Client();
+        $responseInitiateAuth = $clientInitiateAuth->request('PUT', $apiEndpoint . '/order/' . $this->orderId . '/transaction/' . $this->transactionId, [
+            'auth' => [
+                'merchant.' . $merchantId,
+                $authPass
+            ],
+            'headers' => [
+                'Content-Type' => 'application/json'
+            ],
+            'json' => [
+                "session" => [
+                    'id' => $this->sessionId,
+                ],
+                "authentication" => [
+                    "acceptVersions" => "3DS1,3DS2",
+                    "channel" => "PAYER_BROWSER",
+                    "purpose" => "PAYMENT_TRANSACTION"
+                ],
+                "correlationId" => "test",
+                "apiOperation" => "INITIATE_AUTHENTICATION"
+            ],
+        ]);
+        $bodyInitiateAuth = $responseInitiateAuth->getBody()->getContents();
+        $dataInitiateAuth = json_decode($bodyInitiateAuth, true);
+
+        if ($dataInitiateAuth != null) {
+            $clientAuthPayer = new Client();
+            $responseAuthPayer = $clientAuthPayer->request('PUT', $apiEndpoint . '/order/' . $this->orderId . '/transaction/' . $this->transactionId, [
+                'auth' => [
+                    'merchant.' . $merchantId,
+                    $authPass
+                ],
+                'headers' => [
+                    'Content-Type' => 'application/json'
+                ],
+                'json' => [
+                    "session" => [
+                        'id' => $this->sessionId,
+                    ],
+                    "authentication" => [
+                        "redirectResponseUrl" => "http://127.0.0.1:8000/payNow?sessionId=$this->sessionId",
+                    ],
+                    "correlationId" => "test",
+                    "device" =>  [
+                        "browser" =>  "MOZILLA",
+                        "browserDetails" =>  [
+                            "3DSecureChallengeWindowSize" =>  "FULL_SCREEN",
+                            "acceptHeaders" =>  "application/json",
+                            "colorDepth" =>  24,
+                            "javaEnabled" =>  true,
+                            "language" =>  "en-US",
+                            "screenHeight" =>  1640,
+                            "screenWidth" =>  1480,
+                            "timeZone" =>  273
+                        ],
+                        "ipAddress" =>  "127.0.0.1"
+                    ],
+                    "apiOperation" => "AUTHENTICATE_PAYER",
+                ],
+            ]);
+            $bodyAuthPayer = $responseAuthPayer->getBody()->getContents();
+            $dataAuthPayer = json_decode($bodyAuthPayer, true);
+            
+            $this->htmlCodeOTP = $dataAuthPayer['authentication']['redirect']['html'];
+        }
+    }
+
     public function resetPaymentCC()
     {
         $this->sessionId = null;
         $this->cardDetails = false;
+        $this->orderId = null;
+        $this->transactionId = null;
+        $this->htmlCodeOTP = null;
         Session::forget('sessionId');
     }
 

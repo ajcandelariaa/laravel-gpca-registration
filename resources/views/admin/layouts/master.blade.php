@@ -5,26 +5,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>{{ $pageTitle }}</title>
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' 'unsafe-eval';">
 
-    {{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script> --}}
+    <title>{{ $pageTitle }}</title>
 
     {{-- FONT AWESOME LINK --}}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css"
         integrity="sha512-SzlrxWUlpfuzQ+pcUCosxcglQRNAq/DZjVsC0lE40xsADsfeQoEypE+enwcOiGjk/bSuGGKHEyjSoQ1zVisanQ=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+    
     {{-- VITE --}}
     @vite('resources/css/app.css')
 
     {{-- LIVEWIRE --}}
     @livewireStyles()
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-
-
-    <script src="https://ap-gateway.mastercard.com/form/version/70/merchant/{{ env('MERCHANT_ID') }}/session.js"></script>
 
     <style>
         .add-event-form select:required:invalid {
@@ -39,15 +37,17 @@
             background-color: #034889;
             color: #fff;
         }
+
         .swal-button--cancel {
             background-color: #dd3333;
             color: #fff;
         }
 
-        
+
         .swal-button--confirm:hover {
             background-color: #033e75 !important;
         }
+
         .swal-button--cancel:hover {
             background-color: #cb2e2e !important;
         }
@@ -99,9 +99,9 @@
         <script src="{{ asset('js/manageEvents/loadingButtonEdit.js') }}"></script>
     @else
     @endif
+
     <script src="{{ asset('js/manageEvents/imagePreview.js') }}"></script>
     <script src="{{ asset('js/allswal.js') }}"></script>
-
 </body>
 
 </html>
