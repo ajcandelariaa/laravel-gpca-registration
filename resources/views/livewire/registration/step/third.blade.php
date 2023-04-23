@@ -41,12 +41,12 @@
                 class="{{ $paymentMethod == 'creditCard' ? 'bg-registrationSecondaryColor text-white' : 'hover:bg-registrationSecondaryColor hover:text-white border-registrationSecondaryColor border-2 bg-white text-registrationSecondaryColor' }} font-bold w-52 rounded-md py-5 ">
                 <i class="fa-solid fa-credit-card mr-2"></i> Credit Card</button>
         </div>
-        
+
         @if ($paymentMethodError != null)
-        <div class="text-red-500 text-xs italic mt-2">
-            {{ $paymentMethodError }}
-        </div>
-    @endif
+            <div class="text-red-500 text-xs italic mt-2">
+                {{ $paymentMethodError }}
+            </div>
+        @endif
 
         @if ($paymentMethod == 'bankTransfer')
             <div class="mt-5 bg-registrationCardBGColor p-5 rounded-lg">
@@ -66,67 +66,7 @@
         @endif
 
         @if ($paymentMethod == 'creditCard')
-            <div class="mt-5 bg-registrationCardBGColor p-5 rounded-lg">
-                <div class="text-registrationPrimaryColor font-bold text-lg">
-                    Credit Card Details
-                </div>
-
-                <div class="mt-5 grid grid-cols-3 gap-y-3 gap-x-5">
-
-                    {{-- ROW 1 --}}
-                    <div class="space-y-2 col-span-3">
-                        <div class="text-registrationPrimaryColor">
-                            Name on Card <span class="text-red-500">*</span>
-                        </div>
-                        <div>
-                            <input placeholder="AJ CANDELARIA" type="text" name="" id=""
-                                class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                        </div>
-                    </div>
-
-                    {{-- ROW 2 --}}
-                    <div class="space-y-2 col-span-3">
-                        <div class="text-registrationPrimaryColor">
-                            Card Number <span class="text-red-500">*</span>
-                        </div>
-                        <div>
-                            <input placeholder="xxxx-xxxx-xxxx-xxxx" type="text" name="" id=""
-                                class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                        </div>
-                    </div>
-
-                    {{-- ROW 3 --}}
-                    <div class="space-y-2">
-                        <div class="text-registrationPrimaryColor">
-                            Expiration Month <span class="text-red-500">*</span>
-                        </div>
-                        <div>
-                            <input placeholder="mm" type="text" name="" id=""
-                                class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                        </div>
-                    </div>
-
-                    <div class="space-y-2">
-                        <div class="text-registrationPrimaryColor">
-                            Expiration Year <span class="text-red-500">*</span>
-                        </div>
-                        <div>
-                            <input placeholder="yyyy" type="text" name="" id=""
-                                class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                        </div>
-                    </div>
-
-                    <div class="space-y-2">
-                        <div class="text-registrationPrimaryColor">
-                            CVC <span class="text-red-500">*</span>
-                        </div>
-                        <div>
-                            <input placeholder="xxx" type="text" name="" id=""
-                                class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                        </div>
-                    </div>
-                </div>
-            </div>
+            @include('livewire.registration.step.third_credit_card')
         @endif
     </div>
 
@@ -162,7 +102,8 @@
                 <div class="grid grid-cols-6 gap-2">
                     <div class="col-span-2 bg-white p-4">
                         @if ($count == 1)
-                            <p>{{ $event->name }} – {{ $finalEventStartDate . ' - ' . $finalEventEndDate }} at {{ $event->location }}</p>
+                            <p>{{ $event->name }} – {{ $finalEventStartDate . ' - ' . $finalEventEndDate }} at
+                                {{ $event->location }}</p>
                             <p class="mt-10">{{ $delegatInvoiceDetail['delegateDescription'] }}</p>
                         @else
                             <p>{{ $delegatInvoiceDetail['delegateDescription'] }}</p>

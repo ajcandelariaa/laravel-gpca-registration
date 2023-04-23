@@ -24,6 +24,8 @@
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
 
+    <script src="https://ap-gateway.mastercard.com/form/version/70/merchant/{{ env('MERCHANT_ID') }}/session.js"></script>
+
     <style>
         .add-event-form select:required:invalid {
             color: #afafaf;

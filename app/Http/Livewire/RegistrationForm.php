@@ -12,6 +12,8 @@ use App\Models\Transaction as Transactions;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Session;
 
 
 class RegistrationForm extends Component
@@ -58,6 +60,7 @@ class RegistrationForm extends Component
     // 3RD PAGE
     public $paymentMethod, $finalEventStartDate, $finalEventEndDate, $finalQuantity, $finalUnitPrice, $finalNetAmount, $finalDiscount, $finalVat, $finalTotal;
     public $delegatInvoiceDetails = array();
+    public $sessionId, $cardDetails;
 
     // ERROR CHECKER
     public $emailMainExistingError, $emailSubExistingError, $emailMainAlreadyUsedError, $emailSubAlreadyUsedError;
@@ -66,19 +69,22 @@ class RegistrationForm extends Component
     public $promoCodeFailSubEdit, $promoCodeSuccessSubEdit;
 
 
+
     public function mount($data)
     {
         $this->countries = config('app.countries');
         $this->companySectors = config('app.companySectors');
         $this->salutations = config('app.salutations');
         $this->event = $data;
-        $this->currentStep = 1;
+        $this->currentStep = 3;
 
         $this->badgeType = "Delegate";
         $this->subBadgeType = "Delegate";
         $this->subBadgeTypeEdit = "Delegate";
 
         $this->members = Members::where('active', true)->get();
+
+        $this->cardDetails = false;
 
         $today = Carbon::today();
 
@@ -99,6 +105,11 @@ class RegistrationForm extends Component
 
     public function render()
     {
+        // if (Session::has('sessionId')) {
+        //     $this->sessionId = Session::get('sessionId');
+        // } else {
+        //     $this->sessionId = null;
+        // }
         return view('livewire.registration.registration-form');
     }
 
@@ -535,6 +546,7 @@ class RegistrationForm extends Component
     public function btClicked()
     {
         $this->paymentMethodError = null;
+        $this->resetPaymentCC();
         if ($this->paymentMethod == 'creditCard') {
             $this->paymentMethod = 'bankTransfer';
         } else if ($this->paymentMethod == 'bankTransfer') {
@@ -547,15 +559,76 @@ class RegistrationForm extends Component
     public function ccClicked()
     {
         $this->paymentMethodError = null;
+        $this->resetPaymentCC();
         if ($this->paymentMethod == 'bankTransfer') {
             $this->paymentMethod = 'creditCard';
+            $this->setSessionCC();
         } else if ($this->paymentMethod == 'creditCard') {
             $this->paymentMethod = null;
         } else {
             $this->paymentMethod = 'creditCard';
+            $this->setSessionCC();
         }
     }
 
+    public function setSessionCC()
+    {
+        $apiEndpoint = env('MERCHANT_API_URL');
+        $merchantId = env('MERCHANT_ID');
+        $authPass = env('MERCHANT_AUTH_PASSWORD');
+
+        // GET SESSION ID
+        $clientGetSession = new Client();
+        $responseGetSession = $clientGetSession->request('POST', $apiEndpoint . '/session', [
+            'auth' => [
+                'merchant.' . $merchantId,
+                $authPass
+            ],
+            'headers' => [
+                'Content-Type' => 'application/json'
+            ],
+        ]);
+        $bodyGetSession = $responseGetSession->getBody()->getContents();
+        $dataGetSession = json_decode($bodyGetSession, true);
+
+        if ($dataGetSession['result'] == "SUCCESS") {
+            $this->sessionId =  $dataGetSession['session']['id'];
+
+            // UPDATE SESSION
+            $clientUpdateSession = new Client();
+            $responseUpdateSession = $clientUpdateSession->request('PUT', $apiEndpoint . '/session/' . $this->sessionId, [
+                'auth' => [
+                    'merchant.' . $merchantId,
+                    $authPass
+                ],
+                'headers' => [
+                    'Content-Type' => 'application/json'
+                ],
+                'json' => [
+                    "order" => [
+                        'amount' => '100.00',
+                        // 'amount' => $this->finalTotal,
+                        'currency' => 'USD',
+                    ],
+                ]
+            ]);
+            $bodyUpdateSession = $responseUpdateSession->getBody()->getContents();
+            $dataUpdateSession = json_decode($bodyUpdateSession, true);
+
+            if ($dataUpdateSession['session']['updateStatus'] == "SUCCESS") {
+                $this->cardDetails = true;
+            } else {
+                $this->cardDetails = false;
+            }
+        }
+    }
+
+    public function resetPaymentCC()
+    {
+        $this->sessionId = null;
+        $this->cardDetails = false;
+        Session::forget('sessionId');
+    }
 
     public function memberClicked()
     {

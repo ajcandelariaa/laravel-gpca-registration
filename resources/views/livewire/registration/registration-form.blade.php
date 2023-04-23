@@ -7,6 +7,7 @@
 
     <div class="form-container mt-10 xl:mt-0">
         <form wire:submit.prevent="submit">
+            {{ $sessionId }}
             @if ($currentStep == 1)
                 @include('livewire.registration.step.first')
             @elseif ($currentStep == 2)
@@ -33,17 +34,15 @@
                 @endif
                 @if ($currentStep == 3)
                     <button type="submit" wire:key="btnSubmit"
-                        class="hover:bg-registrationPrimaryColorHover font-bold bg-registrationPrimaryColor text-white w-52 rounded-md py-2"
-                        >SUBMIT</button>
+                        class="hover:bg-registrationPrimaryColorHover font-bold bg-registrationPrimaryColor text-white w-52 rounded-md py-2">SUBMIT</button>
                 @endif
             </div>
         </form>
     </div>
 
-    
     <script>
-        document.addEventListener('livewire:load', function () {
-            Livewire.on('stepChanges', function () {
+        document.addEventListener('livewire:load', function() {
+            Livewire.on('stepChanges', function() {
                 window.scrollTo(0, 0);
             });
         });
