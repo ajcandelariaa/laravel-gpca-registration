@@ -45,7 +45,7 @@
 
 
     {{-- STEP 4 --}}
-    <div style="width: 60px;" class="flex justify-center">
+    {{-- <div style="width: 60px;" class="flex justify-center">
         <div style="width: 2px;" class="h-12 bg-registrationPrimaryColor"></div>
     </div>
     <div class="flex items-center gap-6">
@@ -57,5 +57,5 @@
         <div class="text-registrationPrimaryColor font-bold text-xl">
             Confirmation
         </div>
-    </div>
+    </div> --}}
 </div>

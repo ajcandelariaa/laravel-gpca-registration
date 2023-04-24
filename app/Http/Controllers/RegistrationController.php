@@ -28,6 +28,7 @@ class RegistrationController extends Controller
 
                 return view('registration.registration_success_message', [
                     'pageTitle' => "Registration Success",
+                    'event' => $event,
                 ]);
             } else {
                 abort(404, 'The URL is incorrect');

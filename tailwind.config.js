@@ -19,7 +19,7 @@ module.exports = {
       gridTemplateColumns: {
         addDelegateGrid: '250px auto',
         delegateDetailGrid: '200px auto',
-        horizontalProgressBarGrid: '55px auto 55px auto 55px auto 55px',
+        horizontalProgressBarGrid: '55px auto 55px auto 55px',
       },
       backgroundImage: {
         loginBg: "url('/public/assets/images/loginbg.png')",

@@ -80,7 +80,7 @@ class RegistrationForm extends Component
         $this->companySectors = config('app.companySectors');
         $this->salutations = config('app.salutations');
         $this->event = $data;
-        $this->currentStep = 4;
+        $this->currentStep = 1;
 
         $this->badgeType = "Delegate";
         $this->subBadgeType = "Delegate";
@@ -481,7 +481,7 @@ class RegistrationForm extends Component
                         }
                     }
                 }
-                $this->currentStep = 4;
+                return redirect()->route('register.success.view', ['eventCategory' => $this->event->category, 'eventId' => $this->event->id, 'eventYear' => $this->event->year, 'mainDelegateId' => $newRegistrant->id]);
             }
         }
     }
@@ -1074,18 +1074,26 @@ class RegistrationForm extends Component
     {
         $allDelegates = Transactions::where('event_id', $this->event->id)->where('event_category', $this->event->category)->get();
 
-        $mainDelegate = null;
-        $subDelegate = null;
+        $countMainDelegate = 0;
+        $countSubDelegate = 0;
 
-        foreach ($allDelegates as $delegate) {
-            if ($delegate->delegate_type == "main") {
-                $mainDelegate = MainDelegates::where('id', $delegate->delegate_id)->where('email_address', $emailAddress)->first();
-            } else {
-                $subDelegate = AdditionalDelegates::where('id', $delegate->delegate_id)->where('email_address', $emailAddress)->first();
+        if(!$allDelegates->isEmpty()){
+            foreach ($allDelegates as $delegate) {
+                if ($delegate->delegate_type == "main") {
+                    $mainDelegate = MainDelegates::where('id', $delegate->delegate_id)->where('email_address', $emailAddress)->first();
+                    if($mainDelegate != null){
+                        $countMainDelegate++;
+                    }
+                } else {
+                    $subDelegate = AdditionalDelegates::where('id', $delegate->delegate_id)->where('email_address', $emailAddress)->first();
+                    if($subDelegate != null){
+                        $countSubDelegate++;
+                    }
+                }
             }
         }
 
-        if ($mainDelegate == null && $subDelegate == null) {
+        if ($countMainDelegate == 0 && $countSubDelegate == 0) {
             return false;
         } else {
             return true;

@@ -14,7 +14,7 @@
 
 <body class="min-h-screen flex flex-col">
     <div class="container mx-auto">
-        {{-- <img src="{{ Storage::url($event->banner) }}" alt="" class="h-52 w-full object-fill object-center"> --}}
+        <img src="{{ Storage::url($event->banner) }}" alt="" class="h-52 w-full object-fill object-center">
         <h1>SUCCESS REGISTRATION</h1>
     </div>
 

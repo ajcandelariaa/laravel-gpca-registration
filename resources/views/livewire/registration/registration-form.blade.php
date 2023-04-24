@@ -7,15 +7,12 @@
 
     <div class="form-container mt-10 xl:mt-0">
         <form wire:submit.prevent="submit">
-            {{ $sessionId }}
             @if ($currentStep == 1)
                 @include('livewire.registration.step.first')
             @elseif ($currentStep == 2)
                 @include('livewire.registration.step.second')
-            @elseif ($currentStep == 3)
-                @include('livewire.registration.step.third')
             @else
-                @include('livewire.registration.step.fourth')
+                @include('livewire.registration.step.third')
             @endif
 
             <div class="w-full mt-20 mx-5 flex justify-between gap-5">
@@ -55,8 +52,8 @@
                 console.log("Test")
                 PaymentSession.configure({
                     session: sessionId,
-                    merchantId: 'TEST900755',
-                    apiKey: '3b41414705a08d0fa159a77316aba3b3',
+                    merchantId: "{{ env('MERCHANT_ID') }}",
+                    apiKey: "{{ env('MERCHANT_AUTH_PASSWORD') }}",
                     fields: {
                         card: {
                             number: "#card-number",
