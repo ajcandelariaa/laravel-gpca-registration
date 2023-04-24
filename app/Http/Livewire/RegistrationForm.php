@@ -3,6 +3,9 @@
 namespace App\Http\Livewire;
 
 use App\Mail\RegistrationConfirmation;
+use App\Mail\RegistrationPaid;
+use App\Mail\RegistrationPaymentConfirmation;
+use App\Mail\RegistrationUnpaid;
 use Livewire\Component;
 use App\Models\Member as Members;
 use App\Models\PromoCode as PromoCodes;
@@ -77,7 +80,7 @@ class RegistrationForm extends Component
         $this->companySectors = config('app.companySectors');
         $this->salutations = config('app.salutations');
         $this->event = $data;
-        $this->currentStep = 3;
+        $this->currentStep = 4;
 
         $this->badgeType = "Delegate";
         $this->subBadgeType = "Delegate";
@@ -314,231 +317,170 @@ class RegistrationForm extends Component
                     $paymentStatus = "free";
                     $registrationStatus = "confirmed";
                 } else {
-                    if ($this->paymentMethod == "bankTransfer") {
-                        $registrationStatus = "pending";
-                        $paymentStatus = "unpaid";
+                    $paymentStatus = "unpaid";
+                    $registrationStatus = "pending";
+                }
 
-                        // FOR BANK TRANSFER
-                        $newRegistrant = MainDelegates::create([
-                            'event_id' => $this->event->id,
-                            'pass_type' => $this->delegatePassType,
-                            'rate_type' => $this->rateType,
-                            'rate_type_string' => $this->rateTypeString,
+                $newRegistrant = MainDelegates::create([
+                    'event_id' => $this->event->id,
+                    'pass_type' => $this->delegatePassType,
+                    'rate_type' => $this->rateType,
+                    'rate_type_string' => $this->rateTypeString,
 
-                            'company_name' => $this->companyName,
-                            'company_sector' => $this->companySector,
-                            'company_address' => $this->companyAddress,
-                            'company_country' => $this->companyCountry,
-                            'company_city' => $this->companyCity,
-                            'company_telephone_number' => $this->companyLandlineNumber,
-                            'company_mobile_number' => $this->companyMobileNumber,
-                            'assistant_email_address' => $this->assistantEmailAddress,
+                    'company_name' => $this->companyName,
+                    'company_sector' => $this->companySector,
+                    'company_address' => $this->companyAddress,
+                    'company_country' => $this->companyCountry,
+                    'company_city' => $this->companyCity,
+                    'company_telephone_number' => $this->companyLandlineNumber,
+                    'company_mobile_number' => $this->companyMobileNumber,
+                    'assistant_email_address' => $this->assistantEmailAddress,
 
-                            'salutation' => $this->salutation,
-                            'first_name' => $this->firstName,
-                            'middle_name' => $this->middleName,
-                            'last_name' => $this->lastName,
-                            'email_address' => $this->emailAddress,
-                            'mobile_number' => $this->mobileNumber,
-                            'nationality' => $this->nationality,
-                            'job_title' => $this->jobTitle,
-                            'badge_type' => $this->badgeType,
-                            'pcode_used' => $this->promoCode,
+                    'salutation' => $this->salutation,
+                    'first_name' => $this->firstName,
+                    'middle_name' => $this->middleName,
+                    'last_name' => $this->lastName,
+                    'email_address' => $this->emailAddress,
+                    'mobile_number' => $this->mobileNumber,
+                    'nationality' => $this->nationality,
+                    'job_title' => $this->jobTitle,
+                    'badge_type' => $this->badgeType,
+                    'pcode_used' => $this->promoCode,
 
-                            'heard_where' => $this->heardWhere,
-                            'quantity' => $this->finalQuantity,
-                            'unit_price' => $this->finalUnitPrice,
-                            'net_amount' => $this->finalNetAmount,
-                            'vat_price' => $this->finalVat,
-                            'discount_price' => $this->finalDiscount,
-                            'total_amount' => $this->finalTotal,
-                            'mode_of_payment' => $this->paymentMethod,
-                            'registration_status' => $registrationStatus,
-                            'payment_status' => $paymentStatus,
-                            'registered_date_time' => Carbon::now(),
-                            'paid_date_time' => null,
-                        ]);
+                    'heard_where' => $this->heardWhere,
+                    'quantity' => $this->finalQuantity,
+                    'unit_price' => $this->finalUnitPrice,
+                    'net_amount' => $this->finalNetAmount,
+                    'vat_price' => $this->finalVat,
+                    'discount_price' => $this->finalDiscount,
+                    'total_amount' => $this->finalTotal,
+                    'mode_of_payment' => $this->paymentMethod,
+                    'registration_status' => $registrationStatus,
+                    'payment_status' => $paymentStatus,
+                    'registered_date_time' => Carbon::now(),
+                    'paid_date_time' => ($paymentStatus == "free") ? Carbon::now() : null,
+                ]);
 
-                        Transactions::create([
-                            'event_id' => $this->event->id,
-                            'event_category' => $this->event->category,
-                            'delegate_id' => $newRegistrant->id,
-                            'delegate_type' => "main",
-                        ]);
+                $transaction = Transactions::create([
+                    'event_id' => $this->event->id,
+                    'event_category' => $this->event->category,
+                    'delegate_id' => $newRegistrant->id,
+                    'delegate_type' => "main",
+                ]);
 
-                        $details = [
-                            'name' => $this->salutation . " " . $this->firstName . " " . $this->middleName . " " . $this->lastName,
-                            'eventName' => $this->event->name,
-                            'startDate' => Carbon::createFromFormat('Y-m-d', $this->event->event_start_date)->format('l j F'),
-                            'endDate' => Carbon::createFromFormat('Y-m-d', $this->event->event_end_date)->format('l j F'),
-                            'year' => $this->event->year,
-                            'location' => $this->event->location,
-                            'badgeLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-badge" . "/" . "main" . "/" . $newRegistrant->id,
-                            'invoiceLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-invoice" . "/" . $newRegistrant->id,
-                        ];
+                $eventFormattedData = Carbon::parse($this->event->event_start_date)->format('d') . '-' . Carbon::parse($this->event->event_end_date)->format('d M Y');
+                $lastDigit = 1000 + intval($transaction->id);
 
-                        Mail::to($this->emailAddress)->send(new RegistrationConfirmation($details));
-
-                        if ($this->assistantEmailAddress != null) {
-                            Mail::to($this->assistantEmailAddress)->send(new RegistrationConfirmation($details));
-                        }
-
-                        if (!empty($this->additionalDelegates)) {
-                            foreach ($this->additionalDelegates as $additionalDelegate) {
-
-                                if ($additionalDelegate['subPromoCode'] != null) {
-                                    PromoCodes::where('event_id', $this->event->id)->where('event_category', $this->event->category)->where('active', true)->where('promo_code', $additionalDelegate['subPromoCode'])->where('badge_type', $additionalDelegate['subBadgeType'])->increment('total_usage');
-                                }
-
-                                $newAdditionDelegate = AdditionalDelegates::create([
-                                    'main_delegate_id' => $newRegistrant->id,
-                                    'salutation' => $additionalDelegate['subSalutation'],
-                                    'first_name' => $additionalDelegate['subFirstName'],
-                                    'middle_name' => $additionalDelegate['subMiddleName'],
-                                    'last_name' => $additionalDelegate['subLastName'],
-                                    'job_title' => $additionalDelegate['subJobTitle'],
-                                    'email_address' => $additionalDelegate['subEmailAddress'],
-                                    'nationality' => $additionalDelegate['subNationality'],
-                                    'mobile_number' => $additionalDelegate['subMobileNumber'],
-                                    'badge_type' => $additionalDelegate['subBadgeType'],
-                                    'pcode_used' => $additionalDelegate['subPromoCode'],
-                                ]);
-
-                                Transactions::create([
-                                    'event_id' => $this->event->id,
-                                    'event_category' => $this->event->category,
-                                    'delegate_id' => $newAdditionDelegate->id,
-                                    'delegate_type' => "sub",
-                                ]);
-
-                                $details = [
-                                    'name' => $additionalDelegate['subSalutation'] . " " . $additionalDelegate['subFirstName'] . " " . $additionalDelegate['subMiddleName'] . " " . $additionalDelegate['subLastName'],
-                                    'eventName' => $this->event->name,
-                                    'startDate' => Carbon::createFromFormat('Y-m-d', $this->event->event_start_date)->format('l j F'),
-                                    'endDate' => Carbon::createFromFormat('Y-m-d', $this->event->event_end_date)->format('l j F'),
-                                    'year' => $this->event->year,
-                                    'location' => $this->event->location,
-                                    'badgeLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-badge" . "/" . "sub" . "/" . $newAdditionDelegate->id,
-                                    'invoiceLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-invoice" . "/" . $newRegistrant->id,
-                                ];
-                                Mail::to($additionalDelegate['subEmailAddress'])->send(new RegistrationConfirmation($details));
-                            }
-                        }
-                    } else {
-                        $paymentStatus = "paid";
-                        $registrationStatus = "confirmed";
-
-                        // FOR CREDIT CARD
-                        $newRegistrant = MainDelegates::create([
-                            'event_id' => $this->event->id,
-                            'pass_type' => $this->delegatePassType,
-                            'rate_type' => $this->rateType,
-                            'rate_type_string' => $this->rateTypeString,
-
-                            'company_name' => $this->companyName,
-                            'company_sector' => $this->companySector,
-                            'company_address' => $this->companyAddress,
-                            'company_country' => $this->companyCountry,
-                            'company_city' => $this->companyCity,
-                            'company_telephone_number' => $this->companyLandlineNumber,
-                            'company_mobile_number' => $this->companyMobileNumber,
-                            'assistant_email_address' => $this->assistantEmailAddress,
-
-                            'salutation' => $this->salutation,
-                            'first_name' => $this->firstName,
-                            'middle_name' => $this->middleName,
-                            'last_name' => $this->lastName,
-                            'email_address' => $this->emailAddress,
-                            'mobile_number' => $this->mobileNumber,
-                            'nationality' => $this->nationality,
-                            'job_title' => $this->jobTitle,
-                            'badge_type' => $this->badgeType,
-                            'pcode_used' => $this->promoCode,
-
-                            'heard_where' => $this->heardWhere,
-                            'quantity' => $this->finalQuantity,
-                            'unit_price' => $this->finalUnitPrice,
-                            'net_amount' => $this->finalNetAmount,
-                            'vat_price' => $this->finalVat,
-                            'discount_price' => $this->finalDiscount,
-                            'total_amount' => $this->finalTotal,
-                            'mode_of_payment' => $this->paymentMethod,
-                            'registration_status' => $registrationStatus,
-                            'payment_status' => $paymentStatus,
-                            'registered_date_time' => Carbon::now(),
-                            'paid_date_time' => Carbon::now(),
-                        ]);
-
-                        Transactions::create([
-                            'event_id' => $this->event->id,
-                            'event_category' => $this->event->category,
-                            'delegate_id' => $newRegistrant->id,
-                            'delegate_type' => "main",
-                        ]);
-
-                        $details = [
-                            'name' => $this->salutation . " " . $this->firstName . " " . $this->middleName . " " . $this->lastName,
-                            'eventName' => $this->event->name,
-                            'startDate' => Carbon::createFromFormat('Y-m-d', $this->event->event_start_date)->format('l j F'),
-                            'endDate' => Carbon::createFromFormat('Y-m-d', $this->event->event_end_date)->format('l j F'),
-                            'year' => $this->event->year,
-                            'location' => $this->event->location,
-                            'badgeLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-badge" . "/" . "main" . "/" . $newRegistrant->id,
-                            'invoiceLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-invoice" . "/" . $newRegistrant->id,
-                        ];
-
-                        Mail::to($this->emailAddress)->send(new RegistrationConfirmation($details));
-
-                        if ($this->assistantEmailAddress != null) {
-                            Mail::to($this->assistantEmailAddress)->send(new RegistrationConfirmation($details));
-                        }
-
-                        if (!empty($this->additionalDelegates)) {
-                            foreach ($this->additionalDelegates as $additionalDelegate) {
-
-                                if ($additionalDelegate['subPromoCode'] != null) {
-                                    PromoCodes::where('event_id', $this->event->id)->where('event_category', $this->event->category)->where('active', true)->where('promo_code', $additionalDelegate['subPromoCode'])->where('badge_type', $additionalDelegate['subBadgeType'])->increment('total_usage');
-                                }
-
-                                $newAdditionDelegate = AdditionalDelegates::create([
-                                    'main_delegate_id' => $newRegistrant->id,
-                                    'salutation' => $additionalDelegate['subSalutation'],
-                                    'first_name' => $additionalDelegate['subFirstName'],
-                                    'middle_name' => $additionalDelegate['subMiddleName'],
-                                    'last_name' => $additionalDelegate['subLastName'],
-                                    'job_title' => $additionalDelegate['subJobTitle'],
-                                    'email_address' => $additionalDelegate['subEmailAddress'],
-                                    'nationality' => $additionalDelegate['subNationality'],
-                                    'mobile_number' => $additionalDelegate['subMobileNumber'],
-                                    'badge_type' => $additionalDelegate['subBadgeType'],
-                                    'pcode_used' => $additionalDelegate['subPromoCode'],
-                                ]);
-
-                                Transactions::create([
-                                    'event_id' => $this->event->id,
-                                    'event_category' => $this->event->category,
-                                    'delegate_id' => $newAdditionDelegate->id,
-                                    'delegate_type' => "sub",
-                                ]);
-
-                                $details = [
-                                    'name' => $additionalDelegate['subSalutation'] . " " . $additionalDelegate['subFirstName'] . " " . $additionalDelegate['subMiddleName'] . " " . $additionalDelegate['subLastName'],
-                                    'eventName' => $this->event->name,
-                                    'startDate' => Carbon::createFromFormat('Y-m-d', $this->event->event_start_date)->format('l j F'),
-                                    'endDate' => Carbon::createFromFormat('Y-m-d', $this->event->event_end_date)->format('l j F'),
-                                    'year' => $this->event->year,
-                                    'location' => $this->event->location,
-                                    'badgeLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-badge" . "/" . "sub" . "/" . $newAdditionDelegate->id,
-                                    'invoiceLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-invoice" . "/" . $newRegistrant->id,
-                                ];
-                                Mail::to($additionalDelegate['subEmailAddress'])->send(new RegistrationConfirmation($details));
-                            }
-                        }
+                foreach (config('app.eventCategories') as $eventCategoryC => $code) {
+                    if ($this->event->category == $eventCategoryC) {
+                        $getEventcode = $code;
                     }
                 }
 
+                $tempTransactionId = $this->event->year . "$getEventcode" . "$lastDigit";
+
+                $details1 = [
+                    'name' => $this->salutation . " " . $this->firstName . " " . $this->middleName . " " . $this->lastName,
+                    'eventLink' => $this->event->link,
+                    'eventName' => $this->event->name,
+                    'eventDates' => $eventFormattedData,
+                    'eventLocation' => $this->event->location,
+
+                    'jobTitle' => $this->jobTitle,
+                    'companyName' => $this->companyName,
+                    'amountPaid' => 0,
+                    'transactionId' => $tempTransactionId,
+                ];
+
+                $details2 = [
+                    'name' => $this->salutation . " " . $this->firstName . " " . $this->middleName . " " . $this->lastName,
+                    'eventLink' => $this->event->link,
+                    'eventName' => $this->event->name,
+
+                    'invoiceAmount' => $this->finalTotal,
+                    'amountPaid' => 0,
+                    'balance' => "0.00",
+                ];
+
+                if ($paymentStatus == "free") {
+                    Mail::to($this->emailAddress)->send(new RegistrationPaid($details1));
+                    Mail::to($this->emailAddress)->send(new RegistrationPaymentConfirmation($details2));
+                } else {
+                    Mail::to($this->emailAddress)->send(new RegistrationUnpaid($details1));
+                }
+
+                if ($this->assistantEmailAddress != null) {
+                    if ($paymentStatus == "free") {
+                        Mail::to($this->assistantEmailAddress)->send(new RegistrationPaid($details1));
+                        Mail::to($this->assistantEmailAddress)->send(new RegistrationPaymentConfirmation($details2));
+                    } else {
+                        Mail::to($this->assistantEmailAddress)->send(new RegistrationUnpaid($details1));
+                    }
+                }
+
+                if (!empty($this->additionalDelegates)) {
+                    foreach ($this->additionalDelegates as $additionalDelegate) {
+
+                        if ($additionalDelegate['subPromoCode'] != null) {
+                            PromoCodes::where('event_id', $this->event->id)->where('event_category', $this->event->category)->where('active', true)->where('promo_code', $additionalDelegate['subPromoCode'])->where('badge_type', $additionalDelegate['subBadgeType'])->increment('total_usage');
+                        }
+
+                        $newAdditionDelegate = AdditionalDelegates::create([
+                            'main_delegate_id' => $newRegistrant->id,
+                            'salutation' => $additionalDelegate['subSalutation'],
+                            'first_name' => $additionalDelegate['subFirstName'],
+                            'middle_name' => $additionalDelegate['subMiddleName'],
+                            'last_name' => $additionalDelegate['subLastName'],
+                            'job_title' => $additionalDelegate['subJobTitle'],
+                            'email_address' => $additionalDelegate['subEmailAddress'],
+                            'nationality' => $additionalDelegate['subNationality'],
+                            'mobile_number' => $additionalDelegate['subMobileNumber'],
+                            'badge_type' => $additionalDelegate['subBadgeType'],
+                            'pcode_used' => $additionalDelegate['subPromoCode'],
+                        ]);
+
+                        $transaction = Transactions::create([
+                            'event_id' => $this->event->id,
+                            'event_category' => $this->event->category,
+                            'delegate_id' => $newAdditionDelegate->id,
+                            'delegate_type' => "sub",
+                        ]);
 
 
+                        $lastDigit = 1000 + intval($transaction->id);
+                        $tempTransactionId = $this->event->year . "$getEventcode" . "$lastDigit";
+
+                        $details1 = [
+                            'name' => $additionalDelegate['subSalutation'] . " " . $additionalDelegate['subFirstName'] . " " . $additionalDelegate['subMiddleName'] . " " . $additionalDelegate['subLastName'],
+                            'eventLink' => $this->event->link,
+                            'eventName' => $this->event->name,
+                            'eventDates' => $eventFormattedData,
+                            'eventLocation' => $this->event->location,
+
+                            'jobTitle' => $additionalDelegate['subJobTitle'],
+                            'companyName' => $this->companyName,
+                            'amountPaid' => 0,
+                            'transactionId' => $tempTransactionId,
+                        ];
+
+                        $details2 = [
+                            'name' => $additionalDelegate['subSalutation'] . " " . $additionalDelegate['subFirstName'] . " " . $additionalDelegate['subMiddleName'] . " " . $additionalDelegate['subLastName'],
+                            'eventLink' => $this->event->link,
+                            'eventName' => $this->event->name,
+        
+                            'invoiceAmount' => $this->finalTotal,
+                            'amountPaid' => 0,
+                            'balance' => "0.00",
+                        ];
+
+                        if ($paymentStatus == "free") {
+                            Mail::to($additionalDelegate['subEmailAddress'])->send(new RegistrationPaid($details1));
+                            Mail::to($additionalDelegate['subEmailAddress'])->send(new RegistrationPaymentConfirmation($details2));
+                        } else {
+                            Mail::to($additionalDelegate['subEmailAddress'])->send(new RegistrationUnpaid($details1));
+                        }
+                    }
+                }
                 $this->currentStep = 4;
             }
         }
@@ -608,8 +550,8 @@ class RegistrationForm extends Component
                 ],
                 'json' => [
                     "order" => [
-                        'amount' => '100.00',
-                        // 'amount' => $this->finalTotal,
+                        // 'amount' => '100.00',
+                        'amount' => $this->finalTotal,
                         'currency' => 'USD',
                     ],
                 ]
@@ -627,7 +569,7 @@ class RegistrationForm extends Component
 
     public function initiateAuthenticationCC()
     {
-        $this->orderId = 212;
+        $this->orderId = substr(uniqid(), -4);
         $this->transactionId = substr(uniqid(), -8);
         $apiEndpoint = env('MERCHANT_API_URL');
         $merchantId = env('MERCHANT_ID');
@@ -659,6 +601,83 @@ class RegistrationForm extends Component
         $dataInitiateAuth = json_decode($bodyInitiateAuth, true);
 
         if ($dataInitiateAuth != null) {
+            // ADD TEMPORARILY TO DATABASE
+            $paymentStatus = "unpaid";
+            $registrationStatus = "pending";
+
+            // FOR CREDIT CARD
+            $newRegistrant = MainDelegates::create([
+                'event_id' => $this->event->id,
+                'pass_type' => $this->delegatePassType,
+                'rate_type' => $this->rateType,
+                'rate_type_string' => $this->rateTypeString,
+
+                'company_name' => $this->companyName,
+                'company_sector' => $this->companySector,
+                'company_address' => $this->companyAddress,
+                'company_country' => $this->companyCountry,
+                'company_city' => $this->companyCity,
+                'company_telephone_number' => $this->companyLandlineNumber,
+                'company_mobile_number' => $this->companyMobileNumber,
+                'assistant_email_address' => $this->assistantEmailAddress,
+
+                'salutation' => $this->salutation,
+                'first_name' => $this->firstName,
+                'middle_name' => $this->middleName,
+                'last_name' => $this->lastName,
+                'email_address' => $this->emailAddress,
+                'mobile_number' => $this->mobileNumber,
+                'nationality' => $this->nationality,
+                'job_title' => $this->jobTitle,
+                'badge_type' => $this->badgeType,
+                'pcode_used' => $this->promoCode,
+
+                'heard_where' => $this->heardWhere,
+                'quantity' => $this->finalQuantity,
+                'unit_price' => $this->finalUnitPrice,
+                'net_amount' => $this->finalNetAmount,
+                'vat_price' => $this->finalVat,
+                'discount_price' => $this->finalDiscount,
+                'total_amount' => $this->finalTotal,
+                'mode_of_payment' => $this->paymentMethod,
+                'registration_status' => $registrationStatus,
+                'payment_status' => $paymentStatus,
+                'registered_date_time' => Carbon::now(),
+                'paid_date_time' => null,
+            ]);
+
+            Transactions::create([
+                'event_id' => $this->event->id,
+                'event_category' => $this->event->category,
+                'delegate_id' => $newRegistrant->id,
+                'delegate_type' => "main",
+            ]);
+
+            if (!empty($this->additionalDelegates)) {
+                foreach ($this->additionalDelegates as $additionalDelegate) {
+                    $newAdditionDelegate = AdditionalDelegates::create([
+                        'main_delegate_id' => $newRegistrant->id,
+                        'salutation' => $additionalDelegate['subSalutation'],
+                        'first_name' => $additionalDelegate['subFirstName'],
+                        'middle_name' => $additionalDelegate['subMiddleName'],
+                        'last_name' => $additionalDelegate['subLastName'],
+                        'job_title' => $additionalDelegate['subJobTitle'],
+                        'email_address' => $additionalDelegate['subEmailAddress'],
+                        'nationality' => $additionalDelegate['subNationality'],
+                        'mobile_number' => $additionalDelegate['subMobileNumber'],
+                        'badge_type' => $additionalDelegate['subBadgeType'],
+                        'pcode_used' => $additionalDelegate['subPromoCode'],
+                    ]);
+
+                    Transactions::create([
+                        'event_id' => $this->event->id,
+                        'event_category' => $this->event->category,
+                        'delegate_id' => $newAdditionDelegate->id,
+                        'delegate_type' => "sub",
+                    ]);
+                }
+            }
+
             $clientAuthPayer = new Client();
             $responseAuthPayer = $clientAuthPayer->request('PUT', $apiEndpoint . '/order/' . $this->orderId . '/transaction/' . $this->transactionId, [
                 'auth' => [
@@ -673,7 +692,7 @@ class RegistrationForm extends Component
                         'id' => $this->sessionId,
                     ],
                     "authentication" => [
-                        "redirectResponseUrl" => "http://127.0.0.1:8000/payNow?sessionId=$this->sessionId",
+                        "redirectResponseUrl" => "http://127.0.0.1:8000/capturePayment?sessionId=$this->sessionId&orderId=$this->orderId&transactionId=$this->transactionId&mainDelegateId=$newRegistrant->id",
                     ],
                     "correlationId" => "test",
                     "device" =>  [
@@ -695,8 +714,31 @@ class RegistrationForm extends Component
             ]);
             $bodyAuthPayer = $responseAuthPayer->getBody()->getContents();
             $dataAuthPayer = json_decode($bodyAuthPayer, true);
-            
-            $this->htmlCodeOTP = $dataAuthPayer['authentication']['redirect']['html'];
+
+            if ($dataAuthPayer != null) {
+                $this->htmlCodeOTP = $dataAuthPayer['authentication']['redirect']['html'];
+                Session::put('paymentStatus', 'pendingOTP');
+                Session::put('htmlOTP', $dataAuthPayer['authentication']['redirect']['html']);
+                Session::put('orderId', $this->orderId);
+
+                return redirect()->route('register.otp.view', ['eventCategory' => $this->event->category, 'eventId' => $this->event->id, 'eventYear' => $this->event->year]);
+            } else {
+                // Remove additional delegates and its transaction
+                $additionalDelegates = AdditionalDelegates::where('main_delegate_id', $newRegistrant->id)->get();
+
+                if (!$additionalDelegates->isEmpty()) {
+                    foreach ($additionalDelegates as $additionalDelegate) {
+                        $transaction = Transactions::where('delegate_id', $additionalDelegate->id)->where('delegate_type', "sub");
+                        $transaction->delete();
+                        AdditionalDelegates::destroy($additionalDelegate->id);
+                    }
+                }
+
+                // Remove main delegate and its transaction
+                $transaction = Transactions::where('delegate_id', $newRegistrant->id)->where('delegate_type', "main");
+                $transaction->delete();
+                MainDelegates::destroy($newRegistrant->id);
+            }
         }
     }
 

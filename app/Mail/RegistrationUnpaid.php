@@ -10,7 +10,7 @@ use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Mail\Mailables\Address;
 
-class RegistrationMarkPaid extends Mailable
+class RegistrationUnpaid extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -33,9 +33,10 @@ class RegistrationMarkPaid extends Mailable
      */
     public function envelope()
     {
+        $subject = $this->details['eventName'].' - Unpaid registration';
         return new Envelope(
             from: new Address('forumregistration@gpca.org.ae', 'GPCA Registration'),
-            subject: 'Successfully Paid',
+            subject: $subject,
         );
     }
 
@@ -47,7 +48,7 @@ class RegistrationMarkPaid extends Mailable
     public function content()
     {
         return new Content(
-            markdown: 'emails.registration-mark-paid',
+            markdown: 'emails.registration-unpaid',
         );
     }
 

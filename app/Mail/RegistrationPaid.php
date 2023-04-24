@@ -10,12 +10,12 @@ use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Mail\Mailables\Address;
 
-
-class RegistrationConfirmation extends Mailable
+class RegistrationPaid extends Mailable
 {
     use Queueable, SerializesModels;
 
     public $details;
+
     /**
      * Create a new message instance.
      *
@@ -33,9 +33,10 @@ class RegistrationConfirmation extends Mailable
      */
     public function envelope()
     {
+        $subject = $this->details['eventName'].' - Paid registration';
         return new Envelope(
             from: new Address('forumregistration@gpca.org.ae', 'GPCA Registration'),
-            subject: 'Registration Confirmation [This is a test]',
+            subject: $subject,
         );
     }
 
@@ -47,7 +48,7 @@ class RegistrationConfirmation extends Mailable
     public function content()
     {
         return new Content(
-            markdown: 'emails.registration-confirmation',
+            markdown: 'emails.registration-paid',
         );
     }
 

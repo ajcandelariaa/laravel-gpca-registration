@@ -6,8 +6,8 @@
     <div class="mt-5 grid grid-cols-2 gap-y-3 gap-x-5">
         {{-- ROW 1 --}}
         <div class="space-y-2 col-span-2">
-            <div class="grid grid-cols-10 gap-x-5">
-                <div class="col-span-10 sm:col-span-2">
+            <div class="grid grid-cols-11 gap-x-5">
+                <div class="col-span-11 sm:col-span-2">
                     <div class="text-registrationPrimaryColor">
                         Salutation
                     </div>
@@ -22,7 +22,7 @@
                     </div>
                 </div>
 
-                <div class="col-span-10 sm:col-span-3">
+                <div class="col-span-11 sm:col-span-3">
                     <div class="text-registrationPrimaryColor">
                         First Name <span class="text-red-500">*</span>
                     </div>
@@ -38,7 +38,7 @@
                     </div>
                 </div>
 
-                <div class="col-span-10 sm:col-span-3">
+                <div class="col-span-11 sm:col-span-3">
                     <div class="text-registrationPrimaryColor">
                         Middle Name
                     </div>
@@ -48,7 +48,7 @@
                     </div>
                 </div>
 
-                <div class="col-span-10 sm:col-span-3">
+                <div class="col-span-11 sm:col-span-3">
                     <div class="text-registrationPrimaryColor">
                         Last Name <span class="text-red-500">*</span>
                     </div>

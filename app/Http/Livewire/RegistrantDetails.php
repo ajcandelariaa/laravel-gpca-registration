@@ -2,14 +2,16 @@
 
 namespace App\Http\Livewire;
 
-use App\Mail\RegistrationMarkPaid;
-use App\Mail\RegistrationReminder;
+use App\Mail\RegistrationPaid;
+use App\Mail\RegistrationPaymentConfirmation;
+use App\Mail\RegistrationPaymentReminder;
 use Livewire\Component;
 use App\Models\Member as Members;
 use App\Models\PromoCode as PromoCodes;
 use App\Models\MainDelegate as MainDelegates;
 use App\Models\Event as Events;
 use App\Models\AdditionalDelegate as AdditionalDelegates;
+use App\Models\Transaction as Transactions;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
 use NumberFormatter;
@@ -352,33 +354,96 @@ class RegistrantDetails extends Component
 
     public function markAsPaid()
     {
-        if($this->finalData['invoiceData']['total_amount'] == 0){
+        if ($this->finalData['invoiceData']['total_amount'] == 0) {
             $paymentStatus = "free";
         } else {
             $paymentStatus = "paid";
         }
+
         MainDelegates::find($this->finalData['mainDelegateId'])->fill([
             'registration_status' => "confirmed",
             'payment_status' => $paymentStatus,
             'paid_date_time' => Carbon::now(),
         ])->save();
 
-        $details = [
-            'name' => $this->finalData['name'],
-        ];
-        
-        Mail::to($this->finalData['email_address'])->send(new RegistrationMarkPaid($details));
+        $event = Events::where('id', $this->eventId)->where('category', $this->eventCategory)->first();
+        $eventFormattedData = Carbon::parse($event->event_start_date)->format('d') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');
 
-        if($this->finalData['assistant_email_address'] != null){
-        Mail::to($this->finalData['assistant_email_address'])->send(new RegistrationMarkPaid($details));
+        $transactionId = Transactions::where('delegate_id', $this->finalData['mainDelegateId'])->where('delegate_type', "main")->value('id');
+        $lastDigit = 1000 + intval($transactionId);
+
+        foreach (config('app.eventCategories') as $eventCategoryC => $code) {
+            if ($event->category == $eventCategoryC) {
+                $getEventcode = $code;
+            }
         }
 
-        if(count($this->finalData['subDelegates']) > 0){
-            foreach($this->finalData['subDelegates'] as $subDelegate){
-                $details = [
+        $tempTransactionId = "$event->year" . "$getEventcode" . "$lastDigit";
+
+        $details1 = [
+            'name' => $this->finalData['name'],
+            'eventLink' => $event->link,
+            'eventName' => $event->name,
+            'eventDates' => $eventFormattedData,
+            'eventLocation' => $event->location,
+
+            'jobTitle' => $this->finalData['job_title'],
+            'companyName' => $this->finalData['company_name'],
+            'amountPaid' => $this->finalData['invoiceData']['total_amount'],
+            'transactionId' => $tempTransactionId,
+        ];
+
+
+        $details2 = [
+            'name' => $this->finalData['name'],
+            'eventLink' => $event->link,
+            'eventName' => $event->name,
+
+            'invoiceAmount' => $this->finalData['invoiceData']['total_amount'],
+            'amountPaid' => $this->finalData['invoiceData']['total_amount'],
+            'balance' => "0.00",
+        ];
+
+        Mail::to($this->finalData['email_address'])->send(new RegistrationPaid($details1));
+        Mail::to($this->finalData['email_address'])->send(new RegistrationPaymentConfirmation($details2));
+
+        if ($this->finalData['assistant_email_address'] != null) {
+            Mail::to($this->finalData['assistant_email_address'])->send(new RegistrationPaid($details1));
+            Mail::to($this->finalData['assistant_email_address'])->send(new RegistrationPaymentConfirmation($details2));
+        }
+
+        if (count($this->finalData['subDelegates']) > 0) {
+            foreach ($this->finalData['subDelegates'] as $subDelegate) {
+                
+                $transactionId = Transactions::where('delegate_id', $subDelegate['subDelegateId'])->where('delegate_type', "sub")->value('id');
+                $lastDigit = 1000 + intval($transactionId);
+                $tempTransactionId = "$event->year" . "$getEventcode" . "$lastDigit";
+
+                $details1 = [
                     'name' => $subDelegate['name'],
+                    'eventLink' => $event->link,
+                    'eventName' => $event->name,
+                    'eventDates' => $eventFormattedData,
+                    'eventLocation' => $event->location,
+
+                    'jobTitle' => $subDelegate['job_title'],
+                    'companyName' => $this->finalData['company_name'],
+                    'amountPaid' => $this->finalData['invoiceData']['total_amount'],
+                    'transactionId' => $tempTransactionId,
                 ];
-                Mail::to($subDelegate['email_address'])->send(new RegistrationMarkPaid($details));
+
+
+                $details2 = [
+                    'name' => $this->finalData['name'],
+                    'eventLink' => $event->link,
+                    'eventName' => $event->name,
+
+                    'invoiceAmount' => $this->finalData['invoiceData']['total_amount'],
+                    'amountPaid' => $this->finalData['invoiceData']['total_amount'],
+                    'balance' => "0.00",
+                ];
+                Mail::to($subDelegate['email_address'])->send(new RegistrationPaid($details1));
+                Mail::to($subDelegate['email_address'])->send(new RegistrationPaymentConfirmation($details2));
             }
         }
 
@@ -422,7 +487,7 @@ class RegistrantDetails extends Component
         $mainDelegate = MainDelegates::where('id', $this->finalData['mainDelegateId'])->where('event_id', $this->eventId)->first();
         $mainDiscount = PromoCodes::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->where('promo_code', $mainDelegate->pcode_used)->where('badge_type', $mainDelegate->badge_type)->value('discount');
 
-        if($mainDiscount == 100){
+        if ($mainDiscount == 100) {
             $promoCodeMainDiscountString = "($mainDelegate->badge_type Complimentary)";
         } else {
             $promoCodeMainDiscountString = ($mainDelegate->pcode_used == null) ? '' : "(" . $mainDiscount . "% discount)";
@@ -470,8 +535,8 @@ class RegistrantDetails extends Component
                     $invoiceDetails[$existingIndex]['totalDiscount'] = $totalDiscountTemp;
                     $invoiceDetails[$existingIndex]['totalNetAmount'] = $totalNetAmountTemp;
                 } else {
-                    
-                    if($subDiscount == 100){
+
+                    if ($subDiscount == 100) {
                         $promoCodeSubDiscountString = "($subDelegate->badge_type Complimentary)";
                     } else {
                         $promoCodeSubDiscountString = ($subDelegate->pcode_used == null) ? '' : "(" . $subDiscount . "% discount)";
@@ -491,11 +556,11 @@ class RegistrantDetails extends Component
                 }
             }
         }
-        
+
         $net_amount = 0;
         $discount_price = 0;
 
-        foreach($invoiceDetails as $invoiceDetail){
+        foreach ($invoiceDetails as $invoiceDetail) {
             $net_amount += $invoiceDetail['totalNetAmount'];
             $discount_price += $invoiceDetail['totalDiscount'];
         }
@@ -517,15 +582,15 @@ class RegistrantDetails extends Component
         ];
 
         $this->finalData['invoiceData'] = $invoiceData;
-        
-        if($this->finalData['registration_status'] == "confirmed"){
-            if($this->finalData['invoiceData']['total_amount'] == 0){
+
+        if ($this->finalData['registration_status'] == "confirmed") {
+            if ($this->finalData['invoiceData']['total_amount'] == 0) {
                 $this->finalData['payment_status'] = "free";
             } else {
                 $this->finalData['payment_status'] = "paid";
             }
         } else {
-            if($this->finalData['invoiceData']['total_amount'] == 0){
+            if ($this->finalData['invoiceData']['total_amount'] == 0) {
                 $this->finalData['payment_status'] = "free";
             } else {
                 $this->finalData['payment_status'] = "unpaid";
@@ -540,29 +605,29 @@ class RegistrantDetails extends Component
             'total_amount' => $totalAmount,
             'payment_status' => $this->finalData['payment_status'],
         ])->save();
-
-
     }
 
-    
-    public function numberToWords($number){
+
+    public function numberToWords($number)
+    {
         $formatter = new NumberFormatter('en', NumberFormatter::SPELLOUT);
         return $formatter->format($number);
     }
 
-    public function sendEmailReminder(){
+    public function sendEmailReminder()
+    {
         $event = Events::where('id', $this->eventId)->where('category', $this->eventCategory)->first();
-        
+
         $details = [
             'name' => $this->finalData['name'],
             'eventName' => $event->name,
             'eventLink' => $event->link,
         ];
 
-        Mail::to($this->finalData['email_address'])->send(new RegistrationReminder($details));
+        Mail::to($this->finalData['email_address'])->send(new RegistrationPaymentReminder($details));
 
-        if($this->finalData['assistant_email_address'] != null){
-            Mail::to($this->finalData['assistant_email_address'])->send(new RegistrationReminder($details));
+        if ($this->finalData['assistant_email_address'] != null) {
+            Mail::to($this->finalData['assistant_email_address'])->send(new RegistrationPaymentReminder($details));
         }
 
         if (count($this->finalData['subDelegates']) > 0) {
@@ -573,7 +638,7 @@ class RegistrantDetails extends Component
                     'eventLink' => $event->link,
                 ];
 
-                Mail::to($subDelegate['email_address'])->send(new RegistrationReminder($details));
+                Mail::to($subDelegate['email_address'])->send(new RegistrationPaymentReminder($details));
             }
         }
     }

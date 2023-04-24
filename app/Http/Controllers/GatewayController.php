@@ -7,8 +7,8 @@ use Illuminate\Support\Facades\Session;
 
 class GatewayController extends Controller
 {
-    public $orderId = 300;
-    public $transactionId = 302;
+    public $orderId = 302;
+    public $transactionId = 304;
 
     public function getSessionId()
     {
@@ -172,8 +172,6 @@ class GatewayController extends Controller
                     "transactionId" => $this->transactionId,
                 ],
                 "order" => [
-                    "amount" => '100.0',
-                    "currency" => 'USD',
                     "reference" => $this->orderId,
                 ],
                 "session" => [

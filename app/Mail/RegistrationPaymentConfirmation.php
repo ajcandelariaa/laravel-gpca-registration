@@ -10,7 +10,7 @@ use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Mail\Mailables\Address;
 
-class RegistrationReminder extends Mailable
+class RegistrationPaymentConfirmation extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -33,7 +33,7 @@ class RegistrationReminder extends Mailable
      */
     public function envelope()
     {
-        $subject = $this->details['eventName'].' - Payment reminder';
+        $subject = $this->details['eventName'].' - Payment Confirmation';
         return new Envelope(
             from: new Address('forumregistration@gpca.org.ae', 'GPCA Registration'),
             subject: $subject,
@@ -48,7 +48,7 @@ class RegistrationReminder extends Mailable
     public function content()
     {
         return new Content(
-            markdown: 'emails.registration-reminder',
+            markdown: 'emails.registration-payment-confirmation',
         );
     }
 

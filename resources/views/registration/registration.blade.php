@@ -12,14 +12,13 @@
         integrity="sha512-SzlrxWUlpfuzQ+pcUCosxcglQRNAq/DZjVsC0lE40xsADsfeQoEypE+enwcOiGjk/bSuGGKHEyjSoQ1zVisanQ=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-    {{-- intlTelInput --}}
-    {{-- @include('helpers.intlTelInput') --}}
-
     {{-- VITE --}}
     @vite('resources/css/app.css')
 
     {{-- LIVEWIRE --}}
     @livewireStyles()
+    
+    {{-- intlTelInput --}}
     @include('helpers.intlTelInput')
     <style>
         select:required:invalid {
@@ -65,7 +64,6 @@
     </div>
 
     @livewire('registration-form', ['data' => $event])
-
 
     <footer class="bg-registrationPrimaryColor w-full py-5 text-center text-white mt-auto">
         <p>Copyright © 2023 GPCA Registration</p>

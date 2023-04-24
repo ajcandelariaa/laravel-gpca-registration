@@ -21,6 +21,14 @@
     <p id="result"></p>
 
     <script src="{{ asset('js/phoneValidation.js') }}"></script>
+    
+    <script>
+        if (self === top) {
+
+        } else {
+            top.location = self.location;
+        }
+    </script>
 </body>
 
 </html>

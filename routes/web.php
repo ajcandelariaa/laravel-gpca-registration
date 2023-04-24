@@ -67,8 +67,10 @@ Route::get('/{eventCategory}/{eventId}/view-badge/{delegateType}/{delegateId}', 
 
 Route::get('/check', [DelegateController::class, 'checkPhpInfo']);
 
-Route::get('/test', [RegistrationController::class, 'testEmail'])->name('test-email');
 Route::get('/register/{eventYear}/{eventCategory}/{eventId}', [RegistrationController::class, 'registrationView'])->name('register.view');
+Route::get('/register/{eventYear}/{eventCategory}/{eventId}/otp', [RegistrationController::class, 'registrationOTPView'])->name('register.otp.view');
+Route::post('capturePayment', [RegistrationController::class, 'capturePayment'])->name('register.capture.payment');
+Route::get('/register/{eventYear}/{eventCategory}/{eventId}/{mainDelegateId}/success', [RegistrationController::class, 'registrationSuccessView'])->name('register.success.view');
 
 
 Route::get('/getSessionId', [GatewayController::class, 'getSessionId']);
