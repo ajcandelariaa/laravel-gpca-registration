@@ -33,7 +33,7 @@ class RegistrationPaid extends Mailable
      */
     public function envelope()
     {
-        $subject = $this->details['eventName'].' - Paid registration';
+        $subject = $this->details['eventName'].' - Paid Registration';
         return new Envelope(
             from: new Address('forumregistration@gpca.org.ae', 'GPCA Registration'),
             subject: $subject,

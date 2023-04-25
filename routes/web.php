@@ -71,6 +71,7 @@ Route::get('/register/{eventYear}/{eventCategory}/{eventId}', [RegistrationContr
 Route::get('/register/{eventYear}/{eventCategory}/{eventId}/otp', [RegistrationController::class, 'registrationOTPView'])->name('register.otp.view');
 Route::post('capturePayment', [RegistrationController::class, 'capturePayment'])->name('register.capture.payment');
 Route::get('/register/{eventYear}/{eventCategory}/{eventId}/{mainDelegateId}/success', [RegistrationController::class, 'registrationSuccessView'])->name('register.success.view');
+Route::get('/register/{eventYear}/{eventCategory}/{eventId}/{mainDelegateId}/failed', [RegistrationController::class, 'registrationFailedView'])->name('register.failed.view');
 
 
 Route::get('/getSessionId', [GatewayController::class, 'getSessionId']);

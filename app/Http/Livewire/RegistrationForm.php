@@ -467,7 +467,7 @@ class RegistrationForm extends Component
                             'name' => $additionalDelegate['subSalutation'] . " " . $additionalDelegate['subFirstName'] . " " . $additionalDelegate['subMiddleName'] . " " . $additionalDelegate['subLastName'],
                             'eventLink' => $this->event->link,
                             'eventName' => $this->event->name,
-        
+
                             'invoiceAmount' => $this->finalTotal,
                             'amountPaid' => 0,
                             'balance' => "0.00",
@@ -600,8 +600,17 @@ class RegistrationForm extends Component
         $bodyInitiateAuth = $responseInitiateAuth->getBody()->getContents();
         $dataInitiateAuth = json_decode($bodyInitiateAuth, true);
 
-        if ($dataInitiateAuth != null) {
+        if (
+            $dataInitiateAuth['response']['gatewayCode'] == "AUTHENTICATION_IN_PROGRESS" &&
+            $dataInitiateAuth['response']['gatewayRecommendation'] == "PROCEED" &&
+            $dataInitiateAuth['transaction']['authenticationStatus'] == "AUTHENTICATION_AVAILABLE" &&
+            $dataInitiateAuth['transaction']['type'] == "AUTHENTICATION"
+        ) {
             // ADD TEMPORARILY TO DATABASE
+            if ($this->promoCode != null) {
+                PromoCodes::where('event_id', $this->event->id)->where('event_category', $this->event->category)->where('active', true)->where('promo_code', $this->promoCode)->where('badge_type', $this->badgeType)->increment('total_usage');
+            }
+
             $paymentStatus = "unpaid";
             $registrationStatus = "pending";
 
@@ -655,6 +664,11 @@ class RegistrationForm extends Component
 
             if (!empty($this->additionalDelegates)) {
                 foreach ($this->additionalDelegates as $additionalDelegate) {
+
+                    if ($additionalDelegate['subPromoCode'] != null) {
+                        PromoCodes::where('event_id', $this->event->id)->where('event_category', $this->event->category)->where('active', true)->where('promo_code', $additionalDelegate['subPromoCode'])->where('badge_type', $additionalDelegate['subBadgeType'])->increment('total_usage');
+                    }
+
                     $newAdditionDelegate = AdditionalDelegates::create([
                         'main_delegate_id' => $newRegistrant->id,
                         'salutation' => $additionalDelegate['subSalutation'],
@@ -692,7 +706,7 @@ class RegistrationForm extends Component
                         'id' => $this->sessionId,
                     ],
                     "authentication" => [
-                        "redirectResponseUrl" => "http://127.0.0.1:8000/capturePayment?sessionId=$this->sessionId&orderId=$this->orderId&transactionId=$this->transactionId&mainDelegateId=$newRegistrant->id",
+                        "redirectResponseUrl" => "http://127.0.0.1:8000/capturePayment?sessionId=$this->sessionId&mainDelegateId=$newRegistrant->id",
                     ],
                     "correlationId" => "test",
                     "device" =>  [
@@ -715,7 +729,12 @@ class RegistrationForm extends Component
             $bodyAuthPayer = $responseAuthPayer->getBody()->getContents();
             $dataAuthPayer = json_decode($bodyAuthPayer, true);
 
-            if ($dataAuthPayer != null) {
+            if (
+                $dataAuthPayer['response']['gatewayCode'] == "PENDING" &&
+                $dataAuthPayer['response']['gatewayRecommendation'] == "PROCEED" &&
+                $dataAuthPayer['transaction']['authenticationStatus'] == "AUTHENTICATION_PENDING" &&
+                $dataAuthPayer['transaction']['type'] == "AUTHENTICATION"
+            ) {
                 $this->htmlCodeOTP = $dataAuthPayer['authentication']['redirect']['html'];
                 Session::put('paymentStatus', 'pendingOTP');
                 Session::put('htmlOTP', $dataAuthPayer['authentication']['redirect']['html']);
@@ -728,17 +747,33 @@ class RegistrationForm extends Component
 
                 if (!$additionalDelegates->isEmpty()) {
                     foreach ($additionalDelegates as $additionalDelegate) {
-                        $transaction = Transactions::where('delegate_id', $additionalDelegate->id)->where('delegate_type', "sub");
+                        $transaction = Transactions::where('delegate_id', $additionalDelegate->id)->where('delegate_type', "sub")->first();
                         $transaction->delete();
                         AdditionalDelegates::destroy($additionalDelegate->id);
+
+                        if ($additionalDelegate['pcode_used'] != null) {
+                            PromoCodes::where('event_id', $this->event->id)->where('event_category', $this->event->category)->where('active', true)->where('promo_code', $additionalDelegate['pcode_used'])->where('badge_type', $additionalDelegate['badge_type'])->increment('total_usage');
+                        }
                     }
                 }
 
                 // Remove main delegate and its transaction
-                $transaction = Transactions::where('delegate_id', $newRegistrant->id)->where('delegate_type', "main");
+                $transaction = Transactions::where('delegate_id', $newRegistrant->id)->where('delegate_type', "main")->first();
                 $transaction->delete();
-                MainDelegates::destroy($newRegistrant->id);
+
+                $mainDelegate = MainDelegates::where('id', $newRegistrant->id)->first();
+                if ($mainDelegate->pcode_used != null) {
+                    PromoCodes::where('event_id', $this->event->id)->where('event_category', $this->event->category)->where('active', true)->where('promo_code', $mainDelegate->pcode_used)->where('badge_type', $mainDelegate->badge_type)->increment('total_usage');
+                }
+                $mainDelegate->delete();
+
+                // do error handling
+                // then pop up error
             }
+        } else {
+            // do error handling
+            // since it is not supported for authenticating
+            // pop up error
         }
     }
 
@@ -1077,16 +1112,16 @@ class RegistrationForm extends Component
         $countMainDelegate = 0;
         $countSubDelegate = 0;
 
-        if(!$allDelegates->isEmpty()){
+        if (!$allDelegates->isEmpty()) {
             foreach ($allDelegates as $delegate) {
                 if ($delegate->delegate_type == "main") {
                     $mainDelegate = MainDelegates::where('id', $delegate->delegate_id)->where('email_address', $emailAddress)->first();
-                    if($mainDelegate != null){
+                    if ($mainDelegate != null) {
                         $countMainDelegate++;
                     }
                 } else {
                     $subDelegate = AdditionalDelegates::where('id', $delegate->delegate_id)->where('email_address', $emailAddress)->first();
-                    if($subDelegate != null){
+                    if ($subDelegate != null) {
                         $countSubDelegate++;
                     }
                 }

@@ -18,32 +18,70 @@ use NumberFormatter;
 
 class RegistrationController extends Controller
 {
-    public function registrationSuccessView($eventYear, $eventCategory, $eventId, $mainDelegateId){
+    public function registrationFailedView($eventYear, $eventCategory, $eventId, $mainDelegateId)
+    {
         if (Event::where('year', $eventYear)->where('category', $eventCategory)->where('id', $eventId)->exists()) {
-            if(!Session::has('registrationStatus')){
+            if (!Session::has('registrationStatus')) {
                 $event = Event::where('id', $eventId)->first();
                 $mainDelegate = MainDelegate::where('id', $mainDelegateId)->first();
+                $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('d') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');
+                $invoiceLink = env('APP_URL') . '/' . $eventCategory . '/' . $eventId . '/view-invoice/' . $mainDelegateId;
 
-                
-
-                return view('registration.registration_success_message', [
-                    'pageTitle' => "Registration Success",
+                return view('registration.registration_failed_message', [
+                    'pageTitle' => "Registration Failed",
                     'event' => $event,
+                    'mainDelegate' => $mainDelegate,
+                    'eventFormattedDate' =>  $eventFormattedDate,
+                    'invoiceLink' => $invoiceLink,
                 ]);
             } else {
                 abort(404, 'The URL is incorrect');
             }
         } else {
+            abort(404, 'The URL is incorrect');
+        }
+    }
+
+    public function registrationSuccessView($eventYear, $eventCategory, $eventId, $mainDelegateId)
+    {
+        if (Event::where('year', $eventYear)->where('category', $eventCategory)->where('id', $eventId)->exists()) {
+            if (!Session::has('registrationStatus')) {
+                $event = Event::where('id', $eventId)->first();
+                $mainDelegate = MainDelegate::where('id', $mainDelegateId)->first();
+                $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('d') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');
+                $invoiceLink = env('APP_URL') . '/' . $eventCategory . '/' . $eventId . '/view-invoice/' . $mainDelegateId;
+
+                return view('registration.registration_success_message', [
+                    'pageTitle' => "Registration Success",
+                    'event' => $event,
+                    'mainDelegate' => $mainDelegate,
+                    'eventFormattedDate' =>  $eventFormattedDate,
+                    'invoiceLink' => $invoiceLink,
+                ]);
+            } else {
+                abort(404, 'The URL is incorrect');
+            }
+        } else {
+            abort(404, 'The URL is incorrect');
         }
     }
     public function capturePayment()
     {
-        if (request()->query('sessionId') && request()->query('orderId')) {
-            $sessionId = request()->query('sessionId');
-            $orderId = request()->query('orderId');
-            $oldTransactionId = request()->query('transactionId');
-            $mainDelegateId = request()->query('mainDelegateId');
+        $mainDelegateId = request()->query('mainDelegateId');
+        $sessionId = request()->query('sessionId');
+
+        if (
+            request()->input('response_gatewayRecommendation') == "PROCEED" &&
+            request()->input('result') == "SUCCESS" &&
+            request()->input('order_id') &&
+            request()->input('transaction_id') &&
+            request()->query('sessionId') &&
+            request()->query('mainDelegateId')
+        ) {
+            $orderId = request()->input('order_id');
+            $oldTransactionId = request()->input('transaction_id');
             $newTransactionId = substr(uniqid(), -8);
+
             $apiEndpoint = env('MERCHANT_API_URL');
             $merchantId = env('MERCHANT_ID');
             $authPass = env('MERCHANT_AUTH_PASSWORD');
@@ -76,7 +114,12 @@ class RegistrationController extends Controller
             $body = $response->getBody()->getContents();
             $data = json_decode($body, true);
 
-            if ($data['transaction']['type'] == "PAYMENT") {
+            if (
+                $data['response']['gatewayCode'] == "APPROVED" &&
+                $data['response']['gatewayRecommendation'] == "NO_ACTION" &&
+                $data['transaction']['authenticationStatus'] == "AUTHENTICATION_SUCCESSFUL" &&
+                $data['transaction']['type'] == "PAYMENT"
+            ) {
                 MainDelegate::find($mainDelegateId)->fill([
                     'registration_status' => "confirmed",
                     'payment_status' => "paid",
@@ -86,10 +129,6 @@ class RegistrationController extends Controller
                 $mainDelegate = MainDelegate::where('id', $mainDelegateId)->first();
                 $event = Event::where('id', $mainDelegate->event_id)->first();
                 $eventFormattedData = Carbon::parse($event->event_start_date)->format('d') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');
-
-                if ($mainDelegate->pcode_used != null) {
-                    PromoCode::where('event_id', $event->id)->where('event_category', $event->category)->where('active', true)->where('promo_code', $mainDelegate->pcode_used)->where('badge_type', $mainDelegate->badge_type)->increment('total_usage');
-                }
 
                 $transactionId = Transaction::where('delegate_id', $mainDelegateId)->where('delegate_type', "main")->value('id');
                 $lastDigit = 1000 + intval($transactionId);
@@ -103,7 +142,7 @@ class RegistrationController extends Controller
                 $tempTransactionId = "$event->year" . "$getEventcode" . "$lastDigit";
 
                 $details1 = [
-                    'name' => $mainDelegate->salutation . " " . $mainDelegate->firstName . " " . $mainDelegate->middleName . " " . $mainDelegate->lastName,
+                    'name' => $mainDelegate->salutation . " " . $mainDelegate->first_name . " " . $mainDelegate->middle_name . " " . $mainDelegate->last_name,
                     'eventLink' => $event->link,
                     'eventName' => $event->name,
                     'eventDates' => $eventFormattedData,
@@ -116,7 +155,7 @@ class RegistrationController extends Controller
                 ];
 
                 $details2 = [
-                    'name' => $mainDelegate->salutation . " " . $mainDelegate->firstName . " " . $mainDelegate->middleName . " " . $mainDelegate->lastName,
+                    'name' => $mainDelegate->salutation . " " . $mainDelegate->first_name . " " . $mainDelegate->middle_name . " " . $mainDelegate->last_name,
                     'eventLink' => $event->link,
                     'eventName' => $event->name,
 
@@ -137,16 +176,12 @@ class RegistrationController extends Controller
 
                 if (!$additionalDelegates->isEmpty()) {
                     foreach ($additionalDelegates as $additionalDelegate) {
-                        if ($additionalDelegate->pcode_used != null) {
-                            PromoCode::where('event_id', $event->id)->where('event_category', $event->category)->where('active', true)->where('promo_code', $additionalDelegate->pcode_used)->where('badge_type', $additionalDelegate->badge_type)->increment('total_usage');
-                        }
-
                         $transactionId = Transaction::where('delegate_id', $additionalDelegate->id)->where('delegate_type', "sub")->value('id');
                         $lastDigit = 1000 + intval($transactionId);
                         $tempTransactionId = "$event->year" . "$getEventcode" . "$lastDigit";
 
                         $details1 = [
-                            'name' => $additionalDelegate->salutation . " " . $additionalDelegate->firstName . " " . $additionalDelegate->middleName . " " . $additionalDelegate->lastName,
+                            'name' => $additionalDelegate->salutation . " " . $additionalDelegate->first_name . " " . $additionalDelegate->middle_name . " " . $additionalDelegate->last_name,
                             'eventLink' => $event->link,
                             'eventName' => $event->name,
                             'eventDates' => $eventFormattedData,
@@ -159,7 +194,7 @@ class RegistrationController extends Controller
                         ];
 
                         $details2 = [
-                            'name' => $additionalDelegate->salutation . " " . $additionalDelegate->firstName . " " . $additionalDelegate->middleName . " " . $additionalDelegate->lastName,
+                            'name' => $additionalDelegate->salutation . " " . $additionalDelegate->first_name . " " . $additionalDelegate->middle_name . " " . $additionalDelegate->last_name,
                             'eventLink' => $event->link,
                             'eventName' => $event->name,
 
@@ -173,9 +208,23 @@ class RegistrationController extends Controller
                 }
                 Session::flash('registrationStatus', "success");
                 return redirect()->route('register.success.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'eventYear' => $event->year, 'mainDelegateId' => $mainDelegateId]);
+            } else {
+                // (This is the part where we will send them email notification failed and redirect them)
+                $mainDelegate = MainDelegate::where('id', $mainDelegateId)->first();
+                $event = Event::where('id', $mainDelegate->event_id)->first();
+                $eventFormattedData = Carbon::parse($event->event_start_date)->format('d') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');
+
+                return redirect()->route('register.failed.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'eventYear' => $event->year, 'mainDelegateId' => $mainDelegateId]);
             }
         } else {
-            abort(404, 'The URL is incorrect');
+            // (This is the part where we will send them email notification failed and redirect them)
+            $mainDelegate = MainDelegate::where('id', $mainDelegateId)->first();
+            $event = Event::where('id', $mainDelegate->event_id)->first();
+            $eventFormattedData = Carbon::parse($event->event_start_date)->format('d') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');
+
+            
+
+            return redirect()->route('register.failed.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'eventYear' => $event->year, 'mainDelegateId' => $mainDelegateId]);
         }
     }
 
@@ -197,9 +246,7 @@ class RegistrationController extends Controller
     public function registrationView($eventYear, $eventCategory, $eventId)
     {
         if (Event::where('year', $eventYear)->where('category', $eventCategory)->where('id', $eventId)->exists()) {
-
             $event = Event::where('year', $eventYear)->where('category', $eventCategory)->where('id', $eventId)->first();
-
             return view('registration.registration', [
                 'pageTitle' => $event->name,
                 'event' => $event,

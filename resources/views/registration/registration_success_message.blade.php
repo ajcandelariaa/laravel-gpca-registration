@@ -15,13 +15,28 @@
 <body class="min-h-screen flex flex-col">
     <div class="container mx-auto">
         <img src="{{ Storage::url($event->banner) }}" alt="" class="h-52 w-full object-fill object-center">
-        <h1>SUCCESS REGISTRATION</h1>
+
+        <div class="my-10">
+            @if ($mainDelegate->payment_status == 'unpaid')
+                @include('registration.unpaid_message')
+            @else
+                @include('registration.paid_message')
+            @endif
+        </div>
     </div>
 
 
     <footer class="bg-registrationPrimaryColor w-full py-5 text-center text-white mt-auto">
         <p>Copyright © 2023 GPCA Registration</p>
     </footer>
+    
+    <script>
+        if (self === top) {
+
+        } else {
+            top.location = self.location;
+        }
+    </script>
 </body>
 
 </html>
