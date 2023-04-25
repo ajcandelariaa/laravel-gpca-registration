@@ -2,7 +2,6 @@
 
 namespace App\Http\Livewire;
 
-use App\Mail\RegistrationConfirmation;
 use App\Mail\RegistrationPaid;
 use App\Mail\RegistrationPaymentConfirmation;
 use App\Mail\RegistrationUnpaid;
@@ -72,7 +71,7 @@ class RegistrationForm extends Component
     public $promoCodeFailSubEdit, $promoCodeSuccessSubEdit;
 
 
-    protected $listeners = ['emitInitiateAuthentication' => 'initiateAuthenticationCC'];
+    protected $listeners = ['emitRegistrationPayConfirmation' => 'registrationPayConfirmation', 'registrationPayConfirmed' => 'initiateAuthenticationCC'];
 
     public function mount($data)
     {
@@ -109,11 +108,6 @@ class RegistrationForm extends Component
 
     public function render()
     {
-        // if (Session::has('sessionId')) {
-        //     $this->sessionId = Session::get('sessionId');
-        // } else {
-        //     $this->sessionId = null;
-        // }
         return view('livewire.registration.registration-form');
     }
 
@@ -252,6 +246,7 @@ class RegistrationForm extends Component
             }
         } else if ($this->currentStep == 2) {
             $this->resetCalculations();
+            $this->paymentMethod = null;
 
             $this->validate([
                 'companySector' => 'required',
@@ -292,10 +287,12 @@ class RegistrationForm extends Component
         $this->emit('stepChanges');
         if ($this->currentStep == 2) {
             $this->members = Members::where('active', true)->get();
+            $this->resetCalculations();
         }
 
-        if ($this->currentStep == 2) {
+        if($this->currentStep == 3){
             $this->resetCalculations();
+            $this->resetPaymentCC();
         }
 
         $this->currentStep -= 1;
@@ -533,7 +530,6 @@ class RegistrationForm extends Component
         ]);
         $bodyGetSession = $responseGetSession->getBody()->getContents();
         $dataGetSession = json_decode($bodyGetSession, true);
-
         if ($dataGetSession['result'] == "SUCCESS") {
             $this->sessionId =  $dataGetSession['session']['id'];
             Session::put('sessionId', $dataGetSession['session']['id']);
@@ -565,6 +561,14 @@ class RegistrationForm extends Component
                 $this->cardDetails = false;
             }
         }
+    }
+
+    public function registrationPayConfirmation(){
+        $this->dispatchBrowserEvent('swal:registration-pay-confirmation', [
+            'type' => 'warning',
+            'message' => 'Are you sure your want to pay via Credit Card?',
+            'text' => "",
+        ]);
     }
 
     public function initiateAuthenticationCC()
@@ -766,14 +770,19 @@ class RegistrationForm extends Component
                     PromoCodes::where('event_id', $this->event->id)->where('event_category', $this->event->category)->where('active', true)->where('promo_code', $mainDelegate->pcode_used)->where('badge_type', $mainDelegate->badge_type)->increment('total_usage');
                 }
                 $mainDelegate->delete();
-
-                // do error handling
-                // then pop up error
+                $this->dispatchBrowserEvent('swal:registration-error-authentication', [
+                    'type' => 'error',
+                    'message' => 'Authentication Error',
+                    'text' => 'There was a problem authenticating your card, please try again!'
+                ]);
             }
         } else {
-            // do error handling
-            // since it is not supported for authenticating
-            // pop up error
+            
+            $this->dispatchBrowserEvent('swal:registration-error-authentication', [
+                'type' => 'error',
+                'message' => 'Authentication Error',
+                'text' => 'There was a problem authenticating your card, please try again!'
+            ]);
         }
     }
 

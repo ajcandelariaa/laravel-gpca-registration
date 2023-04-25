@@ -69,9 +69,5 @@
                 </div>
             </div>
         </div>
-
-        @if ($htmlCodeOTP != null)
-            @include('livewire.registration.step.third_otp')
-        @endif
     @endif
 </div>

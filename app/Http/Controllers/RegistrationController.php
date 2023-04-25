@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\RegistrationCardDeclined;
 use App\Mail\RegistrationPaid;
 use App\Mail\RegistrationPaymentConfirmation;
 use App\Models\AdditionalDelegate;
@@ -214,6 +215,35 @@ class RegistrationController extends Controller
                 $event = Event::where('id', $mainDelegate->event_id)->first();
                 $eventFormattedData = Carbon::parse($event->event_start_date)->format('d') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');
 
+                $details = [
+                    'name' => $mainDelegate->salutation . " " . $mainDelegate->first_name . " " . $mainDelegate->middle_name . " " . $mainDelegate->last_name,
+                    'eventLink' => $event->link,
+                    'eventName' => $event->name,
+                    'eventDates' => $eventFormattedData,
+                    'eventLocation' => $event->location,
+                ];
+    
+                Mail::to($mainDelegate->email_address)->send(new RegistrationCardDeclined($details));
+    
+                if ($mainDelegate->assistant_email_address != null) {
+                    Mail::to($mainDelegate->assistant_email_address)->send(new RegistrationCardDeclined($details));
+                }
+    
+                $additionalDelegates = AdditionalDelegate::where('main_delegate_id', $mainDelegateId)->get();
+    
+                if (!$additionalDelegates->isEmpty()) {
+                    foreach ($additionalDelegates as $additionalDelegate) {
+                        $details = [
+                            'name' => $additionalDelegate->salutation . " " . $additionalDelegate->first_name . " " . $additionalDelegate->middle_name . " " . $additionalDelegate->last_name,
+                            'eventLink' => $event->link,
+                            'eventName' => $event->name,
+                            'eventDates' => $eventFormattedData,
+                            'eventLocation' => $event->location,
+                        ];
+                        Mail::to($additionalDelegate->email_address)->send(new RegistrationCardDeclined($details));
+                    }
+                }
+
                 return redirect()->route('register.failed.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'eventYear' => $event->year, 'mainDelegateId' => $mainDelegateId]);
             }
         } else {
@@ -222,7 +252,34 @@ class RegistrationController extends Controller
             $event = Event::where('id', $mainDelegate->event_id)->first();
             $eventFormattedData = Carbon::parse($event->event_start_date)->format('d') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');
 
-            
+            $details = [
+                'name' => $mainDelegate->salutation . " " . $mainDelegate->first_name . " " . $mainDelegate->middle_name . " " . $mainDelegate->last_name,
+                'eventLink' => $event->link,
+                'eventName' => $event->name,
+                'eventDates' => $eventFormattedData,
+                'eventLocation' => $event->location,
+            ];
+
+            Mail::to($mainDelegate->email_address)->send(new RegistrationCardDeclined($details));
+
+            if ($mainDelegate->assistant_email_address != null) {
+                Mail::to($mainDelegate->assistant_email_address)->send(new RegistrationCardDeclined($details));
+            }
+
+            $additionalDelegates = AdditionalDelegate::where('main_delegate_id', $mainDelegateId)->get();
+
+            if (!$additionalDelegates->isEmpty()) {
+                foreach ($additionalDelegates as $additionalDelegate) {
+                    $details = [
+                        'name' => $additionalDelegate->salutation . " " . $additionalDelegate->first_name . " " . $additionalDelegate->middle_name . " " . $additionalDelegate->last_name,
+                        'eventLink' => $event->link,
+                        'eventName' => $event->name,
+                        'eventDates' => $eventFormattedData,
+                        'eventLocation' => $event->location,
+                    ];
+                    Mail::to($additionalDelegate->email_address)->send(new RegistrationCardDeclined($details));
+                }
+            }
 
             return redirect()->route('register.failed.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'eventYear' => $event->year, 'mainDelegateId' => $mainDelegateId]);
         }

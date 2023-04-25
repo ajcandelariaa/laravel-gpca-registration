@@ -7,6 +7,9 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>{{ $pageTitle }}</title>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
     {{-- FONT AWESOME LINK --}}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css"
         integrity="sha512-SzlrxWUlpfuzQ+pcUCosxcglQRNAq/DZjVsC0lE40xsADsfeQoEypE+enwcOiGjk/bSuGGKHEyjSoQ1zVisanQ=="
@@ -39,6 +42,25 @@
 
         .horizontal-progress {
             display: block;
+        }
+        
+        .swal-button--confirm {
+            background-color: #034889;
+            color: #fff;
+        }
+
+        .swal-button--cancel {
+            background-color: #dd3333;
+            color: #fff;
+        }
+
+
+        .swal-button--confirm:hover {
+            background-color: #033e75 !important;
+        }
+
+        .swal-button--cancel:hover {
+            background-color: #cb2e2e !important;
         }
 
         @media only screen and (min-width: 1280px) {
@@ -74,6 +96,8 @@
             return "Are you sure?";
         }
     </script> --}}
+    
+    <script src="{{ asset('js/allswal.js') }}"></script>
     @livewireScripts()
 </body>
 

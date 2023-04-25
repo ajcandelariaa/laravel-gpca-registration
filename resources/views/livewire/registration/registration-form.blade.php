@@ -49,6 +49,7 @@
         <script>
             $(document).ready(function() {
                 let sessionId = "{{ $sessionId }}";
+                console.log(sessionId);
                 console.log("Test")
                 PaymentSession.configure({
                     session: sessionId,
@@ -80,7 +81,7 @@
                                     if (response.sourceOfFunds.provided.card.scheme == 'MASTERCARD') {
                                         console.log("The user entered a Mastercard credit card.")
                                     }
-                                    window.Livewire.emit('emitInitiateAuthentication');
+                                    window.Livewire.emit('emitRegistrationPayConfirmation');
                                 } else if ("fields_in_error" == response.status) {
                                     console.log("Session update failed with field errors.");
                                     if (response.errors.cardNumber) {

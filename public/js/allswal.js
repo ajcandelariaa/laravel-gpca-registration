@@ -1,3 +1,41 @@
+// REGISTRATION AUTHENTICATION ERROR
+window.addEventListener("swal:registration-error-authentication", (event) => {
+    swal({
+        title: event.detail.message,
+        text: event.detail.text,
+        icon: event.detail.type,
+    });
+});
+
+// REGISTRATION PAY CONFIRMATION
+window.addEventListener("swal:registration-pay-confirmation", (event) => {
+    swal({
+        title: event.detail.message,
+        text: event.detail.text,
+        icon: event.detail.type,
+        buttons: {
+            confirm: {
+                text: "Yes, I will!",
+                value: true,
+                visible: true,
+                closeModal: true,
+            },
+            cancel: {
+                text: "Cancel",
+                value: null,
+                visible: true,
+                closeModal: true,
+            },
+        }
+      }).then((result) => {
+        console.log(result);
+        if (result) {
+            Livewire.emit('registrationPayConfirmed')
+        }
+      });
+});
+
+
 // PROMO CODE ADD CONFIRMATION
 window.addEventListener("swal:add-promo-code-confirmation", (event) => {
     swal({

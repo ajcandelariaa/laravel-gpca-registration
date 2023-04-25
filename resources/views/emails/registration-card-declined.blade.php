@@ -16,20 +16,18 @@
     <li style="mso-special-format:bullet;">There may be a problem with your bank’s authorization system.</li>
 </ul>
 
-<br>
-
 <p>Although your registration is saved in our system. You can still pay by bank transfer through the below bank account.</p>
 
+<span>In favour of: <strong>Gulf Petrochemicals & Chemicals Association Mashreq Bank Riqqa Branch, Deira, P.O. Box5511, Dubai, UAE</strong></span>
 <br>
-
-<p>In favour of: Gulf Petrochemicals & Chemicals Association Mashreq Bank Riqqa Branch, Deira, P.O. Box5511, Dubai, UAE</p>
-<p>USD Acct No. <strong>0190-00-05007-7</strong></p>
-<p>IBAN No. <strong>AE360330000019000050077</strong></p>
-<p>Swift Code <strong>BOMLAEAD</strong></p>
+<span>USD Acct No. <strong>0190-00-05007-7</strong></span>
+<br>
+<span>IBAN No. <strong>AE360330000019000050077</strong></span>
+<br>
+<span>Swift Code <strong>BOMLAEAD</strong></span>
 
 <br><br>
 <p>For more information or queries please contact Analee Candelaria at <a href="mailto:analee@gpca.org.ae">analee@gpca.org.ae</a> | +971 4 451 0666 Ext 116.</p>
-<br>
 
 Kind regards,
 <br><br>
