@@ -697,6 +697,7 @@ class RegistrationForm extends Component
             }
 
             $clientAuthPayer = new Client();
+            $appUrl = env('APP_URL');
             $responseAuthPayer = $clientAuthPayer->request('PUT', $apiEndpoint . '/order/' . $this->orderId . '/transaction/' . $this->transactionId, [
                 'auth' => [
                     'merchant.' . $merchantId,
@@ -710,7 +711,7 @@ class RegistrationForm extends Component
                         'id' => $this->sessionId,
                     ],
                     "authentication" => [
-                        "redirectResponseUrl" => "http://127.0.0.1:8000/capturePayment?sessionId=$this->sessionId&mainDelegateId=$newRegistrant->id",
+                        "redirectResponseUrl" => "$appUrl/capturePayment?sessionId=$this->sessionId&mainDelegateId=$newRegistrant->id",
                     ],
                     "correlationId" => "test",
                     "device" =>  [
