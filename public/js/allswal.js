@@ -7,8 +7,8 @@ window.addEventListener("swal:registration-error-authentication", (event) => {
     });
 });
 
-// REGISTRATION PAY CONFIRMATION
-window.addEventListener("swal:registration-pay-confirmation", (event) => {
+// REGISTRATION CONFIRMATION
+window.addEventListener("swal:registration-confirmation", (event) => {
     swal({
         title: event.detail.message,
         text: event.detail.text,
@@ -30,7 +30,7 @@ window.addEventListener("swal:registration-pay-confirmation", (event) => {
       }).then((result) => {
         console.log(result);
         if (result) {
-            Livewire.emit('registrationPayConfirmed')
+            Livewire.emit('registrationConfirmed')
         }
       });
 });

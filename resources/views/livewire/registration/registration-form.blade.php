@@ -11,8 +11,10 @@
                 @include('livewire.registration.step.first')
             @elseif ($currentStep == 2)
                 @include('livewire.registration.step.second')
-            @else
+            @elseif ($currentStep == 3)
                 @include('livewire.registration.step.third')
+            @else
+                @include('livewire.registration.step.fourth')
             @endif
 
             <div class="w-full mt-20 mx-5 flex justify-between gap-5">
@@ -30,13 +32,18 @@
                         wire:click.prevent="increaseStep">NEXT</button>
                 @endif
                 @if ($currentStep == 3)
-                    @if ($sessionId && $cardDetails)
+                    <button type="button" wire:key="btnIncreaseStep"
+                        class="hover:bg-registrationPrimaryColor hover:text-white font-bold border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor w-52 rounded-md py-2"
+                        wire:click.prevent="increaseStep">REGISTER</button>
+                @endif
+                @if ($currentStep == 4)
+                    @if ($sessionId && $cardDetails && $paymentMethod == "creditCard")
                         <button type="button"
                             class="hover:bg-registrationPrimaryColorHover font-bold bg-registrationPrimaryColor text-white w-52 rounded-md py-2"
                             id="payButton">PAY</button>
                     @else
                         <button type="submit" wire:key="btnSubmitBank"
-                            class="hover:bg-registrationPrimaryColorHover font-bold bg-registrationPrimaryColor text-white w-52 rounded-md py-2">SUBMIT</button>
+                            class="hover:bg-registrationPrimaryColorHover font-bold bg-registrationPrimaryColor text-white w-52 rounded-md py-2">PAY</button>
                     @endif
                 @endif
             </div>
@@ -81,7 +88,7 @@
                                     if (response.sourceOfFunds.provided.card.scheme == 'MASTERCARD') {
                                         console.log("The user entered a Mastercard credit card.")
                                     }
-                                    window.Livewire.emit('emitRegistrationPayConfirmation');
+                                    window.Livewire.emit('emitInitiateAuth');
                                 } else if ("fields_in_error" == response.status) {
                                     console.log("Session update failed with field errors.");
                                     if (response.errors.cardNumber) {
