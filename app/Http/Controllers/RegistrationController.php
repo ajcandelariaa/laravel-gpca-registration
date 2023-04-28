@@ -211,6 +211,11 @@ class RegistrationController extends Controller
                 return redirect()->route('register.success.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'eventYear' => $event->year, 'mainDelegateId' => $mainDelegateId]);
             } else {
                 // (This is the part where we will send them email notification failed and redirect them)
+                MainDelegate::find($mainDelegateId)->fill([
+                    'registration_status' => "pending",
+                    'payment_status' => "unpaid",
+                ])->save();
+                
                 $mainDelegate = MainDelegate::where('id', $mainDelegateId)->first();
                 $event = Event::where('id', $mainDelegate->event_id)->first();
                 $eventFormattedData = Carbon::parse($event->event_start_date)->format('d') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');
@@ -222,15 +227,15 @@ class RegistrationController extends Controller
                     'eventDates' => $eventFormattedData,
                     'eventLocation' => $event->location,
                 ];
-    
+
                 Mail::to($mainDelegate->email_address)->send(new RegistrationCardDeclined($details));
-    
+
                 if ($mainDelegate->assistant_email_address != null) {
                     Mail::to($mainDelegate->assistant_email_address)->send(new RegistrationCardDeclined($details));
                 }
-    
+
                 $additionalDelegates = AdditionalDelegate::where('main_delegate_id', $mainDelegateId)->get();
-    
+
                 if (!$additionalDelegates->isEmpty()) {
                     foreach ($additionalDelegates as $additionalDelegate) {
                         $details = [
@@ -248,6 +253,11 @@ class RegistrationController extends Controller
             }
         } else {
             // (This is the part where we will send them email notification failed and redirect them)
+            MainDelegate::find($mainDelegateId)->fill([
+                'registration_status' => "pending",
+                'payment_status' => "unpaid",
+            ])->save();
+
             $mainDelegate = MainDelegate::where('id', $mainDelegateId)->first();
             $event = Event::where('id', $mainDelegate->event_id)->first();
             $eventFormattedData = Carbon::parse($event->event_start_date)->format('d') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');

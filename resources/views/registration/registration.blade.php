@@ -63,6 +63,14 @@
             background-color: #cb2e2e !important;
         }
 
+        .cc-show-red-border{
+            border:1px solid red !important;
+        }
+        
+        .cc-show-green-border{
+            border:1px solid green !important;
+        }
+
         @media only screen and (min-width: 1280px) {
             .form-container {
                 margin-left: 360px;

@@ -598,6 +598,7 @@ class RegistrationForm extends Component
                 'json' => [
                     "order" => [
                         'amount' => $this->finalTotal,
+                        // 'amount' => 0.27,
                         'currency' => 'USD',
                     ],
                 ]

@@ -15,7 +15,8 @@
             <div class="mt-3 bg-registrationInputFieldsBGColor py-1 px-1">
                 <div class="flex items-center gap-3">
                     <p class="text-xl text-registrationPrimaryColor font-bold italic py-2 px-3">Company Details</p>
-                    <button wire:click="openEditCompanyDetailsModal" class="cursor-pointer hover:text-yellow-600 text-yellow-500">
+                    <button wire:click="openEditCompanyDetailsModal"
+                        class="cursor-pointer hover:text-yellow-600 text-yellow-500">
                         <i class="fa-solid fa-pen-to-square"></i> Edit
                     </button>
                 </div>
@@ -73,7 +74,7 @@
             <div class="grid grid-cols-2 bg-registrationCardBGColor py-3 px-4 gap-4 mt-3">
                 <p>Mode of Payment:</p>
                 <p class="font-bold">
-                    @if ($finalData['mode_of_payment'] == "bankTransfer")
+                    @if ($finalData['mode_of_payment'] == 'bankTransfer')
                         Bank Transfer
                     @else
                         Credit Card
@@ -86,15 +87,15 @@
                 @elseif ($finalData['registration_status'] == 'pending')
                     <p class="font-bold text-yellow-600">Pending</p>
                 @else
-                    <p class="font-bold text-red-600">Cancelled</p>
+                    <p class="font-bold text-red-600">Dropped Out</p>
                 @endif
 
                 <p>Payment Status:</p>
                 <p class="font-bold">
-                    @if ($finalData['payment_status'] == "paid")
+                    @if ($finalData['payment_status'] == 'paid')
                         Paid
                     @elseif ($finalData['payment_status'] == 'free')
-                        Free 
+                        Free
                     @else
                         Unpaid
                     @endif
@@ -108,15 +109,18 @@
             </div>
 
             <div class="grid grid-cols-2 gap-3 mt-5">
-                @if ($finalData['registration_status'] == 'confirmed')
-                    <button disabled class="bg-gray-400 cursor-not-allowed text-white py-2 rounded-md text-lg text-center"
-                    >Mark as Paid</button>
+                @if ($finalData['registration_status'] == 'pending')
+                    <button wire:click="markAsPaid"
+                        class="bg-green-600 hover:bg-green-700 text-white py-2 rounded-md text-lg text-center">Mark as
+                        Paid</button>
                 @else
-                    <button wire:click="markAsPaid" class="bg-green-600 hover:bg-green-700 text-white py-2 rounded-md text-lg text-center"
-                    >Mark as Paid</button>
+                    <button disabled
+                        class="bg-gray-400 cursor-not-allowed text-white py-2 rounded-md text-lg text-center">Mark as
+                        Paid</button>
                 @endif
-                <button wire:click="calculateTotal" class="bg-registrationPrimaryColorHover hover:bg-registrationPrimaryColor text-white py-2 rounded-md text-lg text-center"
-                    >Calculate Total</button>
+                <button wire:click="calculateTotal"
+                    class="bg-registrationPrimaryColorHover hover:bg-registrationPrimaryColor text-white py-2 rounded-md text-lg text-center">Calculate
+                    Total</button>
 
                 <a href="{{ route('admin.event.registrants.view.invoice', ['eventCategory' => $eventCategory, 'eventId' => $eventId, 'registrantId' => $registrantId]) }}"
                     class="bg-orange-800 hover:bg-orange-900 text-white py-2 rounded-md text-lg text-center"
@@ -124,13 +128,15 @@
                 <a href="{{ route('admin.event.registrants.download.invoice', ['eventCategory' => $eventCategory, 'eventId' => $eventId, 'registrantId' => $registrantId]) }}"
                     class="bg-gray-800 hover:bg-black text-white py-2 rounded-md text-lg text-center"
                     target="_blank">Download Invoice</a>
-                    
-                @if ($finalData['registration_status'] == 'confirmed')
-                <button disabled class="col-span-2 mt-10 bg-gray-400 cursor-not-allowed text-white py-2 rounded-md text-lg text-center"
-                >Send Email Reminder</button>
+
+                @if ($finalData['registration_status'] == 'pending')
+                    <button wire:click="sendEmailReminder"
+                        class="col-span-2 mt-10 bg-sky-600 hover:bg-sky-700 text-white py-2 rounded-md text-lg text-center">Send
+                        Email Reminder</button>
                 @else
-                    <button wire:click="sendEmailReminder" class="col-span-2 mt-10 bg-sky-600 hover:bg-sky-700 text-white py-2 rounded-md text-lg text-center"
-                    >Send Email Reminder</button>
+                    <button disabled
+                        class="col-span-2 mt-10 bg-gray-400 cursor-not-allowed text-white py-2 rounded-md text-lg text-center">Send
+                        Email Reminder</button>
                 @endif
             </div>
         </div>
@@ -139,7 +145,8 @@
             <div class="bg-registrationInputFieldsBGColor py-1 px-1">
                 <div class="flex items-center gap-3">
                     <p class="text-xl text-registrationPrimaryColor font-bold italic py-2 px-3">Delegate Details</p>
-                    <button wire:click="openEditMainDelegateModal" class="cursor-pointer hover:text-yellow-600 text-yellow-500">
+                    <button wire:click="openEditMainDelegateModal"
+                        class="cursor-pointer hover:text-yellow-600 text-yellow-500">
                         <i class="fa-solid fa-pen-to-square"></i> Edit
                     </button>
                 </div>
@@ -190,9 +197,11 @@
                                     <span
                                         class="col-span-2 text-registrationPrimaryColor py-1 rounded-full border border-registrationPrimaryColor px-4 font-bold text-sm">
                                         Delegate {{ $count }}</span>
-                                        <button wire:click.prevent="openEditSubDelegateModal('{{ $subDelegate['subDelegateId'] }}')" class="cursor-pointer hover:text-yellow-600 text-yellow-500">
-                                            <i class="fa-solid fa-pen-to-square"></i> Edit
-                                        </button>
+                                    <button
+                                        wire:click.prevent="openEditSubDelegateModal('{{ $subDelegate['subDelegateId'] }}')"
+                                        class="cursor-pointer hover:text-yellow-600 text-yellow-500">
+                                        <i class="fa-solid fa-pen-to-square"></i> Edit
+                                    </button>
                                 </div>
 
                                 <div class="grid grid-cols-2 mt-5 gap-2 px-6">
@@ -332,7 +341,7 @@
     @if ($showDelegateModal)
         @include('livewire.registrants.edit_delegate_form')
     @endif
-    
+
     @if ($showCompanyModal)
         @include('livewire.registrants.edit_company_form')
     @endif

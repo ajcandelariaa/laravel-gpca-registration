@@ -32,7 +32,7 @@
     <div>Security Code:<input type="text" id="security-code" class="input-field" title="security code"
             aria-label="three digit CCV security code" value="" tabindex="4" readonly></div>
     <div>Cardholder Name:<input type="text" id="cardholder-name" class="input-field" title="cardholder name"
-            aria-label="enter name on card" value="" tabindex="5" readonly required></div>
+            aria-label="enter name on card" value="" tabindex="5" readonly></div>
     <div><button id="payButton" onclick="pay('card');">Pay Now</button></div>
 
     <span id="card-number-error"></span>
@@ -51,7 +51,8 @@
         }
 
         let sessionId = "{{ session('sessionId') }}";
-        let cardNumberError = expiryMonthError = expiryYearError = securityCodeError = cardNameError = true;
+        let cardNumberError = expiryMonthError = expiryYearError = securityCodeError = true;
+        let securityCodeErrorEmpty = cardNameErrorEmpty = true;
 
         let cardNumberErrMessage = document.getElementById('card-number-error');
         let cardMonthErrMessage = document.getElementById('card-month-error');
@@ -89,18 +90,34 @@
                     // HANDLE RESPONSE FOR UPDATE SESSION
                     if (response.status) {
                         if ("ok" == response.status) {
-                            if (securityCodeError || cardNameError) {
-                                if (securityCodeError) {
+
+                            document.querySelector('#card-number').style.borderColor = "green";
+                            cardNumberErrMessage.classList.remove("error");
+
+                            document.querySelector('#expiry-month').style.borderColor = "green";
+                            cardMonthErrMessage.classList.remove("error");
+
+                            document.querySelector('#expiry-year').style.borderColor = "green";
+                            cardYearErrMessage.classList.remove("error");
+
+                            if (securityCodeErrorEmpty || cardNameErrorEmpty) {
+                                if (securityCodeErrorEmpty) {
                                     document.querySelector('#security-code').style.borderColor = "red";
                                     cardSecurityErrMessage.classList.add("error");
                                 }
 
-                                if (cardNameError) {
+                                if (cardNameErrorEmpty) {
                                     document.querySelector('#cardholder-name').style.borderColor = "red";
                                     cardNameErrMessage.classList.add("error");
                                 }
                             } else {
                                 console.log("Session updated with data: " + response.session.id);
+
+                                document.querySelector('#security-code').style.borderColor = "green";
+                                cardSecurityErrMessage.classList.remove("error");
+
+                                document.querySelector('#cardholder-name').style.borderColor = "green";
+                                cardNameErrMessage.classList.remove("error");
 
                                 if (response.sourceOfFunds.provided.card.securityCode) {
                                     console.log("Security code was provided.");
@@ -115,24 +132,38 @@
                             console.log("Session update failed with field errors.");
 
                             // if missing din yung details ng security code at card holder name
-                            if (securityCodeError) {
-                                console.log("Security code missing.");
-
-                                securityCodeError = true;
-                                cardSecurityErrMessage.textContent = "Security Code is missing";
-
+                            if (securityCodeErrorEmpty) {
+                                console.log("Security code required.");
+                                cardSecurityErrMessage.textContent = "Security Code is required";
                                 document.querySelector('#security-code').style.borderColor = "red";
                                 cardSecurityErrMessage.classList.add('error');
+                            } else {
+                                if (response.errors.securityCode) {
+                                    console.log("Security code invalid.");
+                                    securityCodeError = true;
+                                    securityCodeErrorEmpty = false;
+                                    cardSecurityErrMessage.textContent = "Security Code is invalid";
+                                    document.querySelector('#security-code').style.borderColor = "red";
+                                    cardSecurityErrMessage.classList.add('error');
+                                } else {
+                                    securityCodeError = false;
+                                    securityCodeErrorEmpty = false;
+                                    cardSecurityErrMessage.textContent = "";
+                                    document.querySelector('#security-code').style.borderColor = "green";
+                                    cardSecurityErrMessage.classList.remove('error');
+                                }
                             }
 
-                            if (cardNameError) {
-                                console.log("Cardholder name missing.");
-
-                                cardNameError = true;
-                                cardNameErrMessage.textContent = "Cardholder Name is missing";
-
+                            if (cardNameErrorEmpty) {
+                                console.log("Cardholder name required.");
+                                cardNameErrMessage.textContent = "Cardholder Name is required";
                                 document.querySelector('#cardholder-name').style.borderColor = "red";
                                 cardNameErrMessage.classList.add('error');
+                            } else {
+                                cardNameErrorEmpty = false;
+                                cardNameErrMessage.textContent = "";
+                                document.querySelector('#cardholder-name').style.borderColor = "green";
+                                cardNameErrMessage.classList.remove('error');
                             }
 
 
@@ -151,7 +182,14 @@
 
                                 document.querySelector('#card-number').style.borderColor = "red";
                                 cardNumberErrMessage.classList.add('error');
+                            } else {
+                                cardNumberError = false;
+                                cardNumberErrMessage.textContent = "";
+                                document.querySelector('#card-number').style.borderColor = "green";
+                                cardNumberErrMessage.classList.remove('error');
                             }
+
+
                             if (response.errors.expiryYear) {
                                 console.log("Expiry year invalid or missing.");
 
@@ -167,7 +205,14 @@
 
                                 document.querySelector('#expiry-year').style.borderColor = "red";
                                 cardYearErrMessage.classList.add('error');
+                            } else {
+                                expiryYearError = false;
+                                cardYearErrMessage.textContent = "";
+                                document.querySelector('#expiry-year').style.borderColor = "green";
+                                cardYearErrMessage.classList.remove('error');
                             }
+
+
                             if (response.errors.expiryMonth) {
                                 console.log("Expiry month invalid or missing.");
 
@@ -183,17 +228,13 @@
 
                                 document.querySelector('#expiry-month').style.borderColor = "red";
                                 cardMonthErrMessage.classList.add('error');
+                            } else {
+                                expiryMonthError = false;
+                                cardMonthErrMessage.textContent = "";
+                                document.querySelector('#expiry-month').style.borderColor = "green";
+                                cardMonthErrMessage.classList.remove('error');
                             }
 
-                            if (response.errors.securityCode) {
-                                console.log("Security code invalid.");
-
-                                securityCodeError = true;
-                                cardSecurityErrMessage.textContent = "Security Code is invalid";
-
-                                document.querySelector('#security-code').style.borderColor = "red";
-                                cardSecurityErrMessage.classList.add('error');
-                            }
                         } else if ("request_timeout" == response.status) {
                             console.log("Session update failed with request timeout: " + response.errors
                                 .message);
@@ -213,13 +254,6 @@
             }
         });
 
-
-        PaymentSession.onFocus(["card.number", "card.securityCode", "card.expiryYear", "card.expiryMonth",
-            "card.nameOnCard"
-        ], function(selector, role) {
-            // removeErrorMessage();
-        });
-
         PaymentSession.onValidityChange(["card.number", "card.securityCode", "card.expiryYear", "card.expiryMonth"],
             function(selector, result) {
                 if (result.isValid) {
@@ -230,53 +264,25 @@
             });
 
         PaymentSession.onEmptinessChange(["card.nameOnCard", "card.securityCode"], function(selector, result) {
-            if (result.isEmpty) {
-                if (selector == "#cardholder-name") {
-                    cardNameError = true;
-                    cardNameErrMessage.textContent = "Cardholder Name is required";
+            if (selector == "#cardholder-name") {
+                if (result.isEmpty) {
+                    cardNameErrorEmpty = true;
+                    document.querySelector(selector).style.borderColor = "red";
                 } else {
-                    securityCodeError = true;
-                    cardSecurityErrMessage.textContent = "Security Code is required";
+                    cardNameErrorEmpty = false;
+                    document.querySelector(selector).style.borderColor = "green";
                 }
-                document.querySelector(selector).style.borderColor = "red";
-            } else if (!result.isEmpty) {
-                if (selector == "#security-code") {
-                    cardNameError = false;
-                    cardNameErrMessage.textContent = "";
+            } else {
+                if (result.isEmpty) {
+                    securityCodeErrorEmpty = true;
+                    console.log('sec empty');
+                    document.querySelector(selector).style.borderColor = "red";
                 } else {
-                    securityCodeError = false;
-                    cardSecurityErrMessage.textContent = "";
+                    securityCodeErrorEmpty = false;
+                    document.querySelector(selector).style.borderColor = "green";
                 }
-                document.querySelector(selector).style.borderColor = "green";
             }
         });
-
-        function removeErrorMessage() {
-            if (cardNumberErrMessage.classList.contains("error")) {
-                cardNumberErrMessage.classList.remove("error");
-                cardNumberErrMessage.textContent = "";
-            }
-
-            if (cardMonthErrMessage.classList.contains("error")) {
-                cardMonthErrMessage.classList.remove("error");
-                cardMonthErrMessage.textContent = "";
-            }
-
-            if (cardYearErrMessage.classList.contains("error")) {
-                cardYearErrMessage.classList.remove("error");
-                cardYearErrMessage.textContent = "";
-            }
-
-            if (cardSecurityErrMessage.classList.contains("error")) {
-                cardSecurityErrMessage.classList.remove("error");
-                cardSecurityErrMessage.textContent = "";
-            }
-
-            if (cardNameErrMessage.classList.contains("error")) {
-                cardNameErrMessage.classList.remove("error");
-                cardNameErrMessage.textContent = "";
-            }
-        }
 
         function pay() {
             PaymentSession.updateSessionFromForm('card');
