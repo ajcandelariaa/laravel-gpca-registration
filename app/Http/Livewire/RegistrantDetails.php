@@ -405,12 +405,12 @@ class RegistrantDetails extends Component
             'balance' => "0.00",
         ];
 
-        Mail::to($this->finalData['email_address'])->send(new RegistrationPaid($details1));
-        Mail::to($this->finalData['email_address'])->send(new RegistrationPaymentConfirmation($details2));
+        Mail::to($this->finalData['email_address'])->queue(new RegistrationPaid($details1));
+        Mail::to($this->finalData['email_address'])->queue(new RegistrationPaymentConfirmation($details2));
 
         if ($this->finalData['assistant_email_address'] != null) {
-            Mail::to($this->finalData['assistant_email_address'])->send(new RegistrationPaid($details1));
-            Mail::to($this->finalData['assistant_email_address'])->send(new RegistrationPaymentConfirmation($details2));
+            Mail::to($this->finalData['assistant_email_address'])->queue(new RegistrationPaid($details1));
+            Mail::to($this->finalData['assistant_email_address'])->queue(new RegistrationPaymentConfirmation($details2));
         }
 
         if (count($this->finalData['subDelegates']) > 0) {
@@ -443,8 +443,8 @@ class RegistrantDetails extends Component
                     'amountPaid' => $this->finalData['invoiceData']['total_amount'],
                     'balance' => "0.00",
                 ];
-                Mail::to($subDelegate['email_address'])->send(new RegistrationPaid($details1));
-                Mail::to($subDelegate['email_address'])->send(new RegistrationPaymentConfirmation($details2));
+                Mail::to($subDelegate['email_address'])->queue(new RegistrationPaid($details1));
+                Mail::to($subDelegate['email_address'])->queue(new RegistrationPaymentConfirmation($details2));
             }
         }
 
