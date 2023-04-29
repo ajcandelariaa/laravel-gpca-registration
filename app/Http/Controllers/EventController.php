@@ -309,6 +309,7 @@ class EventController extends Controller
             $event->category = $validatedData['category'];
             $event->name = $validatedData['name'];
             $event->location = $validatedData['location'];
+            $event->description = $validatedData['description'];
             $event->link = $validatedData['link'];
             $event->event_start_date = $validatedData['event_start_date'];
             $event->event_end_date = $validatedData['event_end_date'];
