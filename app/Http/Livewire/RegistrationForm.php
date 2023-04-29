@@ -84,12 +84,12 @@ class RegistrationForm extends Component
         $this->companySectors = config('app.companySectors');
         $this->salutations = config('app.salutations');
 
-        if($data->category == "AF"){
+        if ($data->category == "AF") {
             $this->bankDetails = config('app.bankDetails.AF');
         } else {
             $this->bankDetails = config('app.bankDetails.DEFAULT');
         }
-        
+
         $this->event = $data;
         $this->currentStep = 1;
 
@@ -266,6 +266,13 @@ class RegistrationForm extends Component
                 'companyCity' => 'required',
                 'companyMobileNumber' => 'required',
 
+            ]);
+            $this->currentStep += 1;
+        } else if ($this->currentStep == 3) {
+            $this->resetCalculations();
+            $this->paymentMethod = null;
+
+            $this->validate([
                 'firstName' => 'required',
                 'lastName' => 'required',
                 'emailAddress' => 'required',
@@ -274,7 +281,6 @@ class RegistrationForm extends Component
                 'jobTitle' => 'required',
                 'badgeType' => 'required',
             ]);
-
 
             if ($this->checkEmailIfUsedAlreadyMain($this->emailAddress)) {
                 $this->emailMainAlreadyUsedError = "You already used this email!";
@@ -290,11 +296,11 @@ class RegistrationForm extends Component
                     $this->currentStep += 1;
                 }
             }
-        } else if ($this->currentStep == 3) {
+        } else if ($this->currentStep == 4) {
             if ($this->paymentMethod == null) {
                 $this->paymentMethodError = "Please choose your payment method first";
             } else {
-                if($this->paymentMethod == "creditCard"){
+                if ($this->paymentMethod == "creditCard") {
                     $this->dispatchBrowserEvent('swal:registration-confirmation', [
                         'type' => 'warning',
                         'message' => 'Are you sure your want to pay via Credit Card?',
@@ -311,7 +317,8 @@ class RegistrationForm extends Component
         }
     }
 
-    public function addtoDatabase(){
+    public function addtoDatabase()
+    {
         if ($this->promoCode != null) {
             PromoCodes::where('event_id', $this->event->id)->where('event_category', $this->event->category)->where('active', true)->where('promo_code', $this->promoCode)->where('badge_type', $this->badgeType)->increment('total_usage');
         }
@@ -405,7 +412,7 @@ class RegistrationForm extends Component
             }
         }
 
-        if ($this->paymentMethod == "creditCard"){
+        if ($this->paymentMethod == "creditCard") {
             $this->setSessionCC();
             $this->orderId = $tempOrderId;
         }
@@ -425,12 +432,16 @@ class RegistrationForm extends Component
             $this->resetCalculations();
         }
 
+        if ($this->currentStep == 4) {
+            $this->resetCalculations();
+        }
+
         $this->currentStep -= 1;
     }
 
     public function submit()
     {
-        if ($this->currentStep == 4) {
+        if ($this->currentStep == 5) {
             // UPDATE DETAILS
 
             if ($this->finalTotal == 0) {

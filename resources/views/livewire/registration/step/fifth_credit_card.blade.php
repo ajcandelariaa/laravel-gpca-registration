@@ -1,6 +1,6 @@
 <div class="mt-5 bg-registrationCardBGColor p-5 rounded-lg">
     <div class="text-registrationPrimaryColor font-bold text-lg">
-        Credit Card Details
+        Card Details
     </div>
 
     @if ($sessionId && $cardDetails)

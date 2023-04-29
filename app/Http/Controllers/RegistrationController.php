@@ -383,7 +383,7 @@ class RegistrationController extends Controller
         if (Event::where('year', $eventYear)->where('category', $eventCategory)->where('id', $eventId)->exists()) {
             $event = Event::where('year', $eventYear)->where('category', $eventCategory)->where('id', $eventId)->first();
             return view('registration.registration', [
-                'pageTitle' => $event->name,
+                'pageTitle' => $event->name . " - Registration",
                 'event' => $event,
             ]);
         } else {

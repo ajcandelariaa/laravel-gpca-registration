@@ -1,153 +1,291 @@
+{{-- MAIN DELEGATE --}}
 <div class="mx-5">
-    <div>
-        <div class="text-registrationPrimaryColor font-bold text-2xl">
-            Package Summary
-        </div>
-
-        <div class="italic mt-5">
-            By registering your details, you understand that your personal data will be handled according to <a
-                href="" class="text-registrationPrimaryColor underline ">GPCA Privacy Policy</a>
-        </div>
+    <div class="text-registrationPrimaryColor italic font-bold text-xl">
+        Delegate details
     </div>
 
-    <div class="mt-5">
-        <div class="grid grid-cols-addDelegateGrid gap-y-2">
-            <div class="text-registrationPrimaryColor">
-                Invoice to be sent to:
-            </div>
+    <div class="mt-5 grid grid-cols-2 gap-y-3 gap-x-5">
+        {{-- ROW 1 --}}
+        <div class="space-y-2 col-span-2">
+            <div class="grid grid-cols-11 gap-x-5">
+                <div class="col-span-11 sm:col-span-2">
+                    <div class="text-registrationPrimaryColor">
+                        Salutation
+                    </div>
+                    <div>
+                        <select wire:model="salutation"
+                            class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                            <option value=""></option>
+                            @foreach ($salutations as $salutation)
+                                <option value="{{ $salutation }}">{{ $salutation }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
 
-            <div>
-                {{ $salutation . ' ' . $firstName . ' ' . $middleName . ' ' . $lastName }}
-            </div>
+                <div class="col-span-11 sm:col-span-3">
+                    <div class="text-registrationPrimaryColor">
+                        First Name <span class="text-red-500">*</span>
+                    </div>
+                    <div>
+                        <input placeholder="First Name" type="text" wire:model="firstName"
+                            class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
 
-            <div class="text-registrationPrimaryColor">
-                Email Address:
-            </div>
+                        @error('firstName')
+                            <div class="text-red-500 text-xs italic mt-1">
+                                {{ $message }}
+                            </div>
+                        @enderror
+                    </div>
+                </div>
 
-            <div>
-                {{ $emailAddress }}
-            </div>
+                <div class="col-span-11 sm:col-span-3">
+                    <div class="text-registrationPrimaryColor">
+                        Middle Name
+                    </div>
+                    <div>
+                        <input placeholder="Middle Name" type="text" wire:model="middleName"
+                            class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                    </div>
+                </div>
 
-            <div class="text-registrationPrimaryColor col-span-2">
-                Payment method:
+                <div class="col-span-11 sm:col-span-3">
+                    <div class="text-registrationPrimaryColor">
+                        Last Name <span class="text-red-500">*</span>
+                    </div>
+                    <div>
+                        <input placeholder="Last Name" type="text" wire:model="lastName"
+                            class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+
+                        @error('lastName')
+                            <div class="text-red-500 text-xs italic mt-1">
+                                {{ $message }}
+                            </div>
+                        @enderror
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="mt-5 flex gap-5">
-            <button wire:click.prevent="btClicked" type="button"
-                class="{{ $paymentMethod == 'bankTransfer' ? 'bg-registrationSecondaryColor text-white' : 'hover:bg-registrationSecondaryColor hover:text-white border-registrationSecondaryColor border-2 bg-white text-registrationSecondaryColor' }} font-bold w-52 rounded-md py-5 ">
-                <i class="fa-solid fa-building-columns mr-2"></i> Bank Transfer</button>
 
-            @if ($finalTotal == 0)
-                <button type="button"
-                    class="border-gray-400 border-2 text-gray-400 bg-white font-bold w-52 rounded-md py-5 cursor-not-allowed" disabled>
-                    <i class="fa-solid fa-credit-card mr-2"></i> Credit Card</button>
-            @else
-                <button wire:click.prevent="ccClicked" type="button"
-                    class="{{ $paymentMethod == 'creditCard' ? 'bg-registrationSecondaryColor text-white' : 'hover:bg-registrationSecondaryColor hover:text-white border-registrationSecondaryColor border-2 bg-white text-registrationSecondaryColor' }} font-bold w-52 rounded-md py-5 ">
-                    <i class="fa-solid fa-credit-card mr-2"></i> Credit Card</button>
-            @endif
+        {{-- ROW 2 --}}
+        <div class="space-y-2 col-span-2">
+            <div class="grid grid-cols-2 gap-x-5">
+                <div class="col-span-2 sm:col-span-1">
+                    <div class="text-registrationPrimaryColor">
+                        Email Address <span class="text-red-500">*</span>
+                    </div>
+                    <div>
+                        <input placeholder="Email Address" type="text" wire:model="emailAddress"
+                            class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+
+                        @error('emailAddress')
+                            <div class="text-red-500 text-xs italic mt-1">
+                                {{ $message }}
+                            </div>
+                        @enderror
+
+                        @if ($emailMainExistingError != null)
+                            <div class="text-red-500 text-xs italic mt-1">
+                                {{ $emailMainExistingError }}
+                            </div>
+                        @endif
+
+                        @if ($emailMainAlreadyUsedError != null)
+                            <div class="text-red-500 text-xs italic mt-1">
+                                {{ $emailMainAlreadyUsedError }}
+                            </div>
+                        @endif
+                    </div>
+                </div>
+
+                <div class="col-span-2 sm:col-span-1">
+                    <div class="text-registrationPrimaryColor">
+                        Mobile Number <span class="text-red-500">*</span>
+                    </div>
+                    <div>
+                        <input placeholder="xxxxxxx" type="text" wire:model="mobileNumber"
+                            class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+
+                        @error('mobileNumber')
+                            <div class="text-red-500 text-xs italic mt-1">
+                                {{ $message }}
+                            </div>
+                        @enderror
+                    </div>
+                </div>
+            </div>
         </div>
 
-        @if ($paymentMethodError != null)
-            <div class="text-red-500 text-xs italic mt-2">
-                {{ $paymentMethodError }}
+
+        {{-- ROW 3 --}}
+        <div class="space-y-2 col-span-2">
+            <div class="grid grid-cols-3 gap-x-5">
+                <div class="col-span-3 sm:col-span-1">
+                    <div class="text-registrationPrimaryColor">
+                        Nationality <span class="text-red-500">*</span>
+                    </div>
+                    <div>
+                        <input placeholder="Nationality" type="text" wire:model="nationality"
+                            class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+
+                        @error('nationality')
+                            <div class="text-red-500 text-xs italic mt-1">
+                                {{ $message }}
+                            </div>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="col-span-3 sm:col-span-1">
+                    <div class="text-registrationPrimaryColor">
+                        Job Title <span class="text-red-500">*</span>
+                    </div>
+                    <div>
+                        <input placeholder="Job Title" type="text" wire:model="jobTitle"
+                            class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+
+                        @error('jobTitle')
+                            <div class="text-red-500 text-xs italic mt-1">
+                                {{ $message }}
+                            </div>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="col-span-3 sm:col-span-1">
+                    <div class="text-registrationPrimaryColor">
+                        Promo Code
+                    </div>
+                    <div class="flex">
+
+                        @if ($promoCodeSuccessMain != null)
+                            <input readonly type="text" wire:model="promoCode"
+                                class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-none cursor-not-allowed">
+
+                            <button wire:click.prevent="removePromoCodeMain" wire:key="btnRemovePromoCodeMain"
+                                type="button" class="bg-red-300 px-5 ml-2">Remove</button>
+                        @else
+                            <input placeholder="Enter your promo code here" type="text" wire:model="promoCode"
+                                class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+
+                            <button wire:click.prevent="applyPromoCodeMain" wire:key="btnApplyPromoCodeMain"
+                                type="button"
+                                class="bg-registrationPrimaryColor text-white px-5 ml-2 hover:bg-registrationPrimaryColorHover">Apply</button>
+                        @endif
+                    </div>
+
+                    @if ($promoCodeFailMain != null)
+                        <div class="text-red-500 text-xs italic mt-1">
+                            {{ $promoCodeFailMain }}
+                        </div>
+                    @endif
+
+                    @if ($promoCodeSuccessMain != null)
+                        <div class="text-green-500 text-xs italic mt-1">
+                            {{ $promoCodeSuccessMain }}
+                        </div>
+                    @endif
+                </div>
             </div>
+        </div>
+    </div>
+</div>
+
+@if (!empty($additionalDelegates))
+    <div class="mt-10">
+        <div class="text-registrationPrimaryColor italic font-bold text-xl">
+            Additional Delegate(s)
+        </div>
+
+        <div class="mt-5">
+            @php $count = 2; @endphp
+            @foreach ($additionalDelegates as $additionalDelegate)
+                <div class="bg-registrationCardBGColor px-5 py-2 mt-5 flex justify-between rounded-md">
+                    <div>
+                        <div class="font-bold text-2xl flex items-center gap-2 mt-1">
+                            <p>{{ $additionalDelegate['subSalutation'] }} {{ $additionalDelegate['subFirstName'] }}
+                                {{ $additionalDelegate['subMiddleName'] }} {{ $additionalDelegate['subLastName'] }}
+                            </p>
+                            <p
+                                class="border-2 border-registrationPrimaryColor rounded-full text-registrationPrimaryColor py-1 px-3 text-sm">
+                                {{ $additionalDelegate['subBadgeType'] }}</p>
+                        </div>
+                        <p class="mt-2"> {{ $additionalDelegate['subEmailAddress'] }},
+                            {{ $additionalDelegate['subMobileNumber'] }}, {{ $additionalDelegate['subJobTitle'] }}</p>
+                        <p>Nationality: {{ $additionalDelegate['subNationality'] }}</p>
+                        @if ($additionalDelegate['subPromoCode'] == null)
+                            <p>Promo code used: None</p>
+                        @else
+                            <p>Promo code used: <span
+                                    class="font-bold">{{ $additionalDelegate['subPromoCode'] }}</span>
+                                <span
+                                    class="text-green-500 text-xs italic mt-1">({{ $additionalDelegate['promoCodeSuccessSub'] }})</span>
+                            </p>
+                        @endif
+                    </div>
+                    <div class="flex flex-col justify-between items-end">
+                        <p class="text-registrationPrimaryColor font-bold">Delegate {{ $count }}</p>
+                        <div class="flex gap-3">
+                            <div wire:click.prevent="openEditModal('{{ $additionalDelegate['subDelegateId'] }}')"
+                                class="cursor-pointer hover:text-yellow-600 text-yellow-500">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                                Edit
+                            </div>
+
+                            <div wire:click.prevent="removeAdditionalDelegate('{{ $additionalDelegate['subDelegateId'] }}')"
+                                class="cursor-pointer hover:text-red-600 text-red-500">
+                                <i class="fa-solid fa-trash"></i>
+                                Remove
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @php $count++; @endphp
+            @endforeach
+        </div>
+    </div>
+@endif
+
+<div class="mt-10 flex flex-col sm:flex-row gap-10">
+    <div class="col-span-1">
+
+        @if ($showAddDelegateModal)
+            @include('livewire.registration.add_delegate_modal')
+        @endif
+
+        @if ($showEditDelegateModal)
+            @include('livewire.registration.edit_delegate_modal')
+        @endif
+
+        @if (
+            $firstName != null &&
+                $lastName != null &&
+                $emailAddress != null &&
+                $mobileNumber != null &&
+                $nationality != null &&
+                $jobTitle != null &&
+                $badgeType != null &&
+                count($additionalDelegates) < 4)
+            <button wire:click.prevent="openAddModal" type="button" wire:key="btnOpenAddModal"
+                class="cursor-pointer hover:bg-registrationPrimaryColor hover:text-white font-bold border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor rounded-md py-4 px-10">+
+                Add Delegate</button>
+        @else
+            <button disabled type="button"
+                class="cursor-not-allowed font-bold border-gray-600 border-2 bg-white text-gray-600  rounded-md py-4 px-10">+
+                Add Delegate</button>
         @endif
     </div>
 
-    <div class="mt-5">
-        <div class="bg-registrationInputFieldsBGColor p-2">
-            <div class="grid grid-cols-6 text-center font-bold text-registrationPrimaryColor text-lg pt-2 pb-4">
-                <div class="col-span-2">
-                    <p>Description</p>
-                </div>
+    <div class="col-span-1">
+        <div class="text-registrationPrimaryColor italic font-bold text-xl">
+            Do you wish to invite more delegates?
+        </div>
 
-                <div class="col-span-1">
-                    <p>Qty</p>
-                </div>
-
-                <div class="col-span-1">
-                    <p>Unit price</p>
-                </div>
-
-                <div class="col-span-1">
-                    <p>Discount</p>
-                </div>
-
-                <div class="col-span-1">
-                    <p>Net amount</p>
-                </div>
-            </div>
-
-            @php
-                $count = 1;
-            @endphp
-
-            @foreach ($delegatInvoiceDetails as $delegatInvoiceDetail)
-                <div class="grid grid-cols-6 gap-2">
-                    <div class="col-span-2 bg-white p-4">
-                        @if ($count == 1)
-                            <p>{{ $event->name }} – {{ $finalEventStartDate . ' - ' . $finalEventEndDate }} at
-                                {{ $event->location }}</p>
-                            <p class="mt-10">{{ $delegatInvoiceDetail['delegateDescription'] }}</p>
-                        @else
-                            <p>{{ $delegatInvoiceDetail['delegateDescription'] }}</p>
-                        @endif
-                        <ul class="mt-2 list-decimal ml-4">
-                            @foreach ($delegatInvoiceDetail['delegateNames'] as $name)
-                                <li>{{ $name }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-
-                    <div class="col-span-1 bg-white p-4 flex justify-center items-center">
-                        <p>{{ $delegatInvoiceDetail['quantity'] }}</p>
-                    </div>
-
-                    <div class="col-span-1 bg-white p-4 flex justify-center items-center">
-                        <p>$ {{ number_format($finalUnitPrice, 2, '.', ',') }}</p>
-                    </div>
-
-                    <div class="col-span-1 bg-white p-4 flex justify-center items-center">
-                        <p>$ {{ number_format($delegatInvoiceDetail['totalDiscount'], 2, '.', ',') }}</p>
-                    </div>
-
-                    <div class="col-span-1 bg-white p-4 flex justify-center items-center">
-                        <p>$ {{ number_format($delegatInvoiceDetail['totalNetAmount'], 2, '.', ',') }}</p>
-                    </div>
-                </div>
-
-                @php
-                    $count += 1;
-                @endphp
-            @endforeach
-
-            <div class="grid grid-cols-5 gap-2 mt-2">
-                <div class="col-span-4 bg-white p-4">
-                    <p>Total (before VAT)</p>
-                </div>
-
-                <div class="col-span-1 bg-white p-4 text-right">
-                    <p>$ {{ number_format($finalNetAmount, 2, '.', ',') }}</p>
-                </div>
-
-                <div class="col-span-4 bg-white p-4">
-                    <p>VAT {{ $event->event_vat }}%</p>
-                </div>
-
-                <div class="col-span-1 bg-white p-4 text-right">
-                    <p>$ {{ number_format($finalVat, 2, '.', ',') }}</p>
-                </div>
-
-                <div class="col-span-4 bg-white p-4 font-bold">
-                    <p>TOTAL</p>
-                </div>
-
-                <div class="col-span-1 bg-white p-4 text-right font-bold">
-                    <p>$ {{ number_format($finalTotal, 2, '.', ',') }}</p>
-                </div>
-            </div>
+        <div class="text-registrationPrimaryColor italic text-sm mt-2 w-full sm:w-3/5">
+            If you wish to register more than 5 delegates, please contact our sales team at
+            forumregistration@gpca.org.ae or call +971 4 5106666 ext. 153
         </div>
     </div>
 </div>
