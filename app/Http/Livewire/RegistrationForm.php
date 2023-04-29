@@ -478,18 +478,18 @@ class RegistrationForm extends Component
             ];
 
             if ($paymentStatus == "free") {
-                Mail::to($this->emailAddress)->send(new RegistrationPaid($details1));
-                Mail::to($this->emailAddress)->send(new RegistrationPaymentConfirmation($details2));
+                Mail::to($this->emailAddress)->queue(new RegistrationPaid($details1));
+                Mail::to($this->emailAddress)->queue(new RegistrationPaymentConfirmation($details2));
             } else {
-                Mail::to($this->emailAddress)->send(new RegistrationUnpaid($details1));
+                Mail::to($this->emailAddress)->queue(new RegistrationUnpaid($details1));
             }
 
             if ($this->assistantEmailAddress != null) {
                 if ($paymentStatus == "free") {
-                    Mail::to($this->assistantEmailAddress)->send(new RegistrationPaid($details1));
-                    Mail::to($this->assistantEmailAddress)->send(new RegistrationPaymentConfirmation($details2));
+                    Mail::to($this->assistantEmailAddress)->queue(new RegistrationPaid($details1));
+                    Mail::to($this->assistantEmailAddress)->queue(new RegistrationPaymentConfirmation($details2));
                 } else {
-                    Mail::to($this->assistantEmailAddress)->send(new RegistrationUnpaid($details1));
+                    Mail::to($this->assistantEmailAddress)->queue(new RegistrationUnpaid($details1));
                 }
             }
 
@@ -526,10 +526,10 @@ class RegistrationForm extends Component
                     ];
 
                     if ($paymentStatus == "free") {
-                        Mail::to($additionalDelegate->email_address)->send(new RegistrationPaid($details1));
-                        Mail::to($additionalDelegate->email_address)->send(new RegistrationPaymentConfirmation($details2));
+                        Mail::to($additionalDelegate->email_address)->queue(new RegistrationPaid($details1));
+                        Mail::to($additionalDelegate->email_address)->queue(new RegistrationPaymentConfirmation($details2));
                     } else {
-                        Mail::to($additionalDelegate->email_address)->send(new RegistrationUnpaid($details1));
+                        Mail::to($additionalDelegate->email_address)->queue(new RegistrationUnpaid($details1));
                     }
                 }
             }

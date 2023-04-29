@@ -1,4 +1,10 @@
 <div class="container mx-auto my-10">
+
+    <div wire:loading>
+        @include('livewire.registrants.loading_screen')
+    </div>
+
+
     <a href="{{ route('admin.event.registrants.view', ['eventCategory' => $eventCategory, 'eventId' => $eventId]) }}"
         class="bg-red-500 hover:bg-red-400 text-white font-medium py-2 px-5 rounded inline-flex items-center text-sm">
         <span class="mr-2"><i class="fa-sharp fa-solid fa-arrow-left"></i></span>
@@ -130,13 +136,13 @@
                     target="_blank">Download Invoice</a>
 
                 @if ($finalData['registration_status'] == 'pending')
-                    <button wire:click="sendEmailReminder"
+                    <button wire:click="sendEmailReminderConfirmation"
                         class="col-span-2 mt-10 bg-sky-600 hover:bg-sky-700 text-white py-2 rounded-md text-lg text-center">Send
-                        Email Reminder</button>
+                        Payment Reminder</button>
                 @else
                     <button disabled
                         class="col-span-2 mt-10 bg-gray-400 cursor-not-allowed text-white py-2 rounded-md text-lg text-center">Send
-                        Email Reminder</button>
+                        Payment Reminder</button>
                 @endif
             </div>
         </div>

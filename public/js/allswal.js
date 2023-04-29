@@ -1,3 +1,41 @@
+// PAYMENT REMINDER
+window.addEventListener("swal:payment-reminder-confirmation", (event) => {
+    swal({
+        title: event.detail.message,
+        text: event.detail.text,
+        icon: event.detail.type,
+        buttons: {
+            confirm: {
+                text: "Yes, send it!",
+                value: true,
+                visible: true,
+                closeModal: true,
+            },
+            cancel: {
+                text: "Cancel",
+                value: null,
+                visible: true,
+                closeModal: true,
+            },
+        }
+      }).then((result) => {
+        console.log(result);
+        if (result) {
+            Livewire.emit('paymentReminderConfirmed')
+        }
+      });
+});
+
+// PAYMENT REMINDER SUCCESS
+window.addEventListener("swal:payment-reminder-success", (event) => {
+    swal({
+        title: event.detail.message,
+        text: event.detail.text,
+        icon: event.detail.type,
+    });
+});
+
+
 // REGISTRATION AUTHENTICATION ERROR
 window.addEventListener("swal:registration-error-authentication", (event) => {
     swal({

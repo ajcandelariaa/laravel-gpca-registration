@@ -50,6 +50,7 @@ class RegistrantDetails extends Component
     public $showDelegateModal = false;
     public $showCompanyModal = false;
 
+    protected $listeners = ['paymentReminderConfirmed' => 'sendEmailReminder'];
 
     public function mount($eventCategory, $eventId, $registrantId, $finalData)
     {
@@ -414,7 +415,7 @@ class RegistrantDetails extends Component
 
         if (count($this->finalData['subDelegates']) > 0) {
             foreach ($this->finalData['subDelegates'] as $subDelegate) {
-                
+
                 $transactionId = Transactions::where('delegate_id', $subDelegate['subDelegateId'])->where('delegate_type', "sub")->value('id');
                 $lastDigit = 1000 + intval($transactionId);
                 $tempTransactionId = "$event->year" . "$getEventcode" . "$lastDigit";
@@ -614,6 +615,15 @@ class RegistrantDetails extends Component
         return $formatter->format($number);
     }
 
+    public function sendEmailReminderConfirmation()
+    {
+        $this->dispatchBrowserEvent('swal:payment-reminder-confirmation', [
+            'type' => 'warning',
+            'message' => 'Are you sure?',
+            'text' => "",
+        ]);
+    }
+
     public function sendEmailReminder()
     {
         $event = Events::where('id', $this->eventId)->where('category', $this->eventCategory)->first();
@@ -624,10 +634,10 @@ class RegistrantDetails extends Component
             'eventLink' => $event->link,
         ];
 
-        Mail::to($this->finalData['email_address'])->send(new RegistrationPaymentReminder($details));
+        Mail::to($this->finalData['email_address'])->queue(new RegistrationPaymentReminder($details));
 
         if ($this->finalData['assistant_email_address'] != null) {
-            Mail::to($this->finalData['assistant_email_address'])->send(new RegistrationPaymentReminder($details));
+            Mail::to($this->finalData['assistant_email_address'])->queue(new RegistrationPaymentReminder($details));
         }
 
         if (count($this->finalData['subDelegates']) > 0) {
@@ -638,8 +648,15 @@ class RegistrantDetails extends Component
                     'eventLink' => $event->link,
                 ];
 
-                Mail::to($subDelegate['email_address'])->send(new RegistrationPaymentReminder($details));
+                Mail::to($subDelegate['email_address'])->queue(new RegistrationPaymentReminder($details));
             }
         }
+
+        
+        $this->dispatchBrowserEvent('swal:payment-reminder-success', [
+            'type' => 'success',
+            'message' => 'Payment Reminder Sent!',
+            'text' => "",
+        ]);
     }
 }

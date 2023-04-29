@@ -165,12 +165,12 @@ class RegistrationController extends Controller
                     'balance' => "0.00",
                 ];
 
-                Mail::to($mainDelegate->email_address)->send(new RegistrationPaid($details1));
-                Mail::to($mainDelegate->email_address)->send(new RegistrationPaymentConfirmation($details2));
+                Mail::to($mainDelegate->email_address)->queue(new RegistrationPaid($details1));
+                Mail::to($mainDelegate->email_address)->queue(new RegistrationPaymentConfirmation($details2));
 
                 if ($mainDelegate->assistant_email_address != null) {
-                    Mail::to($mainDelegate->assistant_email_address)->send(new RegistrationPaid($details1));
-                    Mail::to($mainDelegate->assistant_email_address)->send(new RegistrationPaymentConfirmation($details2));
+                    Mail::to($mainDelegate->assistant_email_address)->queue(new RegistrationPaid($details1));
+                    Mail::to($mainDelegate->assistant_email_address)->queue(new RegistrationPaymentConfirmation($details2));
                 }
 
                 $additionalDelegates = AdditionalDelegate::where('main_delegate_id', $mainDelegateId)->get();
@@ -203,8 +203,8 @@ class RegistrationController extends Controller
                             'amountPaid' => $mainDelegate->total_amount,
                             'balance' => "0.00",
                         ];
-                        Mail::to($additionalDelegate->email_address)->send(new RegistrationPaid($details1));
-                        Mail::to($additionalDelegate->email_address)->send(new RegistrationPaymentConfirmation($details2));
+                        Mail::to($additionalDelegate->email_address)->queue(new RegistrationPaid($details1));
+                        Mail::to($additionalDelegate->email_address)->queue(new RegistrationPaymentConfirmation($details2));
                     }
                 }
                 Session::flash('registrationStatus', "success");
@@ -228,10 +228,10 @@ class RegistrationController extends Controller
                     'eventLocation' => $event->location,
                 ];
 
-                Mail::to($mainDelegate->email_address)->send(new RegistrationCardDeclined($details));
+                Mail::to($mainDelegate->email_address)->queue(new RegistrationCardDeclined($details));
 
                 if ($mainDelegate->assistant_email_address != null) {
-                    Mail::to($mainDelegate->assistant_email_address)->send(new RegistrationCardDeclined($details));
+                    Mail::to($mainDelegate->assistant_email_address)->queue(new RegistrationCardDeclined($details));
                 }
 
                 $additionalDelegates = AdditionalDelegate::where('main_delegate_id', $mainDelegateId)->get();
@@ -245,7 +245,7 @@ class RegistrationController extends Controller
                             'eventDates' => $eventFormattedData,
                             'eventLocation' => $event->location,
                         ];
-                        Mail::to($additionalDelegate->email_address)->send(new RegistrationCardDeclined($details));
+                        Mail::to($additionalDelegate->email_address)->queue(new RegistrationCardDeclined($details));
                     }
                 }
 
@@ -270,10 +270,10 @@ class RegistrationController extends Controller
                 'eventLocation' => $event->location,
             ];
 
-            Mail::to($mainDelegate->email_address)->send(new RegistrationCardDeclined($details));
+            Mail::to($mainDelegate->email_address)->queue(new RegistrationCardDeclined($details));
 
             if ($mainDelegate->assistant_email_address != null) {
-                Mail::to($mainDelegate->assistant_email_address)->send(new RegistrationCardDeclined($details));
+                Mail::to($mainDelegate->assistant_email_address)->queue(new RegistrationCardDeclined($details));
             }
 
             $additionalDelegates = AdditionalDelegate::where('main_delegate_id', $mainDelegateId)->get();
@@ -287,7 +287,7 @@ class RegistrationController extends Controller
                         'eventDates' => $eventFormattedData,
                         'eventLocation' => $event->location,
                     ];
-                    Mail::to($additionalDelegate->email_address)->send(new RegistrationCardDeclined($details));
+                    Mail::to($additionalDelegate->email_address)->queue(new RegistrationCardDeclined($details));
                 }
             }
 
