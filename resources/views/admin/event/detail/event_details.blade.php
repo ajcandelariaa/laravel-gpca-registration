@@ -2,7 +2,7 @@
 
 @section('content')
     <div>
-        <img src="{{ Storage::url($event->banner) }}" alt="" class="w-full object-cover h-52">
+        <img src="{{ Storage::url($event->banner) }}" alt="" class="w-full object-cover">
     </div>
 
     <div class="container mx-auto my-10">
