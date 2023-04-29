@@ -77,7 +77,7 @@
                     Add Delegate</button>
             @else
                 <button disabled type="button"
-                    class="cursor-not-allowed font-bold border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor  rounded-md py-4 px-10">+
+                    class="cursor-not-allowed font-bold border-gray-600 border-2 bg-white text-gray-600  rounded-md py-4 px-10">+
                     Add Delegate</button>
             @endif
         </div>

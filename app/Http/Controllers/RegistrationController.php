@@ -28,12 +28,19 @@ class RegistrationController extends Controller
                 $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('d') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');
                 $invoiceLink = env('APP_URL') . '/' . $eventCategory . '/' . $eventId . '/view-invoice/' . $mainDelegateId;
 
+                if ($eventCategory == "AF") {
+                    $bankDetails = config('app.bankDetails.AF');
+                } else {
+                    $bankDetails = config('app.bankDetails.DEFAULT');
+                }
+
                 return view('registration.registration_failed_message', [
                     'pageTitle' => "Registration Failed",
                     'event' => $event,
                     'mainDelegate' => $mainDelegate,
                     'eventFormattedDate' =>  $eventFormattedDate,
                     'invoiceLink' => $invoiceLink,
+                    'bankDetails' => $bankDetails,
                 ]);
             } else {
                 abort(404, 'The URL is incorrect');
@@ -52,12 +59,19 @@ class RegistrationController extends Controller
                 $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('d') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');
                 $invoiceLink = env('APP_URL') . '/' . $eventCategory . '/' . $eventId . '/view-invoice/' . $mainDelegateId;
 
+                if ($eventCategory == "AF") {
+                    $bankDetails = config('app.bankDetails.AF');
+                } else {
+                    $bankDetails = config('app.bankDetails.DEFAULT');
+                }
+
                 return view('registration.registration_success_message', [
                     'pageTitle' => "Registration Success",
                     'event' => $event,
                     'mainDelegate' => $mainDelegate,
                     'eventFormattedDate' =>  $eventFormattedDate,
                     'invoiceLink' => $invoiceLink,
+                    'bankDetails' => $bankDetails,
                 ]);
             } else {
                 abort(404, 'The URL is incorrect');
@@ -215,10 +229,16 @@ class RegistrationController extends Controller
                     'registration_status' => "pending",
                     'payment_status' => "unpaid",
                 ])->save();
-                
+
                 $mainDelegate = MainDelegate::where('id', $mainDelegateId)->first();
                 $event = Event::where('id', $mainDelegate->event_id)->first();
                 $eventFormattedData = Carbon::parse($event->event_start_date)->format('d') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');
+
+                if ($event->category == "AF") {
+                    $bankDetails = config('app.bankDetails.AF');
+                } else {
+                    $bankDetails = config('app.bankDetails.DEFAULT');
+                }
 
                 $details = [
                     'name' => $mainDelegate->salutation . " " . $mainDelegate->first_name . " " . $mainDelegate->middle_name . " " . $mainDelegate->last_name,
@@ -226,6 +246,7 @@ class RegistrationController extends Controller
                     'eventName' => $event->name,
                     'eventDates' => $eventFormattedData,
                     'eventLocation' => $event->location,
+                    'bankDetails' => $bankDetails,
                 ];
 
                 Mail::to($mainDelegate->email_address)->queue(new RegistrationCardDeclined($details));
@@ -244,6 +265,7 @@ class RegistrationController extends Controller
                             'eventName' => $event->name,
                             'eventDates' => $eventFormattedData,
                             'eventLocation' => $event->location,
+                            'bankDetails' => $bankDetails,
                         ];
                         Mail::to($additionalDelegate->email_address)->queue(new RegistrationCardDeclined($details));
                     }
@@ -262,12 +284,19 @@ class RegistrationController extends Controller
             $event = Event::where('id', $mainDelegate->event_id)->first();
             $eventFormattedData = Carbon::parse($event->event_start_date)->format('d') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');
 
+            if ($event->category == "AF") {
+                $bankDetails = config('app.bankDetails.AF');
+            } else {
+                $bankDetails = config('app.bankDetails.DEFAULT');
+            }
+
             $details = [
                 'name' => $mainDelegate->salutation . " " . $mainDelegate->first_name . " " . $mainDelegate->middle_name . " " . $mainDelegate->last_name,
                 'eventLink' => $event->link,
                 'eventName' => $event->name,
                 'eventDates' => $eventFormattedData,
                 'eventLocation' => $event->location,
+                'bankDetails' => $bankDetails,
             ];
 
             Mail::to($mainDelegate->email_address)->queue(new RegistrationCardDeclined($details));
@@ -286,6 +315,7 @@ class RegistrationController extends Controller
                         'eventName' => $event->name,
                         'eventDates' => $eventFormattedData,
                         'eventLocation' => $event->location,
+                        'bankDetails' => $bankDetails,
                     ];
                     Mail::to($additionalDelegate->email_address)->queue(new RegistrationCardDeclined($details));
                 }
@@ -584,6 +614,13 @@ class RegistrationController extends Controller
                 $tempInvoiceNumber = "$event->category" . "$tempYear" . "/" . "$lastDigit";
                 $tempBookReference = "$event->year" . "$getEventcode" . "$lastDigit";
 
+
+                if ($eventCategory == "AF") {
+                    $bankDetails = config('app.bankDetails.AF');
+                } else {
+                    $bankDetails = config('app.bankDetails.DEFAULT');
+                }
+
                 $invoiceData = [
                     "finalEventStartDate" => Carbon::parse($event->event_start_date)->format('d M Y'),
                     "finalEventEndDate" => Carbon::parse($event->event_end_date)->format('d M Y'),
@@ -603,6 +640,7 @@ class RegistrationController extends Controller
                     'total_amount' => $mainDelegate->total_amount,
                     'unit_price' => $mainDelegate->unit_price,
                     'invoiceDetails' => $invoiceDetails,
+                    'bankDetails' => $bankDetails,
                     'total_amount_string' => ucwords($this->numberToWords($mainDelegate->total_amount)),
                 ];
 

@@ -20,9 +20,9 @@
 
 <span>In favour of: <strong>Gulf Petrochemicals & Chemicals Association Mashreq Bank Riqqa Branch, Deira, P.O. Box5511, Dubai, UAE</strong></span>
 <br>
-<span>USD Acct No. <strong>0190-00-05007-7</strong></span>
+<span>USD Acct No. <strong>{{ $details['bankDetails']['accountNumber'] }}</strong></span>
 <br>
-<span>IBAN No. <strong>AE360330000019000050077</strong></span>
+<span>IBAN No. <strong>{{ $details['bankDetails']['ibanNumber'] }}</strong></span>
 <br>
 <span>Swift Code <strong>BOMLAEAD</strong></span>
 

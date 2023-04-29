@@ -73,6 +73,8 @@ class RegistrationForm extends Component
     public $promoCodeFailMain, $promoCodeSuccessMain, $promoCodeFailSub, $promoCodeSuccessSub;
     public $promoCodeFailSubEdit, $promoCodeSuccessSubEdit;
 
+    // BANK DETAILS
+    public $bankDetails;
 
     protected $listeners = ['registrationConfirmed' => 'addtoDatabase', 'emitInitiateAuth' => 'initiateAuthenticationCC'];
 
@@ -81,6 +83,13 @@ class RegistrationForm extends Component
         $this->countries = config('app.countries');
         $this->companySectors = config('app.companySectors');
         $this->salutations = config('app.salutations');
+
+        if($data->category == "AF"){
+            $this->bankDetails = config('app.bankDetails.AF');
+        } else {
+            $this->bankDetails = config('app.bankDetails.DEFAULT');
+        }
+        
         $this->event = $data;
         $this->currentStep = 1;
 
@@ -236,7 +245,6 @@ class RegistrationForm extends Component
 
     public function increaseStep()
     {
-        $this->emit('stepChanges');
         if ($this->currentStep == 1) {
             if ($this->delegatePassType != null) {
                 $this->delegatePassTypeError = null;
@@ -408,7 +416,6 @@ class RegistrationForm extends Component
 
     public function decreaseStep()
     {
-        $this->emit('stepChanges');
         if ($this->currentStep == 2) {
             $this->members = Members::where('active', true)->get();
             $this->resetCalculations();
@@ -423,7 +430,6 @@ class RegistrationForm extends Component
 
     public function submit()
     {
-        $this->emit('stepChanges');
         if ($this->currentStep == 4) {
             // UPDATE DETAILS
 

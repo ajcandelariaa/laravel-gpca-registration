@@ -134,8 +134,8 @@
                                <p>Please remit to:</p>
                                <p>Mashreq Bank</p>
                                <p>Riqa Branch, Deira, P.O. Box 5511, Dubai</p>
-                               <p>USD Acct No. 0104-48-47064-5</p>
-                               <p>IBAN No. AE290330000010448470645</p>
+                               <p>USD Acct No. {{ $bankDetails['accountNumber'] }}</p>
+                               <p>IBAN No. {{ $bankDetails['ibanNumber'] }}</p>
                                <p>Swift Code BOMLAEAD</p>
                                <p>In favor of: Gulf Petrochemicals & Chemicals Association</p>
                            </div>

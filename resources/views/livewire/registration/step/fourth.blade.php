@@ -1,4 +1,8 @@
 <div class="mx-5">
+    <div wire:loading>
+        @include('livewire.registrants.loading_screen')
+    </div>
+
     <div>
         <div class="text-registrationPrimaryColor font-bold text-2xl">
             Payment Details
@@ -14,8 +18,8 @@
                     <p>In favour of: Gulf Petrochemicals & Chemicals Association Mashreq Bank Riqqa Branch, Deira, P.O.
                         Box
                         5511, Dubai, UAE</p>
-                    <p class="mt-5">USD Acct No. <strong>0190-00-05007-7</strong></p>
-                    <p>IBAN No. <strong>AE360330000019000050077</strong></p>
+                    <p class="mt-5">USD Acct No. <strong>{{ $bankDetails['accountNumber'] }}</strong></p>
+                    <p>IBAN No. <strong>{{ $bankDetails['ibanNumber'] }}</strong></p>
                     <p>Swift Code <strong>BOMLAEAD</strong></p>
                 </div>
             </div>

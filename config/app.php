@@ -475,5 +475,16 @@ return [
         'RIC' => "04",
         'RC' => "05",
         'AF' => "06",
-    ]
+    ],
+
+    'bankDetails' => [
+        'AF' => [
+            'accountNumber' => "0190-00-05007-7",
+            'ibanNumber' => 'AE360330000019000050077',
+        ],
+        'DEFAULT' => [
+            'accountNumber' => "0104-48-47064-5",
+            'ibanNumber' => 'AE290330000010448470645',
+        ],
+    ],
 ];

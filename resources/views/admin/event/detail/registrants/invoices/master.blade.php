@@ -199,6 +199,7 @@
         .invoice-main-footer .right{
             text-align: right;
             font-family: DejaVu Sans, sans-serif;
+            line-height: 8px;
         }
 
 

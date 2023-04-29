@@ -34,7 +34,7 @@
                 @if ($currentStep == 3)
                     <button type="button" wire:key="btnIncreaseStep"
                         class="hover:bg-registrationPrimaryColor hover:text-white font-bold border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor w-52 rounded-md py-2"
-                        wire:click.prevent="increaseStep">REGISTER</button>
+                        wire:click.prevent="increaseStep" wire:loading.attr="disabled" wire:loading.class="cursor-not-allowed">REGISTER</button>
                 @endif
                 @if ($currentStep == 4)
                     @if ($sessionId && $cardDetails && $paymentMethod == 'creditCard')
@@ -337,11 +337,11 @@
         </script>
     @endif
 
-    <script>
+    {{-- <script>
         document.addEventListener('livewire:load', function() {
             Livewire.on('stepChanges', function() {
                 window.scrollTo(0, 0);
             });
         });
-    </script>
+    </script> --}}
 </div>
