@@ -6,6 +6,7 @@ use Livewire\Component;
 use App\Models\Member as Members;
 use App\Models\MainDelegate as MainDelegates;
 use App\Models\AdditionalDelegate as AdditionalDelegates;
+use App\Models\Event as Events;
 
 class DelegateDetails extends Component
 {
@@ -26,7 +27,7 @@ class DelegateDetails extends Component
     ];
 
 
-    public $eventCategory, $eventId, $finalDelegate, $members;
+    public $eventCategory, $eventId, $finalDelegate, $members, $event;
 
     // COMPANY INFO
     public $delegatePassType, $rateTypeString, $companyName, $companySector, $companyAddress, $companyCountry, $companyCity, $companyLandlineNumber, $companyMobileNumber;
@@ -47,6 +48,8 @@ class DelegateDetails extends Component
         $this->eventCategory = $eventCategory;
         $this->eventId = $eventId;
         $this->finalDelegate = $finalDelegate;
+
+        $this->event = Events::where('id', $eventId)->first();
     }
 
 

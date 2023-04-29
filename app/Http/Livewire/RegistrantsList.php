@@ -369,11 +369,11 @@ class RegistrantsList extends Component
                     'invoiceLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-invoice" . "/" . $newRegistrant->id,
                 ];
 
-                Mail::to($rows[$i][6])->send(new RegistrationConfirmation($details));
+                // Mail::to($rows[$i][6])->send(new RegistrationConfirmation($details));
 
-                if ($this->assistantEmailAddress != null) {
-                    Mail::to($this->assistantEmailAddress)->send(new RegistrationConfirmation($details));
-                }
+                // if ($this->assistantEmailAddress != null) {
+                //     Mail::to($this->assistantEmailAddress)->send(new RegistrationConfirmation($details));
+                // }
             } else {
                 // add sub delegate
                 $newAdditionDelegate = AdditionalDelegates::create([
@@ -410,7 +410,7 @@ class RegistrantsList extends Component
                     'invoiceLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-invoice" . "/" . $mainDelegateId,
                 ];
 
-                Mail::to($rows[$i][6])->send(new RegistrationConfirmation($details));
+                // Mail::to($rows[$i][6])->send(new RegistrationConfirmation($details));
             }
         }
 

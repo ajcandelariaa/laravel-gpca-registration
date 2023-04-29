@@ -184,7 +184,7 @@
                     <div style="width: 321px; height: 492px;">
                         <div class="border border-black mt-10 flex flex-col justify-between h-full">
                             <div>
-                                <img src="{{ asset('assets/images/sc_badge_banner.png') }}">
+                                <img src="{{ Storage::url($event->badge_front_banner) }}">
                             </div>
                             <div>
                                 <p class="text-center font-bold text-lg">{{ $finalDelegate['salutation'] }}
@@ -207,7 +207,7 @@
                     <div style="width: 321px; height: 492px;">
                         <div class="border border-black mt-10 flex flex-col justify-between h-full">
                             <div>
-                                <img src="{{ asset('assets/images/sc_badge_banner.png') }}">
+                                <img src="{{ Storage::url($event->badge_back_banner) }}">
                             </div>
                             <div>
                                 <p class="text-center font-bold text-lg">{{ $finalDelegate['salutation'] }}
@@ -217,7 +217,7 @@
                                 <p class="text-center font-bold">{{ $finalDelegate['companyName'] }}</p>
                             </div>
                             <div>
-                                <p class="text-center py-4 font-bold" style="color: #103c5c">www.gpcasupplychain.com</p>
+                                <p class="text-center py-4 font-bold" style="color: {{ $event->badge_footer_link_color }}">{{ $event->badge_footer_link }}</p>
                             </div>
                         </div>
 

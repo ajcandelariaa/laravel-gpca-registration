@@ -8,6 +8,7 @@ use App\Models\Event;
 use App\Models\MainDelegate;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class DelegateController extends Controller
 {
@@ -33,19 +34,20 @@ class DelegateController extends Controller
         }
     }
 
-    public function delegateDetailView($eventCategory, $eventId, $delegateType, $delegateId, Request $request){
+    public function delegateDetailView($eventCategory, $eventId, $delegateType, $delegateId, Request $request)
+    {
         if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {
             $finalDelegate = array();
             $tempDelegate = array();
 
-            if($delegateType == "main"){
+            if ($delegateType == "main") {
                 $tempDelegate = MainDelegate::where('id', $delegateId)->first();
             } else {
                 $tempDelegate = AdditionalDelegate::where('id', $delegateId)->first();
             }
 
-            if($tempDelegate != null){
-                if($delegateType  == "main"){
+            if ($tempDelegate != null) {
+                if ($delegateType  == "main") {
                     $finalDelegate = [
                         'eventCategory' => $eventCategory,
                         'eventId' => $eventId,
@@ -100,7 +102,7 @@ class DelegateController extends Controller
                         'company_mobile_number' => $mainDelegateInfo->company_mobile_number,
                     ];
                 }
-    
+
                 return view('admin.event.detail.delegates.delegates_detail', [
                     "pageTitle" => "Event Delegates",
                     "eventCategory" => $eventCategory,
@@ -115,19 +117,27 @@ class DelegateController extends Controller
         }
     }
 
-    public function delegateDetailPrintBadge($eventCategory, $eventId, $delegateType, $delegateId){
+    public function delegateDetailPrintBadge($eventCategory, $eventId, $delegateType, $delegateId)
+    {
         if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {
             $finalDelegate = array();
             $tempDelegate = array();
 
-            if($delegateType == "main"){
+            $event = Event::where('category', $eventCategory)->where('id', $eventId)->first();
+
+            if ($delegateType == "main") {
                 $tempDelegate = MainDelegate::where('id', $delegateId)->first();
             } else {
                 $tempDelegate = AdditionalDelegate::where('id', $delegateId)->first();
             }
+            $frontBanner = public_path(Storage::url($event->badge_front_banner));
+            $finalFrontBanner = str_replace('\/', '/', $frontBanner);
 
-            if($tempDelegate != null){
-                if($delegateType  == "main"){
+            $backtBanner = public_path(Storage::url($event->badge_back_banner));
+            $finalBackBanner = str_replace('\/', '/', $backtBanner);
+
+            if ($tempDelegate != null) {
+                if ($delegateType  == "main") {
                     $finalDelegate = [
                         'salutation' => $tempDelegate->salutation,
                         'first_name' => $tempDelegate->first_name,
@@ -136,10 +146,11 @@ class DelegateController extends Controller
                         'job_title' => $tempDelegate->job_title,
                         'badge_type' => $tempDelegate->badge_type,
                         'companyName' => $tempDelegate->company_name,
-                        'frontBanner' => asset('assets/images/sc_badge_banner.png'),
-                        'backBanner' => asset('assets/images/sc_badge_banner.png'),
-                        'textColor' => "#284c5c",
-                        'link' => "www.gpcasupplaychain.com",
+                        'frontBanner' =>  $finalFrontBanner,
+                        'backBanner' =>  $finalBackBanner,
+                        'textColor' => $event->badge_footer_link_color,
+                        'bgColor' => $event->badge_footer_bg_color,
+                        'link' => $event->badge_footer_link,
                     ];
                 } else {
                     $mainDelegateInfo = MainDelegate::where('id', $tempDelegate->main_delegate_id)->first();
@@ -151,13 +162,13 @@ class DelegateController extends Controller
                         'job_title' => $tempDelegate->job_title,
                         'badge_type' => $tempDelegate->badge_type,
                         'companyName' => $mainDelegateInfo->company_name,
-                        'frontBanner' => asset('assets/images/sc_badge_banner.png'),
-                        'backBanner' => asset('assets/images/sc_badge_banner.png'),
-                        'textColor' => "#284c5c",
-                        'link' => "www.gpcasupplaychain.com",
+                        'frontBanner' =>  $finalFrontBanner,
+                        'backBanner' =>  $finalBackBanner,
+                        'textColor' => $event->badge_footer_link_color,
+                        'bgColor' => $event->badge_footer_bg_color,
+                        'link' => $event->badge_footer_link,
                     ];
                 }
-                
                 $pdf = Pdf::loadView('admin.event.detail.delegates.delegate_badge', $finalDelegate, [
                     'margin_top' => 0,
                     'margin_right' => 0,
@@ -167,7 +178,7 @@ class DelegateController extends Controller
 
                 $pdf->setPaper(array(0, 0, 481, 369), 'portrait');  //fixed based on the view
                 // $pdf->setPaper(array(0, 0, 642, 492), 'portrait'); original
-                
+
                 return $pdf->stream('badge.pdf');
             } else {
                 abort(404, 'The URL is incorrect');
@@ -177,7 +188,8 @@ class DelegateController extends Controller
         }
     }
 
-    public function checkPhpInfo(){
+    public function checkPhpInfo()
+    {
         phpinfo();
     }
 }

@@ -96,7 +96,7 @@
     <div class="badges">
         <div class="badge front">
             <div class="header">
-                <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('/assets/images/sc_badge_banner.png'))) }}" alt="banners">
+                <img src="data:image/png;base64,{{ base64_encode(file_get_contents($frontBanner)) }}" alt="banners">
             </div>
             <div class="middle">
                 <p class="name">{{ $salutation }} {{ $first_name }} {{ $middle_name }} {{ $last_name }}</p>
@@ -110,7 +110,7 @@
     
         <div class="badge back">
             <div class="header">
-                <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('/assets/images/sc_badge_banner.png'))) }}" alt="banners">
+                <img src="data:image/png;base64,{{ base64_encode(file_get_contents($backBanner)) }}" alt="banners">
             </div>
             <div class="middle">
                 <p class="name">{{ $salutation }} {{ $first_name }} {{ $middle_name }} {{ $last_name }}</p>
