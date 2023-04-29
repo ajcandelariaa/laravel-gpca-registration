@@ -19,6 +19,44 @@ use NumberFormatter;
 
 class RegistrationController extends Controller
 {
+    public function homepageView(){
+        $events = Event::where('active', true)->orderBy('event_start_date', 'asc')->get();
+        $finalUpcomingEvents = array();
+        $finalPastEvents = array();
+
+        if(!$events->isEmpty()){
+            foreach($events as $event){
+                $eventLink = env('APP_URL').'/register/'.$event->year.'/'.$event->category.'/'.$event->id;
+                $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('d M Y') . ' - ' . Carbon::parse($event->event_end_date)->format('d M Y');
+
+                if(Carbon::parse($event->event_end_date)->isValid()){
+                    array_push($finalUpcomingEvents, [
+                        'eventLogo' => $event->logo,
+                        'eventName' => $event->name,
+                        'eventCategory' => $event->category,
+                        'eventDate' => $eventFormattedDate,
+                        'eventLocation' => $event->location,
+                        'eventDescription' => $event->description,
+                        'eventLink' => $eventLink,
+                    ]);
+                } else {
+                    array_push($finalPastEvents, [
+                        'eventLogo' => $event->logo,
+                        'eventName' => $event->name,
+                        'eventCategory' => $event->category,
+                        'eventDate' => $eventFormattedDate,
+                        'eventLocation' => $event->location,
+                        'eventDescription' => $event->description,
+                    ]);
+                }
+            }
+        }
+        return view('homepage', [
+            'upcomingEvents' => $finalUpcomingEvents,
+            'pastEvents' => $finalPastEvents,
+        ]);
+
+    }
     public function registrationFailedView($eventYear, $eventCategory, $eventId, $mainDelegateId)
     {
         if (Event::where('year', $eventYear)->where('category', $eventCategory)->where('id', $eventId)->exists()) {

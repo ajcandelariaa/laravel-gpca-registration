@@ -19,9 +19,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome_welcome');
-});
+Route::get('/', [RegistrationController::class, 'homepageView'])->name('homepage.view');
 
 Route::prefix('admin')->group(function () {
     Route::middleware(['isAdmin'])->group(function () {
