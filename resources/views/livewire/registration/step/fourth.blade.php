@@ -57,7 +57,18 @@
         @endif
     </div>
 
-    <div class="mt-5">
+    <div class="mt-10 flex justify-between gap-5">
+        <button type="button" wire:key="btnDecreaseStep"
+            class="hover:bg-registrationPrimaryColor hover:text-white font-bold border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor w-52 rounded-md py-2"
+            wire:click.prevent="decreaseStep">PREVIOUS</button>
+
+        <button type="button" wire:key="btnIncreaseStep"
+            class="hover:bg-registrationPrimaryColor hover:text-white font-bold border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor w-52 rounded-md py-2"
+            wire:click.prevent="increaseStep" wire:loading.attr="disabled"
+            wire:loading.class="cursor-not-allowed">NEXT</button>
+    </div>
+
+    <div class="mt-10">
         <div class="bg-registrationInputFieldsBGColor p-2">
             <div class="grid grid-cols-6 text-center font-bold text-registrationPrimaryColor text-lg pt-2 pb-4">
                 <div class="col-span-2">

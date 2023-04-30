@@ -30,7 +30,19 @@
         @endif
     </div>
 
-    <div class="mt-5">
+
+    <div class="mt-10 flex justify-between gap-5">
+        @if ($sessionId && $cardDetails && $paymentMethod == 'creditCard')
+            <button type="button"
+                class="hover:bg-registrationPrimaryColorHover font-bold bg-registrationPrimaryColor text-white w-52 rounded-md py-2"
+                id="payButton">PAY</button>
+        @else
+            <button type="submit" wire:key="btnSubmitBank"
+                class="hover:bg-registrationPrimaryColorHover font-bold bg-registrationPrimaryColor text-white w-52 rounded-md py-2">SUBMIT</button>
+        @endif
+    </div>
+
+    <div class="mt-10">
         <div class="text-registrationPrimaryColor font-bold text-lg">
             Terms and Conditions
         </div>

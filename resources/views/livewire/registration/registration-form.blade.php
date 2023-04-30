@@ -23,7 +23,7 @@
                 @if ($currentStep == 1)
                     <div></div>
                 @endif
-                @if ($currentStep == 2 || $currentStep == 3 || $currentStep == 4)
+                @if ($currentStep == 2 || $currentStep == 3)
                     <button type="button" wire:key="btnDecreaseStep"
                         class="hover:bg-registrationPrimaryColor hover:text-white font-bold border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor w-52 rounded-md py-2"
                         wire:click.prevent="decreaseStep">PREVIOUS</button>
@@ -32,22 +32,6 @@
                     <button type="button" wire:key="btnIncreaseStep"
                         class="hover:bg-registrationPrimaryColor hover:text-white font-bold border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor w-52 rounded-md py-2"
                         wire:click.prevent="increaseStep">NEXT</button>
-                @endif
-                @if ($currentStep == 4)
-                    <button type="button" wire:key="btnIncreaseStep"
-                        class="hover:bg-registrationPrimaryColor hover:text-white font-bold border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor w-52 rounded-md py-2"
-                        wire:click.prevent="increaseStep" wire:loading.attr="disabled"
-                        wire:loading.class="cursor-not-allowed">REGISTER</button>
-                @endif
-                @if ($currentStep == 5)
-                    @if ($sessionId && $cardDetails && $paymentMethod == 'creditCard')
-                        <button type="button"
-                            class="hover:bg-registrationPrimaryColorHover font-bold bg-registrationPrimaryColor text-white w-52 rounded-md py-2"
-                            id="payButton">PAY</button>
-                    @else
-                        <button type="submit" wire:key="btnSubmitBank"
-                            class="hover:bg-registrationPrimaryColorHover font-bold bg-registrationPrimaryColor text-white w-52 rounded-md py-2">PAY</button>
-                    @endif
                 @endif
             </div>
         </form>
