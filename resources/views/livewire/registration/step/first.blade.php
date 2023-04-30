@@ -1,5 +1,4 @@
 <div class="mx-5">
-    {{-- @include('livewire.registration.phone') --}}
     <table class="w-full bg-registrationPrimaryColor text-white text-center" cellspacing="1" cellpadding="2">
         <thead>
             <tr>
@@ -127,7 +126,7 @@
                                         class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                                         <option value=""></option>
                                         @foreach ($members as $member)
-                                            <option value="{{ $member->name }}" data-icon="{{ Storage::url($member->logo) }}">
+                                            <option value="{{ $member->name }}">
                                                 {{ $member->name }}</option>
                                         @endforeach
                                     </select>

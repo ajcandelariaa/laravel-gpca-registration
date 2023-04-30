@@ -1,7 +1,7 @@
 <div class="container mx-auto my-10">
 
     <div wire:loading>
-        @include('livewire.registrants.loading_screen')
+        @include('livewire.loading.loading_screen')
     </div>
 
 

@@ -60,7 +60,7 @@ class RegistrationController extends Controller
     public function registrationFailedView($eventYear, $eventCategory, $eventId, $mainDelegateId)
     {
         if (Event::where('year', $eventYear)->where('category', $eventCategory)->where('id', $eventId)->exists()) {
-            if (!Session::has('registrationStatus')) {
+            if (Session::has('registrationStatus')) {
                 $event = Event::where('id', $eventId)->first();
                 $mainDelegate = MainDelegate::where('id', $mainDelegateId)->first();
                 $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('d') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');
@@ -91,7 +91,7 @@ class RegistrationController extends Controller
     public function registrationSuccessView($eventYear, $eventCategory, $eventId, $mainDelegateId)
     {
         if (Event::where('year', $eventYear)->where('category', $eventCategory)->where('id', $eventId)->exists()) {
-            if (!Session::has('registrationStatus')) {
+            if (Session::has('registrationStatus')) {
                 $event = Event::where('id', $eventId)->first();
                 $mainDelegate = MainDelegate::where('id', $mainDelegateId)->first();
                 $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('d') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');

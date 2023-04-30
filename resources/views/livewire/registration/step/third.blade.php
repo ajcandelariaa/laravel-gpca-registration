@@ -252,11 +252,11 @@
     <div class="col-span-1">
 
         @if ($showAddDelegateModal)
-            @include('livewire.registration.add_delegate_modal')
+            @include('livewire.registration.modal.add_delegate_modal')
         @endif
 
         @if ($showEditDelegateModal)
-            @include('livewire.registration.edit_delegate_modal')
+            @include('livewire.registration.modal.edit_delegate_modal')
         @endif
 
         @if (

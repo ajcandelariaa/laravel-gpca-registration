@@ -1,8 +1,8 @@
 <div class="container mx-auto my-10">
 
     <div class="xl:float-left mx-5">
-        @include('livewire.registration.progress_bar_vertical')
-        @include('livewire.registration.progress_bar_horizontal')
+        @include('livewire.registration.progress.progress_bar_vertical')
+        @include('livewire.registration.progress.progress_bar_horizontal')
     </div>
 
     <div class="form-container mt-10 xl:mt-0">

@@ -18,7 +18,7 @@
     <br>
     Company name: <strong>{{  $details['companyName'] }}</strong>
     <br>
-    Amount paid: <strong>{{  $details['amountPaid'] }}</strong>
+    Amount paid: <strong>$ {{ number_format($details['amountPaid'], 2, '.', ',') }}</strong>
     <br>
     Transaction ID: <strong>{{  $details['transactionId'] }}</strong>
     <br>

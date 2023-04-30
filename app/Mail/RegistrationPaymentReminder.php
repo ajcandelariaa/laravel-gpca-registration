@@ -35,7 +35,7 @@ class RegistrationPaymentReminder extends Mailable
     {
         $subject = "Payment reminder for your delegate registration on the " .$this->details['eventName'];
         return new Envelope(
-            from: new Address('forumregistration@gpca.org.ae', 'GPCA Registration'),
+            from: new Address('forumregistration@gpca.org.ae', 'GPCA Events Registration'),
             subject: $subject,
         );
     }

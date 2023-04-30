@@ -1,6 +1,6 @@
 <div class="mx-5">
     <div wire:loading>
-        @include('livewire.registrants.loading_screen')
+        @include('livewire.loading.loading_screen')
     </div>
 
     <div>

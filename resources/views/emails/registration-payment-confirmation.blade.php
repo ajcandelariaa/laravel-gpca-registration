@@ -17,8 +17,8 @@
     <tbody>
         <tr align="center" valign="middle">
             <td style="border: 1px solid black; padding: 2px;">{{ $details['eventName'] }} registration fees</td>
-            <td style="border: 1px solid black; padding: 2px;">{{ $details['invoiceAmount'] }}</td>
-            <td style="border: 1px solid black; padding: 2px;">{{ $details['amountPaid'] }}</td>
+            <td style="border: 1px solid black; padding: 2px;">$ {{ number_format($details['invoiceAmount'], 2, '.', ',') }}</td>
+            <td style="border: 1px solid black; padding: 2px;">$ {{ number_format($details['amountPaid'], 2, '.', ',') }}</td>
             <td style="border: 1px solid black; padding: 2px;">{{ $details['balance'] }}</td>
         </tr>
     </tbody>
