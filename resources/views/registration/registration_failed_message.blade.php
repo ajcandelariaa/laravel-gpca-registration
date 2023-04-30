@@ -56,14 +56,6 @@
     <footer class="bg-registrationPrimaryColor w-full py-5 text-center text-white mt-auto">
         <p>Copyright © 2023 GPCA Registration</p>
     </footer>
-    
-    <script>
-        if (self === top) {
-
-        } else {
-            top.location = self.location;
-        }
-    </script>
 </body>
 
 </html>

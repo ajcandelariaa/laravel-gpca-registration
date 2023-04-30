@@ -68,6 +68,7 @@ Route::get('/check', [DelegateController::class, 'checkPhpInfo']);
 Route::get('/register/{eventYear}/{eventCategory}/{eventId}', [RegistrationController::class, 'registrationView'])->name('register.view');
 Route::get('/register/{eventYear}/{eventCategory}/{eventId}/otp', [RegistrationController::class, 'registrationOTPView'])->name('register.otp.view');
 Route::post('capturePayment', [RegistrationController::class, 'capturePayment'])->name('register.capture.payment');
+Route::get('/register/{eventYear}/{eventCategory}/{eventId}/{mainDelegateId}/{status}/loading', [RegistrationController::class, 'registrationLoading'])->name('register.loading.view');
 Route::get('/register/{eventYear}/{eventCategory}/{eventId}/{mainDelegateId}/success', [RegistrationController::class, 'registrationSuccessView'])->name('register.success.view');
 Route::get('/register/{eventYear}/{eventCategory}/{eventId}/{mainDelegateId}/failed', [RegistrationController::class, 'registrationFailedView'])->name('register.failed.view');
 

@@ -518,7 +518,7 @@ class RegistrationForm extends Component
 
                 'invoiceAmount' => $this->finalTotal,
                 'amountPaid' => 0,
-                'balance' => "0.00",
+                'balance' => 0,
             ];
 
             if ($paymentStatus == "free") {
@@ -566,7 +566,7 @@ class RegistrationForm extends Component
 
                         'invoiceAmount' => $this->finalTotal,
                         'amountPaid' => 0,
-                        'balance' => "0.00",
+                        'balance' => 0,
                     ];
 
                     if ($paymentStatus == "free") {
@@ -577,7 +577,6 @@ class RegistrationForm extends Component
                     }
                 }
             }
-
             return redirect()->route('register.success.view', ['eventCategory' => $this->event->category, 'eventId' => $this->event->id, 'eventYear' => $this->event->year, 'mainDelegateId' => $this->currentMainDelegateId]);
         }
     }

@@ -19,17 +19,18 @@ use NumberFormatter;
 
 class RegistrationController extends Controller
 {
-    public function homepageView(){
+    public function homepageView()
+    {
         $events = Event::where('active', true)->orderBy('event_start_date', 'asc')->get();
         $finalUpcomingEvents = array();
         $finalPastEvents = array();
 
-        if(!$events->isEmpty()){
-            foreach($events as $event){
-                $eventLink = env('APP_URL').'/register/'.$event->year.'/'.$event->category.'/'.$event->id;
+        if (!$events->isEmpty()) {
+            foreach ($events as $event) {
+                $eventLink = env('APP_URL') . '/register/' . $event->year . '/' . $event->category . '/' . $event->id;
                 $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('d M Y') . ' - ' . Carbon::parse($event->event_end_date)->format('d M Y');
 
-                if(Carbon::parse($event->event_end_date)->isValid()){
+                if (Carbon::parse($event->event_end_date)->isValid()) {
                     array_push($finalUpcomingEvents, [
                         'eventLogo' => $event->logo,
                         'eventName' => $event->name,
@@ -55,14 +56,14 @@ class RegistrationController extends Controller
             'upcomingEvents' => $finalUpcomingEvents,
             'pastEvents' => $finalPastEvents,
         ]);
-
     }
     public function registrationFailedView($eventYear, $eventCategory, $eventId, $mainDelegateId)
     {
         if (Event::where('year', $eventYear)->where('category', $eventCategory)->where('id', $eventId)->exists()) {
-            if (Session::has('registrationStatus')) {
+            $mainDelegate = MainDelegate::where('id', $mainDelegateId)->first();
+            
+            if ($mainDelegate->confirmation_date_time == null) {
                 $event = Event::where('id', $eventId)->first();
-                $mainDelegate = MainDelegate::where('id', $mainDelegateId)->first();
                 $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('d') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');
                 $invoiceLink = env('APP_URL') . '/' . $eventCategory . '/' . $eventId . '/view-invoice/' . $mainDelegateId;
 
@@ -71,6 +72,10 @@ class RegistrationController extends Controller
                 } else {
                     $bankDetails = config('app.bankDetails.DEFAULT');
                 }
+
+                MainDelegate::find($mainDelegateId)->fill([
+                    'confirmation_date_time' => Carbon::now(),
+                ])->save();
 
                 return view('registration.registration_failed_message', [
                     'pageTitle' => "Registration Failed",
@@ -91,9 +96,10 @@ class RegistrationController extends Controller
     public function registrationSuccessView($eventYear, $eventCategory, $eventId, $mainDelegateId)
     {
         if (Event::where('year', $eventYear)->where('category', $eventCategory)->where('id', $eventId)->exists()) {
-            if (Session::has('registrationStatus')) {
+            $mainDelegate = MainDelegate::where('id', $mainDelegateId)->first();
+
+            if ($mainDelegate->confirmation_date_time == null) {
                 $event = Event::where('id', $eventId)->first();
-                $mainDelegate = MainDelegate::where('id', $mainDelegateId)->first();
                 $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('d') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');
                 $invoiceLink = env('APP_URL') . '/' . $eventCategory . '/' . $eventId . '/view-invoice/' . $mainDelegateId;
 
@@ -102,6 +108,10 @@ class RegistrationController extends Controller
                 } else {
                     $bankDetails = config('app.bankDetails.DEFAULT');
                 }
+
+                MainDelegate::find($mainDelegateId)->fill([
+                    'confirmation_date_time' => Carbon::now(),
+                ])->save();
 
                 return view('registration.registration_success_message', [
                     'pageTitle' => "Registration Success",
@@ -118,6 +128,14 @@ class RegistrationController extends Controller
             abort(404, 'The URL is incorrect');
         }
     }
+
+    public function registrationLoading($eventYear, $eventCategory, $eventId, $mainDelegateId, $status){
+        $redirectLink = env('APP_URL').'/register/'.$eventYear.'/'.$eventCategory.'/'.$eventId.'/'.$mainDelegateId.'/'.$status;
+        return view('registration.registration_loading', [
+            'redirectLink' => $redirectLink,
+        ]);
+    }
+
     public function capturePayment()
     {
         $mainDelegateId = request()->query('mainDelegateId');
@@ -214,7 +232,7 @@ class RegistrationController extends Controller
 
                     'invoiceAmount' => $mainDelegate->total_amount,
                     'amountPaid' => $mainDelegate->total_amount,
-                    'balance' => "0.00",
+                    'balance' => 0,
                 ];
 
                 Mail::to($mainDelegate->email_address)->queue(new RegistrationPaid($details1));
@@ -253,14 +271,13 @@ class RegistrationController extends Controller
 
                             'invoiceAmount' => $mainDelegate->total_amount,
                             'amountPaid' => $mainDelegate->total_amount,
-                            'balance' => "0.00",
+                            'balance' => 0,
                         ];
                         Mail::to($additionalDelegate->email_address)->queue(new RegistrationPaid($details1));
                         Mail::to($additionalDelegate->email_address)->queue(new RegistrationPaymentConfirmation($details2));
                     }
                 }
-                Session::flash('registrationStatus', "success");
-                return redirect()->route('register.success.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'eventYear' => $event->year, 'mainDelegateId' => $mainDelegateId]);
+                return redirect()->route('register.loading.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'eventYear' => $event->year, 'mainDelegateId' => $mainDelegateId, 'status' => "success"]);
             } else {
                 // (This is the part where we will send them email notification failed and redirect them)
                 MainDelegate::find($mainDelegateId)->fill([
@@ -308,8 +325,7 @@ class RegistrationController extends Controller
                         Mail::to($additionalDelegate->email_address)->queue(new RegistrationCardDeclined($details));
                     }
                 }
-
-                return redirect()->route('register.failed.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'eventYear' => $event->year, 'mainDelegateId' => $mainDelegateId]);
+                return redirect()->route('register.loading.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'eventYear' => $event->year, 'mainDelegateId' => $mainDelegateId, 'status' => "failed"]);
             }
         } else {
             // (This is the part where we will send them email notification failed and redirect them)
@@ -358,8 +374,7 @@ class RegistrationController extends Controller
                     Mail::to($additionalDelegate->email_address)->queue(new RegistrationCardDeclined($details));
                 }
             }
-
-            return redirect()->route('register.failed.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'eventYear' => $event->year, 'mainDelegateId' => $mainDelegateId]);
+            return redirect()->route('register.loading.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'eventYear' => $event->year, 'mainDelegateId' => $mainDelegateId, 'status' => "failed"]);
         }
     }
 
