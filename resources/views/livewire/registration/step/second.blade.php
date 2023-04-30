@@ -133,7 +133,13 @@
             </div>
             <div>
                 <input placeholder="Email Address" type="text" wire:model="assistantEmailAddress"
+                    wire:key="assistantEmailAddress"
                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                @error('assistantEmailAddress')
+                    <div class="text-red-500 text-xs italic mt-1">
+                        {{ $message }}
+                    </div>
+                @enderror
             </div>
         </div>
 

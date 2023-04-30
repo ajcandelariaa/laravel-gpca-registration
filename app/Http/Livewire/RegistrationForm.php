@@ -248,9 +248,14 @@ class RegistrationForm extends Component
         if ($this->currentStep == 1) {
             if ($this->delegatePassType != null) {
                 $this->delegatePassTypeError = null;
-                $this->validate([
-                    'companyName' => 'required',
-                ]);
+                $this->validate(
+                    [
+                        'companyName' => 'required',
+                    ],
+                    [
+                        'companyName.required' => "Company Name is required",
+                    ]
+                );
                 $this->currentStep += 1;
             } else {
                 $this->delegatePassTypeError = "Delegate pass type is required";
@@ -258,29 +263,51 @@ class RegistrationForm extends Component
         } else if ($this->currentStep == 2) {
             $this->resetCalculations();
             $this->paymentMethod = null;
+            $this->validate(
+                [
+                    'companySector' => 'required',
+                    'companyAddress' => 'required',
+                    'companyCountry' => 'required',
+                    'companyCity' => 'required',
+                    'companyMobileNumber' => 'required',
+                    'assistantEmailAddress' => 'nullable|email',
+                ],
+                [
+                    'companySector.required' => 'Company Sector is required',
+                    'companyAddress.required' => 'Company Address is required',
+                    'companyCountry.required' => 'Country is required',
+                    'companyCity.required' => 'City is required',
+                    'companyMobileNumber.required' => 'Mobile Number is required',
+                    'assistantEmailAddress.email' => 'Assistant\'s email address must be a valid email',
+                ]
+            );
 
-            $this->validate([
-                'companySector' => 'required',
-                'companyAddress' => 'required',
-                'companyCountry' => 'required',
-                'companyCity' => 'required',
-                'companyMobileNumber' => 'required',
-
-            ]);
             $this->currentStep += 1;
         } else if ($this->currentStep == 3) {
             $this->resetCalculations();
             $this->paymentMethod = null;
 
-            $this->validate([
-                'firstName' => 'required',
-                'lastName' => 'required',
-                'emailAddress' => 'required',
-                'nationality' => 'required',
-                'mobileNumber' => 'required',
-                'jobTitle' => 'required',
-                'badgeType' => 'required',
-            ]);
+            $this->validate(
+                [
+                    'firstName' => 'required',
+                    'lastName' => 'required',
+                    'emailAddress' => 'required|email',
+                    'nationality' => 'required',
+                    'mobileNumber' => 'required',
+                    'jobTitle' => 'required',
+                    'badgeType' => 'required',
+                ],
+                [
+                    'firstName.required' => "First Name is required",
+                    'lastName.required' => "Last Name is required",
+                    'emailAddress.required' => "Email Address is required",
+                    'emailAddress.email' => "Email Address must be a valid email",
+                    'nationality.required' => "Nationality is required",
+                    'mobileNumber.required' => "Mobile Number is required",
+                    'jobTitle.required' => "Job Title is required",
+                    'badgeType.required' => "Badge Type is required",
+                ]
+            );
 
             if ($this->checkEmailIfUsedAlreadyMain($this->emailAddress)) {
                 $this->emailMainAlreadyUsedError = "You already used this email!";
@@ -841,16 +868,27 @@ class RegistrationForm extends Component
 
     public function saveAdditionalDelegate()
     {
-        $this->validate([
-            'subFirstName' => 'required',
-            'subLastName' => 'required',
-            'subEmailAddress' => 'required',
-            'subMobileNumber' => 'required',
-            'subNationality' => 'required',
-            'subJobTitle' => 'required',
-            'subBadgeType' => 'required',
-        ]);
-
+        $this->validate(
+            [
+                'subFirstName' => 'required',
+                'subLastName' => 'required',
+                'subEmailAddress' => 'required|email',
+                'subMobileNumber' => 'required',
+                'subNationality' => 'required',
+                'subJobTitle' => 'required',
+                'subBadgeType' => 'required',
+            ],
+            [
+                'subFirstName.required' => "First Name is required",
+                'subLastName.required' => "Last Name is required",
+                'subEmailAddress.required' => "Email Address is required",
+                'subEmailAddress.email' => "Email Address must be a valid email",
+                'subMobileNumber.required' => "Mobile Number is required",
+                'subNationality.required' => "Nationality is required",
+                'subJobTitle.required' => "Job Title is required",
+                'subBadgeType.required' => "Badge Type is required",
+            ]
+        );
 
         if ($this->checkEmailIfUsedAlreadySub($this->subEmailAddress)) {
             $this->emailSubAlreadyUsedError = "You already used this email!";
@@ -901,12 +939,38 @@ class RegistrationForm extends Component
 
     public function editAdditionalDelegate($subDelegateId)
     {
+        $this->validate(
+            [
+                'subFirstNameEdit' => 'required',
+                'subLastNameEdit' => 'required',
+                'subEmailAddressEdit' => 'required|email',
+                'subMobileNumberEdit' => 'required',
+                'subNationalityEdit' => 'required',
+                'subJobTitleEdit' => 'required',
+                'subBadgeTypeEdit' => 'required',
+            ],
+            [
+                'subFirstNameEdit.required' => "First Name is required",
+                'subLastNameEdit.required' => "Last Name is required",
+                'subEmailAddressEdit.required' => "Email Address is required",
+                'subEmailAddressEdit.email' => "Email Address must be a valid email",
+                'subMobileNumberEdit.required' => "Mobile Number is required",
+                'subNationalityEdit.required' => "Nationality is required",
+                'subJobTitleEdit.required' => "Job Title is required",
+                'subBadgeTypeEdit.required' => "Badge Type is required",
+            ]
+        );
+
         $tempCheckEmail = false;
 
-        foreach ($this->additionalDelegates as $additionalDelegate) {
-            if ($additionalDelegate['subDelegateId'] != $subDelegateId) {
-                if ($additionalDelegate['subEmailAddress'] == $this->subEmailAddressEdit || $this->subEmailAddressEdit == $this->emailAddress) {
-                    $tempCheckEmail = true;
+        if ($this->subEmailAddressEdit == $this->emailAddress) {
+            $tempCheckEmail = true;
+        } else {
+            foreach ($this->additionalDelegates as $additionalDelegate) {
+                if ($additionalDelegate['subDelegateId'] != $subDelegateId) {
+                    if ($additionalDelegate['subEmailAddress'] == $this->subEmailAddressEdit) {
+                        $tempCheckEmail = true;
+                    }
                 }
             }
         }
