@@ -15,11 +15,19 @@
     <li style="mso-special-format:bullet;">Your card cannot be used for card-not-present transactions</li>
     <li style="mso-special-format:bullet;">There may be a problem with your bank’s authorization system.</li>
 </ul>
+<x-mail::button :url="$details['invoiceLink']" color="registration">
+Download invoice
+</x-mail::button>
+<span>&nbsp;</span>
 
 <p>Although your registration is saved in our system. You can still pay by bank transfer through the below bank account.</p>
 
-<span>In favour of: <strong>Gulf Petrochemicals & Chemicals Association Mashreq Bank Riqqa Branch, Deira, P.O. Box5511, Dubai, UAE</strong></span>
+<span>In favor of: <strong>Gulf Petrochemicals & Chemicals Association</strong></span>
 <br>
+<span>Mashreq Bank</span>
+<br>
+<span>Riqa Branch, Deira, P.O. Box 5511, Dubai</span>
+<br><br>
 <span>USD Acct No. <strong>{{ $details['bankDetails']['accountNumber'] }}</strong></span>
 <br>
 <span>IBAN No. <strong>{{ $details['bankDetails']['ibanNumber'] }}</strong></span>

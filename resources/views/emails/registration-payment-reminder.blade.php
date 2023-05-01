@@ -9,7 +9,13 @@
 
 <p>Kindly contact Analee Candelaria at <a href="mailto:analee@gpca.org.ae">analee@gpca.org.ae</a> or call +971 4 451 0666 ext. 116 for more information on how to settle your payment.</p>
 
-Kind regards,
-<br><br>
-GPCA Team
+<x-mail::button :url="$details['invoiceLink']" color="registration">
+Download invoice
+</x-mail::button>
+
+<span>&nbsp;</span>
+
+<p>Kind regards,</p>
+
+<p>GPCA Team</p>
 </x-mail::message>

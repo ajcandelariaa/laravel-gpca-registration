@@ -47,35 +47,35 @@
     
     <div class="grid grid-cols-horizontalProgressBarGrid mt-5">
         <div class="font-bold text-registrationPrimaryColor text-center flex justify-center">
-            Registration Type
+            Registration type
         </div>
 
         <div class="w-full"></div>
 
         
         <div class="font-bold text-registrationPrimaryColor text-center flex justify-center">
-            Company Details
+            Company details
         </div>
 
         <div class="w-full"></div>
 
         
         <div class="font-bold text-registrationPrimaryColor text-center flex justify-center">
-            Delegate Details
+            Delegate details
         </div>
 
         <div class="w-full"></div>
 
         
         <div class="font-bold text-registrationPrimaryColor text-center flex justify-center">
-            Package Summary
+            Package summary
         </div>
 
         <div class="w-full"></div>
 
         
         <div class="font-bold text-registrationPrimaryColor text-center flex justify-center">
-            Payment Details
+            Payment details
         </div>
     </div>
 </div>

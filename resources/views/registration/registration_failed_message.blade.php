@@ -32,9 +32,9 @@
                 </div>
 
                 <div class="ml-5 text-black mt-2">
-                    <p>In favour of: Gulf Petrochemicals & Chemicals Association Mashreq Bank Riqqa Branch, Deira, P.O.
-                        Box
-                        5511, Dubai, UAE</p>
+                    <p>In favor of: <strong>Gulf Petrochemicals & Chemicals Association</strong></p>
+                    <p>Mashreq Bank</p>
+                    <p>Riqa Branch, Deira, P.O. Box 5511, Dubai</p>
                     <p class="mt-5">USD Acct No. <strong>{{ $bankDetails['accountNumber'] }}</strong></p>
                     <p>IBAN No. <strong>{{ $bankDetails['ibanNumber'] }}</strong></p>
                     <p>Swift Code <strong>BOMLAEAD</strong></p>

@@ -1,6 +1,6 @@
 <div class="mt-5 bg-registrationCardBGColor p-5 rounded-lg">
     <div class="text-registrationPrimaryColor font-bold text-lg">
-        Card Details
+        Card details
     </div>
 
     @if ($sessionId && $cardDetails)
@@ -8,7 +8,7 @@
             {{-- ROW 1 --}}
             <div class="space-y-2 col-span-3">
                 <div class="text-registrationPrimaryColor">
-                    Name on Card <span class="text-red-500">*</span>
+                    Name on card <span class="text-red-500">*</span>
                 </div>
                 <div>
                     <input type="text" id="cardholder-name"
@@ -21,7 +21,7 @@
             {{-- ROW 2 --}}
             <div class="space-y-2 col-span-3">
                 <div class="text-registrationPrimaryColor">
-                    Card Number <span class="text-red-500">*</span>
+                    Card number <span class="text-red-500">*</span>
                 </div>
                 <div>
                     <input type="text" id="card-number"
@@ -35,7 +35,7 @@
             {{-- ROW 3 --}}
             <div class="space-y-2">
                 <div class="text-registrationPrimaryColor">
-                    Expiration Month <span class="text-red-500">*</span>
+                    Expiration month <span class="text-red-500">*</span>
                 </div>
                 <div>
                     <input type="text" id="expiry-month"
@@ -47,7 +47,7 @@
 
             <div class="space-y-2">
                 <div class="text-registrationPrimaryColor">
-                    Expiration Year <span class="text-red-500">*</span>
+                    Expiration year <span class="text-red-500">*</span>
                 </div>
                 <div>
                     <input type="text" id="expiry-year"

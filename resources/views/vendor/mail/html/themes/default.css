@@ -217,7 +217,7 @@ img {
     -premailer-cellpadding: 0;
     -premailer-cellspacing: 0;
     -premailer-width: 100%;
-    margin: 30px auto;
+    margin: 0px auto;
     padding: 0;
     text-align: center;
     width: 100%;
@@ -257,6 +257,18 @@ img {
     border-left: 18px solid #e53e3e;
     border-right: 18px solid #e53e3e;
     border-top: 8px solid #e53e3e;
+}
+
+.button-registration{
+    background-color: #034889;
+    border-bottom: 8px solid #034889;
+    border-left: 18px solid #034889;
+    border-right: 18px solid #034889;
+    border-top: 8px solid #034889;
+}
+
+.button-registration:active, .button-registration:visited{
+    color: #ffffff;
 }
 
 /* Panels */

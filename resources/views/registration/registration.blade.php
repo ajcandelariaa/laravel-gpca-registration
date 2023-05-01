@@ -106,6 +106,12 @@
     </script> --}}
     
     <script src="{{ asset('js/allswal.js') }}"></script>
+
+    <div>
+        @include('livewire.loading.registration_loading_screen')
+        @include('livewire.loading.registration_loading_screen2')
+    </div>
+
     @livewireScripts()
 </body>
 

@@ -21,10 +21,12 @@
     Amount paid: <strong>$ {{ number_format($details['amountPaid'], 2, '.', ',') }}</strong>
     <br>
     Transaction ID: <strong>{{  $details['transactionId'] }}</strong>
-    <br>
 </span>
-
-<br>
+<br><br>
+<x-mail::button :url="$details['invoiceLink']" color="registration">
+Download invoice
+</x-mail::button>
+<span>&nbsp;</span>
 
 <h1>GENERAL INFORMATION</h1>
 

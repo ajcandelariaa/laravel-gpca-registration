@@ -26,6 +26,11 @@
 
 <br>
 
+<x-mail::button :url="$details['invoiceLink']" color="registration">
+Download invoice
+</x-mail::button>
+<span>&nbsp;</span>
+
 <p>For further queries, you may contact below.</p>
 
 <span>

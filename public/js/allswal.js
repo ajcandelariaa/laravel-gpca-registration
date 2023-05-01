@@ -68,11 +68,38 @@ window.addEventListener("swal:registration-confirmation", (event) => {
       }).then((result) => {
         console.log(result);
         if (result) {
+            let registrationLloadingScreen = document.getElementById('registration-loading-screen');
+            registrationLloadingScreen.classList.remove('hidden');
             Livewire.emit('registrationConfirmed')
         }
       });
 });
 
+window.addEventListener("swal:remove-loading-button", () => {
+      let payButton = document.getElementById('payButton');
+      let processingButton = document.getElementById('processingButton');
+      let registrationLloadingScreen = document.getElementById('registration-loading-screen');
+      
+      processingButton.classList.add('hidden');
+      payButton.classList.remove('hidden');
+      registrationLloadingScreen.classList.add('hidden');
+});
+
+window.addEventListener("swal:hide-pay-button", () => {
+      let payButton = document.getElementById('payButton');
+      payButton.classList.add('hidden');
+});
+
+window.addEventListener("swal:remove-registration-loading-screen", () => {
+      let registrationLloadingScreen = document.getElementById('registration-loading-screen');
+      registrationLloadingScreen.classList.add('hidden');
+});
+
+window.addEventListener("swal:add-registration-loading-screen", () => {
+    let registrationLloadingScreen = document.getElementById('registration-loading-screen');
+    registrationLloadingScreen.classList.remove('hidden');
+    Livewire.emit('emitSubmit')
+});
 
 // PROMO CODE ADD CONFIRMATION
 window.addEventListener("swal:add-promo-code-confirmation", (event) => {

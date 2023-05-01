@@ -10,7 +10,7 @@
                 {{-- SUB DELEGATE --}}
                 <div>
                     <div class="text-registrationPrimaryColor italic font-bold text-xl">
-                        Edit Delegate
+                        Edit delegate
                     </div>
 
                     <div class="mt-5 grid grid-cols-2 gap-y-3 gap-x-5">
@@ -34,10 +34,10 @@
 
                         <div class="space-y-2">
                             <div class="text-registrationPrimaryColor">
-                                First Name <span class="text-red-500">*</span>
+                                First name <span class="text-red-500">*</span>
                             </div>
                             <div>
-                                <input placeholder="First Name" type="text" wire:model="subFirstNameEdit"
+                                <input placeholder="First name" type="text" wire:model="subFirstNameEdit"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                                 @error('subFirstNameEdit')
                                     <div class="text-red-500 text-xs italic mt-1">
@@ -50,20 +50,20 @@
                         {{-- ROW 2 --}}
                         <div class="space-y-2">
                             <div class="text-registrationPrimaryColor">
-                                Middle Name
+                                Middle name
                             </div>
                             <div>
-                                <input placeholder="Middle Name" type="text" wire:model="subMiddleNameEdit"
+                                <input placeholder="Middle name" type="text" wire:model="subMiddleNameEdit"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                             </div>
                         </div>
 
                         <div class="space-y-2">
                             <div class="text-registrationPrimaryColor">
-                                Last Name <span class="text-red-500">*</span>
+                                Last name <span class="text-red-500">*</span>
                             </div>
                             <div>
-                                <input placeholder="Last Name" type="text" wire:model="subLastNameEdit"
+                                <input placeholder="Last name" type="text" wire:model="subLastNameEdit"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                                 @error('subLastNameEdit')
                                     <div class="text-red-500 text-xs italic mt-1">
@@ -77,10 +77,10 @@
                         {{-- ROW 3 --}}
                         <div class="space-y-2">
                             <div class="text-registrationPrimaryColor">
-                                Email Address <span class="text-red-500">*</span>
+                                Email address <span class="text-red-500">*</span>
                             </div>
                             <div>
-                                <input placeholder="Email Address" type="text" wire:model="subEmailAddressEdit"
+                                <input placeholder="Email address" type="text" wire:model="subEmailAddressEdit"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                                 @error('subEmailAddressEdit')
                                     <div class="text-red-500 text-xs italic mt-1">
@@ -105,7 +105,7 @@
 
                         <div class="space-y-2">
                             <div class="text-registrationPrimaryColor">
-                                Mobile Number <span class="text-red-500">*</span>
+                                Mobile number <span class="text-red-500">*</span>
                             </div>
                             <div>
                                 <input placeholder="xxxxxxx" type="text" wire:model="subMobileNumberEdit"
@@ -125,8 +125,17 @@
                                 Nationality <span class="text-red-500">*</span>
                             </div>
                             <div>
-                                <input placeholder="Nationality" type="text" wire:model="subNationalityEdit"
+                                
+                                <select wire:model="subNationalityEdit"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                                    <option value=""></option>
+                                    @foreach ($countries as $country)
+                                        <option value="{{ $country }}">
+                                            {{ $country }}
+                                        </option>
+                                    @endforeach
+                                </select>
+
                                 @error('subNationalityEdit')
                                     <div class="text-red-500 text-xs italic mt-1">
                                         {{ $message }}
@@ -137,10 +146,10 @@
 
                         <div class="space-y-2">
                             <div class="text-registrationPrimaryColor">
-                                Job Title <span class="text-red-500">*</span>
+                                Job title <span class="text-red-500">*</span>
                             </div>
                             <div>
-                                <input placeholder="Job Title" type="text" wire:model="subJobTitleEdit"
+                                <input placeholder="Job title" type="text" wire:model="subJobTitleEdit"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                                 @error('subJobTitleEdit')
                                     <div class="text-red-500 text-xs italic mt-1">
@@ -153,7 +162,7 @@
 
                         <div class="space-y-2 col-span-2">
                             <div class="text-registrationPrimaryColor">
-                                Promo Code
+                                Promo code
                             </div>
 
                             <div class="flex">

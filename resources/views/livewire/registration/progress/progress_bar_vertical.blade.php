@@ -8,7 +8,7 @@
         </div>
 
         <div class="text-registrationPrimaryColor font-bold text-xl">
-            Registration Type
+            Registration type
         </div>
     </div>
 
@@ -23,7 +23,7 @@
         </div>
 
         <div class="text-registrationPrimaryColor font-bold text-xl">
-            Company Details
+            Company details
         </div>
     </div>
 
@@ -39,7 +39,7 @@
         </div>
 
         <div class="text-registrationPrimaryColor font-bold text-xl">
-            Delegate Details
+            Delegate details
         </div>
     </div>
 
@@ -55,7 +55,7 @@
         </div>
 
         <div class="text-registrationPrimaryColor font-bold text-xl">
-            Package Summary
+            Package summary
         </div>
     </div>
 
@@ -71,7 +71,7 @@
         </div>
 
         <div class="text-registrationPrimaryColor font-bold text-xl">
-            Payment Details
+            Payment details
         </div>
     </div>
 </div>

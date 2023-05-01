@@ -76,7 +76,7 @@ class RegistrationForm extends Component
     // BANK DETAILS
     public $bankDetails;
 
-    protected $listeners = ['registrationConfirmed' => 'addtoDatabase', 'emitInitiateAuth' => 'initiateAuthenticationCC'];
+    protected $listeners = ['registrationConfirmed' => 'addtoDatabase', 'emitInitiateAuth' => 'initiateAuthenticationCC', 'emitSubmit' => 'submitBankTransfer'];
 
     public function mount($data)
     {
@@ -253,7 +253,7 @@ class RegistrationForm extends Component
                         'companyName' => 'required',
                     ],
                     [
-                        'companyName.required' => "Company Name is required",
+                        'companyName.required' => "Company name is required",
                     ]
                 );
                 $this->currentStep += 1;
@@ -273,11 +273,11 @@ class RegistrationForm extends Component
                     'assistantEmailAddress' => 'nullable|email',
                 ],
                 [
-                    'companySector.required' => 'Company Sector is required',
-                    'companyAddress.required' => 'Company Address is required',
+                    'companySector.required' => 'Company sector is required',
+                    'companyAddress.required' => 'Company address is required',
                     'companyCountry.required' => 'Country is required',
                     'companyCity.required' => 'City is required',
-                    'companyMobileNumber.required' => 'Mobile Number is required',
+                    'companyMobileNumber.required' => 'Mobile number is required',
                     'assistantEmailAddress.email' => 'Assistant\'s email address must be a valid email',
                 ]
             );
@@ -298,14 +298,14 @@ class RegistrationForm extends Component
                     'badgeType' => 'required',
                 ],
                 [
-                    'firstName.required' => "First Name is required",
-                    'lastName.required' => "Last Name is required",
-                    'emailAddress.required' => "Email Address is required",
-                    'emailAddress.email' => "Email Address must be a valid email",
+                    'firstName.required' => "First name is required",
+                    'lastName.required' => "Last name is required",
+                    'emailAddress.required' => "Email address is required",
+                    'emailAddress.email' => "Email address must be a valid email",
                     'nationality.required' => "Nationality is required",
-                    'mobileNumber.required' => "Mobile Number is required",
-                    'jobTitle.required' => "Job Title is required",
-                    'badgeType.required' => "Badge Type is required",
+                    'mobileNumber.required' => "Mobile number is required",
+                    'jobTitle.required' => "Job title is required",
+                    'badgeType.required' => "Badge type is required",
                 ]
             );
 
@@ -330,13 +330,13 @@ class RegistrationForm extends Component
                 if ($this->paymentMethod == "creditCard") {
                     $this->dispatchBrowserEvent('swal:registration-confirmation', [
                         'type' => 'warning',
-                        'message' => 'Are you sure your want to pay via Credit Card?',
+                        'message' => 'Are you sure your want to pay via Credit card?',
                         'text' => "",
                     ]);
                 } else {
                     $this->dispatchBrowserEvent('swal:registration-confirmation', [
                         'type' => 'warning',
-                        'message' => 'Are you sure your want to pay via Bank Transfer?',
+                        'message' => 'Are you sure your want to pay via Bank transfer?',
                         'text' => "",
                     ]);
                 }
@@ -442,6 +442,8 @@ class RegistrationForm extends Component
         if ($this->paymentMethod == "creditCard") {
             $this->setSessionCC();
             $this->orderId = $tempOrderId;
+        } else {
+            $this->dispatchBrowserEvent('swal:remove-registration-loading-screen');
         }
 
         $this->currentStep += 1;
@@ -469,116 +471,125 @@ class RegistrationForm extends Component
     public function submit()
     {
         if ($this->currentStep == 5) {
-            // UPDATE DETAILS
-
-            if ($this->finalTotal == 0) {
-                $paymentStatus = "free";
-                $registrationStatus = "confirmed";
-            } else {
-                $paymentStatus = "unpaid";
-                $registrationStatus = "pending";
-            }
-
-            MainDelegates::find($this->currentMainDelegateId)->fill([
-                'registration_status' => $registrationStatus,
-                'payment_status' => $paymentStatus,
-                'paid_date_time' => null,
-            ])->save();
-
-            $transaction = Transactions::where('delegate_id', $this->currentMainDelegateId)->where('delegate_type', "main")->first();
-
-            $eventFormattedData = Carbon::parse($this->event->event_start_date)->format('d') . '-' . Carbon::parse($this->event->event_end_date)->format('d M Y');
-            $lastDigit = 1000 + intval($transaction->id);
-
-            foreach (config('app.eventCategories') as $eventCategoryC => $code) {
-                if ($this->event->category == $eventCategoryC) {
-                    $getEventcode = $code;
-                }
-            }
-
-            $tempTransactionId = $this->event->year . "$getEventcode" . "$lastDigit";
-
-            $details1 = [
-                'name' => $this->salutation . " " . $this->firstName . " " . $this->middleName . " " . $this->lastName,
-                'eventLink' => $this->event->link,
-                'eventName' => $this->event->name,
-                'eventDates' => $eventFormattedData,
-                'eventLocation' => $this->event->location,
-
-                'jobTitle' => $this->jobTitle,
-                'companyName' => $this->companyName,
-                'amountPaid' => 0,
-                'transactionId' => $tempTransactionId,
-            ];
-
-            $details2 = [
-                'name' => $this->salutation . " " . $this->firstName . " " . $this->middleName . " " . $this->lastName,
-                'eventLink' => $this->event->link,
-                'eventName' => $this->event->name,
-
-                'invoiceAmount' => $this->finalTotal,
-                'amountPaid' => 0,
-                'balance' => 0,
-            ];
-
-            if ($paymentStatus == "free") {
-                Mail::to($this->emailAddress)->queue(new RegistrationPaid($details1));
-                Mail::to($this->emailAddress)->queue(new RegistrationPaymentConfirmation($details2));
-            } else {
-                Mail::to($this->emailAddress)->queue(new RegistrationUnpaid($details1));
-            }
-
-            if ($this->assistantEmailAddress != null) {
-                if ($paymentStatus == "free") {
-                    Mail::to($this->assistantEmailAddress)->queue(new RegistrationPaid($details1));
-                    Mail::to($this->assistantEmailAddress)->queue(new RegistrationPaymentConfirmation($details2));
-                } else {
-                    Mail::to($this->assistantEmailAddress)->queue(new RegistrationUnpaid($details1));
-                }
-            }
-
-            $addtionalDelegates = AdditionalDelegates::where('main_delegate_id', $this->currentMainDelegateId)->get();
-            if (!empty($addtionalDelegates)) {
-                foreach ($addtionalDelegates as $additionalDelegate) {
-
-                    $transaction = Transactions::where('delegate_id', $additionalDelegate->id)->where('delegate_type', "sub")->first();
-
-                    $lastDigit = 1000 + intval($transaction->id);
-                    $tempTransactionId = $this->event->year . "$getEventcode" . "$lastDigit";
-
-                    $details1 = [
-                        'name' => $additionalDelegate->salutation . " " . $additionalDelegate->first_name . " " . $additionalDelegate->middle_name . " " . $additionalDelegate->last_name,
-                        'eventLink' => $this->event->link,
-                        'eventName' => $this->event->name,
-                        'eventDates' => $eventFormattedData,
-                        'eventLocation' => $this->event->location,
-
-                        'jobTitle' => $additionalDelegate->job_title,
-                        'companyName' => $this->companyName,
-                        'amountPaid' => 0,
-                        'transactionId' => $tempTransactionId,
-                    ];
-
-                    $details2 = [
-                        'name' => $additionalDelegate->salutation . " " . $additionalDelegate->first_name . " " . $additionalDelegate->middle_name . " " . $additionalDelegate->last_name,
-                        'eventLink' => $this->event->link,
-                        'eventName' => $this->event->name,
-
-                        'invoiceAmount' => $this->finalTotal,
-                        'amountPaid' => 0,
-                        'balance' => 0,
-                    ];
-
-                    if ($paymentStatus == "free") {
-                        Mail::to($additionalDelegate->email_address)->queue(new RegistrationPaid($details1));
-                        Mail::to($additionalDelegate->email_address)->queue(new RegistrationPaymentConfirmation($details2));
-                    } else {
-                        Mail::to($additionalDelegate->email_address)->queue(new RegistrationUnpaid($details1));
-                    }
-                }
-            }
-            return redirect()->route('register.success.view', ['eventCategory' => $this->event->category, 'eventId' => $this->event->id, 'eventYear' => $this->event->year, 'mainDelegateId' => $this->currentMainDelegateId]);
+            $this->dispatchBrowserEvent('swal:add-registration-loading-screen');
         }
+    }
+
+    public function submitBankTransfer()
+    {
+        // UPDATE DETAILS
+        if ($this->finalTotal == 0) {
+            $paymentStatus = "free";
+            $registrationStatus = "confirmed";
+        } else {
+            $paymentStatus = "unpaid";
+            $registrationStatus = "pending";
+        }
+
+        MainDelegates::find($this->currentMainDelegateId)->fill([
+            'registration_status' => $registrationStatus,
+            'payment_status' => $paymentStatus,
+            'paid_date_time' => null,
+        ])->save();
+
+        $transaction = Transactions::where('delegate_id', $this->currentMainDelegateId)->where('delegate_type', "main")->first();
+
+        $eventFormattedData = Carbon::parse($this->event->event_start_date)->format('d') . '-' . Carbon::parse($this->event->event_end_date)->format('d M Y');
+        $lastDigit = 1000 + intval($transaction->id);
+
+        foreach (config('app.eventCategories') as $eventCategoryC => $code) {
+            if ($this->event->category == $eventCategoryC) {
+                $getEventcode = $code;
+            }
+        }
+
+        $tempTransactionId = $this->event->year . "$getEventcode" . "$lastDigit";
+        $invoiceLink = env('APP_URL') . '/' . $this->event->category . '/' . $this->event->id . '/view-invoice/' . $this->currentMainDelegateId;
+
+        $details1 = [
+            'name' => $this->salutation . " " . $this->firstName . " " . $this->middleName . " " . $this->lastName,
+            'eventLink' => $this->event->link,
+            'eventName' => $this->event->name,
+            'eventDates' => $eventFormattedData,
+            'eventLocation' => $this->event->location,
+
+            'jobTitle' => $this->jobTitle,
+            'companyName' => $this->companyName,
+            'amountPaid' => 0,
+            'transactionId' => $tempTransactionId,
+            'invoiceLink' => $invoiceLink,
+        ];
+
+        $details2 = [
+            'name' => $this->salutation . " " . $this->firstName . " " . $this->middleName . " " . $this->lastName,
+            'eventLink' => $this->event->link,
+            'eventName' => $this->event->name,
+
+            'invoiceAmount' => $this->finalTotal,
+            'amountPaid' => 0,
+            'balance' => 0,
+            'invoiceLink' => $invoiceLink,
+        ];
+
+        if ($paymentStatus == "free") {
+            Mail::to($this->emailAddress)->queue(new RegistrationPaid($details1));
+            Mail::to($this->emailAddress)->queue(new RegistrationPaymentConfirmation($details2));
+        } else {
+            Mail::to($this->emailAddress)->queue(new RegistrationUnpaid($details1));
+        }
+
+        if ($this->assistantEmailAddress != null) {
+            if ($paymentStatus == "free") {
+                Mail::to($this->assistantEmailAddress)->queue(new RegistrationPaid($details1));
+                Mail::to($this->assistantEmailAddress)->queue(new RegistrationPaymentConfirmation($details2));
+            } else {
+                Mail::to($this->assistantEmailAddress)->queue(new RegistrationUnpaid($details1));
+            }
+        }
+
+        $addtionalDelegates = AdditionalDelegates::where('main_delegate_id', $this->currentMainDelegateId)->get();
+        if (!empty($addtionalDelegates)) {
+            foreach ($addtionalDelegates as $additionalDelegate) {
+
+                $transaction = Transactions::where('delegate_id', $additionalDelegate->id)->where('delegate_type', "sub")->first();
+
+                $lastDigit = 1000 + intval($transaction->id);
+                $tempTransactionId = $this->event->year . "$getEventcode" . "$lastDigit";
+
+                $details1 = [
+                    'name' => $additionalDelegate->salutation . " " . $additionalDelegate->first_name . " " . $additionalDelegate->middle_name . " " . $additionalDelegate->last_name,
+                    'eventLink' => $this->event->link,
+                    'eventName' => $this->event->name,
+                    'eventDates' => $eventFormattedData,
+                    'eventLocation' => $this->event->location,
+
+                    'jobTitle' => $additionalDelegate->job_title,
+                    'companyName' => $this->companyName,
+                    'amountPaid' => 0,
+                    'transactionId' => $tempTransactionId,
+                    'invoiceLink' => $invoiceLink,
+                ];
+
+                $details2 = [
+                    'name' => $additionalDelegate->salutation . " " . $additionalDelegate->first_name . " " . $additionalDelegate->middle_name . " " . $additionalDelegate->last_name,
+                    'eventLink' => $this->event->link,
+                    'eventName' => $this->event->name,
+
+                    'invoiceAmount' => $this->finalTotal,
+                    'amountPaid' => 0,
+                    'balance' => 0,
+                    'invoiceLink' => $invoiceLink,
+                ];
+
+                if ($paymentStatus == "free") {
+                    Mail::to($additionalDelegate->email_address)->queue(new RegistrationPaid($details1));
+                    Mail::to($additionalDelegate->email_address)->queue(new RegistrationPaymentConfirmation($details2));
+                } else {
+                    Mail::to($additionalDelegate->email_address)->queue(new RegistrationUnpaid($details1));
+                }
+            }
+        }
+        return redirect()->route('register.success.view', ['eventCategory' => $this->event->category, 'eventId' => $this->event->id, 'eventYear' => $this->event->year, 'mainDelegateId' => $this->currentMainDelegateId]);
     }
 
     public function btClicked()
@@ -648,6 +659,8 @@ class RegistrationForm extends Component
             ]);
             $bodyUpdateSession = $responseUpdateSession->getBody()->getContents();
             $dataUpdateSession = json_decode($bodyUpdateSession, true);
+
+            $this->dispatchBrowserEvent('swal:remove-registration-loading-screen');
 
             if ($dataUpdateSession['session']['updateStatus'] == "SUCCESS") {
                 $this->cardDetails = true;
@@ -747,8 +760,10 @@ class RegistrationForm extends Component
                 Session::put('htmlOTP', $dataAuthPayer['authentication']['redirect']['html']);
                 Session::put('orderId', $this->orderId);
 
+                $this->dispatchBrowserEvent('swal:hide-pay-button');
                 return redirect()->route('register.otp.view', ['eventCategory' => $this->event->category, 'eventId' => $this->event->id, 'eventYear' => $this->event->year]);
             } else {
+                $this->dispatchBrowserEvent('swal:remove-loading-button');
                 $this->dispatchBrowserEvent('swal:registration-error-authentication', [
                     'type' => 'error',
                     'message' => 'Authentication Error',
@@ -756,6 +771,7 @@ class RegistrationForm extends Component
                 ]);
             }
         } else {
+            $this->dispatchBrowserEvent('swal:remove-loading-button');
             $this->dispatchBrowserEvent('swal:registration-error-authentication', [
                 'type' => 'error',
                 'message' => 'Authentication Error',
@@ -878,14 +894,14 @@ class RegistrationForm extends Component
                 'subBadgeType' => 'required',
             ],
             [
-                'subFirstName.required' => "First Name is required",
-                'subLastName.required' => "Last Name is required",
-                'subEmailAddress.required' => "Email Address is required",
-                'subEmailAddress.email' => "Email Address must be a valid email",
-                'subMobileNumber.required' => "Mobile Number is required",
+                'subFirstName.required' => "First name is required",
+                'subLastName.required' => "Last name is required",
+                'subEmailAddress.required' => "Email address is required",
+                'subEmailAddress.email' => "Email address must be a valid email",
+                'subMobileNumber.required' => "Mobile number is required",
                 'subNationality.required' => "Nationality is required",
-                'subJobTitle.required' => "Job Title is required",
-                'subBadgeType.required' => "Badge Type is required",
+                'subJobTitle.required' => "Job title is required",
+                'subBadgeType.required' => "Badge type is required",
             ]
         );
 
@@ -949,14 +965,14 @@ class RegistrationForm extends Component
                 'subBadgeTypeEdit' => 'required',
             ],
             [
-                'subFirstNameEdit.required' => "First Name is required",
-                'subLastNameEdit.required' => "Last Name is required",
-                'subEmailAddressEdit.required' => "Email Address is required",
-                'subEmailAddressEdit.email' => "Email Address must be a valid email",
-                'subMobileNumberEdit.required' => "Mobile Number is required",
+                'subFirstNameEdit.required' => "First name is required",
+                'subLastNameEdit.required' => "Last name is required",
+                'subEmailAddressEdit.required' => "Email address is required",
+                'subEmailAddressEdit.email' => "Email address must be a valid email",
+                'subMobileNumberEdit.required' => "Mobile number is required",
                 'subNationalityEdit.required' => "Nationality is required",
-                'subJobTitleEdit.required' => "Job Title is required",
-                'subBadgeTypeEdit.required' => "Badge Type is required",
+                'subJobTitleEdit.required' => "Job title is required",
+                'subBadgeTypeEdit.required' => "Badge type is required",
             ]
         );
 
@@ -1018,7 +1034,7 @@ class RegistrationForm extends Component
             } else {
                 $promoCode = PromoCodes::where('event_id', $this->event->id)->where('event_category', $this->event->category)->where('active', true)->where('promo_code', $this->promoCode)->where('badge_type', $this->badgeType)->first();
                 if ($promoCode == null) {
-                    $this->promoCodeFailMain = "Invalid Code";
+                    $this->promoCodeFailMain = "Invalid code";
                 } else {
                     if ($promoCode->total_usage < $promoCode->number_of_codes) {
                         $validityDateTime = Carbon::parse($promoCode->validity);
@@ -1055,7 +1071,7 @@ class RegistrationForm extends Component
             } else {
                 $promoCode = PromoCodes::where('event_id', $this->event->id)->where('event_category', $this->event->category)->where('active', true)->where('promo_code', $this->subPromoCode)->where('badge_type', $this->subBadgeType)->first();
                 if ($promoCode == null) {
-                    $this->promoCodeFailSub = "Invalid Code";
+                    $this->promoCodeFailSub = "Invalid code";
                 } else {
                     if ($promoCode->total_usage < $promoCode->number_of_codes) {
                         $validityDateTime = Carbon::parse($promoCode->validity);
@@ -1092,7 +1108,7 @@ class RegistrationForm extends Component
             } else {
                 $promoCode = PromoCodes::where('event_id', $this->event->id)->where('event_category', $this->event->category)->where('active', true)->where('promo_code', $this->subPromoCodeEdit)->where('badge_type', $this->subBadgeTypeEdit)->first();
                 if ($promoCode == null) {
-                    $this->promoCodeFailSubEdit = "Invalid Code";
+                    $this->promoCodeFailSubEdit = "Invalid code";
                 } else {
                     if ($promoCode->total_usage < $promoCode->number_of_codes) {
                         $validityDateTime = Carbon::parse($promoCode->validity);

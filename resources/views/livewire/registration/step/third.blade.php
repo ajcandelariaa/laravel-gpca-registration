@@ -25,10 +25,10 @@
 
                 <div class="col-span-11 sm:col-span-3">
                     <div class="text-registrationPrimaryColor">
-                        First Name <span class="text-red-500">*</span>
+                        First name <span class="text-red-500">*</span>
                     </div>
                     <div>
-                        <input placeholder="First Name" type="text" wire:model="firstName"
+                        <input placeholder="First name" type="text" wire:model="firstName"
                             class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
 
                         @error('firstName')
@@ -41,20 +41,20 @@
 
                 <div class="col-span-11 sm:col-span-3">
                     <div class="text-registrationPrimaryColor">
-                        Middle Name
+                        Middle name
                     </div>
                     <div>
-                        <input placeholder="Middle Name" type="text" wire:model="middleName"
+                        <input placeholder="Middle name" type="text" wire:model="middleName"
                             class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                     </div>
                 </div>
 
                 <div class="col-span-11 sm:col-span-3">
                     <div class="text-registrationPrimaryColor">
-                        Last Name <span class="text-red-500">*</span>
+                        Last name <span class="text-red-500">*</span>
                     </div>
                     <div>
-                        <input placeholder="Last Name" type="text" wire:model="lastName"
+                        <input placeholder="Last name" type="text" wire:model="lastName"
                             class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
 
                         @error('lastName')
@@ -73,10 +73,10 @@
             <div class="grid grid-cols-2 gap-x-5">
                 <div class="col-span-2 sm:col-span-1">
                     <div class="text-registrationPrimaryColor">
-                        Email Address <span class="text-red-500">*</span>
+                        Email address <span class="text-red-500">*</span>
                     </div>
                     <div>
-                        <input placeholder="Email Address" type="text" wire:model="emailAddress"
+                        <input placeholder="Email address" type="text" wire:model="emailAddress"
                             class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
 
                         @error('emailAddress')
@@ -101,7 +101,7 @@
 
                 <div class="col-span-2 sm:col-span-1">
                     <div class="text-registrationPrimaryColor">
-                        Mobile Number <span class="text-red-500">*</span>
+                        Mobile number <span class="text-red-500">*</span>
                     </div>
                     <div>
                         <input placeholder="xxxxxxx" type="text" wire:model="mobileNumber"
@@ -126,8 +126,15 @@
                         Nationality <span class="text-red-500">*</span>
                     </div>
                     <div>
-                        <input placeholder="Nationality" type="text" wire:model="nationality"
+                        <select wire:model="nationality"
                             class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                            <option value=""></option>
+                            @foreach ($countries as $country)
+                                <option value="{{ $country }}">
+                                    {{ $country }}
+                                </option>
+                            @endforeach
+                        </select>
 
                         @error('nationality')
                             <div class="text-red-500 text-xs italic mt-1">
@@ -139,10 +146,10 @@
 
                 <div class="col-span-3 sm:col-span-1">
                     <div class="text-registrationPrimaryColor">
-                        Job Title <span class="text-red-500">*</span>
+                        Job title <span class="text-red-500">*</span>
                     </div>
                     <div>
-                        <input placeholder="Job Title" type="text" wire:model="jobTitle"
+                        <input placeholder="Job title" type="text" wire:model="jobTitle"
                             class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
 
                         @error('jobTitle')
@@ -155,7 +162,7 @@
 
                 <div class="col-span-3 sm:col-span-1">
                     <div class="text-registrationPrimaryColor">
-                        Promo Code
+                        Promo code
                     </div>
                     <div class="flex">
 
@@ -195,7 +202,7 @@
 @if (!empty($additionalDelegates))
     <div class="mt-10">
         <div class="text-registrationPrimaryColor italic font-bold text-xl">
-            Additional Delegate(s)
+            Additional delegate(s)
         </div>
 
         <div class="mt-5">
@@ -270,11 +277,11 @@
                 count($additionalDelegates) < 4)
             <button wire:click.prevent="openAddModal" type="button" wire:key="btnOpenAddModal"
                 class="cursor-pointer hover:bg-registrationPrimaryColor hover:text-white font-bold border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor rounded-md py-4 px-10">+
-                Add Delegate</button>
+                Add delegate</button>
         @else
             <button disabled type="button"
                 class="cursor-not-allowed font-bold border-gray-600 border-2 bg-white text-gray-600  rounded-md py-4 px-10">+
-                Add Delegate</button>
+                Add delegate</button>
         @endif
     </div>
 

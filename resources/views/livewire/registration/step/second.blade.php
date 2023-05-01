@@ -1,24 +1,24 @@
 <div class="mx-5">
     {{-- COMPANY INFORMATION --}}
     <div class="text-registrationPrimaryColor italic font-bold text-xl">
-        Company Details
+        Company details
     </div>
 
     <div class="mt-5 grid grid-cols-2 gap-y-3 gap-x-5 items-start">
         {{-- ROW 1 --}}
         <div class="col-span-2 sm:col-span-1 space-y-2">
             <div class="text-registrationPrimaryColor">
-                Company Name <span class="text-red-500">*</span>
+                Company name <span class="text-red-500">*</span>
             </div>
             <div>
-                <input readonly placeholder="Company Name" type="text" wire:model="companyName"
+                <input readonly placeholder="Company name" type="text" wire:model="companyName"
                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-none">
             </div>
         </div>
 
         <div class="col-span-2 sm:col-span-1 space-y-2">
             <div class="text-registrationPrimaryColor">
-                Company Sector <span class="text-red-500">*</span>
+                Company sector <span class="text-red-500">*</span>
             </div>
             <div>
                 <select wire:model="companySector"
@@ -40,10 +40,10 @@
         {{-- ROW 2 --}}
         <div class="space-y-2 col-span-2">
             <div class="text-registrationPrimaryColor">
-                Company Address <span class="text-red-500">*</span>
+                Company address <span class="text-red-500">*</span>
             </div>
             <div>
-                <input placeholder="Please enter Complete Company Address" type="text" wire:model="companyAddress"
+                <input placeholder="Please enter complete company address" type="text" wire:model="companyAddress"
                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                 @error('companyAddress')
                     <div class="text-red-500 text-xs italic mt-1">
@@ -96,7 +96,7 @@
         {{-- ROW 4 --}}
         <div class="col-span-2 sm:col-span-1 space-y-2">
             <div class="text-registrationPrimaryColor">
-                Landline Number <span class="italic">(optional)</span>
+                Landline number <span class="italic">(optional)</span>
             </div>
             <div>
                 <input placeholder="xxxxxxx" type="text" wire:model="companyLandlineNumber"
@@ -112,7 +112,7 @@
 
         <div class="col-span-2 sm:col-span-1 space-y-2">
             <div class="text-registrationPrimaryColor">
-                Mobile Number <span class="text-red-500">*</span>
+                Mobile number <span class="text-red-500">*</span>
             </div>
             <div>
                 <input placeholder="xxxxxxx" type="text" wire:model="companyMobileNumber"
@@ -132,7 +132,7 @@
                 Assistant's email address
             </div>
             <div>
-                <input placeholder="Email Address" type="text" wire:model="assistantEmailAddress"
+                <input placeholder="Email address" type="text" wire:model="assistantEmailAddress"
                     wire:key="assistantEmailAddress"
                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                 @error('assistantEmailAddress')
@@ -151,11 +151,14 @@
                 <select wire:model="heardWhere"
                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                     <option value=""></option>
-                    <option value="Social Media">Social Media</option>
-                    <option value="Friends">Friends</option>
-                    <option value="Family">Family</option>
-                    <option value="News">News</option>
-                    <option value="Others">Others</option>
+                    <option value="Email">Email</option>
+                    <option value="Industry association">Industry association</option>
+                    <option value="Media">Media</option>
+                    <option value="Facbook">Facbook</option>
+                    <option value="Twitter">Twitter</option>
+                    <option value="YouTube">YouTube</option>
+                    <option value="Instagram">Instagram</option>
+                    <option value="LinkedIn">LinkedIn</option>
                 </select>
 
                 @error('heardWhere')

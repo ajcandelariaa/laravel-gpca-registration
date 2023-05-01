@@ -1,7 +1,7 @@
 <div class="mx-5">
     <div>
         <div class="text-registrationPrimaryColor font-bold text-2xl">
-            Package Summary
+            Package summary
         </div>
 
         <div class="italic mt-5">
@@ -21,7 +21,7 @@
             </div>
 
             <div class="text-registrationPrimaryColor">
-                Email Address:
+                Email address:
             </div>
 
             <div>
@@ -36,17 +36,17 @@
         <div class="mt-5 flex gap-5">
             <button wire:click.prevent="btClicked" type="button"
                 class="{{ $paymentMethod == 'bankTransfer' ? 'bg-registrationSecondaryColor text-white' : 'hover:bg-registrationSecondaryColor hover:text-white border-registrationSecondaryColor border-2 bg-white text-registrationSecondaryColor' }} font-bold w-52 rounded-md py-5 ">
-                <i class="fa-solid fa-building-columns mr-2"></i> Bank Transfer</button>
+                <i class="fa-solid fa-building-columns mr-2"></i> Bank transfer</button>
 
             @if ($finalTotal == 0)
                 <button type="button"
                     class="border-gray-400 border-2 text-gray-400 bg-white font-bold w-52 rounded-md py-5 cursor-not-allowed"
                     disabled>
-                    <i class="fa-solid fa-credit-card mr-2"></i> Credit Card</button>
+                    <i class="fa-solid fa-credit-card mr-2"></i> Credit card</button>
             @else
                 <button wire:click.prevent="ccClicked" type="button"
                     class="{{ $paymentMethod == 'creditCard' ? 'bg-registrationSecondaryColor text-white' : 'hover:bg-registrationSecondaryColor hover:text-white border-registrationSecondaryColor border-2 bg-white text-registrationSecondaryColor' }} font-bold w-52 rounded-md py-5 ">
-                    <i class="fa-solid fa-credit-card mr-2"></i> Credit Card</button>
+                    <i class="fa-solid fa-credit-card mr-2"></i> Credit card</button>
             @endif
         </div>
 

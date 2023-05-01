@@ -119,7 +119,7 @@ class RegistrationController extends Controller
                 'invoiceLink' => $invoiceLink,
                 'bankDetails' => $bankDetails,
             ]);
-            
+
             // if ($mainDelegate->confirmation_date_time == null) {
             // } else {
             //     abort(404, 'The URL is incorrect');
@@ -212,6 +212,7 @@ class RegistrationController extends Controller
                 }
 
                 $tempTransactionId = "$event->year" . "$getEventcode" . "$lastDigit";
+                $invoiceLink = env('APP_URL') . '/' . $event->category . '/' . $event->id . '/view-invoice/' . $mainDelegateId;
 
                 $details1 = [
                     'name' => $mainDelegate->salutation . " " . $mainDelegate->first_name . " " . $mainDelegate->middle_name . " " . $mainDelegate->last_name,
@@ -224,6 +225,7 @@ class RegistrationController extends Controller
                     'companyName' => $mainDelegate->company_name,
                     'amountPaid' => $mainDelegate->total_amount,
                     'transactionId' => $tempTransactionId,
+                    'invoiceLink' => $invoiceLink,
                 ];
 
                 $details2 = [
@@ -234,6 +236,7 @@ class RegistrationController extends Controller
                     'invoiceAmount' => $mainDelegate->total_amount,
                     'amountPaid' => $mainDelegate->total_amount,
                     'balance' => 0,
+                    'invoiceLink' => $invoiceLink,
                 ];
 
                 Mail::to($mainDelegate->email_address)->queue(new RegistrationPaid($details1));
@@ -263,6 +266,7 @@ class RegistrationController extends Controller
                             'companyName' => $mainDelegate->company_name,
                             'amountPaid' => $mainDelegate->total_amount,
                             'transactionId' => $tempTransactionId,
+                            'invoiceLink' => $invoiceLink,
                         ];
 
                         $details2 = [
@@ -273,6 +277,7 @@ class RegistrationController extends Controller
                             'invoiceAmount' => $mainDelegate->total_amount,
                             'amountPaid' => $mainDelegate->total_amount,
                             'balance' => 0,
+                            'invoiceLink' => $invoiceLink,
                         ];
                         Mail::to($additionalDelegate->email_address)->queue(new RegistrationPaid($details1));
                         Mail::to($additionalDelegate->email_address)->queue(new RegistrationPaymentConfirmation($details2));
@@ -296,6 +301,8 @@ class RegistrationController extends Controller
                     $bankDetails = config('app.bankDetails.DEFAULT');
                 }
 
+                $invoiceLink = env('APP_URL') . '/' . $event->category . '/' . $event->id . '/view-invoice/' . $mainDelegateId;
+
                 $details = [
                     'name' => $mainDelegate->salutation . " " . $mainDelegate->first_name . " " . $mainDelegate->middle_name . " " . $mainDelegate->last_name,
                     'eventLink' => $event->link,
@@ -303,6 +310,7 @@ class RegistrationController extends Controller
                     'eventDates' => $eventFormattedData,
                     'eventLocation' => $event->location,
                     'bankDetails' => $bankDetails,
+                    'invoiceLink' => $invoiceLink,
                 ];
 
                 Mail::to($mainDelegate->email_address)->queue(new RegistrationCardDeclined($details));
@@ -322,6 +330,7 @@ class RegistrationController extends Controller
                             'eventDates' => $eventFormattedData,
                             'eventLocation' => $event->location,
                             'bankDetails' => $bankDetails,
+                            'invoiceLink' => $invoiceLink,
                         ];
                         Mail::to($additionalDelegate->email_address)->queue(new RegistrationCardDeclined($details));
                     }
@@ -344,6 +353,8 @@ class RegistrationController extends Controller
             } else {
                 $bankDetails = config('app.bankDetails.DEFAULT');
             }
+            
+            $invoiceLink = env('APP_URL') . '/' . $event->category . '/' . $event->id . '/view-invoice/' . $mainDelegateId;
 
             $details = [
                 'name' => $mainDelegate->salutation . " " . $mainDelegate->first_name . " " . $mainDelegate->middle_name . " " . $mainDelegate->last_name,
@@ -352,6 +363,7 @@ class RegistrationController extends Controller
                 'eventDates' => $eventFormattedData,
                 'eventLocation' => $event->location,
                 'bankDetails' => $bankDetails,
+                'invoiceLink' => $invoiceLink,
             ];
 
             Mail::to($mainDelegate->email_address)->queue(new RegistrationCardDeclined($details));
@@ -371,6 +383,7 @@ class RegistrationController extends Controller
                         'eventDates' => $eventFormattedData,
                         'eventLocation' => $event->location,
                         'bankDetails' => $bankDetails,
+                        'invoiceLink' => $invoiceLink,
                     ];
                     Mail::to($additionalDelegate->email_address)->queue(new RegistrationCardDeclined($details));
                 }

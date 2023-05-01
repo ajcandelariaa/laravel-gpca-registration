@@ -44,6 +44,11 @@
             $(document).ready(function() {
                 let sessionId = "{{ $sessionId }}";
 
+                let payButton = document.getElementById('payButton');
+                let processingButton = document.getElementById('processingButton');
+                let registrationLloadingScreen2 = document.getElementById('registration-loading-screen-2');
+
+                processingButton.classList.add('hidden');
 
                 let cardNumberError = true;
                 let expiryMonthError = true;
@@ -108,6 +113,7 @@
                                             cardNameErrMessage.classList.add("block");
                                             cardNameErrMessage.classList.remove("hidden");
                                         }
+                                        removeLoading();
                                     } else {
                                         console.log("Session updated with data: " + response.session.id);
 
@@ -123,7 +129,7 @@
                                     }
                                 } else if ("fields_in_error" == response.status) {
                                     console.log("Session update failed with field errors.");
-
+                                    removeLoading();
                                     if (securityCodeErrorEmpty) {
                                         console.log("Security code required.");
                                         cardSecurityErrMessage.textContent = "Security Code is required";
@@ -242,12 +248,15 @@
                                     console.log("Session update failed with request timeout: " + response
                                         .errors
                                         .message);
+                                    removeLoading();
                                 } else if ("system_error" == response.status) {
                                     console.log("Session update failed with system error: " + response
                                         .errors.message);
+                                    removeLoading();
                                 }
                             } else {
                                 console.log("Session update failed: " + response);
+                                removeLoading();
                             }
                         }
                     },
@@ -311,9 +320,21 @@
                     }
                 }
 
+                function showLoading() {
+                    processingButton.classList.remove('hidden');
+                    payButton.classList.add('hidden');
+                    registrationLloadingScreen2.classList.remove('hidden');
+                }
+
+                function removeLoading() {
+                    processingButton.classList.add('hidden');
+                    payButton.classList.remove('hidden');
+                    registrationLloadingScreen2.classList.add('hidden');
+                }
 
                 function pay() {
                     console.log('clicked');
+                    showLoading();
                     PaymentSession.updateSessionFromForm('card');
                 }
 

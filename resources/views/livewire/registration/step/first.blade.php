@@ -2,7 +2,7 @@
     <table class="w-full bg-registrationPrimaryColor text-white text-center" cellspacing="1" cellpadding="2">
         <thead>
             <tr>
-                <td class="py-4 font-bold text-lg">Pass Category</td>
+                <td class="py-4 font-bold text-lg">Pass category</td>
                 @if ($finalEbEndDate != null)
                     <td class="py-4 font-bold text-lg">
                         <span>Early Bird Rate <br> <span class="font-normal text-base">(valid until
@@ -10,7 +10,7 @@
                     </td>
                 @endif
                 <td class="py-4 font-bold text-lg">
-                    <span>Standard Rate <br> <span class="font-normal text-base">(starting
+                    <span>Standard rate <br> <span class="font-normal text-base">(starting
                             {{ $finalStdStartDate }})</span></span>
                 </td>
             </tr>
@@ -25,13 +25,15 @@
                 @if ($finalEbEndDate != null)
                     <td class="text-black">
                         <div class="bg-white py-4">
-                            $ {{ $event->eb_member_rate }} {{ ($event->event_vat == 0) ? '' : '+ '.$event->event_vat.'%' }}
+                            $ {{ number_format($event->eb_member_rate, 2, '.', ',') }}
+                            {{ $event->event_vat == 0 ? '' : '+ ' . $event->event_vat . '%' }}
                         </div>
                     </td>
                 @endif
                 <td class="text-black">
                     <div class="bg-white py-4 mr-1">
-                        $ {{ $event->std_member_rate }} {{ ($event->event_vat == 0) ? '' : '+ '.$event->event_vat.'%' }}
+                        $ {{ number_format($event->std_member_rate, 2, '.', ',') }}
+                        {{ $event->event_vat == 0 ? '' : '+ ' . $event->event_vat . '%' }}
                     </div>
                 </td>
             </tr>
@@ -44,13 +46,15 @@
                 @if ($finalEbEndDate != null)
                     <td class="text-black">
                         <div class="bg-white py-4 mb-1">
-                            $ {{ $event->eb_nmember_rate }} {{ ($event->event_vat == 0) ? '' : '+ '.$event->event_vat.'%' }}
+                            $ {{ number_format($event->eb_nmember_rate, 2, '.', ',') }}
+                            {{ $event->event_vat == 0 ? '' : '+ ' . $event->event_vat . '%' }}
                         </div>
                     </td>
                 @endif
                 <td class="text-black">
                     <div class="bg-white py-4 mb-1 mr-1">
-                        $ {{ $event->std_nmember_rate }} {{ ($event->event_vat == 0) ? '' : '+ '.$event->event_vat.'%' }}
+                        $ {{ number_format($event->std_nmember_rate, 2, '.', ',') }}
+                        {{ $event->event_vat == 0 ? '' : '+ ' . $event->event_vat . '%' }}
                     </div>
                 </td>
             </tr>
@@ -118,7 +122,7 @@
                     @if ($delegatePassType != null)
                         <div class="mt-10">
                             <div class="text-registrationPrimaryColor">
-                                Company Name <span class="text-red-500">*</span>
+                                Company name <span class="text-red-500">*</span>
                             </div>
                             <div>
                                 @if ($delegatePassType == 'member')
@@ -134,13 +138,13 @@
                                     <input placeholder="Company Name" type="text" wire:model="companyName"
                                         class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                                 @endif
-                
+
                                 @error('companyName')
                                     <div class="text-red-500 text-xs italic mt-1">
                                         {{ $message }}
                                     </div>
                                 @enderror
-                        </div>
+                            </div>
                     @endif
                 </div>
             </div>

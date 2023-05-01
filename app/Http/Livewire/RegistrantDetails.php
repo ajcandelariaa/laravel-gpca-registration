@@ -627,11 +627,14 @@ class RegistrantDetails extends Component
     public function sendEmailReminder()
     {
         $event = Events::where('id', $this->eventId)->where('category', $this->eventCategory)->first();
+        
+        $invoiceLink = env('APP_URL').'/'.$this->eventCategory.'/'.$this->eventId.'/view-invoice/'.$this->registrantId;
 
         $details = [
             'name' => $this->finalData['name'],
             'eventName' => $event->name,
             'eventLink' => $event->link,
+            'invoiceLink' => $invoiceLink,
         ];
 
         Mail::to($this->finalData['email_address'])->queue(new RegistrationPaymentReminder($details));
@@ -646,6 +649,7 @@ class RegistrantDetails extends Component
                     'name' => $subDelegate['name'],
                     'eventName' => $event->name,
                     'eventLink' => $event->link,
+                    'invoiceLink' => $invoiceLink,
                 ];
 
                 Mail::to($subDelegate['email_address'])->queue(new RegistrationPaymentReminder($details));
