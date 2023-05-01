@@ -62,6 +62,18 @@ class EventController extends Controller
         }
     }
 
+    public function eventDelegateFeesView($eventCategory, $eventId){
+        if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {
+            return view('admin.event.detail.delegate_fees', [
+                "pageTitle" => "Event Delegate Fees",
+                "eventCategory" => $eventCategory,
+                "eventId" => $eventId,
+            ]);
+        } else {
+            abort(404, 'The URL is incorrect');
+        }
+    }
+
     public function eventPromoCodeView($eventCategory, $eventId)
     {
         if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {

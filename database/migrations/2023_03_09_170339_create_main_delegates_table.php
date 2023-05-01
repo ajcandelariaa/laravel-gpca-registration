@@ -52,7 +52,8 @@ return new class extends Migration
             $table->string('payment_status');
             $table->dateTime('registered_date_time');
             $table->dateTime('paid_date_time')->nullable();
-            // $table->dateTime('confirmation_date_time')->nullable();
+            $table->dateTime('confirmation_date_time')->nullable();
+            $table->string('confirmation_status')->nullable();
             $table->timestamps();
             $table->foreign('event_id')->references('id')->on('events')->onDelete('cascade');
         });

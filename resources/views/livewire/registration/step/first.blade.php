@@ -66,28 +66,13 @@
             <div class="bg-gray-200 py-4 px-2">
                 <h1 class="text-2xl text-registrationPrimaryColor font-bold text-center">DELEGATE FEE INCLUDES:</h1>
                 <div class="bg-white mx-1 mt-5 px-14 py-5">
-                    <ul class="list-disc ">
-                        <li class="text-registrationPrimaryColor"><span class="text-black">All conference and
-                                masterclasses for all two (2) days</span></li>
-                        <li class="text-registrationPrimaryColor"><span class="text-black">Networking lunch and breaks
-                                for all two (2) days</span></li>
-                        <li class="text-registrationPrimaryColor"><span class="text-black">Exhibition for two (2)
-                                days</span></li>
-                        <li class="text-registrationPrimaryColor"><span class="text-black">Inauguration ceremony on day
-                                1 (10 February 2021)</span></li>
-                        <li class="text-registrationPrimaryColor"><span class="text-black">Closing ceremony on day 2 (11
-                                February 2021)</span></li>
-                        <li class="text-registrationPrimaryColor"><span class="text-black">Dinner (gala dinner on Day 1
-                                – 10 February2021)</span></li>
-                        <li class="text-registrationPrimaryColor"><span class="text-black">Closing Ceremony on day 2 (11
-                                February 2021)</span></li>
-                        <li class="text-registrationPrimaryColor"><span class="text-black">Conferences related handouts
-                                and publications</span></li>
-                        <li class="text-registrationPrimaryColor"><span class="text-black">Delegate bag</span></li>
-                        <li class="text-registrationPrimaryColor"><span class="text-black">Event App will give you
-                                access to information on the forum such as the attendance list, program, speakers,
-                                session, etc. You can send messages and pre-arrange meetings to registered attendees who
-                                have already downloaded and logged in to the app.</span></li>
+                    <ul class="list-disc">
+                        @if ($delegateFees->isNotEmpty())
+                            @foreach ($delegateFees as $delegateFee)
+                                <li class="text-registrationPrimaryColor"><span
+                                        class="text-black">{{ $delegateFee->description }}</span></li>
+                            @endforeach
+                        @endif
                     </ul>
                 </div>
             </div>

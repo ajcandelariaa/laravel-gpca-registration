@@ -11,7 +11,7 @@
                 <div>
                     <div class="text-registrationPrimaryColor italic font-bold text-xl flex items-center gap-2">
                         <span style="width: 200px;">Add delegate </span>
-                        <span class="text-red-500 text-xs font-normal">Please note that all the delegates you add should be from the same company!</span>
+                        <span class="text-red-500 text-xs font-normal">Note: Additional delegates should be from the same company as the primary delegate</span>
                     </div>
 
                     <div class="mt-5 grid grid-cols-2 gap-y-3 gap-x-5">

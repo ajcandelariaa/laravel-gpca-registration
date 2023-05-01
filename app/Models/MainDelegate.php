@@ -48,5 +48,6 @@ class MainDelegate extends Model
         'registered_date_time',
         'paid_date_time',
         'confirmation_date_time',
+        'confirmation_status',
     ];
 }

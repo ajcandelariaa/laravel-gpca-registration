@@ -31,6 +31,7 @@ Route::prefix('admin')->group(function () {
             Route::prefix('{eventCategory}/{eventId}')->group(function (){
                 Route::get('/detail', [EventController::class, 'eventDetailView'])->name('admin.event.detail.view');
                 Route::get('/promo-code', [EventController::class, 'eventPromoCodeView'])->name('admin.event.promo-codes.view');
+                Route::get('/delegate-fees', [EventController::class, 'eventDelegateFeesView'])->name('admin.event.delegate-fees.view');
                 Route::prefix('registrant')->group(function (){
                     Route::get('/', [RegistrationController::class, 'eventRegistrantsView'])->name('admin.event.registrants.view');
                     Route::get('/export', [RegistrationController::class, 'eventRegistrantsExportData'])->name('admin.event.registrants.exportData');
@@ -72,11 +73,10 @@ Route::get('/register/{eventYear}/{eventCategory}/{eventId}/{mainDelegateId}/{st
 Route::get('/register/{eventYear}/{eventCategory}/{eventId}/{mainDelegateId}/success', [RegistrationController::class, 'registrationSuccessView'])->name('register.success.view');
 Route::get('/register/{eventYear}/{eventCategory}/{eventId}/{mainDelegateId}/failed', [RegistrationController::class, 'registrationFailedView'])->name('register.failed.view');
 
-
-Route::get('/getSessionId', [GatewayController::class, 'getSessionId']);
-Route::get('/updateSession', [GatewayController::class, 'updateSession']);
-Route::get('/cardDetails', [GatewayController::class, 'cardDetails']);
-Route::get('/initiateAuthentication', [GatewayController::class, 'initiateAuthentication']);
-Route::get('/initiateAuthenticationPayerRequest', [GatewayController::class, 'initiateAuthenticationPayerRequest']);
-Route::get('/testViewOTP', [GatewayController::class, 'testViewOTP']);
-Route::post('/payNow', [GatewayController::class, 'payNow']);
+// Route::get('/getSessionId', [GatewayController::class, 'getSessionId']);
+// Route::get('/updateSession', [GatewayController::class, 'updateSession']);
+// Route::get('/cardDetails', [GatewayController::class, 'cardDetails']);
+// Route::get('/initiateAuthentication', [GatewayController::class, 'initiateAuthentication']);
+// Route::get('/initiateAuthenticationPayerRequest', [GatewayController::class, 'initiateAuthenticationPayerRequest']);
+// Route::get('/testViewOTP', [GatewayController::class, 'testViewOTP']);
+// Route::post('/payNow', [GatewayController::class, 'payNow']);

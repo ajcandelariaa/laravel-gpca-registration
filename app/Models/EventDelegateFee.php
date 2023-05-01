@@ -11,6 +11,7 @@ class EventDelegateFee extends Model
     
     protected $fillable = [
         'event_id',
+        'event_category',
         'description',
     ];
 }

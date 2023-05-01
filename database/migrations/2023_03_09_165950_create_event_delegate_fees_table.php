@@ -16,7 +16,8 @@ return new class extends Migration
         Schema::create('event_delegate_fees', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('event_id');
-            $table->string('description');
+            $table->string('event_category');
+            $table->mediumText('description');
             $table->timestamps();
             $table->foreign('event_id')->references('id')->on('events')->onDelete('cascade');
         });

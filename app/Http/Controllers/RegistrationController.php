@@ -61,32 +61,36 @@ class RegistrationController extends Controller
     {
         if (Event::where('year', $eventYear)->where('category', $eventCategory)->where('id', $eventId)->exists()) {
             $mainDelegate = MainDelegate::where('id', $mainDelegateId)->first();
-            $event = Event::where('id', $eventId)->first();
-            $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('d') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');
-            $invoiceLink = env('APP_URL') . '/' . $eventCategory . '/' . $eventId . '/view-invoice/' . $mainDelegateId;
 
-            if ($eventCategory == "AF") {
-                $bankDetails = config('app.bankDetails.AF');
+            if ($mainDelegate->confirmation_status == "failed" || $mainDelegate->confirmation_date_time == null) {
+                $event = Event::where('id', $eventId)->first();
+                $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('d') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');
+                $invoiceLink = env('APP_URL') . '/' . $eventCategory . '/' . $eventId . '/view-invoice/' . $mainDelegateId;
+
+                if ($eventCategory == "AF") {
+                    $bankDetails = config('app.bankDetails.AF');
+                } else {
+                    $bankDetails = config('app.bankDetails.DEFAULT');
+                }
+
+                if($mainDelegate->confirmation_date_time == null){
+                    MainDelegate::find($mainDelegateId)->fill([
+                        'confirmation_date_time' => Carbon::now(),
+                        'confirmation_status' => "failed",
+                    ])->save();
+                }
+
+                return view('registration.registration_failed_message', [
+                    'pageTitle' => "Registration Failed",
+                    'event' => $event,
+                    'mainDelegate' => $mainDelegate,
+                    'eventFormattedDate' =>  $eventFormattedDate,
+                    'invoiceLink' => $invoiceLink,
+                    'bankDetails' => $bankDetails,
+                ]);
             } else {
-                $bankDetails = config('app.bankDetails.DEFAULT');
+                abort(404, 'The URL is incorrect');
             }
-
-            MainDelegate::find($mainDelegateId)->fill([
-                'confirmation_date_time' => Carbon::now(),
-            ])->save();
-
-            return view('registration.registration_failed_message', [
-                'pageTitle' => "Registration Failed",
-                'event' => $event,
-                'mainDelegate' => $mainDelegate,
-                'eventFormattedDate' =>  $eventFormattedDate,
-                'invoiceLink' => $invoiceLink,
-                'bankDetails' => $bankDetails,
-            ]);
-            // if ($mainDelegate->confirmation_date_time == null) {
-            // } else {
-            //     abort(404, 'The URL is incorrect');
-            // }
         } else {
             abort(404, 'The URL is incorrect');
         }
@@ -97,33 +101,35 @@ class RegistrationController extends Controller
         if (Event::where('year', $eventYear)->where('category', $eventCategory)->where('id', $eventId)->exists()) {
             $mainDelegate = MainDelegate::where('id', $mainDelegateId)->first();
 
-            $event = Event::where('id', $eventId)->first();
-            $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('d') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');
-            $invoiceLink = env('APP_URL') . '/' . $eventCategory . '/' . $eventId . '/view-invoice/' . $mainDelegateId;
+            if ($mainDelegate->confirmation_status == "success" || $mainDelegate->confirmation_date_time == null) {
+                $event = Event::where('id', $eventId)->first();
+                $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('d') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');
+                $invoiceLink = env('APP_URL') . '/' . $eventCategory . '/' . $eventId . '/view-invoice/' . $mainDelegateId;
 
-            if ($eventCategory == "AF") {
-                $bankDetails = config('app.bankDetails.AF');
+                if ($eventCategory == "AF") {
+                    $bankDetails = config('app.bankDetails.AF');
+                } else {
+                    $bankDetails = config('app.bankDetails.DEFAULT');
+                }
+
+                if($mainDelegate->confirmation_date_time == null){
+                    MainDelegate::find($mainDelegateId)->fill([
+                        'confirmation_date_time' => Carbon::now(),
+                        'confirmation_status' => "failed",
+                    ])->save();
+                }
+
+                return view('registration.registration_success_message', [
+                    'pageTitle' => "Registration Success",
+                    'event' => $event,
+                    'mainDelegate' => $mainDelegate,
+                    'eventFormattedDate' =>  $eventFormattedDate,
+                    'invoiceLink' => $invoiceLink,
+                    'bankDetails' => $bankDetails,
+                ]);
             } else {
-                $bankDetails = config('app.bankDetails.DEFAULT');
+                abort(404, 'The URL is incorrect');
             }
-
-            MainDelegate::find($mainDelegateId)->fill([
-                'confirmation_date_time' => Carbon::now(),
-            ])->save();
-
-            return view('registration.registration_success_message', [
-                'pageTitle' => "Registration Success",
-                'event' => $event,
-                'mainDelegate' => $mainDelegate,
-                'eventFormattedDate' =>  $eventFormattedDate,
-                'invoiceLink' => $invoiceLink,
-                'bankDetails' => $bankDetails,
-            ]);
-
-            // if ($mainDelegate->confirmation_date_time == null) {
-            // } else {
-            //     abort(404, 'The URL is incorrect');
-            // }
         } else {
             abort(404, 'The URL is incorrect');
         }
@@ -353,7 +359,7 @@ class RegistrationController extends Controller
             } else {
                 $bankDetails = config('app.bankDetails.DEFAULT');
             }
-            
+
             $invoiceLink = env('APP_URL') . '/' . $event->category . '/' . $event->id . '/view-invoice/' . $mainDelegateId;
 
             $details = [

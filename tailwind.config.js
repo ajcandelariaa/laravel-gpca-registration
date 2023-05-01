@@ -20,6 +20,8 @@ module.exports = {
         addDelegateGrid: '250px auto',
         delegateDetailGrid: '200px auto',
         horizontalProgressBarGrid: '55px auto 55px auto 55px auto 55px auto 55px',
+        addDelegateFeeGrid: 'auto 100px',
+        delegateFeesGrid: 'auto 150px',
       },
       backgroundImage: {
         loginBg: "url('/public/assets/images/loginbg.png')",

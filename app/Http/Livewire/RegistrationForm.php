@@ -10,6 +10,7 @@ use App\Models\Member as Members;
 use App\Models\PromoCode as PromoCodes;
 use App\Models\MainDelegate as MainDelegates;
 use App\Models\AdditionalDelegate as AdditionalDelegates;
+use App\Models\EventDelegateFee;
 use App\Models\Transaction as Transactions;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
@@ -35,7 +36,7 @@ class RegistrationForm extends Component
         'Organizer',
     ];
 
-    public $members, $event;
+    public $members, $event, $delegateFees;
 
     public $finalEbEndDate, $finalStdStartDate;
     public $currentStep = 1;
@@ -98,6 +99,7 @@ class RegistrationForm extends Component
         $this->subBadgeTypeEdit = "Delegate";
 
         $this->members = Members::where('active', true)->get();
+        $this->delegateFees = EventDelegateFee::where('event_id', $data->id)->where('event_category', $data->category)->get();
 
         $this->cardDetails = false;
 
