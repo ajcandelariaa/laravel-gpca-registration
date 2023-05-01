@@ -115,7 +115,7 @@ class RegistrationController extends Controller
                 if($mainDelegate->confirmation_date_time == null){
                     MainDelegate::find($mainDelegateId)->fill([
                         'confirmation_date_time' => Carbon::now(),
-                        'confirmation_status' => "failed",
+                        'confirmation_status' => "success",
                     ])->save();
                 }
 
