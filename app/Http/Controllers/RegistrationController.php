@@ -61,33 +61,32 @@ class RegistrationController extends Controller
     {
         if (Event::where('year', $eventYear)->where('category', $eventCategory)->where('id', $eventId)->exists()) {
             $mainDelegate = MainDelegate::where('id', $mainDelegateId)->first();
-            
-            if ($mainDelegate->confirmation_date_time == null) {
-                $event = Event::where('id', $eventId)->first();
-                $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('d') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');
-                $invoiceLink = env('APP_URL') . '/' . $eventCategory . '/' . $eventId . '/view-invoice/' . $mainDelegateId;
+            $event = Event::where('id', $eventId)->first();
+            $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('d') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');
+            $invoiceLink = env('APP_URL') . '/' . $eventCategory . '/' . $eventId . '/view-invoice/' . $mainDelegateId;
 
-                if ($eventCategory == "AF") {
-                    $bankDetails = config('app.bankDetails.AF');
-                } else {
-                    $bankDetails = config('app.bankDetails.DEFAULT');
-                }
-
-                MainDelegate::find($mainDelegateId)->fill([
-                    'confirmation_date_time' => Carbon::now(),
-                ])->save();
-
-                return view('registration.registration_failed_message', [
-                    'pageTitle' => "Registration Failed",
-                    'event' => $event,
-                    'mainDelegate' => $mainDelegate,
-                    'eventFormattedDate' =>  $eventFormattedDate,
-                    'invoiceLink' => $invoiceLink,
-                    'bankDetails' => $bankDetails,
-                ]);
+            if ($eventCategory == "AF") {
+                $bankDetails = config('app.bankDetails.AF');
             } else {
-                abort(404, 'The URL is incorrect');
+                $bankDetails = config('app.bankDetails.DEFAULT');
             }
+
+            MainDelegate::find($mainDelegateId)->fill([
+                'confirmation_date_time' => Carbon::now(),
+            ])->save();
+
+            return view('registration.registration_failed_message', [
+                'pageTitle' => "Registration Failed",
+                'event' => $event,
+                'mainDelegate' => $mainDelegate,
+                'eventFormattedDate' =>  $eventFormattedDate,
+                'invoiceLink' => $invoiceLink,
+                'bankDetails' => $bankDetails,
+            ]);
+            // if ($mainDelegate->confirmation_date_time == null) {
+            // } else {
+            //     abort(404, 'The URL is incorrect');
+            // }
         } else {
             abort(404, 'The URL is incorrect');
         }
@@ -98,39 +97,41 @@ class RegistrationController extends Controller
         if (Event::where('year', $eventYear)->where('category', $eventCategory)->where('id', $eventId)->exists()) {
             $mainDelegate = MainDelegate::where('id', $mainDelegateId)->first();
 
-            if ($mainDelegate->confirmation_date_time == null) {
-                $event = Event::where('id', $eventId)->first();
-                $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('d') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');
-                $invoiceLink = env('APP_URL') . '/' . $eventCategory . '/' . $eventId . '/view-invoice/' . $mainDelegateId;
+            $event = Event::where('id', $eventId)->first();
+            $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('d') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');
+            $invoiceLink = env('APP_URL') . '/' . $eventCategory . '/' . $eventId . '/view-invoice/' . $mainDelegateId;
 
-                if ($eventCategory == "AF") {
-                    $bankDetails = config('app.bankDetails.AF');
-                } else {
-                    $bankDetails = config('app.bankDetails.DEFAULT');
-                }
-
-                MainDelegate::find($mainDelegateId)->fill([
-                    'confirmation_date_time' => Carbon::now(),
-                ])->save();
-
-                return view('registration.registration_success_message', [
-                    'pageTitle' => "Registration Success",
-                    'event' => $event,
-                    'mainDelegate' => $mainDelegate,
-                    'eventFormattedDate' =>  $eventFormattedDate,
-                    'invoiceLink' => $invoiceLink,
-                    'bankDetails' => $bankDetails,
-                ]);
+            if ($eventCategory == "AF") {
+                $bankDetails = config('app.bankDetails.AF');
             } else {
-                abort(404, 'The URL is incorrect');
+                $bankDetails = config('app.bankDetails.DEFAULT');
             }
+
+            MainDelegate::find($mainDelegateId)->fill([
+                'confirmation_date_time' => Carbon::now(),
+            ])->save();
+
+            return view('registration.registration_success_message', [
+                'pageTitle' => "Registration Success",
+                'event' => $event,
+                'mainDelegate' => $mainDelegate,
+                'eventFormattedDate' =>  $eventFormattedDate,
+                'invoiceLink' => $invoiceLink,
+                'bankDetails' => $bankDetails,
+            ]);
+            
+            // if ($mainDelegate->confirmation_date_time == null) {
+            // } else {
+            //     abort(404, 'The URL is incorrect');
+            // }
         } else {
             abort(404, 'The URL is incorrect');
         }
     }
 
-    public function registrationLoading($eventYear, $eventCategory, $eventId, $mainDelegateId, $status){
-        $redirectLink = env('APP_URL').'/register/'.$eventYear.'/'.$eventCategory.'/'.$eventId.'/'.$mainDelegateId.'/'.$status;
+    public function registrationLoading($eventYear, $eventCategory, $eventId, $mainDelegateId, $status)
+    {
+        $redirectLink = env('APP_URL') . '/register/' . $eventYear . '/' . $eventCategory . '/' . $eventId . '/' . $mainDelegateId . '/' . $status;
         return view('registration.registration_loading', [
             'redirectLink' => $redirectLink,
         ]);
