@@ -19,6 +19,8 @@ class Member extends Component
     public $showImportModal = false;
     public $csvFile;
 
+    public $insertedData = [];
+
     public $csvFileError;
 
     protected $listeners = ['deleteMemberConfirmed' => 'deleteMember', 'importMemberConfirmed' => 'submitImportMember'];
@@ -27,11 +29,11 @@ class Member extends Component
     {
         $this->companySectors = config('app.companySectors');
         if (empty($this->searchTerm)) {
-            $this->members = Members::orderBy('name', 'ASC')->get();
+            $this->members = Members::orderBy('created_at', 'ASC')->get();
         } else {
             $this->members = Members::where('name', 'like', '%' . $this->searchTerm . '%')
                 ->orWhere('sector', 'like', '%' . $this->searchTerm . '%')
-                ->orderBy('name', 'ASC')
+                ->orderBy('created_at', 'ASC')
                 ->get();
         }
         return view('livewire.members.member');
@@ -178,17 +180,18 @@ class Member extends Component
         ]);
 
         $file = fopen($this->csvFile->getRealPath(), "r");
-        $rows = [];
-        while (($row = fgetcsv($file, 0, ",")) !== FALSE) {
-            $rows[] = $row;
+        while (($row = fgetcsv($file, 1000, ",")) !== FALSE) {
+            // $name = mb_convert_encoding($row[0], 'UTF-8', 'ISO-8859-1');
+            // $sector = mb_convert_encoding($row[1], 'UTF-8', 'ISO-8859-1');
+            $this->insertedData[] = $row;
         }
         fclose($file);
 
         $checkIfCorrectFormat = true;
-        for ($i = 0; $i < count($rows); $i++) {
+        for ($i = 0; $i < count($this->insertedData); $i++) {
             if ($i == 0) {
-                if (count($rows[$i]) == 2) {
-                    if($rows[$i][0] != "Company Name" || $rows[$i][1] != "Company Sectors"){
+                if (count($this->insertedData[$i]) == 2) {
+                    if($this->insertedData[$i][0] != "Company Name" || $this->insertedData[$i][1] != "Company Sectors"){
                         $checkIfCorrectFormat = false;
                     }
                 } else {
@@ -213,20 +216,13 @@ class Member extends Component
 
     public function submitImportMember()
     {
-        $file = fopen($this->csvFile->getRealPath(), "r");
-        $rows = [];
-        while (($row = fgetcsv($file, 0, ",")) !== FALSE) {
-            $rows[] = $row;
-        }
-        fclose($file);
-
-        for ($i = 0; $i < count($rows); $i++) {
+        for ($i = 0; $i < count($this->insertedData); $i++) {
             if ($i == 0) {
                 continue;
             } else {
                 Members::create([
-                    'name' => $rows[$i][0],
-                    'sector' => ($rows[$i][1] == "") ? null : $rows[$i][1],
+                    'name' => $this->insertedData[$i][0],
+                    'sector' => ($this->insertedData[$i][1] == null) ? null : $this->insertedData[$i][1],
                     'active' => true,
                 ]);
             }
