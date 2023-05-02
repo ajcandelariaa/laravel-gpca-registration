@@ -693,10 +693,13 @@ class RegistrationController extends Controller
                 } else {
                     $bankDetails = config('app.bankDetails.DEFAULT');
                 }
-
+                
+                $eventFormattedData = Carbon::parse($event->event_start_date)->format('d') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');
+                
                 $invoiceData = [
                     "finalEventStartDate" => Carbon::parse($event->event_start_date)->format('d M Y'),
                     "finalEventEndDate" => Carbon::parse($event->event_end_date)->format('d M Y'),
+                    "eventFormattedData" => $eventFormattedData,
                     "companyName" => $mainDelegate->company_name,
                     "companyAddress" => $mainDelegate->company_address,
                     "companyCity" => $mainDelegate->company_city,
