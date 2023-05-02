@@ -77,6 +77,11 @@ class RegistrationForm extends Component
     // BANK DETAILS
     public $bankDetails;
 
+    // ADDITIONAL FIELDS
+    public $pcAttendingND;
+    public $sccAttendingND;
+
+
     protected $listeners = ['registrationConfirmed' => 'addtoDatabase', 'emitInitiateAuth' => 'initiateAuthenticationCC', 'emitSubmit' => 'submitBankTransfer', 'emitSubmitStep3' => 'submitStep3'];
 
     public function mount($data)
@@ -402,6 +407,9 @@ class RegistrationForm extends Component
             'payment_status' => $paymentStatus,
             'registered_date_time' => Carbon::now(),
             'paid_date_time' => null,
+
+            'pc_attending_nd' => $this->pcAttendingND,
+            'scc_attending_nd' => $this->sccAttendingND,
         ]);
 
         $transaction = Transactions::create([

@@ -49,5 +49,8 @@ class MainDelegate extends Model
         'paid_date_time',
         'confirmation_date_time',
         'confirmation_status',
+
+        'pc_attending_nd',
+        'scc_attending_nd',
     ];
 }
