@@ -612,7 +612,7 @@ class RegistrationController extends Controller
                 array_push($invoiceDetails, [
                     'delegateDescription' => "Delegate Registration Fee - {$mainDelegate->rate_type_string} {$promoCodeMainDiscountString}",
                     'delegateNames' => [
-                        $mainDelegate->salutation . " " . $mainDelegate->first_name . " " . $mainDelegate->middle_name . " " . $mainDelegate->last_name,
+                        $mainDelegate->first_name . " " . $mainDelegate->middle_name . " " . $mainDelegate->last_name,
                     ],
                     'badgeType' => $mainDelegate->badge_type,
                     'quantity' => 1,
@@ -641,7 +641,7 @@ class RegistrationController extends Controller
                         if ($checkIfExisting) {
                             array_push(
                                 $invoiceDetails[$existingIndex]['delegateNames'],
-                                $subDelegate->salutation . " " . $subDelegate->first_name . " " . $subDelegate->middle_name . " " . $subDelegate->last_name
+                                $subDelegate->first_name . " " . $subDelegate->middle_name . " " . $subDelegate->last_name
                             );
 
                             $quantityTemp = $invoiceDetails[$existingIndex]['quantity'] + 1;
@@ -661,7 +661,7 @@ class RegistrationController extends Controller
                             array_push($invoiceDetails, [
                                 'delegateDescription' => "Delegate Registration Fee - {$mainDelegate->rate_type_string} {$promoCodeSubDiscountString}",
                                 'delegateNames' => [
-                                    $subDelegate->salutation . " " . $subDelegate->first_name . " " . $subDelegate->middle_name . " " . $subDelegate->last_name,
+                                    $subDelegate->first_name . " " . $subDelegate->middle_name . " " . $subDelegate->last_name,
                                 ],
                                 'badgeType' => $subDelegate->badge_type,
                                 'quantity' => 1,
