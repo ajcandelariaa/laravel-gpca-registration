@@ -487,4 +487,8 @@ return [
             'ibanNumber' => 'AE290330000010448470645',
         ],
     ],
+
+    'ccEmailNotif' => [
+        'analee@gpca.org.ae', 'jovelyn@gpca.org.ae', 'forumregistration@gpca.org.ae',
+    ]
 ];

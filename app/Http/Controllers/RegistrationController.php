@@ -245,8 +245,8 @@ class RegistrationController extends Controller
                     'invoiceLink' => $invoiceLink,
                 ];
 
-                Mail::to($mainDelegate->email_address)->queue(new RegistrationPaid($details1));
-                Mail::to($mainDelegate->email_address)->queue(new RegistrationPaymentConfirmation($details2));
+                Mail::to($mainDelegate->email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaid($details1));
+                Mail::to($mainDelegate->email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaymentConfirmation($details2));
 
                 if ($mainDelegate->assistant_email_address != null) {
                     Mail::to($mainDelegate->assistant_email_address)->queue(new RegistrationPaid($details1));
@@ -319,7 +319,7 @@ class RegistrationController extends Controller
                     'invoiceLink' => $invoiceLink,
                 ];
 
-                Mail::to($mainDelegate->email_address)->queue(new RegistrationCardDeclined($details));
+                Mail::to($mainDelegate->email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationCardDeclined($details));
 
                 if ($mainDelegate->assistant_email_address != null) {
                     Mail::to($mainDelegate->assistant_email_address)->queue(new RegistrationCardDeclined($details));
@@ -372,7 +372,7 @@ class RegistrationController extends Controller
                 'invoiceLink' => $invoiceLink,
             ];
 
-            Mail::to($mainDelegate->email_address)->queue(new RegistrationCardDeclined($details));
+            Mail::to($mainDelegate->email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationCardDeclined($details));
 
             if ($mainDelegate->assistant_email_address != null) {
                 Mail::to($mainDelegate->assistant_email_address)->queue(new RegistrationCardDeclined($details));

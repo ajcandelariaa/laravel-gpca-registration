@@ -101,6 +101,12 @@ window.addEventListener("swal:add-registration-loading-screen", () => {
     Livewire.emit('emitSubmit')
 });
 
+window.addEventListener("swal:add-step3-registration-loading-screen", () => {
+    let registrationLloadingScreen = document.getElementById('registration-loading-screen');
+    registrationLloadingScreen.classList.remove('hidden');
+    Livewire.emit('emitSubmitStep3')
+});
+
 // PROMO CODE ADD CONFIRMATION
 window.addEventListener("swal:add-promo-code-confirmation", (event) => {
     swal({

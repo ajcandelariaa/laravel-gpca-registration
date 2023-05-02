@@ -405,8 +405,8 @@ class RegistrantDetails extends Component
             'balance' => 0,
         ];
 
-        Mail::to($this->finalData['email_address'])->queue(new RegistrationPaid($details1));
-        Mail::to($this->finalData['email_address'])->queue(new RegistrationPaymentConfirmation($details2));
+        Mail::to($this->finalData['email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaid($details1));
+        Mail::to($this->finalData['email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaymentConfirmation($details2));
 
         if ($this->finalData['assistant_email_address'] != null) {
             Mail::to($this->finalData['assistant_email_address'])->queue(new RegistrationPaid($details1));
@@ -637,10 +637,10 @@ class RegistrantDetails extends Component
             'invoiceLink' => $invoiceLink,
         ];
 
-        Mail::to($this->finalData['email_address'])->cc(['ajajcandelaria@gmail.com'])->queue(new RegistrationPaymentReminder($details));
+        Mail::to($this->finalData['email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaymentReminder($details));
 
         if ($this->finalData['assistant_email_address'] != null) {
-            Mail::to($this->finalData['assistant_email_address'])->cc(['ajajcandelaria@gmail.com'])->queue(new RegistrationPaymentReminder($details));
+            Mail::to($this->finalData['assistant_email_address'])->queue(new RegistrationPaymentReminder($details));
         }
 
         if (count($this->finalData['subDelegates']) > 0) {
@@ -652,7 +652,7 @@ class RegistrantDetails extends Component
                     'invoiceLink' => $invoiceLink,
                 ];
 
-                Mail::to($subDelegate['email_address'])->cc(['ajajcandelaria@gmail.com'])->queue(new RegistrationPaymentReminder($details));
+                Mail::to($subDelegate['email_address'])->queue(new RegistrationPaymentReminder($details));
             }
         }
 

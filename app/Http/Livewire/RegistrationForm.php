@@ -77,7 +77,7 @@ class RegistrationForm extends Component
     // BANK DETAILS
     public $bankDetails;
 
-    protected $listeners = ['registrationConfirmed' => 'addtoDatabase', 'emitInitiateAuth' => 'initiateAuthenticationCC', 'emitSubmit' => 'submitBankTransfer'];
+    protected $listeners = ['registrationConfirmed' => 'addtoDatabase', 'emitInitiateAuth' => 'initiateAuthenticationCC', 'emitSubmit' => 'submitBankTransfer', 'emitSubmitStep3' => 'submitStep3'];
 
     public function mount($data)
     {
@@ -288,7 +288,6 @@ class RegistrationForm extends Component
         } else if ($this->currentStep == 3) {
             $this->resetCalculations();
             $this->paymentMethod = null;
-
             $this->validate(
                 [
                     'firstName' => 'required',
@@ -311,20 +310,8 @@ class RegistrationForm extends Component
                 ]
             );
 
-            if ($this->checkEmailIfUsedAlreadyMain($this->emailAddress)) {
-                $this->emailMainAlreadyUsedError = "You already used this email!";
-            } else {
-                if ($this->checkEmailIfExistsInDatabase($this->emailAddress)) {
-                    $this->emailMainAlreadyUsedError = null;
-                    $this->emailMainExistingError = "Email is already registered, please use another email!";
-                } else {
-                    $this->emailMainAlreadyUsedError = null;
-                    $this->emailMainExistingError = null;
-                    $this->checkUnitPrice();
-                    $this->calculateAmount();
-                    $this->currentStep += 1;
-                }
-            }
+            $this->dispatchBrowserEvent('swal:add-step3-registration-loading-screen');
+
         } else if ($this->currentStep == 4) {
             if ($this->paymentMethod == null) {
                 $this->paymentMethodError = "Please choose your payment method first";
@@ -344,6 +331,25 @@ class RegistrationForm extends Component
                 }
             }
         }
+    }
+
+    public function submitStep3(){
+        if ($this->checkEmailIfUsedAlreadyMain($this->emailAddress)) {
+            $this->emailMainAlreadyUsedError = "You already used this email!";
+        } else {
+            if ($this->checkEmailIfExistsInDatabase($this->emailAddress)) {
+                $this->emailMainAlreadyUsedError = null;
+                $this->emailMainExistingError = "Email is already registered, please use another email!";
+            } else {
+                $this->emailMainAlreadyUsedError = null;
+                $this->emailMainExistingError = null;
+                $this->checkUnitPrice();
+                $this->calculateAmount();
+                $this->currentStep += 1;
+            }
+        }
+
+        $this->dispatchBrowserEvent('swal:remove-registration-loading-screen');
     }
 
     public function addtoDatabase()
@@ -534,10 +540,10 @@ class RegistrationForm extends Component
         ];
 
         if ($paymentStatus == "free") {
-            Mail::to($this->emailAddress)->queue(new RegistrationPaid($details1));
-            Mail::to($this->emailAddress)->queue(new RegistrationPaymentConfirmation($details2));
+            Mail::to($this->emailAddress)->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaid($details1));
+            Mail::to($this->emailAddress)->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaymentConfirmation($details2));
         } else {
-            Mail::to($this->emailAddress)->queue(new RegistrationUnpaid($details1));
+            Mail::to($this->emailAddress)->cc(config('app.ccEmailNotif'))->queue(new RegistrationUnpaid($details1));
         }
 
         if ($this->assistantEmailAddress != null) {
