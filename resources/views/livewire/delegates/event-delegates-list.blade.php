@@ -1,4 +1,4 @@
-<div class="container mx-auto my-10">
+<div class="mx-10 my-10">
     <form>
         <div class="relative">
             <input type="text" wire:model="searchTerm"

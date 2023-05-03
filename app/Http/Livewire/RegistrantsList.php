@@ -2,7 +2,6 @@
 
 namespace App\Http\Livewire;
 
-use App\Mail\RegistrationConfirmation;
 use App\Models\MainDelegate as MainDelegates;
 use App\Models\AdditionalDelegate as AdditionalDelegates;
 use App\Models\Transaction as Transactions;
@@ -10,7 +9,6 @@ use App\Models\Event as Events;
 use App\Models\Member as Members;
 use App\Models\PromoCode as PromoCodes;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Mail;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -23,7 +21,8 @@ class RegistrantsList extends Component
     public $countries;
     public $companySectors;
 
-    public $finalListOfRegistrants;
+    public $finalListOfRegistrants = array();
+    public $finalListOfRegistrantsConst = array();
     public $eventId;
     public $eventCategory;
     public $searchTerm;
@@ -36,11 +35,14 @@ class RegistrantsList extends Component
     public $rateTypeString;
     public $finalUnitPrice;
 
+    // FILTERS
+    public $filterByPassType, $filterByRegStatus, $filterByPayStatus;
 
     // ERRORS
     public $incompleDetails = array(), $emailYouAlreadyUsed = array(), $emailAlreadyExisting = array(), $promoCodeErrors = array();
     public $csvFileError;
 
+    public $getEventCode;
 
     protected $listeners = ['importDelegateConfirmed' => 'submitImportRegistrants'];
 
@@ -52,28 +54,138 @@ class RegistrantsList extends Component
         $this->delegatePassType = "member";
         $this->eventId = $eventId;
         $this->eventCategory = $eventCategory;
+
+        $mainDelegates = MainDelegates::where('event_id', $this->eventId)->orderBy('registered_date_time', 'DESC')->get();
+
+        foreach (config('app.eventCategories') as $eventCategoryC => $code) {
+            if ($this->event->category == $eventCategoryC) {
+                $this->getEventCode = $code;
+            }
+        }
+
+        if ($mainDelegates->isNotEmpty()) {
+            foreach ($mainDelegates as $mainDelegate) {
+
+                // get invoice number & transaction id
+                $transactionId = Transactions::where('delegate_id', $mainDelegate->id)->where('delegate_type', "main")->value('id');
+                $tempYear = Carbon::parse($mainDelegate->registered_date_time)->format('y');
+                $lastDigit = 1000 + intval($transactionId);
+                $tempInvoiceNumber = $this->event->category . $tempYear . "/" . $lastDigit;
+                $tempTransactionId = $this->event->year . $this->getEventCode . $lastDigit;
+
+                // get pass type
+                if ($mainDelegate->pass_type == 'member') {
+                    $passType = "Member";
+                } else {
+                    $passType = "Non-Member";
+                }
+
+                // get reg status
+                if ($mainDelegate->registration_status == 'confirmed') {
+                    $regStatus = "Confirmed";
+                } else if ($mainDelegate->registration_status == 'pending') {
+                    $regStatus = "Pending";
+                } else {
+                    $regStatus = "Dropped out";
+                }
+
+                // get payment status
+                if ($mainDelegate->payment_status == 'paid') {
+                    $payStatus = "Paid";
+                } else if ($mainDelegate->payment_status == 'free') {
+                    $payStatus = "Free";
+                } else {
+                    $payStatus = "Unpaid";
+                }
+
+                array_push($this->finalListOfRegistrants, [
+                    'mainDelegateId' => $mainDelegate->id,
+                    'invoiceNumber' => $tempInvoiceNumber,
+                    'transactionId' => $tempTransactionId,
+                    'companyName' => $mainDelegate->company_name,
+                    'country' => $mainDelegate->company_country,
+                    'city' => $mainDelegate->company_city,
+                    'passType' => $passType,
+                    'quantity' => $mainDelegate->quantity,
+                    'totalAmount' => $mainDelegate->total_amount,
+                    'regDateTime' => Carbon::parse($mainDelegate->registered_date_time)->format('M j, Y g:iA'),
+                    'regStatus' => $regStatus,
+                    'payStatus' => $payStatus,
+                ]);
+            }
+
+            $this->finalListOfRegistrantsConst = $this->finalListOfRegistrants;
+        }
     }
 
     public function render()
     {
-        if (empty($this->searchTerm)) {
-            $this->finalListOfRegistrants = MainDelegates::where('event_id', $this->eventId)->get();
-        } else {
-            if ($this->searchTerm == "member") {
-                $this->finalListOfRegistrants = MainDelegates::where('event_id', $this->eventId)
-                    ->where('pass_type', 'member')
-                    ->get();
-            } else {
-                $this->finalListOfRegistrants = MainDelegates::where('event_id', $this->eventId)
-                    ->where('company_name', 'like', '%' . $this->searchTerm . '%')
-                    ->orWhere('company_country', 'like', '%' . $this->searchTerm . '%')
-                    ->orWhere('company_city', 'like', '%' . $this->searchTerm . '%')
-                    ->orWhere('pass_type', 'like', '%' . $this->searchTerm . '%')
-                    ->orWhere('payment_status', 'like', '%' . $this->searchTerm . '%')
-                    ->get();
-            }
-        }
         return view('livewire.registrants.registrants-list');
+    }
+
+    public function filter()
+    {
+        if ($this->filterByPassType == null && $this->filterByRegStatus == null && $this->filterByPayStatus == null) {
+            $this->finalListOfRegistrants = $this->finalListOfRegistrantsConst;
+        } else if ($this->filterByPassType != null && $this->filterByRegStatus == null && $this->filterByPayStatus == null) {
+            $this->finalListOfRegistrants = collect($this->finalListOfRegistrantsConst)
+                ->filter(function ($item) {
+                    return strtolower($item['passType'] === ($this->filterByPassType));
+                })->all();
+        } else if ($this->filterByPassType == null && $this->filterByRegStatus != null && $this->filterByPayStatus == null) {
+            $this->finalListOfRegistrants = collect($this->finalListOfRegistrantsConst)
+                ->filter(function ($item) {
+                    return strtolower($item['regStatus'] === ($this->filterByRegStatus));
+                })->all();
+        } else if ($this->filterByPassType == null && $this->filterByRegStatus == null && $this->filterByPayStatus != null) {
+            $this->finalListOfRegistrants = collect($this->finalListOfRegistrantsConst)
+                ->filter(function ($item) {
+                    return strtolower($item['payStatus'] === ($this->filterByPayStatus));
+                })->all();
+        } else if ($this->filterByPassType != null && $this->filterByRegStatus != null && $this->filterByPayStatus == null) {
+            $this->finalListOfRegistrants = collect($this->finalListOfRegistrantsConst)
+                ->filter(function ($item) {
+                    return strtolower($item['passType'] === ($this->filterByPassType)) &&
+                        strtolower($item['regStatus'] === ($this->filterByRegStatus));
+                })->all();
+        } else if ($this->filterByPassType != null && $this->filterByRegStatus == null && $this->filterByPayStatus != null) {
+            $this->finalListOfRegistrants = collect($this->finalListOfRegistrantsConst)
+                ->filter(function ($item) {
+                    return strtolower($item['passType'] === ($this->filterByPassType)) &&
+                        strtolower($item['payStatus'] === ($this->filterByPayStatus));
+                })->all();
+        } else if ($this->filterByPassType == null && $this->filterByRegStatus != null && $this->filterByPayStatus != null) {
+            $this->finalListOfRegistrants = collect($this->finalListOfRegistrantsConst)
+                ->filter(function ($item) {
+                    return strtolower($item['regStatus'] === ($this->filterByRegStatus)) &&
+                        strtolower($item['payStatus'] === ($this->filterByPayStatus));
+                })->all();
+        } else {
+            $this->finalListOfRegistrants = collect($this->finalListOfRegistrantsConst)
+                ->filter(function ($item) {
+                    return strtolower($item['passType'] === ($this->filterByPassType)) &&
+                        strtolower($item['regStatus'] === ($this->filterByRegStatus)) &&
+                        strtolower($item['payStatus'] === ($this->filterByPayStatus));
+                })->all();
+        }
+    }
+
+    public function search()
+    {
+        if (empty($this->searchTerm)) {
+            $this->finalListOfRegistrants = $this->finalListOfRegistrantsConst;
+        } else {
+            $this->finalListOfRegistrants = collect($this->finalListOfRegistrantsConst)
+                ->filter(function ($item) {
+                    return str_contains(strtolower($item['companyName']), strtolower($this->searchTerm)) ||
+                        str_contains(strtolower($item['country']), strtolower($this->searchTerm)) ||
+                        str_contains(strtolower($item['city']), strtolower($this->searchTerm)) ||
+                        str_contains(strtolower($item['invoiceNumber']), strtolower($this->searchTerm)) ||
+                        str_contains(strtolower($item['transactionId']), strtolower($this->searchTerm)) ||
+                        str_contains(strtolower($item['regDateTime']), strtolower($this->searchTerm));
+                })
+                ->all();
+        }
     }
 
     public function submitImportRegistrantsConfirmation()
@@ -252,7 +364,7 @@ class RegistrantsList extends Component
 
     public function submitImportRegistrants()
     {
-        
+
         $file = fopen($this->csvFile->getRealPath(), "r");
         $rows = [];
         while (($row = fgetcsv($file, 0, ",")) !== FALSE) {

@@ -28,7 +28,8 @@
             {{ $event->description }}
         </div>
 
-        <table class="w-1/2 mx-auto bg-registrationPrimaryColor text-white text-center mt-10" cellspacing="1" cellpadding="2">
+        <table class="w-1/2 mx-auto bg-registrationPrimaryColor text-white text-center mt-10" cellspacing="1"
+            cellpadding="2">
             <thead>
                 <tr>
                     <td class="py-4 font-bold text-lg">Pass Category</td>
@@ -85,5 +86,51 @@
                 </tr>
             </tbody>
         </table>
+
+
+        <div class="mt-5 pb-20 flex justify-center items-center">
+            <div class="flex gap-10">
+                <div style="width: 321px; height: 492px;">
+                    <div class="border border-black mt-10 flex flex-col justify-between h-full">
+                        <div>
+                            <img src="{{ Storage::url($event->badge_front_banner) }}">
+                        </div>
+                        <div>
+                            <p class="text-center font-bold text-lg">Full name</p>
+                            <p class="text-center italic mt-3">Job title</p>
+                            <p class="text-center font-bold">Company name</p>
+                        </div>
+                        <div>
+                            <p class="text-white bg-black text-center py-4 font-bold">Delegate</p>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-3">
+                        <p>Front</p>
+                    </div>
+                </div>
+
+                <div style="width: 321px; height: 492px;">
+                    <div class="border border-black mt-10 flex flex-col justify-between h-full">
+                        <div>
+                            <img src="{{ Storage::url($event->badge_back_banner) }}">
+                        </div>
+                        <div>
+                            <p class="text-center font-bold text-lg">Full name</p>
+                            <p class="text-center italic mt-3">Job title</p>
+                            <p class="text-center font-bold">Company name</p>
+                        </div>
+                        <div>
+                            <p class="text-center py-4 font-bold" style="color: {{ $event->badge_footer_link_color }}">
+                                {{ $event->badge_footer_link }}</p>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-3">
+                        <p>Back</p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 @endsection
