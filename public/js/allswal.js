@@ -53,7 +53,7 @@ window.addEventListener("swal:registration-confirmation", (event) => {
         icon: event.detail.type,
         buttons: {
             confirm: {
-                text: "Yes, I will!",
+                text: "Yes, I'm sure!",
                 value: true,
                 visible: true,
                 closeModal: true,

@@ -1,5 +1,5 @@
 {{-- PROGRESS BAR --}}
-<div class="horizontal-progress">
+<div class="horizontal-progress mx-5">
     {{-- STEP 1 --}}
     <div class="grid grid-cols-horizontalProgressBarGrid">
         <div class="bg-registrationPrimaryColor font-bold text-white rounded-full flex items-center justify-center"
@@ -46,35 +46,35 @@
 
     
     <div class="grid grid-cols-horizontalProgressBarGrid mt-5">
-        <div class="font-bold text-registrationPrimaryColor text-center flex justify-center">
+        <div class="text-sm md:text-base font-bold text-registrationPrimaryColor text-center flex justify-center">
             Registration type
         </div>
 
         <div class="w-full"></div>
 
         
-        <div class="font-bold text-registrationPrimaryColor text-center flex justify-center">
+        <div class="text-sm md:text-base font-bold text-registrationPrimaryColor text-center flex justify-center">
             Company details
         </div>
 
         <div class="w-full"></div>
 
         
-        <div class="font-bold text-registrationPrimaryColor text-center flex justify-center">
+        <div class="text-sm md:text-base font-bold text-registrationPrimaryColor text-center flex justify-center">
             Delegate details
         </div>
 
         <div class="w-full"></div>
 
         
-        <div class="font-bold text-registrationPrimaryColor text-center flex justify-center">
+        <div class="text-sm md:text-base font-bold text-registrationPrimaryColor text-center flex justify-center">
             Package summary
         </div>
 
         <div class="w-full"></div>
 
         
-        <div class="font-bold text-registrationPrimaryColor text-center flex justify-center">
+        <div class="text-sm md:text-base font-bold text-registrationPrimaryColor text-center flex justify-center">
             Payment details
         </div>
     </div>

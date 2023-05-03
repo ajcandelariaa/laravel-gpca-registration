@@ -9,8 +9,8 @@
             <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                 {{-- SUB DELEGATE --}}
                 <div>
-                    <div class="text-registrationPrimaryColor italic font-bold text-xl flex items-center gap-2">
-                        <span style="width: 200px;">Add delegate </span>
+                    <div class="text-registrationPrimaryColor italic font-bold text-xl flex md:flex-row flex-col md:items-center gap-2">
+                        <span style="width: 200px; text-align: left">Add delegate </span>
                         <span class="text-red-500 text-xs font-normal">Note: Additional delegates should be from the same company as the primary delegate</span>
                     </div>
 

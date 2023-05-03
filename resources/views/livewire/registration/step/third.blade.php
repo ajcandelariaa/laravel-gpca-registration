@@ -200,7 +200,7 @@
 </div>
 
 @if (!empty($additionalDelegates))
-    <div class="mt-10">
+    <div class="mt-10 mx-5">
         <div class="text-registrationPrimaryColor italic font-bold text-xl">
             Additional delegate(s)
         </div>
@@ -255,7 +255,7 @@
     </div>
 @endif
 
-<div class="mt-10 flex flex-col sm:flex-row gap-10">
+<div class="mt-10 flex flex-col sm:flex-row gap-10 mx-5">
     <div class="col-span-1">
 
         @if ($showAddDelegateModal)

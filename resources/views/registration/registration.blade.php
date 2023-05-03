@@ -20,7 +20,7 @@
 
     {{-- LIVEWIRE --}}
     @livewireStyles()
-    
+
     {{-- intlTelInput --}}
     @include('helpers.intlTelInput')
     <style>
@@ -36,14 +36,6 @@
             margin-left: 0px;
         }
 
-        .vertical-progress {
-            display: none;
-        }
-
-        .horizontal-progress {
-            display: block;
-        }
-        
         .swal-button--confirm {
             background-color: #034889;
             color: #fff;
@@ -63,12 +55,22 @@
             background-color: #cb2e2e !important;
         }
 
-        .cc-show-red-border{
-            border:1px solid red !important;
+        .cc-show-red-border {
+            border: 1px solid red !important;
         }
-        
-        .cc-show-green-border{
-            border:1px solid green !important;
+
+        .cc-show-green-border {
+            border: 1px solid green !important;
+        }
+
+
+
+        .vertical-progress {
+            display: none;
+        }
+
+        .horizontal-progress {
+            display: block;
         }
 
         @media only screen and (min-width: 1280px) {
@@ -81,6 +83,26 @@
             }
 
             .horizontal-progress {
+                display: none;
+            }
+        }
+
+
+
+        .package-summary-col {
+            display: none;
+        }
+
+        .package-summary-row {
+            display: block;
+        }
+
+        @media only screen and (min-width: 768px) {
+            .package-summary-col {
+                display: block;
+            }
+
+            .package-summary-row {
                 display: none;
             }
         }
@@ -104,7 +126,7 @@
             return "Are you sure?";
         }
     </script> --}}
-    
+
     <script src="{{ asset('js/allswal.js') }}"></script>
 
     <div>

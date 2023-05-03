@@ -324,13 +324,13 @@ class RegistrationForm extends Component
                 if ($this->paymentMethod == "creditCard") {
                     $this->dispatchBrowserEvent('swal:registration-confirmation', [
                         'type' => 'warning',
-                        'message' => 'Are you sure your want to pay via Credit card?',
+                        'message' => 'Are you sure you want to pay via Credit card?',
                         'text' => "",
                     ]);
                 } else {
                     $this->dispatchBrowserEvent('swal:registration-confirmation', [
                         'type' => 'warning',
-                        'message' => 'Are you sure your want to pay via Bank transfer?',
+                        'message' => 'Are you sure you want to pay via Bank transfer?',
                         'text' => "",
                     ]);
                 }
