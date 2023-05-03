@@ -490,5 +490,7 @@ return [
 
     'ccEmailNotif' => [
         'analee@gpca.org.ae', 'jovelyn@gpca.org.ae', 'forumregistration@gpca.org.ae',
-    ]
+    ],
+
+    // 'ccEmailNotif' => ['aj@gpca.org.ae'],
 ];

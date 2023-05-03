@@ -293,6 +293,9 @@ class RegistrationForm extends Component
         } else if ($this->currentStep == 3) {
             $this->resetCalculations();
             $this->paymentMethod = null;
+            $this->emailMainAlreadyUsedError = null;
+            $this->emailMainExistingError = null;
+            
             $this->validate(
                 [
                     'firstName' => 'required',
@@ -899,6 +902,9 @@ class RegistrationForm extends Component
 
     public function saveAdditionalDelegate()
     {
+        $this->emailSubAlreadyUsedError = null;
+        $this->emailSubExistingError = null;
+
         $this->validate(
             [
                 'subFirstName' => 'required',
@@ -970,6 +976,9 @@ class RegistrationForm extends Component
 
     public function editAdditionalDelegate($subDelegateId)
     {
+        $this->emailSubAlreadyUsedError = null;
+        $this->emailSubExistingError = null;
+        
         $this->validate(
             [
                 'subFirstNameEdit' => 'required',
@@ -1161,14 +1170,17 @@ class RegistrationForm extends Component
         if (!$allDelegates->isEmpty()) {
             foreach ($allDelegates as $delegate) {
                 if ($delegate->delegate_type == "main") {
-                    $mainDelegate = MainDelegates::where('id', $delegate->delegate_id)->where('email_address', $emailAddress)->first();
+                    $mainDelegate = MainDelegates::where('id', $delegate->delegate_id)->where('email_address', $emailAddress)->where('registration_status', '!=', 'droppedOut')->first();
                     if ($mainDelegate != null) {
                         $countMainDelegate++;
                     }
                 } else {
                     $subDelegate = AdditionalDelegates::where('id', $delegate->delegate_id)->where('email_address', $emailAddress)->first();
                     if ($subDelegate != null) {
-                        $countSubDelegate++;
+                        $registrationStatsMain = MainDelegates::where('id', $subDelegate->main_delegate_id)->value('registration_status');
+                        if($registrationStatsMain != "droppedOut"){
+                            $countSubDelegate++;
+                        }
                     }
                 }
             }
