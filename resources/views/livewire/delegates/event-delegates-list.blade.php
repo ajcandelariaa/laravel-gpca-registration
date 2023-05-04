@@ -1,3 +1,6 @@
+<div>
+    <img src="{{ Storage::url($eventBanner) }}" alt="" class="w-full object-cover">
+</div>
 <div class="mx-10 my-10">
     <form>
         <div class="relative">

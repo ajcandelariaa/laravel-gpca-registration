@@ -1,3 +1,6 @@
+<div>
+    <img src="{{ Storage::url($eventBanner) }}" alt="" class="w-full object-cover">
+</div>
 <div class="px-5">
     <div class="float-left">
         @if ($updatePromoCode)

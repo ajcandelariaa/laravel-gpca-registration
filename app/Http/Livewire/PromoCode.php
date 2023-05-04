@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire;
 
+use App\Models\Event as Events;
 use Livewire\Component;
 use App\Models\PromoCode as PromoCodes;
 
@@ -30,12 +31,15 @@ class PromoCode extends Component
     public $number_of_codes;
     public $total_usage;
     public $validity;
+
+    public $eventBanner;
     
     
     protected $listeners = ['updatePromoCodeConfirmed' => 'updatePromoCode', 'addPromoCodeConfirmed' => 'addPromoCode'];
     
     public function mount($eventCategory, $eventId)
     {
+        $this->eventBanner = Events::where('id', $eventId)->where('category', $eventCategory)->value('banner');
         $this->eventCategory = $eventCategory;
         $this->eventId = $eventId;
     }

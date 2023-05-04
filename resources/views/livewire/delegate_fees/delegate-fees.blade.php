@@ -1,3 +1,6 @@
+<div>
+    <img src="{{ Storage::url($eventBanner) }}" alt="" class="w-full object-cover">
+</div>
 <div class="container mx-auto my-10">
 
     @if ($isDelegateFeeEdit)

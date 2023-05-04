@@ -1,3 +1,7 @@
+<div>
+    <img src="{{ Storage::url($event->banner) }}" alt="" class="w-full object-cover">
+</div>
+
 <div class="mx-10 my-10">
     <div class="flex justify-between">
         <div>

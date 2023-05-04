@@ -4,6 +4,7 @@ namespace App\Http\Livewire;
 
 use App\Models\MainDelegate as MainDelegates;
 use App\Models\AdditionalDelegate as AdditionalDelegates;
+use App\Models\Event as Events;
 use Livewire\Component;
 
 class EventDelegatesList extends Component
@@ -13,11 +14,14 @@ class EventDelegatesList extends Component
     public $eventId;
     public $eventCategory;
     public $searchTerm;
+    public $eventBanner;
 
     public function mount($eventId, $eventCategory)
     {
         $this->eventId = $eventId;
         $this->eventCategory = $eventCategory;
+        
+        $this->eventBanner = Events::where('id', $eventId)->where('category', $eventCategory)->value('banner');
 
         $mainDelegates = MainDelegates::where('event_id', $this->eventId)->where('payment_status', '!=', 'unpaid')->get();
         if (!$mainDelegates->isEmpty()) {

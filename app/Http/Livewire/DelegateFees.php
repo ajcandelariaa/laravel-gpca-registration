@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire;
 
+use App\Models\Event as Events;
 use Livewire\Component;
 use App\Models\EventDelegateFee as EventDelegateFees;
 
@@ -14,9 +15,11 @@ class DelegateFees extends Component
     public $delegateFeeEdit;
     public $delegateFeeId;
     public $isDelegateFeeEdit = false;
+    public $eventBanner;
 
     public function mount($eventCategory, $eventId)
     {
+        $this->eventBanner = Events::where('id', $eventId)->where('category', $eventCategory)->value('banner');
         $this->eventCategory = $eventCategory;
         $this->eventId = $eventId;
     }
