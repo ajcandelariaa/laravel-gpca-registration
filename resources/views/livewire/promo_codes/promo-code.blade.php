@@ -15,10 +15,11 @@
         @if ($promoCodes->isNotEmpty())
             <div class="shadow-lg my-5 pt-5 bg-white rounded-md" style="margin-left: 320px; ">
                 <h1 class="text-center text-2xl">Promo codes</h1>
-                <div class="grid grid-cols-9 pt-4 pb-2 place-items-center">
+                <div class="grid grid-cols-11 pt-4 pb-2 place-items-center">
                     <div class="col-span-1">Code</div>
                     <div class="col-span-1">Registration Type</div>
                     <div class="col-span-1">Discount</div>
+                    <div class="col-span-2">Description</div>
                     <div class="col-span-1">Remaining Usage</div>
                     <div class="col-span-1">Total Usage</div>
                     <div class="col-span-1">Number of Codes</div>
@@ -33,10 +34,11 @@
 
                 @foreach ($promoCodes as $promoCode)
                     <div
-                        class="grid grid-cols-9 pt-2 pb-2 mb-1 place-items-center {{ $count % 2 == 0 ? 'bg-registrationInputFieldsBGColor' : 'bg-registrationCardBGColor' }}">
+                        class="grid grid-cols-11 pt-2 pb-2 mb-1 place-items-center {{ $count % 2 == 0 ? 'bg-registrationInputFieldsBGColor' : 'bg-registrationCardBGColor' }}">
                         <div class="col-span-1">{{ $promoCode->promo_code }}</div>
                         <div class="col-span-1">{{ $promoCode->badge_type }}</div>
                         <div class="col-span-1">{{ $promoCode->discount }}%</div>
+                        <div class="col-span-2">{{ $promoCode->description }}</div>
                         <div class="col-span-1">{{ $promoCode->number_of_codes - $promoCode->total_usage }}</div>
                         <div class="col-span-1">{{ $promoCode->total_usage }}</div>
                         <div class="col-span-1">{{ $promoCode->number_of_codes }}</div>
