@@ -2,7 +2,7 @@
     <div>
         <img src="{{ Storage::url($eventBanner) }}" alt="" class="w-full object-cover">
     </div>
-    <div class="class="px-5"">
+    <div class="px-5">
         <div class="float-left">
             @if ($updatePromoCode)
                 @include('livewire.promo_codes.edit')
