@@ -1,5 +1,6 @@
 <div class="shadow-lg bg-white rounded-md w-72">
     <form>
+        @csrf
         <input type="hidden" wire:model="promo_code_id">
         <div class="p-5">
             <div class="text-registrationPrimaryColor italic text-center font-bold text-2xl mt-4">
