@@ -1,6 +1,5 @@
 <div class="shadow-lg bg-white rounded-md w-72">
     <form>
-        @csrf
         <div class="p-5">
             <div class="text-registrationPrimaryColor italic text-center font-bold text-2xl mt-4">
                 Add promo code
