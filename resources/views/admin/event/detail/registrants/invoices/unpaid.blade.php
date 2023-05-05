@@ -119,7 +119,7 @@
                 <table>
                     <tr>
                         <td class="total-amount-words">
-                            <p><strong>Total Amount USD: {{ $total_amount_string }}</strong></p>
+                            <p><strong>Total Amount USD: {{ $total_amount_string }} Only</strong></p>
                         </td>
                     </tr>
                     <tr>
