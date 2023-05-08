@@ -37,6 +37,8 @@ class RegistrantDetails extends Component
 
     public $eventCategory, $eventId, $registrantId, $finalData, $members;
 
+    public $eventBanner;
+
     // DELEGATE PASS TYPE
     public $rateType, $finalUnitPrice;
 
@@ -57,6 +59,7 @@ class RegistrantDetails extends Component
         $this->countries = config('app.countries');
         $this->companySectors = config('app.companySectors');
         $this->salutations = config('app.salutations');
+        $this->eventBanner = Events::where('id', $eventId)->where('category', $eventCategory)->value('banner');
 
         $this->eventCategory = $eventCategory;
         $this->eventId = $eventId;

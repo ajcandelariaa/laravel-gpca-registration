@@ -1,11 +1,8 @@
 <div>
+    <div>
+        <img src="{{ Storage::url($eventBanner) }}" alt="" class="w-full object-cover">
+    </div>
     <div class="container mx-auto my-10">
-        {{-- <a href="{{ url()->previous() }}"
-            class="bg-red-500 hover:bg-red-400 text-white font-medium py-2 px-5 rounded inline-flex items-center text-sm">
-            <span class="mr-2"><i class="fa-sharp fa-solid fa-arrow-left"></i></span>
-            <span>List of Delegates</span>
-        </a> --}}
-
         <div class="grid grid-cols-12 gap-20 mt-10">
             <div class="col-span-12 grid grid-cols-2 items-start">
                 <div>
@@ -217,7 +214,9 @@
                                 <p class="text-center font-bold">{{ $finalDelegate['companyName'] }}</p>
                             </div>
                             <div>
-                                <p class="text-center py-4 font-bold" style="color: {{ $event->badge_footer_link_color }}">{{ $event->badge_footer_link }}</p>
+                                <p class="text-center py-4 font-bold"
+                                    style="color: {{ $event->badge_footer_link_color }}">
+                                    {{ $event->badge_footer_link }}</p>
                             </div>
                         </div>
 
