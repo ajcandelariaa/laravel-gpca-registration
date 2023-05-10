@@ -5,23 +5,14 @@ namespace App\Http\Livewire;
 use App\Models\Event as Events;
 use Livewire\Component;
 use App\Models\PromoCode as PromoCodes;
+use App\Models\EventRegistrationType as EventRegistrationTypes;
 
 class PromoCode extends Component
 {
     public $eventCategory, $eventId;
     public $promoCodes;
     public $updatePromoCode = false;
-    public $badgeTypes = [
-        'VVIP',
-        'VIP',
-        'Speaker',
-        'Commitee',
-        'Sponsor',
-        'Exhibitor',
-        'Delegate',
-        'Media partner',
-        'Organizer',
-    ];
+    public $registrationTypes;
 
     public $promo_code_id;
     public $promo_code;
@@ -42,6 +33,7 @@ class PromoCode extends Component
         $this->eventBanner = Events::where('id', $eventId)->where('category', $eventCategory)->value('banner');
         $this->eventCategory = $eventCategory;
         $this->eventId = $eventId;
+        $this->registrationTypes = EventRegistrationTypes::where('event_id', $eventId)->where('event_category', $eventCategory)->where('active', true)->get();
     }
 
     public function render()

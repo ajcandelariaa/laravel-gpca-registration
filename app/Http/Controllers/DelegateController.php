@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\AdditionalDelegate;
 use App\Models\Event;
+use App\Models\EventRegistrationType;
 use App\Models\MainDelegate;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -137,6 +138,8 @@ class DelegateController extends Controller
             $finalBackBanner = str_replace('\/', '/', $backtBanner);
 
             if ($tempDelegate != null) {
+                $registrationType = EventRegistrationType::where('event_id', $eventId)->where('event_category', $eventCategory)->where('registration_type', $tempDelegate->badge_type)->first();
+
                 if ($delegateType  == "main") {
                     $finalDelegate = [
                         'salutation' => $tempDelegate->salutation,
@@ -151,6 +154,13 @@ class DelegateController extends Controller
                         'textColor' => $event->badge_footer_link_color,
                         'bgColor' => $event->badge_footer_bg_color,
                         'link' => $event->badge_footer_link,
+
+                        'frontText' => $registrationType->badge_footer_front_name,
+                        'frontTextColor' => $registrationType->badge_footer_front_text_color,
+                        'frontTextBGColor' => $registrationType->badge_footer_front_bg_color,
+                        'backText' => $registrationType->badge_footer_back_name,
+                        'backTextColor' => $registrationType->badge_footer_back_text_color,
+                        'backTextBGColor' => $registrationType->badge_footer_back_bg_color,
                     ];
                 } else {
                     $mainDelegateInfo = MainDelegate::where('id', $tempDelegate->main_delegate_id)->first();
@@ -167,6 +177,13 @@ class DelegateController extends Controller
                         'textColor' => $event->badge_footer_link_color,
                         'bgColor' => $event->badge_footer_bg_color,
                         'link' => $event->badge_footer_link,
+
+                        'frontText' => $registrationType->badge_footer_front_name,
+                        'frontTextColor' => $registrationType->badge_footer_front_text_color,
+                        'frontTextBGColor' => $registrationType->badge_footer_front_bg_color,
+                        'backText' => $registrationType->badge_footer_back_name,
+                        'backTextColor' => $registrationType->badge_footer_back_text_color,
+                        'backTextBGColor' => $registrationType->badge_footer_back_bg_color,
                     ];
                 }
                 $pdf = Pdf::loadView('admin.event.detail.delegates.delegate_badge', $finalDelegate, [

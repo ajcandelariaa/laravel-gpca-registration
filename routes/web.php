@@ -30,8 +30,9 @@ Route::prefix('admin')->group(function () {
             Route::get('/', [EventController::class, 'manageEventView'])->name('admin.event.view');
             Route::prefix('{eventCategory}/{eventId}')->group(function (){
                 Route::get('/detail', [EventController::class, 'eventDetailView'])->name('admin.event.detail.view');
-                Route::get('/promo-code', [EventController::class, 'eventPromoCodeView'])->name('admin.event.promo-codes.view');
+                Route::get('/registration-type', [EventController::class, 'eventRegistrationType'])->name('admin.event.registration-type.view');
                 Route::get('/delegate-fees', [EventController::class, 'eventDelegateFeesView'])->name('admin.event.delegate-fees.view');
+                Route::get('/promo-code', [EventController::class, 'eventPromoCodeView'])->name('admin.event.promo-codes.view');
                 Route::prefix('registrant')->group(function (){
                     Route::get('/', [RegistrationController::class, 'eventRegistrantsView'])->name('admin.event.registrants.view');
                     Route::get('/export', [RegistrationController::class, 'eventRegistrantsExportData'])->name('admin.event.registrants.exportData');

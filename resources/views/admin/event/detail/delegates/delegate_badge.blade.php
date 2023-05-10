@@ -55,12 +55,13 @@
         }
         
         .badge-type{
-            color: #fff;
-            background-color: #000;
+            /* color: #fff;
+            background-color: #000; */
             padding: 16px 0px;
             font-weight: bold;
             margin-bottom: 0px;
             text-align: center;
+            text-transform: uppercase
         } 
 
         .link{
@@ -104,7 +105,7 @@
                 <p class="company-name">{{ $companyName }}</p>
             </div>
             <div class="footer">
-                <p class="badge-type">{{ $badge_type }}</p>
+                <p class="badge-type" style="color: {{ $frontTextColor }}; background-color: {{ $frontTextBGColor }}">{{ $frontText }}</p>
             </div>
         </div>
     
@@ -117,8 +118,11 @@
                 <p class="job-title">{{ $job_title }}</p>
                 <p class="company-name">{{ $companyName }}</p>
             </div>
-            <div class="footer">
+            {{-- <div class="footer">
                 <p class="link" style="color: {{ $textColor }};">{{ $link }}</p>
+            </div> --}}
+            <div class="footer">
+                <p class="badge-type" style="color: {{ $backTextColor }}; background-color: {{ $backTextBGColor }}">{{ $backText }}</p>
             </div>
         </div>
     </div>

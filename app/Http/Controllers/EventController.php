@@ -65,6 +65,18 @@ class EventController extends Controller
         }
     }
 
+    public function eventRegistrationType($eventCategory, $eventId){
+        if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {
+            return view('admin.event.detail.registration_type', [
+                "pageTitle" => "Event Registration Type",
+                "eventCategory" => $eventCategory,
+                "eventId" => $eventId,
+            ]);
+        } else {
+            abort(404, 'The URL is incorrect');
+        }
+    }
+
     public function eventDelegateFeesView($eventCategory, $eventId){
         if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {
             return view('admin.event.detail.delegate_fees', [
@@ -192,13 +204,12 @@ class EventController extends Controller
             ]
         );
 
-        $currentYear = date('Y');
+        $currentYear = strval(Carbon::parse($request->event_start_date)->year);
         $logoPath = $request->file('logo')->store('public/event/' . $currentYear . '/logos');
         $bannerPath = $request->file('banner')->store('public/event/' . $currentYear . '/banners');
         $badgeFrontBannerPath = $request->file('badge_front_banner')->store('public/event/' . $currentYear . '/badges/front');
         $badgeBackBannerPath = $request->file('badge_back_banner')->store('public/event/' . $currentYear . '/badges/back');
 
-        
         Event::create([
             'category' => $request->category,
             'name' => $request->name,

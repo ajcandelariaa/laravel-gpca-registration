@@ -151,10 +151,10 @@
                                 <select wire:model="badgeType"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                                     <option value=""></option>
-                                    @foreach ($badgeTypes as $badgeType)
-                                        <option value="{{ $badgeType }}"
-                                            {{ $badgeType == $badgeType ? 'selected' : '' }}>
-                                            {{ $badgeType }}</option>
+                                    @foreach ($registrationTypes as $registrationType)
+                                        <option value="{{ $registrationType->registration_type }}"
+                                            {{ $registrationType->registration_type == $badgeType ? 'selected' : '' }}>
+                                            {{ $registrationType->registration_type }}</option>
                                     @endforeach
                                 </select>
                             @endif

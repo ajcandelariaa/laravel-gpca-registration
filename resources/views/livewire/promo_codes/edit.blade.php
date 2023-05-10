@@ -30,12 +30,12 @@
                     <select wire:model="badge_type"
                         class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                         <option value=""></option>
-                        @foreach ($badgeTypes as $badgeType)
-                            <option value="{{ $badgeType }}" @if (old('badge_type') == $badgeType) selected @endif>
-                                {{ $badgeType }}</option>
+                        @foreach ($registrationTypes as $registrationType)
+                            <option value="{{ $registrationType->registration_type }}" @if (old('badge_type') == $registrationType->registration_type) selected @endif>
+                                {{ $registrationType->registration_type }}</option>
                         @endforeach
                     </select>
-
+                    
                     @error('badge_type')
                         <span class="mt-2 text-red-600 italic text-sm">
                             {{ $message }}

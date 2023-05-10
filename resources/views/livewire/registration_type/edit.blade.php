@@ -3,17 +3,17 @@
         @csrf
         <div class="p-5">
             <div class="text-registrationPrimaryColor italic text-center font-bold text-2xl mt-4">
-                Add promo code
+                Edit Registration Type
             </div>
 
             <div class="space-y-2 mt-10">
                 <div class="text-registrationPrimaryColor">
-                    Code: <span class="text-red-500">*</span>
+                    Registration type: <span class="text-red-500">*</span>
                 </div>
                 <div>
-                    <input type="text" wire:model="promo_code"
+                    <input type="text" wire:model="registrationType"
                         class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                    @error('promo_code')
+                    @error('registrationType')
                         <span class="mt-2 text-red-600 italic text-sm">
                             {{ $message }}
                         </span>
@@ -21,21 +21,14 @@
                 </div>
             </div>
 
-            <div class="space-y-2 mt-5">
+            <div class="space-y-2 mt-10">
                 <div class="text-registrationPrimaryColor">
-                    Registration Type: <span class="text-red-500">*</span>
+                    Badge footer front name: <span class="text-red-500">*</span>
                 </div>
                 <div>
-                    <select wire:model="badge_type"
+                    <input type="text" wire:model="badgeFooterFrontName"
                         class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                        <option value=""></option>
-                        @foreach ($registrationTypes as $registrationType)
-                            <option value="{{ $registrationType->registration_type }}" @if (old('badge_type') == $registrationType->registration_type) selected @endif>
-                                {{ $registrationType->registration_type }}</option>
-                        @endforeach
-                    </select>
-
-                    @error('badge_type')
+                    @error('badgeFooterFrontName')
                         <span class="mt-2 text-red-600 italic text-sm">
                             {{ $message }}
                         </span>
@@ -43,16 +36,14 @@
                 </div>
             </div>
 
-            <div class="space-y-2 mt-5">
+            <div class="space-y-2 mt-10">
                 <div class="text-registrationPrimaryColor">
-                    Discount: <span class="text-red-500">*</span>
+                    Badge footer front BG color: <span class="text-red-500">*</span>
                 </div>
                 <div>
-                    <input type="number" wire:model="discount" step="1" min="0" placeholder="0%" max="100"
-                        value="{{ old('discount') }}"
+                    <input type="text" wire:model="badgeFooterFrontBGColor"
                         class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-
-                    @error('discount')
+                    @error('badgeFooterFrontBGColor')
                         <span class="mt-2 text-red-600 italic text-sm">
                             {{ $message }}
                         </span>
@@ -60,16 +51,14 @@
                 </div>
             </div>
 
-            <div class="space-y-2 mt-5">
+            <div class="space-y-2 mt-10">
                 <div class="text-registrationPrimaryColor">
-                    Number of Codes: <span class="text-red-500">*</span>
+                    Badge footer front text color: <span class="text-red-500">*</span>
                 </div>
                 <div>
-                    <input type="number" wire:model="number_of_codes" step="1" min="1" placeholder="1" max="10000"
-                        value="{{ old('number_of_codes') }}"
+                    <input type="text" wire:model="badgeFooterFrontTextColor"
                         class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-
-                    @error('number_of_codes')
+                    @error('badgeFooterFrontTextColor')
                         <span class="mt-2 text-red-600 italic text-sm">
                             {{ $message }}
                         </span>
@@ -77,16 +66,14 @@
                 </div>
             </div>
 
-            <div class="space-y-2 mt-5">
+            <div class="space-y-2 mt-10">
                 <div class="text-registrationPrimaryColor">
-                    Code Validity: <span class="text-red-500">*</span>
+                    Badge footer back name: <span class="text-red-500">*</span>
                 </div>
                 <div>
-                    <input type="datetime-local" wire:model="validity"
-                        value="{{ old('validity') }}"
+                    <input type="text" wire:model="badgeFooterBackName"
                         class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-
-                    @error('validity')
+                    @error('badgeFooterBackName')
                         <span class="mt-2 text-red-600 italic text-sm">
                             {{ $message }}
                         </span>
@@ -94,14 +81,14 @@
                 </div>
             </div>
 
-            <div class="space-y-2 mt-5">
+            <div class="space-y-2 mt-10">
                 <div class="text-registrationPrimaryColor">
-                    Description: 
+                    Badge footer back BG color: <span class="text-red-500">*</span>
                 </div>
                 <div>
-                    <input type="text" wire:model="description"
+                    <input type="text" wire:model="badgeFooterBackBGColor"
                         class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                    @error('description')
+                    @error('badgeFooterBackBGColor')
                         <span class="mt-2 text-red-600 italic text-sm">
                             {{ $message }}
                         </span>
@@ -109,12 +96,26 @@
                 </div>
             </div>
 
-            <div class="text-center mt-10">
-                <button wire:click.prevent="addPromoCodeConfirmation"
-                    class="bg-registrationPrimaryColor hover:bg-registrationPrimaryColorHover text-white font-medium py-2 px-5 rounded inline-flex items-center text-sm">
-                    <span class="mr-2"><i class="fas fa-plus"></i></span>
-                    <span>Add Promo Code</span>
-                </button>
+            <div class="space-y-2 mt-10">
+                <div class="text-registrationPrimaryColor">
+                    Badge footer back text color: <span class="text-red-500">*</span>
+                </div>
+                <div>
+                    <input type="text" wire:model="badgeFooterBackTextColor"
+                        class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                    @error('badgeFooterBackTextColor')
+                        <span class="mt-2 text-red-600 italic text-sm">
+                            {{ $message }}
+                        </span>
+                    @enderror
+                </div>
+            </div>
+
+            <div class="text-center mt-10 flex gap-4">
+                <button wire:click.prevent="cancelEditRegistrationType"
+                    class="bg-red-500 rounded-md text-white py-1 w-full hover:cursor-pointer hover:bg-red-700">Cancel</button>
+                <button wire:click.prevent="updateRegistrationTypeConfirmation"
+                    class="bg-registrationPrimaryColor rounded-md text-white py-1 w-full hover:cursor-pointer hover:bg-registrationPrimaryColorHover">Update</button>
             </div>
         </div>
 

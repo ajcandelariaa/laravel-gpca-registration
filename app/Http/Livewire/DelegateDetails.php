@@ -6,6 +6,7 @@ use Livewire\Component;
 use App\Models\Member as Members;
 use App\Models\MainDelegate as MainDelegates;
 use App\Models\AdditionalDelegate as AdditionalDelegates;
+use App\Models\EventRegistrationType as EventRegistrationTypes;
 use App\Models\Event as Events;
 
 class DelegateDetails extends Component
@@ -14,17 +15,7 @@ class DelegateDetails extends Component
     public $companySectors;
     public $salutations;
 
-    public $badgeTypes = [
-        'VVIP',
-        'VIP',
-        'Speaker',
-        'Commitee',
-        'Sponsor',
-        'Exhibitor',
-        'Delegate',
-        'Media partner',
-        'Organizer',
-    ];
+    public $registrationTypes;
 
 
     public $eventCategory, $eventId, $finalDelegate, $members, $event;
@@ -47,6 +38,7 @@ class DelegateDetails extends Component
         $this->companySectors = config('app.companySectors');
         $this->salutations = config('app.salutations');
         $this->eventBanner = Events::where('id', $eventId)->where('category', $eventCategory)->value('banner');
+        $this->registrationTypes = EventRegistrationTypes::where('event_id', $eventId)->where('event_category', $eventCategory)->where('active', true)->get();
 
         $this->eventCategory = $eventCategory;
         $this->eventId = $eventId;

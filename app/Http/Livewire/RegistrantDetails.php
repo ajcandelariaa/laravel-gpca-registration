@@ -12,6 +12,7 @@ use App\Models\MainDelegate as MainDelegates;
 use App\Models\Event as Events;
 use App\Models\AdditionalDelegate as AdditionalDelegates;
 use App\Models\Transaction as Transactions;
+use App\Models\EventRegistrationType as EventRegistrationTypes;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
 use NumberFormatter;
@@ -22,18 +23,7 @@ class RegistrantDetails extends Component
     public $companySectors;
     public $salutations;
 
-    public $badgeTypes = [
-        'VVIP',
-        'VIP',
-        'Speaker',
-        'Commitee',
-        'Sponsor',
-        'Exhibitor',
-        'Delegate',
-        'Media partner',
-        'Organizer',
-    ];
-
+    public $registrationTypes;
 
     public $eventCategory, $eventId, $registrantId, $finalData, $members;
 
@@ -60,6 +50,7 @@ class RegistrantDetails extends Component
         $this->companySectors = config('app.companySectors');
         $this->salutations = config('app.salutations');
         $this->eventBanner = Events::where('id', $eventId)->where('category', $eventCategory)->value('banner');
+        $this->registrationTypes = EventRegistrationTypes::where('event_id', $eventId)->where('event_category', $eventCategory)->where('active', true)->get();
 
         $this->eventCategory = $eventCategory;
         $this->eventId = $eventId;
