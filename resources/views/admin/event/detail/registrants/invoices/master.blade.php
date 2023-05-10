@@ -48,6 +48,9 @@
             font-weight: bold;
             margin: 4px 0px;
         }
+        .invoice-intro-left{
+            width: 60%
+        }
         .invoice-intro-right{
             padding-right: 15px;
         }

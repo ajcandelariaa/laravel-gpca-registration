@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
+use App\Models\EventRegistrationType;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -210,7 +211,7 @@ class EventController extends Controller
         $badgeFrontBannerPath = $request->file('badge_front_banner')->store('public/event/' . $currentYear . '/badges/front');
         $badgeBackBannerPath = $request->file('badge_back_banner')->store('public/event/' . $currentYear . '/badges/back');
 
-        Event::create([
+        $newEvent = Event::create([
             'category' => $request->category,
             'name' => $request->name,
             'location' => $request->location,
@@ -237,6 +238,32 @@ class EventController extends Controller
             'badge_back_banner' => $badgeBackBannerPath,
 
             'year' => $currentYear,
+            'active' => true,
+        ]);
+
+        EventRegistrationType::create([
+            'event_id' => $newEvent->id,
+            'event_category' => $newEvent->category,
+            'registration_type' => "Delegate",
+            'badge_footer_front_name' => "Delegate",
+            'badge_footer_front_bg_color' => "#000000",
+            'badge_footer_front_text_color' => "#ffffff",
+            'badge_footer_back_name' => "Delegate",
+            'badge_footer_back_bg_color' => "000000",
+            'badge_footer_back_text_color' => "#ffffff",
+            'active' => true,
+        ]);
+
+        EventRegistrationType::create([
+            'event_id' => $newEvent->id,
+            'event_category' => $newEvent->category,
+            'registration_type' => "Organizer",
+            'badge_footer_front_name' => "Organizer",
+            'badge_footer_front_bg_color' => "#000000",
+            'badge_footer_front_text_color' => "#ffffff",
+            'badge_footer_back_name' => "Organizer",
+            'badge_footer_back_bg_color' => "000000",
+            'badge_footer_back_text_color' => "#ffffff",
             'active' => true,
         ]);
 
