@@ -6,12 +6,21 @@
     </div>
 
     <div class="container mx-auto my-10">
-        <div class="flex items-center gap-4">
-            <img src="{{ Storage::url($event->logo) }}" alt="" class="h-16">
-            <p class="font-bold text-3xl">{{ $event->name }}</p>
-            <p
-                class="text-registrationPrimaryColor rounded-full border border-registrationPrimaryColor px-4 font-bold text-sm">
-                {{ $event->category }}</p>
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <img src="{{ Storage::url($event->logo) }}" alt="" class="h-16">
+                <p class="font-bold text-3xl">{{ $event->name }}</p>
+                <p
+                    class="text-registrationPrimaryColor rounded-full border border-registrationPrimaryColor px-4 font-bold text-sm">
+                    {{ $event->category }}</p>
+            </div>
+            <div>
+                <a href="{{ $regFormLink }}" target="_blank"
+                    class="bg-registrationPrimaryColor hover:bg-registrationPrimaryColorHover text-white font-medium py-2 px-5 rounded-md inline-flex items-center text-sm">
+                    <span class="mr-2"><i class="fa-solid fa-file-pen"></i></span>
+                    <span>View registration form</span>
+                </a>
+            </div>
         </div>
 
         <div class="flex gap-3 items-center mt-5 text-registrationPrimaryColor">

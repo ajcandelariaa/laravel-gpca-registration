@@ -47,6 +47,8 @@ class EventController extends Controller
             $finalEventStartDate = Carbon::parse($event->event_start_date)->format('d M Y');
             $finalEventEndDate = Carbon::parse($event->event_end_date)->format('d M Y');
 
+            $regFormLink = env('APP_URL').'/register/'.$event->year.'/'.$eventCategory.'/'.$eventId;
+
             return view('admin.event.detail.event_details', [
                 "pageTitle" => "Event Details",
                 "eventCategory" => $eventCategory,
@@ -56,6 +58,7 @@ class EventController extends Controller
                 "finalStdStartDate" => $finalStdStartDate,
                 "finalEventStartDate" => $finalEventStartDate,
                 "finalEventEndDate" => $finalEventEndDate,
+                "regFormLink" => $regFormLink,
             ]);
         } else {
             abort(404, 'The URL is incorrect');
