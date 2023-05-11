@@ -137,6 +137,9 @@ class DelegateController extends Controller
             $backtBanner = public_path(Storage::url($event->badge_back_banner));
             $finalBackBanner = str_replace('\/', '/', $backtBanner);
 
+            $finalWidth = (17/2.54) * 72;
+            $finalHeight = (13/2.54) * 72;
+            
             if ($tempDelegate != null) {
                 $registrationType = EventRegistrationType::where('event_id', $eventId)->where('event_category', $eventCategory)->where('registration_type', $tempDelegate->badge_type)->first();
 
@@ -161,6 +164,8 @@ class DelegateController extends Controller
                         'backText' => $registrationType->badge_footer_back_name,
                         'backTextColor' => $registrationType->badge_footer_back_text_color,
                         'backTextBGColor' => $registrationType->badge_footer_back_bg_color,
+                        'finalWidth' => $finalWidth,
+                        'finalHeight' => $finalHeight,
                     ];
                 } else {
                     $mainDelegateInfo = MainDelegate::where('id', $tempDelegate->main_delegate_id)->first();
@@ -184,6 +189,8 @@ class DelegateController extends Controller
                         'backText' => $registrationType->badge_footer_back_name,
                         'backTextColor' => $registrationType->badge_footer_back_text_color,
                         'backTextBGColor' => $registrationType->badge_footer_back_bg_color,
+                        'finalWidth' => $finalWidth,
+                        'finalHeight' => $finalHeight,
                     ];
                 }
                 $pdf = Pdf::loadView('admin.event.detail.delegates.delegate_badge', $finalDelegate, [
@@ -193,7 +200,8 @@ class DelegateController extends Controller
                     'margin_left' => 0,
                 ]);
 
-                $pdf->setPaper(array(0, 0, 481, 369), 'portrait');  //fixed based on the view
+
+                $pdf->setPaper(array(0, 0, $finalWidth, $finalHeight), 'custom');  //fixed based on the view
                 // $pdf->setPaper(array(0, 0, 642, 492), 'portrait'); original
 
                 return $pdf->stream('badge.pdf');

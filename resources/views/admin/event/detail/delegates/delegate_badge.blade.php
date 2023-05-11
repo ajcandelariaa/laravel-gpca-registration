@@ -13,8 +13,6 @@
             padding: 0;
             font-family: Arial, sans-serif;
             font-size: 14px;
-            width: 642px;
-            height: 492px;
         }
 
         @page {
@@ -23,8 +21,6 @@
         }
 
         .badge{
-            width: 321px;
-            height: 492px;
             text-align: center;
         }
 
@@ -33,10 +29,6 @@
         }
         .back{
             float: right;
-        }
-
-        img{
-            width: 321px;
         }
 
         .name{
@@ -58,7 +50,8 @@
             /* color: #fff;
             background-color: #000; */
             padding: 16px 0px;
-            font-weight: bold;
+            font-weight: 700;
+            font-size: 20px;
             margin-bottom: 0px;
             text-align: center;
             text-transform: uppercase
@@ -72,13 +65,11 @@
         }
 
         .header{
-            width: 321px;
             position: absolute;
             top: 0%;
         }
 
         .middle{
-            width: 321px;
             position: relative;
             top: 64%;
             left: 50%;
@@ -86,42 +77,41 @@
         }
 
         .footer{
-            width: 321px;
             position: absolute;
             bottom: 0%;
         }
     </style>
 </head>
 
-<body>
+<body style="width: {{ $finalWidth }}; height: {{ $finalHeight }}">
     <div class="badges">
-        <div class="badge front">
-            <div class="header">
-                <img src="data:image/png;base64,{{ base64_encode(file_get_contents($frontBanner)) }}" alt="banners">
+        <div class="badge front" style="width: {{ $finalWidth/2 }}; height: {{ $finalHeight }}">
+            <div class="header" style="width: {{ $finalWidth/2 }}">
+                <img src="data:image/png;base64,{{ base64_encode(file_get_contents($frontBanner)) }}" alt="banners" style="width: {{ $finalWidth/2 }}">
             </div>
-            <div class="middle">
+            <div class="middle" style="width: {{ $finalWidth/2 }}">
                 <p class="name">{{ $salutation }} {{ $first_name }} {{ $middle_name }} {{ $last_name }}</p>
                 <p class="job-title">{{ $job_title }}</p>
                 <p class="company-name">{{ $companyName }}</p>
             </div>
-            <div class="footer">
+            <div class="footer" style="width: {{ $finalWidth/2 }}">
                 <p class="badge-type" style="color: {{ $frontTextColor }}; background-color: {{ $frontTextBGColor }}">{{ $frontText }}</p>
             </div>
         </div>
     
-        <div class="badge back">
-            <div class="header">
-                <img src="data:image/png;base64,{{ base64_encode(file_get_contents($backBanner)) }}" alt="banners">
+        <div class="badge back" style="width: {{ $finalWidth/2 }}; height: {{ $finalHeight }}">
+            <div class="header" style="width: {{ $finalWidth/2 }}">
+                <img src="data:image/png;base64,{{ base64_encode(file_get_contents($backBanner)) }}" alt="banners" style="width: {{ $finalWidth/2 }}">
             </div>
-            <div class="middle">
+            <div class="middle" style="width: {{ $finalWidth/2 }}">
                 <p class="name">{{ $salutation }} {{ $first_name }} {{ $middle_name }} {{ $last_name }}</p>
                 <p class="job-title">{{ $job_title }}</p>
                 <p class="company-name">{{ $companyName }}</p>
             </div>
-            {{-- <div class="footer">
+            {{-- <div class="footer" style="width: {{ $finalWidth/2 }}">
                 <p class="link" style="color: {{ $textColor }};">{{ $link }}</p>
             </div> --}}
-            <div class="footer">
+            <div class="footer" style="width: {{ $finalWidth/2 }}">
                 <p class="badge-type" style="color: {{ $backTextColor }}; background-color: {{ $backTextBGColor }}">{{ $backText }}</p>
             </div>
         </div>
