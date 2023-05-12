@@ -62,23 +62,23 @@
     </table>
 
     <div class="grid grid-cols-2 gap-5 mt-10">
-        <div class="col-span-2 lg:col-span-1">
-            <div class="bg-gray-200 py-4 px-2">
-                <h1 class="text-2xl text-registrationPrimaryColor font-bold text-center">DELEGATE FEE INCLUDES:</h1>
-                <div class="bg-white mx-1 mt-5 px-14 py-5">
-                    <ul class="list-disc">
-                        @if ($delegateFees->isNotEmpty())
-                            @foreach ($delegateFees as $delegateFee)
-                                <li class="text-registrationPrimaryColor"><span
-                                        class="text-black">{{ $delegateFee->description }}</span></li>
-                            @endforeach
-                        @endif
-                    </ul>
+        @if ($delegateFees->isNotEmpty())
+            <div class="col-span-2 lg:col-span-1">
+                <div class="bg-gray-200 py-4 px-2">
+                    <h1 class="text-2xl text-registrationPrimaryColor font-bold text-center">DELEGATE FEE INCLUDES:</h1>
+                    <div class="bg-white mx-1 mt-5 px-14 py-5">
+                        <ul class="list-disc">
+                                @foreach ($delegateFees as $delegateFee)
+                                    <li class="text-registrationPrimaryColor"><span
+                                            class="text-black">{{ $delegateFee->description }}</span></li>
+                                @endforeach
+                        </ul>
+                    </div>
                 </div>
             </div>
-        </div>
+        @endif
 
-        <div class="col-span-2 lg:col-span-1 flex flex-col gap-5">
+        <div class="col-span-2 {{ $delegateFees->isNotEmpty() ? 'lg:col-span-1' : 'lg:col-span-2' }} lg:col-span-1 flex flex-col gap-5">
             <div class="bg-gray-200 py-4 px-2">
                 <h1 class="text-2xl text-registrationPrimaryColor font-bold text-center">DO YOU WISH TO BECOME A MEMBER?
                 </h1>

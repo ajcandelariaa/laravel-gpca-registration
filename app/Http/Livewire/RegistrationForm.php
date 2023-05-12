@@ -531,6 +531,7 @@ class RegistrationForm extends Component
             'eventName' => $this->event->name,
             'eventDates' => $eventFormattedData,
             'eventLocation' => $this->event->location,
+            'eventCategory' => $this->event->category,
 
             'jobTitle' => $this->jobTitle,
             'companyName' => $this->companyName,
@@ -581,6 +582,7 @@ class RegistrationForm extends Component
                     'eventName' => $this->event->name,
                     'eventDates' => $eventFormattedData,
                     'eventLocation' => $this->event->location,
+                    'eventCategory' => $this->event->category,
 
                     'jobTitle' => $additionalDelegate->job_title,
                     'companyName' => $this->companyName,

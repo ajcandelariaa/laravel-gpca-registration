@@ -30,6 +30,25 @@ Download invoice
 
 <h1>GENERAL INFORMATION</h1>
 
+@if ($details['eventCategory'] == "IPAW")
+<h3>HOTEL AND ACCOMMODATION</h3>
+
+<p>For your hotel and accommodation, GPCA attendees can avail of special rates by contacting the Hotel at <a href="mailto:reservations.aplq@anantara.com" target="_blank">reservations.aplq@anantara.com</a>.</p>
+
+<p>Contact person Name: Shady Abdulaziz <br> Contact person Phone Number: +974 3300 0294</p>
+    
+<h3>ROOM RATES PER NIGHT:</h3>
+
+<ul>
+    <li>Premier Room: QAR 550</li>
+    <li>Deluxe Room: QAR 600</li>
+    <li>Executive Room: QAR 650</li>
+    <li>Deluxe Suite: QAR 1200</li>
+    <li>Executive Suite: QAR 1400</li>
+</ul>
+
+<p>Note: <em>Special rates are subject to availability</em></p>
+@else
 <h3>INVITATION LETTER</h3>
 
 <p>Non-GCC participants attending the <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a> must process their tourist visa and can notify the GPCA office for assistance in issuing the Invitation letter. Visa applications for some nationalities can be submitted online at <a href="https://visa.visitsaudi.com" target="_blank">https://visa.visitsaudi.com</a></p>
@@ -45,6 +64,7 @@ Download invoice
     <li>Special rates are subject to availability.</li>
     <li>All rates are valid only from May 13 – 18 2023.</li>
 </ul>
+@endif
 
 <p>For the latest updates on the event, please visit the event website at <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a>.</p>
 

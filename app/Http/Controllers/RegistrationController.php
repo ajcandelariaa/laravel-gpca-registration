@@ -226,6 +226,7 @@ class RegistrationController extends Controller
                     'eventName' => $event->name,
                     'eventDates' => $eventFormattedData,
                     'eventLocation' => $event->location,
+                    'eventCategory' => $event->category,
 
                     'jobTitle' => $mainDelegate->job_title,
                     'companyName' => $mainDelegate->company_name,
@@ -267,6 +268,7 @@ class RegistrationController extends Controller
                             'eventName' => $event->name,
                             'eventDates' => $eventFormattedData,
                             'eventLocation' => $event->location,
+                            'eventCategory' => $event->category,
 
                             'jobTitle' => $additionalDelegate->job_title,
                             'companyName' => $mainDelegate->company_name,

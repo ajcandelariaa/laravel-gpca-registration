@@ -381,6 +381,7 @@ class RegistrantDetails extends Component
             'eventName' => $event->name,
             'eventDates' => $eventFormattedData,
             'eventLocation' => $event->location,
+            'eventCategory' => $event->category,
 
             'jobTitle' => $this->finalData['job_title'],
             'companyName' => $this->finalData['company_name'],
@@ -420,6 +421,7 @@ class RegistrantDetails extends Component
                     'eventName' => $event->name,
                     'eventDates' => $eventFormattedData,
                     'eventLocation' => $event->location,
+                    'eventCategory' => $event->category,
 
                     'jobTitle' => $subDelegate['job_title'],
                     'companyName' => $this->finalData['company_name'],
