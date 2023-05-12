@@ -9,17 +9,20 @@ use App\Models\EventRegistrationType as EventRegistrationTypes;
 class EventRegistrationType extends Component
 {
     public $eventCategory, $eventId;
-    public $eventBanner;
+    public $event;
     public $registrationTypes;
     public $updateRegistrationType = false;
 
     public $registrationTypeId, $registrationType, $badgeFooterFrontName, $badgeFooterFrontBGColor, $badgeFooterFrontTextColor, $badgeFooterBackName, $badgeFooterBackBGColor, $badgeFooterBackTextColor;
 
+    public $badgeView = false;
+    public $badgeViewFFText, $badgeViewFBText, $badgeViewFFBGColor, $badgeViewFBBGColor, $badgeViewFFTextColor, $badgeViewFBTextColor;
+
     protected $listeners = ['updateRegistrationTypeConfirmed' => 'updateRegistrationType', 'addRegistrationTypeConfirmed' => 'addRegistrationType'];
 
     public function mount($eventCategory, $eventId)
     {
-        $this->eventBanner = Events::where('id', $eventId)->where('category', $eventCategory)->value('banner');
+        $this->event = Events::where('id', $eventId)->where('category', $eventCategory)->first();
         $this->eventCategory = $eventCategory;
         $this->eventId = $eventId;
     }
@@ -164,5 +167,33 @@ class EventRegistrationType extends Component
             'message' => 'Registration Type updated successfully!',
             'text' => ''
         ]);
+    }
+
+    public function showSampleBadge($registrationTypeId){
+        $registrationType = EventRegistrationTypes::findOrFail($registrationTypeId);
+
+        $this->badgeViewFFText = $registrationType->badge_footer_front_name;
+        $this->badgeViewFBText = $registrationType->badge_footer_back_name;
+
+        $this->badgeViewFFBGColor = $registrationType->badge_footer_front_bg_color;
+        $this->badgeViewFBBGColor = $registrationType->badge_footer_back_bg_color;
+
+        $this->badgeViewFFTextColor = $registrationType->badge_footer_front_text_color;
+        $this->badgeViewFBTextColor = $registrationType->badge_footer_back_text_color;
+
+        $this->badgeView = true;
+    }
+
+    public function closeSampleBadge(){
+        $this->badgeViewFFText = null;
+        $this->badgeViewFBText = null;
+
+        $this->badgeViewFFBGColor = null;
+        $this->badgeViewFBBGColor = null;
+
+        $this->badgeViewFFTextColor = null;
+        $this->badgeViewFBTextColor = null;
+
+        $this->badgeView = false;
     }
 }

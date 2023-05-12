@@ -1,6 +1,6 @@
 <div>
     <div>
-        <img src="{{ Storage::url($eventBanner) }}" alt="" class="w-full object-cover">
+        <img src="{{ Storage::url($event->banner) }}" alt="" class="w-full object-cover">
     </div>
     <div class="px-5">
         <div class="float-left">
@@ -14,7 +14,7 @@
 
         @if ($registrationTypes->isNotEmpty())
             <div class="shadow-lg my-5 pt-5 bg-white rounded-md" style="margin-left: 320px; ">
-                <h1 class="text-center text-2xl">Registration Types</h1>
+                <h1 class="text-center text-2xl text-white bg-registrationPrimaryColor py-2">Registration Types</h1>
                 <div class="grid grid-cols-9 pt-4 pb-2 place-items-center text-center">
                     <div class="col-span-1">Registration type</div>
                     <div class="col-span-1">Badge footer <br> front name</div>
@@ -50,7 +50,12 @@
                                     class="text-gray-700 bg-red-300 hover:bg-red-500 hover:text-white py-1 px-2 text-sm rounded-md">Inactive</button>
                             @endif
                         </div>
-                        <div class="col-span-1 flex gap-4">
+                        <div class="col-span-1 flex flex-col text-left gap-1">
+                            <div wire:click="showSampleBadge({{ $registrationType->id }})"
+                                class="cursor-pointer hover:text-gray-600 text-gray-500">
+                                <i class="fa-solid fa-eye"></i>
+                                View
+                            </div>
                             <div wire:click="showEditRegistrationType({{ $registrationType->id }})"
                                 class="cursor-pointer hover:text-yellow-600 text-yellow-500">
                                 <i class="fa-solid fa-pen-to-square"></i>
@@ -63,6 +68,10 @@
                     </div>
                 @endforeach
             </div>
+
+            @if ($badgeView)
+                @include('livewire.registration_type.view_badge_modal')
+            @endif
         @endif
 
         @if ($registrationTypes->isEmpty())
