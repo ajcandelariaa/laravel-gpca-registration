@@ -30,7 +30,9 @@ class RegistrationController extends Controller
                 $eventLink = env('APP_URL') . '/register/' . $event->year . '/' . $event->category . '/' . $event->id;
                 $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('d M Y') . ' - ' . Carbon::parse($event->event_end_date)->format('d M Y');
 
-                if (Carbon::parse($event->event_end_date)->isValid()) {
+                $eventEndDate = Carbon::parse($event->event_end_date);
+
+                if (Carbon::now()->lt($eventEndDate->addDay())) {
                     array_push($finalUpcomingEvents, [
                         'eventLogo' => $event->logo,
                         'eventName' => $event->name,
@@ -419,10 +421,17 @@ class RegistrationController extends Controller
     {
         if (Event::where('year', $eventYear)->where('category', $eventCategory)->where('id', $eventId)->exists()) {
             $event = Event::where('year', $eventYear)->where('category', $eventCategory)->where('id', $eventId)->first();
-            return view('registration.registration', [
-                'pageTitle' => $event->name . " - Registration",
-                'event' => $event,
-            ]);
+
+            $eventEndDate = Carbon::parse($event->event_end_date);
+
+            if(Carbon::now()->lt($eventEndDate->addDay())){
+                return view('registration.registration', [
+                    'pageTitle' => $event->name . " - Registration",
+                    'event' => $event,
+                ]);
+            } else {
+                abort(404, 'The URL is incorrect');
+            }
         } else {
             abort(404, 'The URL is incorrect');
         }
