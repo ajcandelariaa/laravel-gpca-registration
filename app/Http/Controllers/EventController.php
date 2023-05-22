@@ -28,6 +28,21 @@ class EventController extends Controller
         ]);
     }
 
+    public function eventDashboardView($eventCategory, $eventId){
+        if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {
+            $event = Event::where('category', $eventCategory)->where('id', $eventId)->first();
+
+            return view('admin.event.detail.dashboard.dashboard', [
+                "pageTitle" => "Event Dashboard",
+                "eventCategory" => $eventCategory,
+                "eventId" => $eventId,
+                "event" => $event,
+            ]);
+        } else {
+            abort(404, 'The URL is incorrect');
+        }
+    }
+
     public function eventDetailView($eventCategory, $eventId)
     {
         if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {

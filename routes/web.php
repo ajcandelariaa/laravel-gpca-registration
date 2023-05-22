@@ -29,6 +29,7 @@ Route::prefix('admin')->group(function () {
         Route::prefix('event')->group(function () {
             Route::get('/', [EventController::class, 'manageEventView'])->name('admin.event.view');
             Route::prefix('{eventCategory}/{eventId}')->group(function (){
+                Route::get('/dashboard', [EventController::class, 'eventDashboardView'])->name('admin.event.dashboard.view');
                 Route::get('/detail', [EventController::class, 'eventDetailView'])->name('admin.event.detail.view');
                 Route::get('/registration-type', [EventController::class, 'eventRegistrationType'])->name('admin.event.registration-type.view');
                 Route::get('/delegate-fees', [EventController::class, 'eventDelegateFeesView'])->name('admin.event.delegate-fees.view');

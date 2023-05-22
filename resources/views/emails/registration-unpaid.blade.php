@@ -33,7 +33,7 @@ Download invoice
 @if ($details['eventCategory'] == "IPAW")
 <h3>HOTEL AND ACCOMMODATION</h3>
 
-<p>For your hotel and accommodation, GPCA attendees can avail of special rates by contacting the Hotel at <a href="mailto:reservations.aplq@anantara.com" target="_blank">reservations.aplq@anantara.com</a>.</p>
+<p>For your hotel and accommodation, GPCA attendees can avail of special rates by contacting the Hotel at <a href="mailto:reservations@theplazadoha.com" target="_blank">reservations@theplazadoha.com</a> or <a href="mailto:sabdelaziz@theplazadoha.com" target="_blank">sabdelaziz@theplazadoha.com</a> .</p>
 
 <p>Contact person Name: Shady Abdulaziz <br> Contact person Phone Number: +974 3300 0294</p>
     

@@ -79,7 +79,8 @@
         </div>
     </div>
 
-    @if (request()->is('admin/event/*/*/detail*') ||
+    @if (request()->is('admin/event/*/*/dashboard*') ||
+            request()->is('admin/event/*/*/detail*') ||
             request()->is('admin/event/*/*/registration-type*') ||
             request()->is('admin/event/*/*/delegate-fees*') ||
             request()->is('admin/event/*/*/promo-code*') ||

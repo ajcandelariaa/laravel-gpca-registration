@@ -6,6 +6,10 @@
                         class="fa-solid fa-arrow-left text-sm"></i> Back</a>
             </div>
             <div class="text-white font-semibold flex items-center gap-10">
+                <a href="{{ route('admin.event.dashboard.view', ['eventCategory' => $eventCategory, 'eventId' => $eventId]) }}"
+                    class="{{ request()->is('admin/event/*/*/dashboard*') ? 'underline' : 'hover:underline' }} text-registrationPrimaryColor">Event
+                    Dashboard</a>
+
                 <a href="{{ route('admin.event.detail.view', ['eventCategory' => $eventCategory, 'eventId' => $eventId]) }}"
                     class="{{ request()->is('admin/event/*/*/detail*') ? 'underline' : 'hover:underline' }} text-registrationPrimaryColor">Event
                     Detail</a>
