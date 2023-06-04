@@ -1,3 +1,113 @@
+//MARK AS PAID 
+window.addEventListener("swal:mark-as-paid-success", (event) => {
+    swal({
+        title: event.detail.message,
+        text: event.detail.text,
+        icon: event.detail.type,
+    });
+});
+
+window.addEventListener("swal:mark-as-paid-confirmation", (event) => {
+    swal({
+        title: event.detail.message,
+        text: event.detail.text,
+        icon: event.detail.type,
+        buttons: {
+            confirm: {
+                text: "Yes, mark this as paid!",
+                value: true,
+                visible: true,
+                closeModal: true,
+            },
+            cancel: {
+                text: "Cancel",
+                value: null,
+                visible: true,
+                closeModal: true,
+            },
+        }
+      }).then((result) => {
+        console.log(result);
+        if (result) {
+            Livewire.emit('markAsPaidConfirmed')
+        }
+      });
+});
+
+// CANCEL REFUND DELEGATE
+window.addEventListener("swal:delegate-cancel-refund-success", (event) => {
+    swal({
+        title: event.detail.message,
+        text: event.detail.text,
+        icon: event.detail.type,
+    });
+});
+
+window.addEventListener("swal:delegate-cancel-refund-confirmation", (event) => {
+    swal({
+        title: event.detail.message,
+        text: event.detail.text,
+        icon: event.detail.type,
+        buttons: {
+            confirm: {
+                text: "Yes, I'm sure!",
+                value: true,
+                visible: true,
+                closeModal: true,
+            },
+            cancel: {
+                text: "Cancel",
+                value: null,
+                visible: true,
+                closeModal: true,
+            },
+        }
+      }).then((result) => {
+        console.log(result);
+        if (result) {
+            Livewire.emit('cancelRefundDelegateConfirmed')
+        }
+      });
+});
+
+// CANCEL REPLACEMENT DELEGATE
+window.addEventListener("swal:delegate-cancel-replace-success", (event) => {
+    swal({
+        title: event.detail.message,
+        text: event.detail.text,
+        icon: event.detail.type,
+    });
+});
+
+window.addEventListener("swal:delegate-cancel-replace-confirmation", (event) => {
+    swal({
+        title: event.detail.message,
+        text: event.detail.text,
+        icon: event.detail.type,
+        buttons: {
+            confirm: {
+                text: "Yes, cancel and replace it!",
+                value: true,
+                visible: true,
+                closeModal: true,
+            },
+            cancel: {
+                text: "Cancel",
+                value: null,
+                visible: true,
+                closeModal: true,
+            },
+        }
+      }).then((result) => {
+        console.log(result);
+        if (result) {
+            Livewire.emit('cancelReplaceDelegateConfirmed')
+        }
+      });
+});
+
+
+
 // REGISTRATION TYPE
 window.addEventListener("swal:update-registration-type", (event) => {
     swal({

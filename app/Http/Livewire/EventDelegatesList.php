@@ -74,6 +74,6 @@ class EventDelegatesList extends Component
                 })
                 ->all();
         }
-        return view('livewire.delegates.event-delegates-list');
+        return view('livewire.admin.events.delegates.event-delegates-list');
     }
 }

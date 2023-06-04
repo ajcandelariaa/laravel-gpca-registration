@@ -8,23 +8,31 @@ use Illuminate\Support\Facades\Session;
 
 class AdminController extends Controller
 {
-    // RENDER VIEWS
+
+    // =========================================================
+    //                       RENDER VIEWS
+    // =========================================================
+
     public function loginView(){
         if(Session::has('userType')){
             if(Session::get('userType') == 'gpcaAdmin'){
-                return redirect('/admin/dashboard');
+                return redirect()->route('admin.dashboard.view');
             }
         }
-        return view('admin.login');
+        return view('admin.login.login');
     }
+
     public function dashboardView(){
-        return view('admin.dashboard', [
+        return view('admin.dashboard.dashboard', [
             "pageTitle" => "Dashboard"
         ]);
     }
 
 
-    // RENDER LOGICS
+    // =========================================================
+    //                       RENDER LOGICS
+    // =========================================================
+
     public function login(Request $request){
         $request->validate([ 
             'username' => 'required',
@@ -37,6 +45,7 @@ class AdminController extends Controller
             return Redirect::to("/admin/login")->withFail('Invalid username & password!');
         }
     }
+
     public function logout(){
         Session::flush();
         return Redirect::to("/admin/login")->withSuccess('Logged out successfully');

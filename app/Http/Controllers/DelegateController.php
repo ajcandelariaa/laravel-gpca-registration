@@ -13,7 +13,11 @@ use Illuminate\Support\Facades\Storage;
 
 class DelegateController extends Controller
 {
-    // RENDER VIEWS
+
+    // =========================================================
+    //                       RENDER VIEWS
+    // =========================================================
+
     public function manageDelegateView()
     {
         return view('admin.delegates.delegate', [
@@ -25,7 +29,7 @@ class DelegateController extends Controller
     public function eventDelegateView($eventCategory, $eventId)
     {
         if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {
-            return view('admin.event.detail.delegates.delegates', [
+            return view('admin.events.delegates.delegates', [
                 "pageTitle" => "Event Delegates",
                 "eventCategory" => $eventCategory,
                 "eventId" => $eventId,
@@ -104,7 +108,7 @@ class DelegateController extends Controller
                     ];
                 }
 
-                return view('admin.event.detail.delegates.delegates_detail', [
+                return view('admin.events.delegates.delegates_detail', [
                     "pageTitle" => "Event Delegates",
                     "eventCategory" => $eventCategory,
                     "eventId" => $eventId,
@@ -117,6 +121,12 @@ class DelegateController extends Controller
             abort(404, 'The URL is incorrect');
         }
     }
+
+
+
+    // =========================================================
+    //                       RENDER LOGICS
+    // =========================================================
 
     public function delegateDetailPrintBadge($eventCategory, $eventId, $delegateType, $delegateId)
     {
@@ -193,7 +203,7 @@ class DelegateController extends Controller
                         'finalHeight' => $finalHeight,
                     ];
                 }
-                $pdf = Pdf::loadView('admin.event.detail.delegates.delegate_badge', $finalDelegate, [
+                $pdf = Pdf::loadView('admin.events.delegates.delegate_badge', $finalDelegate, [
                     'margin_top' => 0,
                     'margin_right' => 0,
                     'margin_bottom' => 0,
@@ -211,10 +221,5 @@ class DelegateController extends Controller
         } else {
             abort(404, 'The URL is incorrect');
         }
-    }
-
-    public function checkPhpInfo()
-    {
-        phpinfo();
     }
 }

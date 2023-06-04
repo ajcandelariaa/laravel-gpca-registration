@@ -21,8 +21,6 @@
     {{-- LIVEWIRE --}}
     @livewireStyles()
 
-    {{-- intlTelInput --}}
-    @include('helpers.intlTelInput')
     <style>
         select:required:invalid {
             color: #afafaf;
@@ -121,17 +119,11 @@
         <p>Copyright © 2023 GPCA Registration</p>
     </footer>
 
-    {{-- <script>
-        window.onbeforeunload = function(e) {
-            return "Are you sure?";
-        }
-    </script> --}}
-
     <script src="{{ asset('js/allswal.js') }}"></script>
 
     <div>
-        @include('livewire.loading.registration_loading_screen')
-        @include('livewire.loading.registration_loading_screen2')
+        @include('helpers.registration_loading_screen')
+        @include('helpers.registration_loading_screen2')
     </div>
 
     @livewireScripts()

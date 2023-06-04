@@ -16,6 +16,29 @@
             </tr>
         </thead>
         <tbody>
+            @if ($event->eb_full_member_rate != null || $event->std_full_member_rate != null)
+                <tr>
+                    <td class="text-black">
+                        <div class="bg-white py-4 font-bold ml-1">
+                            Full Member
+                        </div>
+                    </td>
+                    @if ($finalEbEndDate != null)
+                        <td class="text-black">
+                            <div class="bg-white py-4">
+                                $ {{ number_format($event->eb_full_member_rate, 2, '.', ',') }}
+                                {{ $event->event_vat == 0 ? '' : '+ ' . $event->event_vat . '%' }}
+                            </div>
+                        </td>
+                    @endif
+                    <td class="text-black">
+                        <div class="bg-white py-4 mr-1">
+                            $ {{ number_format($event->std_full_member_rate, 2, '.', ',') }}
+                            {{ $event->event_vat == 0 ? '' : '+ ' . $event->event_vat . '%' }}
+                        </div>
+                    </td>
+                </tr>
+            @endif
             <tr>
                 <td class="text-black">
                     <div class="bg-white py-4 font-bold ml-1">
@@ -68,17 +91,18 @@
                     <h1 class="text-2xl text-registrationPrimaryColor font-bold text-center">DELEGATE FEE INCLUDES:</h1>
                     <div class="bg-white mx-1 mt-5 px-14 py-5">
                         <ul class="list-disc">
-                                @foreach ($delegateFees as $delegateFee)
-                                    <li class="text-registrationPrimaryColor"><span
-                                            class="text-black">{{ $delegateFee->description }}</span></li>
-                                @endforeach
+                            @foreach ($delegateFees as $delegateFee)
+                                <li class="text-registrationPrimaryColor"><span
+                                        class="text-black">{{ $delegateFee->description }}</span></li>
+                            @endforeach
                         </ul>
                     </div>
                 </div>
             </div>
         @endif
 
-        <div class="col-span-2 {{ $delegateFees->isNotEmpty() ? 'lg:col-span-1' : 'lg:col-span-2' }} lg:col-span-1 flex flex-col gap-5">
+        <div
+            class="col-span-2 {{ $delegateFees->isNotEmpty() ? 'lg:col-span-1' : 'lg:col-span-2' }} lg:col-span-1 flex flex-col gap-5">
             <div class="bg-gray-200 py-4 px-2">
                 <h1 class="text-2xl text-registrationPrimaryColor font-bold text-center">DO YOU WISH TO BECOME A MEMBER?
                 </h1>
@@ -92,6 +116,11 @@
                 <h1 class="text-2xl text-registrationPrimaryColor font-bold text-center">DELEGATE PASS TYPE</h1>
                 <div class="bg-white mx-1 mt-5 p-5">
                     <div class="flex flex-row justify-center items-center gap-5">
+                        @if ($event->eb_full_member_rate != null || $event->std_full_member_rate != null)
+                            <button wire:click.prevent="fullMemberClicked"
+                                class="{{ $delegatePassType == 'fullMember' ? 'bg-registrationPrimaryColor text-white' : 'hover:bg-registrationPrimaryColor hover:text-white border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor' }} w-48 py-2 rounded-md">Full
+                                Member</button>
+                        @endif
                         <button wire:click.prevent="memberClicked"
                             class="{{ $delegatePassType == 'member' ? 'bg-registrationPrimaryColor text-white' : 'hover:bg-registrationPrimaryColor hover:text-white border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor' }} w-48 py-2 rounded-md">Member</button>
                         <button wire:click.prevent="nonMemberClicked"
@@ -110,18 +139,47 @@
                                 Company name <span class="text-red-500">*</span>
                             </div>
                             <div>
-                                @if ($delegatePassType == 'member')
-                                    <select wire:model="companyName"
-                                        class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                                        <option value=""></option>
-                                        @foreach ($members as $member)
-                                            <option value="{{ $member->name }}">
-                                                {{ $member->name }}</option>
-                                        @endforeach
-                                    </select>
+                                @if ($event->eb_full_member_rate != null || $event->std_full_member_rate != null)
+                                    @if ($delegatePassType == 'fullMember')
+                                        <select wire:model="companyName"
+                                            class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                                            <option value=""></option>
+                                            @foreach ($members as $member)
+                                                @if ($member->type == 'full')
+                                                    <option value="{{ $member->name }}">
+                                                        {{ $member->name }}</option>
+                                                @endif
+                                            @endforeach
+                                        </select>
+                                    @elseif($delegatePassType == 'member')
+                                        <select wire:model="companyName"
+                                            class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                                            <option value=""></option>
+                                            @foreach ($members as $member)
+                                                @if ($member->type == 'associate')
+                                                    <option value="{{ $member->name }}">
+                                                        {{ $member->name }}</option>
+                                                @endif
+                                            @endforeach
+                                        </select>
+                                    @else
+                                        <input placeholder="Company Name" type="text" wire:model="companyName"
+                                            class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                                    @endif
                                 @else
-                                    <input placeholder="Company Name" type="text" wire:model="companyName"
-                                        class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                                    @if ($delegatePassType == 'member')
+                                        <select wire:model="companyName"
+                                            class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                                            <option value=""></option>
+                                            @foreach ($members as $member)
+                                                <option value="{{ $member->name }}">
+                                                    {{ $member->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    @else
+                                        <input placeholder="Company Name" type="text" wire:model="companyName"
+                                            class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                                    @endif
                                 @endif
 
                                 @error('companyName')

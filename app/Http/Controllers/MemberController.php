@@ -10,7 +10,7 @@ class MemberController extends Controller
     // RENDER VIEWS
     public function manageMemberView()
     {
-        return view('admin.member.members', [
+        return view('admin.members.members', [
             'pageTitle' => "Manage Member",
         ]);
     }

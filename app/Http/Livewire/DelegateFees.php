@@ -27,7 +27,7 @@ class DelegateFees extends Component
     public function render()
     {
         $this->delegateFees = EventDelegateFees::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->get();
-        return view('livewire.delegate_fees.delegate-fees');
+        return view('livewire.admin.events.delegate-fees.delegate-fees');
     }
 
     public function addDelegateFee()

@@ -19,15 +19,9 @@ use NumberFormatter;
 
 class RegistrantDetails extends Component
 {
-    public $countries;
-    public $companySectors;
-    public $salutations;
+    public $countries, $companySectors, $salutations, $registrationTypes;
 
-    public $registrationTypes;
-
-    public $eventCategory, $eventId, $registrantId, $finalData, $members;
-
-    public $eventBanner;
+    public $eventCategory, $eventId, $eventYear, $registrantId, $finalData, $members, $eventBanner;
 
     // DELEGATE PASS TYPE
     public $rateType, $finalUnitPrice;
@@ -36,13 +30,24 @@ class RegistrantDetails extends Component
     public $delegatePassType, $rateTypeString, $companyName, $companySector, $companyAddress, $companyCountry, $companyCity, $companyLandlineNumber, $assistantEmailAddress, $companyMobileNumber;
 
     // DELEGATE DETAILS
-    public $delegateId, $salutation, $firstName, $middleName, $lastName, $emailAddress, $mobileNumber, $nationality, $jobTitle, $badgeType, $promoCode, $promoCodeDiscount, $promoCodeSuccess, $promoCodeFail, $type;
+    public $mainDelegateId, $delegateId, $salutation, $firstName, $middleName, $lastName, $emailAddress, $mobileNumber, $nationality, $jobTitle, $badgeType, $promoCode, $promoCodeDiscount, $promoCodeSuccess, $promoCodeFail, $type, $delegateIndex, $delegateInnerIndex;
+
+    public $transactionRemarks;
+    public $delegateCancellationStep = 1, $replaceDelegate;
+    public $delegateRefund;
+
+    public $replaceDelegateIndex, $replaceDelegateInnerIndex, $replaceSalutation, $replaceFirstName, $replaceMiddleName, $replaceLastName, $replaceEmailAddress, $replaceMobileNumber, $replaceNationality, $replaceJobTitle, $replaceBadgeType, $replacePromoCode, $replacePromoCodeDiscount, $replacePromoCodeSuccess, $replacePromoCodeFail, $replaceEmailAlreadyUsedError;
+
+    public $mapPaymentMethod;
 
     // MODALS
     public $showDelegateModal = false;
     public $showCompanyModal = false;
+    public $showTransactionRemarksModal = false;
+    public $showDelegateCancellationModal = false;
+    public $showMarkAsPaidModal = false;
 
-    protected $listeners = ['paymentReminderConfirmed' => 'sendEmailReminder'];
+    protected $listeners = ['paymentReminderConfirmed' => 'sendEmailReminder', 'cancelRefundDelegateConfirmed' => 'cancelOrRefundDelegate', 'cancelReplaceDelegateConfirmed' => 'addReplaceDelegate', 'markAsPaidConfirmed' => 'markAsPaid'];
 
     public function mount($eventCategory, $eventId, $registrantId, $finalData)
     {
@@ -52,6 +57,7 @@ class RegistrantDetails extends Component
         $this->eventBanner = Events::where('id', $eventId)->where('category', $eventCategory)->value('banner');
         $this->registrationTypes = EventRegistrationTypes::where('event_id', $eventId)->where('event_category', $eventCategory)->where('active', true)->get();
 
+        $this->eventYear = Events::where('id', $eventId)->where('category', $eventCategory)->value('year');
         $this->eventCategory = $eventCategory;
         $this->eventId = $eventId;
         $this->registrantId = $registrantId;
@@ -60,20 +66,38 @@ class RegistrantDetails extends Component
 
     public function render()
     {
-        return view('livewire.registrants.registrant-details');
+        return view('livewire.admin.events.transactions.registrant-details');
     }
 
-    public function updateMainDelegate()
+    public function updateDelegate()
     {
-        $this->validate([
-            'firstName' => 'required',
-            'lastName' => 'required',
-            'emailAddress' => 'required',
-            'mobileNumber' => 'required',
-            'nationality' => 'required',
-            'jobTitle' => 'required',
-            'badgeType' => 'required',
-        ]);
+        $this->validate(
+            [
+                'firstName' => 'required',
+                'lastName' => 'required',
+                'emailAddress' => 'required|email',
+                'nationality' => 'required',
+                'mobileNumber' => 'required',
+                'jobTitle' => 'required',
+                'badgeType' => 'required',
+            ],
+            [
+                'firstName.required' => "First name is required",
+                'lastName.required' => "Last name is required",
+                'emailAddress.required' => "Email address is required",
+                'emailAddress.email' => "Email address must be a valid email",
+                'nationality.required' => "Nationality is required",
+                'mobileNumber.required' => "Mobile number is required",
+                'jobTitle.required' => "Job title is required",
+                'badgeType.required' => "Registration type is required",
+            ]
+        );
+
+        if ($this->promoCodeSuccess != null) {
+            PromoCodes::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->where('active', true)->where('promo_code', $this->promoCode)->where('badge_type', $this->badgeType)->increment('total_usage');
+        } else {
+            $this->promoCode = null;
+        }
 
         if ($this->type == "main") {
             MainDelegates::find($this->delegateId)->fill([
@@ -89,19 +113,6 @@ class RegistrantDetails extends Component
                 'pcode_used' => $this->promoCode,
                 'discount' => $this->promoCodeDiscount,
             ])->save();
-
-            $this->finalData['salutation'] = $this->salutation;
-            $this->finalData['first_name'] = $this->firstName;
-            $this->finalData['middle_name'] = $this->middleName;
-            $this->finalData['last_name'] = $this->lastName;
-            $this->finalData['name'] = $this->salutation . " " . $this->firstName . " " . $this->middleName . " " . $this->lastName;
-            $this->finalData['email_address'] = $this->emailAddress;
-            $this->finalData['mobile_number'] = $this->mobileNumber;
-            $this->finalData['nationality'] = $this->nationality;
-            $this->finalData['job_title'] = $this->jobTitle;
-            $this->finalData['badge_type'] = $this->badgeType;
-            $this->finalData['pcode_used'] = $this->promoCode;
-            $this->finalData['discount'] = $this->promoCodeDiscount;
         } else {
             AdditionalDelegates::find($this->delegateId)->fill([
                 'salutation' => $this->salutation,
@@ -116,52 +127,52 @@ class RegistrantDetails extends Component
                 'pcode_used' => $this->promoCode,
                 'discount' => $this->promoCodeDiscount,
             ])->save();
-
-            for ($i = 0; $i < count($this->finalData['subDelegates']); $i++) {
-                if ($this->finalData['subDelegates'][$i]['subDelegateId'] == $this->delegateId) {
-                    $this->finalData['subDelegates'][$i]['salutation'] = $this->salutation;
-                    $this->finalData['subDelegates'][$i]['first_name'] = $this->firstName;
-                    $this->finalData['subDelegates'][$i]['middle_name'] = $this->middleName;
-                    $this->finalData['subDelegates'][$i]['last_name'] = $this->lastName;
-                    $this->finalData['subDelegates'][$i]['name'] = $this->salutation . " " . $this->firstName . " " . $this->middleName . " " . $this->lastName;
-                    $this->finalData['subDelegates'][$i]['email_address'] = $this->emailAddress;
-                    $this->finalData['subDelegates'][$i]['mobile_number'] = $this->mobileNumber;
-                    $this->finalData['subDelegates'][$i]['nationality'] = $this->nationality;
-                    $this->finalData['subDelegates'][$i]['job_title'] = $this->jobTitle;
-                    $this->finalData['subDelegates'][$i]['badge_type'] = $this->badgeType;
-                    $this->finalData['subDelegates'][$i]['pcode_used'] = $this->promoCode;
-                    $this->finalData['subDelegates'][$i]['discount'] = $this->promoCodeDiscount;
-                }
-            }
         }
+
+        $this->finalData['allDelegates'][$this->delegateIndex][$this->delegateInnerIndex]['salutation'] = $this->salutation;
+        $this->finalData['allDelegates'][$this->delegateIndex][$this->delegateInnerIndex]['first_name'] = $this->firstName;
+        $this->finalData['allDelegates'][$this->delegateIndex][$this->delegateInnerIndex]['middle_name'] = $this->salutation;
+        $this->finalData['allDelegates'][$this->delegateIndex][$this->delegateInnerIndex]['last_name'] = $this->lastName;
+        $this->finalData['allDelegates'][$this->delegateIndex][$this->delegateInnerIndex]['name'] = $this->salutation . " " . $this->firstName . " " . $this->middleName . " " . $this->lastName;
+        $this->finalData['allDelegates'][$this->delegateIndex][$this->delegateInnerIndex]['email_address'] = $this->emailAddress;
+        $this->finalData['allDelegates'][$this->delegateIndex][$this->delegateInnerIndex]['mobile_number'] = $this->mobileNumber;
+        $this->finalData['allDelegates'][$this->delegateIndex][$this->delegateInnerIndex]['nationality'] = $this->nationality;
+        $this->finalData['allDelegates'][$this->delegateIndex][$this->delegateInnerIndex]['job_title'] = $this->jobTitle;
+        $this->finalData['allDelegates'][$this->delegateIndex][$this->delegateInnerIndex]['badge_type'] = $this->badgeType;
+        $this->finalData['allDelegates'][$this->delegateIndex][$this->delegateInnerIndex]['pcode_used'] = $this->promoCode;
+        $this->finalData['allDelegates'][$this->delegateIndex][$this->delegateInnerIndex]['discount'] = $this->promoCodeDiscount;
 
         $this->showDelegateModal = false;
         $this->resetEditModalFields();
     }
 
-    public function openEditMainDelegateModal()
+    public function openEditDelegateModal($index, $innerIndex)
     {
-        $this->delegateId = $this->finalData['mainDelegateId'];
-        $this->salutation = $this->finalData['salutation'];
-        $this->firstName = $this->finalData['first_name'];
-        $this->middleName = $this->finalData['middle_name'];
-        $this->lastName = $this->finalData['last_name'];
-        $this->emailAddress = $this->finalData['email_address'];
-        $this->mobileNumber = $this->finalData['mobile_number'];
-        $this->nationality = $this->finalData['nationality'];
-        $this->jobTitle = $this->finalData['job_title'];
-        $this->badgeType = $this->finalData['badge_type'];
-        $this->promoCode = $this->finalData['pcode_used'];
-        $this->promoCodeDiscount = $this->finalData['discount'];
-        $this->type = "main";
+        $this->delegateIndex = $index;
+        $this->delegateInnerIndex = $innerIndex;
+        $this->mainDelegateId = $this->finalData['allDelegates'][$index][$innerIndex]['mainDelegateId'];
+        $this->delegateId = $this->finalData['allDelegates'][$index][$innerIndex]['delegateId'];
+        $this->salutation = $this->finalData['allDelegates'][$index][$innerIndex]['salutation'];
+        $this->firstName = $this->finalData['allDelegates'][$index][$innerIndex]['first_name'];
+        $this->middleName = $this->finalData['allDelegates'][$index][$innerIndex]['middle_name'];
+        $this->lastName = $this->finalData['allDelegates'][$index][$innerIndex]['last_name'];
+        $this->emailAddress = $this->finalData['allDelegates'][$index][$innerIndex]['email_address'];
+        $this->mobileNumber = $this->finalData['allDelegates'][$index][$innerIndex]['mobile_number'];
+        $this->nationality = $this->finalData['allDelegates'][$index][$innerIndex]['nationality'];
+        $this->jobTitle = $this->finalData['allDelegates'][$index][$innerIndex]['job_title'];
+        $this->badgeType = $this->finalData['allDelegates'][$index][$innerIndex]['badge_type'];
+        $this->promoCode = $this->finalData['allDelegates'][$index][$innerIndex]['pcode_used'];
+        $this->promoCodeDiscount = $this->finalData['allDelegates'][$index][$innerIndex]['discount'];
+        $this->type = $this->finalData['allDelegates'][$index][$innerIndex]['delegateType'];
 
-        if ($this->finalData['pcode_used'] != null) {
-            $this->promoCodeSuccess = $this->finalData['discount'];
+        if ($this->promoCode != null) {
+            $this->promoCodeSuccess = $this->promoCodeDiscount;
         }
+
         $this->showDelegateModal = true;
     }
 
-    public function closeEditMainDelegateModal()
+    public function closeEditDelegateModal()
     {
         $this->showDelegateModal = false;
         $this->resetEditModalFields();
@@ -169,29 +180,29 @@ class RegistrantDetails extends Component
 
     public function applyPromoCode()
     {
-        if ($this->badgeType == null) {
-            $this->promoCodeFail = "Please choose your registration type first.";
+        $this->validate([
+            'badgeType' => 'required',
+            'promoCode' => 'required',
+        ], [
+            'badgeType.required' => 'Please choose your registration type first',
+            'promoCode.required' => 'Promo code is required',
+        ]);
+
+        $promoCode = PromoCodes::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->where('active', true)->where('promo_code', $this->promoCode)->where('badge_type', $this->badgeType)->first();
+        if ($promoCode == null) {
+            $this->promoCodeFail = "Invalid Code";
         } else {
-            if ($this->promoCode == null) {
-                $this->promoCodeFail = "Promo code is required.";
-            } else {
-                $promoCode = PromoCodes::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->where('active', true)->where('promo_code', $this->promoCode)->where('badge_type', $this->badgeType)->first();
-                if ($promoCode == null) {
-                    $this->promoCodeFail = "Invalid Code";
+            if ($promoCode->total_usage < $promoCode->number_of_codes) {
+                $validityDateTime = Carbon::parse($promoCode->validity);
+                if (Carbon::now()->lt($validityDateTime)) {
+                    $this->promoCodeFail = null;
+                    $this->promoCodeDiscount = $promoCode->discount;
+                    $this->promoCodeSuccess = "$promoCode->discount% discount";
                 } else {
-                    if ($promoCode->total_usage < $promoCode->number_of_codes) {
-                        $validityDateTime = Carbon::parse($promoCode->validity);
-                        if (Carbon::now()->lt($validityDateTime)) {
-                            $this->promoCodeFail = null;
-                            $this->promoCodeDiscount = $promoCode->discount;
-                            $this->promoCodeSuccess = "$promoCode->discount% discount";
-                        } else {
-                            $this->promoCodeFail = "Code is expired already";
-                        }
-                    } else {
-                        $this->promoCodeFail = "Code has reached its capacity";
-                    }
+                    $this->promoCodeFail = "Code is expired already";
                 }
+            } else {
+                $this->promoCodeFail = "Code has reached its capacity";
             }
         }
     }
@@ -206,6 +217,9 @@ class RegistrantDetails extends Component
 
     public function resetEditModalFields()
     {
+        $this->delegateIndex = null;
+        $this->delegateInnerIndex = null;
+        $this->mainDelegateId = null;
         $this->delegateId = null;
         $this->salutation = null;
         $this->firstName = null;
@@ -222,35 +236,6 @@ class RegistrantDetails extends Component
         $this->promoCodeFail = null;
         $this->type = null;
     }
-
-    public function openEditSubDelegateModal($delegateId)
-    {
-        foreach ($this->finalData['subDelegates'] as $subDelegate) {
-            if ($subDelegate['subDelegateId'] == $delegateId) {
-                $this->delegateId = $subDelegate['subDelegateId'];
-                $this->salutation = $subDelegate['salutation'];
-                $this->firstName = $subDelegate['first_name'];
-                $this->middleName = $subDelegate['middle_name'];
-                $this->lastName = $subDelegate['last_name'];
-                $this->emailAddress = $subDelegate['email_address'];
-                $this->mobileNumber = $subDelegate['mobile_number'];
-                $this->nationality = $subDelegate['nationality'];
-                $this->jobTitle = $subDelegate['job_title'];
-                $this->badgeType = $subDelegate['badge_type'];
-                $this->promoCode = $subDelegate['pcode_used'];
-                $this->promoCodeDiscount = $subDelegate['discount'];
-                $this->type = "sub";
-
-                if ($subDelegate['pcode_used'] != null) {
-                    $this->promoCodeSuccess = $subDelegate['discount'];
-                }
-                $this->showDelegateModal = true;
-                break;
-            }
-        }
-    }
-
-
 
 
 
@@ -279,7 +264,6 @@ class RegistrantDetails extends Component
                 $this->rateTypeString = "Early Bird Non-Member Rate";
             }
         }
-
 
         MainDelegates::find($this->finalData['mainDelegateId'])->fill([
             'pass_type' => $this->delegatePassType,
@@ -346,6 +330,31 @@ class RegistrantDetails extends Component
         $this->assistantEmailAddress = null;
     }
 
+    public function openMarkAsPaidModal()
+    {
+        $this->showMarkAsPaidModal = true;
+    }
+
+    public function closeMarkAsPaidModal()
+    {
+        $this->showMarkAsPaidModal = false;
+        $this->mapPaymentMethod = null;
+    }
+
+    public function markAsPaidConfirmation()
+    {
+        $this->validate([
+            'mapPaymentMethod' => 'required',
+        ], [
+            'mapPaymentMethod.required' => "Payment method is required",
+        ]);
+
+        $this->dispatchBrowserEvent('swal:mark-as-paid-confirmation', [
+            'type' => 'warning',
+            'message' => 'Are you sure you want to mark this as paid?',
+            'text' => "",
+        ]);
+    }
 
     public function markAsPaid()
     {
@@ -358,95 +367,66 @@ class RegistrantDetails extends Component
         MainDelegates::find($this->finalData['mainDelegateId'])->fill([
             'registration_status' => "confirmed",
             'payment_status' => $paymentStatus,
+            'mode_of_payment' => $this->mapPaymentMethod,
             'paid_date_time' => Carbon::now(),
         ])->save();
 
         $event = Events::where('id', $this->eventId)->where('category', $this->eventCategory)->first();
         $eventFormattedData = Carbon::parse($event->event_start_date)->format('d') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');
 
-        $transactionId = Transactions::where('delegate_id', $this->finalData['mainDelegateId'])->where('delegate_type', "main")->value('id');
-        $lastDigit = 1000 + intval($transactionId);
+        $allDelegatesArrayLength = count($this->finalData['allDelegates']);
+        foreach ($this->finalData['allDelegates'] as $index => $delegates) {
+            foreach ($delegates as $innerDelegate) {
+                if (end($delegates) == $innerDelegate) {
+                    $details1 = [
+                        'name' => $innerDelegate['name'],
+                        'eventLink' => $event->link,
+                        'eventName' => $event->name,
+                        'eventDates' => $eventFormattedData,
+                        'eventLocation' => $event->location,
+                        'eventCategory' => $event->category,
 
-        foreach (config('app.eventCategories') as $eventCategoryC => $code) {
-            if ($event->category == $eventCategoryC) {
-                $getEventcode = $code;
-            }
-        }
+                        'jobTitle' => $innerDelegate['job_title'],
+                        'companyName' => $this->finalData['company_name'],
+                        'amountPaid' => $this->finalData['invoiceData']['total_amount'],
+                        'transactionId' => $innerDelegate['transactionId'],
+                    ];
 
-        $tempTransactionId = "$event->year" . "$getEventcode" . "$lastDigit";
+                    $details2 = [
+                        'name' => $innerDelegate['name'],
+                        'eventLink' => $event->link,
+                        'eventName' => $event->name,
 
-        $details1 = [
-            'name' => $this->finalData['name'],
-            'eventLink' => $event->link,
-            'eventName' => $event->name,
-            'eventDates' => $eventFormattedData,
-            'eventLocation' => $event->location,
-            'eventCategory' => $event->category,
+                        'invoiceAmount' => $this->finalData['invoiceData']['total_amount'],
+                        'amountPaid' => $this->finalData['invoiceData']['total_amount'],
+                        'balance' => 0,
+                    ];
 
-            'jobTitle' => $this->finalData['job_title'],
-            'companyName' => $this->finalData['company_name'],
-            'amountPaid' => $this->finalData['invoiceData']['total_amount'],
-            'transactionId' => $tempTransactionId,
-        ];
+                    Mail::to($innerDelegate['email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaid($details1));
+                    Mail::to($innerDelegate['email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaymentConfirmation($details2));
 
-
-        $details2 = [
-            'name' => $this->finalData['name'],
-            'eventLink' => $event->link,
-            'eventName' => $event->name,
-
-            'invoiceAmount' => $this->finalData['invoiceData']['total_amount'],
-            'amountPaid' => $this->finalData['invoiceData']['total_amount'],
-            'balance' => 0,
-        ];
-
-        Mail::to($this->finalData['email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaid($details1));
-        Mail::to($this->finalData['email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaymentConfirmation($details2));
-
-        if ($this->finalData['assistant_email_address'] != null) {
-            Mail::to($this->finalData['assistant_email_address'])->queue(new RegistrationPaid($details1));
-            Mail::to($this->finalData['assistant_email_address'])->queue(new RegistrationPaymentConfirmation($details2));
-        }
-
-        if (count($this->finalData['subDelegates']) > 0) {
-            foreach ($this->finalData['subDelegates'] as $subDelegate) {
-
-                $transactionId = Transactions::where('delegate_id', $subDelegate['subDelegateId'])->where('delegate_type', "sub")->value('id');
-                $lastDigit = 1000 + intval($transactionId);
-                $tempTransactionId = "$event->year" . "$getEventcode" . "$lastDigit";
-
-                $details1 = [
-                    'name' => $subDelegate['name'],
-                    'eventLink' => $event->link,
-                    'eventName' => $event->name,
-                    'eventDates' => $eventFormattedData,
-                    'eventLocation' => $event->location,
-                    'eventCategory' => $event->category,
-
-                    'jobTitle' => $subDelegate['job_title'],
-                    'companyName' => $this->finalData['company_name'],
-                    'amountPaid' => $this->finalData['invoiceData']['total_amount'],
-                    'transactionId' => $tempTransactionId,
-                ];
-
-
-                $details2 = [
-                    'name' => $this->finalData['name'],
-                    'eventLink' => $event->link,
-                    'eventName' => $event->name,
-
-                    'invoiceAmount' => $this->finalData['invoiceData']['total_amount'],
-                    'amountPaid' => $this->finalData['invoiceData']['total_amount'],
-                    'balance' => 0,
-                ];
-                Mail::to($subDelegate['email_address'])->queue(new RegistrationPaid($details1));
-                Mail::to($subDelegate['email_address'])->queue(new RegistrationPaymentConfirmation($details2));
+                    if(($index - 1) == $allDelegatesArrayLength){
+                        if ($this->finalData['assistant_email_address'] != null) {
+                            Mail::to($this->finalData['assistant_email_address'])->queue(new RegistrationPaid($details1));
+                            Mail::to($this->finalData['assistant_email_address'])->queue(new RegistrationPaymentConfirmation($details2));
+                        }
+                    }
+                }
             }
         }
 
         $this->finalData['registration_status'] = "confirmed";
         $this->finalData['payment_status'] = $paymentStatus;
+        $this->finalData['mode_of_payment'] = $this->mapPaymentMethod;
         $this->finalData['paid_date_time'] = Carbon::parse(Carbon::now())->format('M j, Y g:i A');
+
+        $this->showMarkAsPaidModal = false;
+        $this->mapPaymentMethod = null;
+        $this->dispatchBrowserEvent('swal:mark-as-paid-success', [
+            'type' => 'success',
+            'message' => 'Marked paid successfully!',
+            'text' => "",
+        ]);
     }
 
 
@@ -462,13 +442,17 @@ class RegistrantDetails extends Component
         $event = Events::where('id', $this->eventId)->where('category', $this->eventCategory)->first();
 
         if ($this->finalData['rate_type'] == "Standard") {
-            if ($this->finalData['pass_type'] == "member") {
+            if ($this->finalData['pass_type'] == "fullMember") {
+                return $event->std_full_member_rate;
+            } else if ($this->finalData['pass_type'] == "member") {
                 return $event->std_member_rate;
             } else {
                 return $event->std_nmember_rate;
             }
         } else {
-            if ($this->finalData['pass_type'] == "member") {
+            if ($this->finalData['pass_type'] == "fullMember") {
+                return $event->eb_full_member_rate;
+            } else if ($this->finalData['pass_type'] == "member") {
                 return $event->eb_member_rate;
             } else {
                 return $event->eb_nmember_rate;
@@ -476,80 +460,124 @@ class RegistrantDetails extends Component
         }
     }
 
+
     public function getInvoice()
     {
         $event = Events::where('id', $this->eventId)->where('category', $this->eventCategory)->first();
         $invoiceDetails = array();
+        $countFinalQuantity = 0;
 
         $mainDelegate = MainDelegates::where('id', $this->finalData['mainDelegateId'])->where('event_id', $this->eventId)->first();
-        $mainDiscount = PromoCodes::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->where('promo_code', $mainDelegate->pcode_used)->where('badge_type', $mainDelegate->badge_type)->value('discount');
 
-        if ($mainDiscount == 100) {
-            $promoCodeMainDiscountString = "($mainDelegate->badge_type Complimentary)";
-        } else {
-            $promoCodeMainDiscountString = ($mainDelegate->pcode_used == null) ? '' : "(" . $mainDiscount . "% discount)";
+        $addMainDelegate = true;
+        if ($mainDelegate->delegate_cancelled) {
+            if ($mainDelegate->delegate_refunded || $mainDelegate->delegate_replaced) {
+                $addMainDelegate = false;
+            }
         }
 
-        array_push($invoiceDetails, [
-            'delegateDescription' => "Delegate Registration Fee - {$mainDelegate->rate_type_string} {$promoCodeMainDiscountString}",
-            'delegateNames' => [
-                $mainDelegate->salutation . " " . $mainDelegate->first_name . " " . $mainDelegate->middle_name . " " . $mainDelegate->last_name,
-            ],
-            'badgeType' => $mainDelegate->badge_type,
-            'quantity' => 1,
-            'totalDiscount' => $this->checkUnitPrice() * ($mainDiscount / 100),
-            'totalNetAmount' =>  $this->checkUnitPrice() - ($this->checkUnitPrice() * ($mainDiscount / 100)),
-            'promoCodeDiscount' => $mainDiscount,
-        ]);
+        if ($mainDelegate->delegate_replaced_by_id == null & (!$mainDelegate->delegate_refunded)) {
+            $countFinalQuantity++;
+        }
+
+        if ($addMainDelegate) {
+            $mainDiscount = PromoCodes::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->where('promo_code', $mainDelegate->pcode_used)->where('badge_type', $mainDelegate->badge_type)->value('discount');
+
+            if ($mainDiscount != null) {
+                if ($mainDiscount == 100) {
+                    $delegateDescription = "Delegate Registration Fee - Complimentary";
+                } else if ($mainDiscount > 0 && $mainDiscount < 100) {
+                    $delegateDescription = "Delegate Registration Fee - " . $mainDelegate->rate_type_string . " (" . $mainDiscount . "% discount)";
+                } else {
+                    $delegateDescription = "Delegate Registration Fee - {$mainDelegate->rate_type_string}";
+                }
+            } else {
+                $delegateDescription = "Delegate Registration Fee - {$mainDelegate->rate_type_string}";
+            }
+
+            array_push($invoiceDetails, [
+                'delegateDescription' => $delegateDescription,
+                'delegateNames' => [
+                    $mainDelegate->salutation . " " . $mainDelegate->first_name . " " . $mainDelegate->middle_name . " " . $mainDelegate->last_name,
+                ],
+                'badgeType' => $mainDelegate->badge_type,
+                'quantity' => 1,
+                'totalDiscount' => $this->checkUnitPrice() * ($mainDiscount / 100),
+                'totalNetAmount' =>  $this->checkUnitPrice() - ($this->checkUnitPrice() * ($mainDiscount / 100)),
+                'promoCodeDiscount' => $mainDiscount,
+            ]);
+        }
+
 
         $subDelegates = AdditionalDelegates::where('main_delegate_id', $this->finalData['mainDelegateId'])->get();
         if (!$subDelegates->isEmpty()) {
             foreach ($subDelegates as $subDelegate) {
-                $subDiscount = PromoCodes::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->where('promo_code', $subDelegate->pcode_used)->where('badge_type', $subDelegate->badge_type)->value('discount');
 
-                $checkIfExisting = false;
-                $existingIndex = 0;
+                if ($subDelegate->delegate_replaced_by_id == null & (!$subDelegate->delegate_refunded)) {
+                    $countFinalQuantity++;
+                }
 
-                for ($j = 0; $j < count($invoiceDetails); $j++) {
-                    if ($subDelegate->badge_type == $invoiceDetails[$j]['badgeType'] && $subDiscount == $invoiceDetails[$j]['promoCodeDiscount']) {
-                        $existingIndex = $j;
-                        $checkIfExisting = true;
-                        break;
+                $addSubDelegate = true;
+                if ($subDelegate->delegate_cancelled) {
+                    if ($subDelegate->delegate_refunded || $subDelegate->delegate_replaced) {
+                        $addSubDelegate = false;
                     }
                 }
 
-                if ($checkIfExisting) {
-                    array_push(
-                        $invoiceDetails[$existingIndex]['delegateNames'],
-                        $subDelegate->salutation . " " . $subDelegate->first_name . " " . $subDelegate->middle_name . " " . $subDelegate->last_name
-                    );
 
-                    $quantityTemp = $invoiceDetails[$existingIndex]['quantity'] + 1;
-                    $totalDiscountTemp = ($this->checkUnitPrice() * ($invoiceDetails[$existingIndex]['promoCodeDiscount'] / 100)) * $quantityTemp;
-                    $totalNetAmountTemp = ($this->checkUnitPrice() * $quantityTemp) - $totalDiscountTemp;
+                if ($addSubDelegate) {
+                    $subDiscount = PromoCodes::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->where('promo_code', $subDelegate->pcode_used)->where('badge_type', $subDelegate->badge_type)->value('discount');
 
-                    $invoiceDetails[$existingIndex]['quantity'] = $quantityTemp;
-                    $invoiceDetails[$existingIndex]['totalDiscount'] = $totalDiscountTemp;
-                    $invoiceDetails[$existingIndex]['totalNetAmount'] = $totalNetAmountTemp;
-                } else {
+                    $checkIfExisting = false;
+                    $existingIndex = 0;
 
-                    if ($subDiscount == 100) {
-                        $promoCodeSubDiscountString = "($subDelegate->badge_type Complimentary)";
-                    } else {
-                        $promoCodeSubDiscountString = ($subDelegate->pcode_used == null) ? '' : "(" . $subDiscount . "% discount)";
+                    for ($j = 0; $j < count($invoiceDetails); $j++) {
+                        if ($subDelegate->badge_type == $invoiceDetails[$j]['badgeType'] && $subDiscount == $invoiceDetails[$j]['promoCodeDiscount']) {
+                            $existingIndex = $j;
+                            $checkIfExisting = true;
+                            break;
+                        }
                     }
 
-                    array_push($invoiceDetails, [
-                        'delegateDescription' => "Delegate Registration Fee - {$mainDelegate->rate_type_string} {$promoCodeSubDiscountString}",
-                        'delegateNames' => [
-                            $subDelegate->salutation . " " . $subDelegate->first_name . " " . $subDelegate->middle_name . " " . $subDelegate->last_name,
-                        ],
-                        'badgeType' => $subDelegate->badge_type,
-                        'quantity' => 1,
-                        'totalDiscount' => $this->checkUnitPrice() * ($subDiscount / 100),
-                        'totalNetAmount' =>  $this->checkUnitPrice() - ($this->checkUnitPrice() * ($subDiscount / 100)),
-                        'promoCodeDiscount' => $subDiscount,
-                    ]);
+                    if ($checkIfExisting) {
+                        array_push(
+                            $invoiceDetails[$existingIndex]['delegateNames'],
+                            $subDelegate->salutation . " " . $subDelegate->first_name . " " . $subDelegate->middle_name . " " . $subDelegate->last_name
+                        );
+
+                        $quantityTemp = $invoiceDetails[$existingIndex]['quantity'] + 1;
+                        $totalDiscountTemp = ($this->checkUnitPrice() * ($invoiceDetails[$existingIndex]['promoCodeDiscount'] / 100)) * $quantityTemp;
+                        $totalNetAmountTemp = ($this->checkUnitPrice() * $quantityTemp) - $totalDiscountTemp;
+
+                        $invoiceDetails[$existingIndex]['quantity'] = $quantityTemp;
+                        $invoiceDetails[$existingIndex]['totalDiscount'] = $totalDiscountTemp;
+                        $invoiceDetails[$existingIndex]['totalNetAmount'] = $totalNetAmountTemp;
+                    } else {
+
+                        if ($subDiscount != null) {
+                            if ($subDiscount == 100) {
+                                $subDelegateDescription = "Delegate Registration Fee - Complimentary";
+                            } else if ($subDiscount > 0 && $subDiscount < 100) {
+                                $subDelegateDescription = "Delegate Registration Fee - " . $mainDelegate->rate_type_string . " (" . $subDiscount . "% discount)";
+                            } else {
+                                $subDelegateDescription = "Delegate Registration Fee - {$mainDelegate->rate_type_string}";
+                            }
+                        } else {
+                            $subDelegateDescription = "Delegate Registration Fee - {$mainDelegate->rate_type_string}";
+                        }
+
+                        array_push($invoiceDetails, [
+                            'delegateDescription' => $subDelegateDescription,
+                            'delegateNames' => [
+                                $subDelegate->salutation . " " . $subDelegate->first_name . " " . $subDelegate->middle_name . " " . $subDelegate->last_name,
+                            ],
+                            'badgeType' => $subDelegate->badge_type,
+                            'quantity' => 1,
+                            'totalDiscount' => $this->checkUnitPrice() * ($subDiscount / 100),
+                            'totalNetAmount' =>  $this->checkUnitPrice() - ($this->checkUnitPrice() * ($subDiscount / 100)),
+                            'promoCodeDiscount' => $subDiscount,
+                        ]);
+                    }
                 }
             }
         }
@@ -564,21 +592,13 @@ class RegistrantDetails extends Component
         $totalVat = $net_amount * ($event->event_vat / 100);
         $totalAmount = $net_amount + $totalVat;
 
-        $invoiceData = [
-            "finalEventStartDate" => Carbon::parse($event->event_start_date)->format('d M Y'),
-            "finalEventEndDate" => Carbon::parse($event->event_end_date)->format('d M Y'),
-            "eventName" => $event->name,
-            "eventLocation" => $event->location,
-            "eventVat" => $event->event_vat,
-            'vat_price' => $totalVat,
-            'net_amount' => $net_amount,
-            'total_amount' => $totalAmount,
-            'unit_price' => $this->checkUnitPrice(),
-            'invoiceDetails' => $invoiceDetails,
-            'total_amount_string' => ucwords($this->numberToWords($totalAmount)),
-        ];
-
-        $this->finalData['invoiceData'] = $invoiceData;
+        $this->finalData['invoiceData']['vat_price'] = $totalVat;
+        $this->finalData['invoiceData']['net_amount'] = $net_amount;
+        $this->finalData['invoiceData']['total_amount'] = $totalAmount;
+        $this->finalData['invoiceData']['unit_price'] = $this->checkUnitPrice();
+        $this->finalData['invoiceData']['invoiceDetails'] = $invoiceDetails;
+        $this->finalData['invoiceData']['finalQuantity'] = $countFinalQuantity;
+        $this->finalData['invoiceData']['total_amount_string'] = ucwords($this->numberToWords($totalAmount));
 
         if ($this->finalData['registration_status'] == "confirmed") {
             if ($this->finalData['invoiceData']['total_amount'] == 0) {
@@ -586,20 +606,22 @@ class RegistrantDetails extends Component
             } else {
                 $this->finalData['payment_status'] = "paid";
             }
-        } else {
+        } else if ($this->finalData['registration_status'] == "pending" || $this->finalData['registration_status'] == "droppedOut") {
             if ($this->finalData['invoiceData']['total_amount'] == 0) {
                 $this->finalData['payment_status'] = "free";
             } else {
                 $this->finalData['payment_status'] = "unpaid";
             }
+        } else {
+            //do nothing
         }
 
         MainDelegates::find($this->finalData['mainDelegateId'])->fill([
-            'unit_price' => $this->checkUnitPrice(),
-            'net_amount' => $net_amount,
             'vat_price' => $totalVat,
-            'discount_price' => $discount_price,
+            'net_amount' => $net_amount,
             'total_amount' => $totalAmount,
+            'unit_price' => $this->checkUnitPrice(),
+            'discount_price' => $discount_price,
             'payment_status' => $this->finalData['payment_status'],
         ])->save();
     }
@@ -623,8 +645,8 @@ class RegistrantDetails extends Component
     public function sendEmailReminder()
     {
         $event = Events::where('id', $this->eventId)->where('category', $this->eventCategory)->first();
-        
-        $invoiceLink = env('APP_URL').'/'.$this->eventCategory.'/'.$this->eventId.'/view-invoice/'.$this->registrantId;
+
+        $invoiceLink = env('APP_URL') . '/' . $this->eventCategory . '/' . $this->eventId . '/view-invoice/' . $this->registrantId;
 
         $details = [
             'name' => $this->finalData['name'],
@@ -652,11 +674,404 @@ class RegistrantDetails extends Component
             }
         }
 
-        
+
         $this->dispatchBrowserEvent('swal:payment-reminder-success', [
             'type' => 'success',
             'message' => 'Payment Reminder Sent!',
             'text' => "",
         ]);
+    }
+
+    public function checkEmailIfExistsInDatabase($emailAddress)
+    {
+        $allDelegates = Transactions::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->get();
+
+        $countMainDelegate = 0;
+        $countSubDelegate = 0;
+
+        if (!$allDelegates->isEmpty()) {
+            foreach ($allDelegates as $delegate) {
+                if ($delegate->delegate_type == "main") {
+                    $mainDelegate = MainDelegates::where('id', $delegate->delegate_id)->where('email_address', $emailAddress)->where('registration_status', '!=', 'droppedOut')->where('delegate_cancelled', '!=', true)->first();
+                    if ($mainDelegate != null) {
+                        $countMainDelegate++;
+                    }
+                } else {
+                    $subDelegate = AdditionalDelegates::where('id', $delegate->delegate_id)->where('email_address', $emailAddress)->where('delegate_cancelled', '!=', true)->first();
+                    if ($subDelegate != null) {
+                        $registrationStatsMain = MainDelegates::where('id', $subDelegate->main_delegate_id)->value('registration_status');
+                        if ($registrationStatsMain != "droppedOut") {
+                            $countSubDelegate++;
+                        }
+                    }
+                }
+            }
+        }
+
+        if ($countMainDelegate == 0 && $countSubDelegate == 0) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public function openEditTransactionRemarksModal()
+    {
+        $this->transactionRemarks = $this->finalData['transaction_remarks'];
+        $this->showTransactionRemarksModal = true;
+    }
+
+    public function closeEditTransactionRemarksModal()
+    {
+        $this->transactionRemarks = null;
+        $this->showTransactionRemarksModal = false;
+    }
+
+    public function updateTransactionRemarks()
+    {
+        MainDelegates::find($this->finalData['mainDelegateId'])->fill([
+            'transaction_remarks' => $this->transactionRemarks,
+        ])->save();
+
+        $this->finalData['transaction_remarks'] = $this->transactionRemarks;
+        $this->transactionRemarks = null;
+        $this->showTransactionRemarksModal = false;
+    }
+
+    public function openDelegateCancellationModal($index, $innerIndex)
+    {
+        $this->replaceDelegateIndex = $index;
+        $this->replaceDelegateInnerIndex = $innerIndex;
+        $this->showDelegateCancellationModal = true;
+    }
+
+    public function closeDelegateCancellationModal()
+    {
+        $this->removeReplaceData();
+        $this->showDelegateCancellationModal = false;
+    }
+
+    public function nextDelegateCancellation()
+    {
+        $this->delegateCancellationStep++;
+    }
+
+    public function prevDelegateCancellation()
+    {
+        $this->delegateCancellationStep--;
+    }
+
+    public function submitDelegateCancellation()
+    {
+        if ($this->delegateCancellationStep == 2) {
+            if ($this->replaceDelegate == "No") {
+                $this->validate(
+                    [
+                        'delegateRefund' => 'required',
+                    ],
+                    [
+                        'delegateRefund.required' => "This needs to be fill up.",
+                    ],
+                );
+
+                if ($this->delegateRefund == "Yes") {
+                    $message = "Are you sure want to cancel and refund this delegate?";
+                } else {
+                    $message = "Are you sure want to cancel and not refund this delegate?";
+                }
+
+                $this->dispatchBrowserEvent('swal:delegate-cancel-refund-confirmation', [
+                    'type' => 'warning',
+                    'message' => $message,
+                    'text' => "",
+                ]);
+            } else {
+                $this->replaceEmailAlreadyUsedError = null;
+
+                $this->validate(
+                    [
+                        'replaceFirstName' => 'required',
+                        'replaceLastName' => 'required',
+                        'replaceEmailAddress' => 'required|email',
+                        'replaceNationality' => 'required',
+                        'replaceMobileNumber' => 'required',
+                        'replaceJobTitle' => 'required',
+                        'replaceBadgeType' => 'required',
+                    ],
+                    [
+                        'replaceFirstName.required' => "First name is required",
+                        'replaceLastName.required' => "Last name is required",
+                        'replaceEmailAddress.required' => "Email address is required",
+                        'replaceEmailAddress.email' => "Email address must be a valid email",
+                        'replaceNationality.required' => "Nationality is required",
+                        'replaceMobileNumber.required' => "Mobile number is required",
+                        'replaceJobTitle.required' => "Job title is required",
+                        'replaceBadgeType.required' => "Registration type is required",
+                    ]
+                );
+
+                if ($this->checkEmailIfExistsInDatabase($this->replaceEmailAddress)) {
+                    $this->replaceEmailAlreadyUsedError = "Email is already registered, please use another email!";
+                } else {
+                    $this->replaceEmailAlreadyUsedError = null;
+                    $this->dispatchBrowserEvent('swal:delegate-cancel-replace-confirmation', [
+                        'type' => 'warning',
+                        'message' => 'Are you sure you want to cancel and replace this delegate?',
+                        'text' => "",
+                    ]);
+                }
+            }
+        }
+    }
+
+    public function cancelOrRefundDelegate()
+    {
+        if ($this->delegateRefund == "Yes") {
+            // refunded
+            if ($this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['delegateType'] == "main") {
+                MainDelegates::find($this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['mainDelegateId'])->fill([
+                    'delegate_cancelled' => true,
+                    'delegate_refunded' => true,
+                    'delegate_cancelled_datetime' => Carbon::now(),
+                    'delegate_refunded_datetime' => Carbon::now(),
+                ])->save();
+            } else {
+                AdditionalDelegates::find($this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['delegateId'])->fill([
+                    'delegate_cancelled' => true,
+                    'delegate_refunded' => true,
+                    'delegate_cancelled_datetime' => Carbon::now(),
+                    'delegate_refunded_datetime' => Carbon::now(),
+                ])->save();
+            }
+
+            $this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['delegate_cancelled'] = true;
+            $this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['delegate_refunded'] = true;
+            $this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['delegate_cancelled_datetime'] = Carbon::now();
+            $this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['delegate_refunded_datetime'] = Carbon::now();
+
+            if ($this->finalData['finalQuantity'] == 1) {
+                MainDelegates::find($this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['mainDelegateId'])->fill([
+                    'registration_status' => "cancelled",
+                    'payment_status' => "refunded",
+                ])->save();
+
+                $this->finalData['registration_status'] = 'cancelled';
+                $this->finalData['payment_status'] = 'refunded';
+            }
+
+            $this->dispatchBrowserEvent('swal:delegate-cancel-refund-success', [
+                'type' => 'success',
+                'message' => 'Delegate cancelled and refunded succesfully!',
+                'text' => "",
+            ]);
+        } else {
+            // not refunded
+            if ($this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['delegateType'] == "main") {
+                MainDelegates::find($this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['mainDelegateId'])->fill([
+                    'delegate_cancelled' => true,
+                    'delegate_cancelled_datetime' => Carbon::now(),
+                ])->save();
+            } else {
+                AdditionalDelegates::find($this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['delegateId'])->fill([
+                    'delegate_cancelled' => true,
+                    'delegate_cancelled_datetime' => Carbon::now(),
+                ])->save();
+            }
+
+            $this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['delegate_cancelled'] = true;
+            $this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['delegate_cancelled_datetime'] = Carbon::now();
+
+            if ($this->finalData['finalQuantity'] == 1) {
+                MainDelegates::find($this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['mainDelegateId'])->fill([
+                    'registration_status' => "cancelled",
+                ])->save();
+
+                $this->finalData['registration_status'] = 'cancelled';
+            }
+
+            $this->dispatchBrowserEvent('swal:delegate-cancel-refund-success', [
+                'type' => 'success',
+                'message' => 'Delegate cancelled but not refunded succesfully!',
+                'text' => "",
+            ]);
+        }
+        $this->showDelegateCancellationModal = false;
+    }
+
+    public function addReplaceDelegate()
+    {
+        if ($this->replacePromoCodeSuccess != null) {
+            PromoCodes::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->where('active', true)->where('promo_code', $this->replacePromoCode)->where('badge_type', $this->replaceBadgeType)->increment('total_usage');
+
+            $subDiscount = PromoCodes::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->where('promo_code', $this->replacePromoCode)->where('badge_type', $this->replaceBadgeType)->value('discount');
+        } else {
+            $this->replacePromoCode = null;
+            $subDiscount = null;
+        }
+
+        $replacedDelegate = AdditionalDelegates::create([
+            'main_delegate_id' => $this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['mainDelegateId'],
+            'salutation' => $this->replaceSalutation,
+            'first_name' => $this->replaceFirstName,
+            'middle_name' => $this->replaceMiddleName,
+            'last_name' => $this->replaceLastName,
+            'job_title' => $this->replaceJobTitle,
+            'email_address' => $this->replaceEmailAddress,
+            'nationality' => $this->replaceNationality,
+            'mobile_number' => $this->replaceMobileNumber,
+            'badge_type' => $this->replaceBadgeType,
+            'pcode_used' => $this->replacePromoCode,
+
+            'delegate_replaced_type' => $this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['delegate_replaced_type'],
+            'delegate_replaced_from_id' => $this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['delegateId'],
+            'delegate_original_from_id' => $this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['delegate_original_from_id'],
+        ]);
+
+
+        $transaction = Transactions::create([
+            'event_id' => $this->eventId,
+            'event_category' => $this->eventCategory,
+            'delegate_id' => $replacedDelegate->id,
+            'delegate_type' => "sub",
+        ]);
+
+        $eventYear = Events::where('id', $this->eventId)->value('year');
+        foreach (config('app.eventCategories') as $eventCategoryC => $code) {
+            if ($this->eventCategory == $eventCategoryC) {
+                $eventCode = $code;
+            }
+        }
+        $lastDigit = 1000 + intval($transaction->id);
+        $finalTransactionId = $eventYear . $eventCode . $lastDigit;
+
+        array_push($this->finalData['allDelegates'][$this->replaceDelegateIndex], [
+            'transactionId' => $finalTransactionId,
+            'main_delegate_id' => $this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['mainDelegateId'],
+            'delegateId' => $replacedDelegate->id,
+            'delegateType' => "sub",
+
+            'name' => $this->replaceSalutation . " " . $this->replaceFirstName . " " . $this->replaceMiddleName . " " . $this->replaceLastName,
+            'salutation' => $this->replaceSalutation,
+            'first_name' => $this->replaceFirstName,
+            'middle_name' => $this->replaceMiddleName,
+            'last_name' => $this->replaceLastName,
+            'job_title' => $this->replaceJobTitle,
+            'email_address' => $this->replaceEmailAddress,
+            'nationality' => $this->replaceNationality,
+            'mobile_number' => $this->replaceMobileNumber,
+            'badge_type' => $this->replaceBadgeType,
+            'pcode_used' => $this->replacePromoCode,
+            'discount' => $subDiscount,
+
+            'is_replacement' => true,
+            'delegate_cancelled' => false,
+            'delegate_replaced' => false,
+            'delegate_refunded' => false,
+
+            'delegate_replaced_type' => "sub",
+            'delegate_original_from_id' => $this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['delegate_original_from_id'],
+            'delegate_replaced_from_id' => $this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['delegateId'],
+            'delegate_replaced_by_id' => null,
+
+            'delegate_cancelled_datetime' => null,
+            'delegate_refunded_datetime' => null,
+            'delegate_replaced_datetime' => null,
+        ]);
+
+        if ($this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['delegateType'] == "main") {
+            MainDelegates::find($this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['mainDelegateId'])->fill([
+                'delegate_cancelled' => true,
+                'delegate_cancelled_datetime' => Carbon::now(),
+                'delegate_replaced' => true,
+                'delegate_replaced_by_id' => $replacedDelegate->id,
+                'delegate_replaced_datetime' => Carbon::now(),
+            ])->save();
+        } else {
+            AdditionalDelegates::find($this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['delegateId'])->fill([
+                'delegate_cancelled' => true,
+                'delegate_cancelled_datetime' => Carbon::now(),
+                'delegate_replaced' => true,
+                'delegate_replaced_by_id' => $replacedDelegate->id,
+                'delegate_replaced_datetime' => Carbon::now(),
+            ])->save();
+        }
+
+
+        MainDelegates::where('id', $this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['mainDelegateId'])->increment('quantity');
+
+        $this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['delegate_cancelled'] = true;
+        $this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['delegate_replaced'] = true;
+        $this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['delegate_cancelled_datetime'] = Carbon::now();
+        $this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['delegate_replaced_datetime'] = Carbon::now();
+
+        $this->dispatchBrowserEvent('swal:delegate-cancel-replace-success', [
+            'type' => 'success',
+            'message' => 'Delegate replaced succesfully!',
+            'text' => "",
+        ]);
+
+        $this->removeReplaceData();
+        $this->showDelegateCancellationModal = false;
+    }
+
+    public function replaceApplyPromoCode()
+    {
+        $this->validate([
+            'replaceBadgeType' => 'required',
+            'replacePromoCode' => 'required',
+        ], [
+            'replaceBadgeType.required' => 'Please choose your registration type first',
+            'replacePromoCode.required' => 'Promo code is required',
+        ]);
+
+        $promoCode = PromoCodes::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->where('active', true)->where('promo_code', $this->replacePromoCode)->where('badge_type', $this->replaceBadgeType)->first();
+        if ($promoCode == null) {
+            $this->replacePromoCodeFail = "Invalid Code";
+        } else {
+            if ($promoCode->total_usage < $promoCode->number_of_codes) {
+                $validityDateTime = Carbon::parse($promoCode->validity);
+                if (Carbon::now()->lt($validityDateTime)) {
+                    $this->replacePromoCodeFail = null;
+                    $this->replacePromoCodeDiscount = $promoCode->discount;
+                    $this->replacePromoCodeSuccess = "$promoCode->discount% discount";
+                } else {
+                    $this->replacePromoCodeFail = "Code is expired already";
+                }
+            } else {
+                $this->replacePromoCodeFail = "Code has reached its capacity";
+            }
+        }
+    }
+
+    public function replaceRemovePromoCode()
+    {
+        $this->replacePromoCode = null;
+        $this->replacePromoCodeDiscount = null;
+        $this->replacePromoCodeFail = null;
+        $this->replacePromoCodeSuccess = null;
+    }
+
+    public function removeReplaceData()
+    {
+        $this->delegateCancellationStep = 1;
+        $this->replaceDelegateIndex = null;
+        $this->replaceDelegateInnerIndex = null;
+
+        $this->replaceSalutation = null;
+        $this->replaceFirstName = null;
+        $this->replaceMiddleName = null;
+        $this->replaceLastName = null;
+        $this->replaceEmailAddress = null;
+        $this->replaceMobileNumber = null;
+        $this->replaceNationality = null;
+        $this->replaceJobTitle = null;
+        $this->replaceBadgeType = null;
+
+        $this->replacePromoCode = null;
+        $this->replacePromoCodeDiscount = null;
+        $this->replacePromoCodeFail = null;
+        $this->replacePromoCodeSuccess = null;
+
+        $this->replaceEmailAlreadyUsedError = null;
     }
 }

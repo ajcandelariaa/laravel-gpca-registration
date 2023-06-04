@@ -21,5 +21,18 @@ class AdditionalDelegate extends Model
         'job_title',
         'badge_type',
         'pcode_used',
+
+        'delegate_cancelled',
+        'delegate_replaced',
+        'delegate_refunded',
+
+        'delegate_replaced_type',
+        'delegate_original_from_id',
+        'delegate_replaced_from_id',
+        'delegate_replaced_by_id',
+
+        'delegate_cancelled_datetime',
+        'delegate_refunded_datetime',
+        'delegate_replaced_datetime',
     ];
 }

@@ -13,6 +13,7 @@ class Member extends Model
         'name',
         'logo',
         'sector',
+        'type',
         'active',
     ];
 }

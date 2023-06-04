@@ -39,7 +39,7 @@ class PromoCode extends Component
     public function render()
     {
         $this->promoCodes = PromoCodes::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->get();
-        return view('livewire.promo_codes.promo-code');
+        return view('livewire.admin.events.promo-codes.promo-code');
     }
 
     public function addPromoCodeConfirmation()

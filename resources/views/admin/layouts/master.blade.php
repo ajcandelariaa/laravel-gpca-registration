@@ -86,7 +86,7 @@
             request()->is('admin/event/*/*/promo-code*') ||
             request()->is('admin/event/*/*/registrant*') ||
             request()->is('admin/event/*/*/delegate*'))
-        @include('admin.event.detail.navigations')
+        @include('admin.layouts.event_navigations')
     @endif
 
     @yield('content')
@@ -96,7 +96,7 @@
     @if (request()->is('admin/event/add'))
         <script src="{{ asset('js/manageEvents/toggleEarlyBirdFieldsAdd.js') }}"></script>
         <script src="{{ asset('js/manageEvents/loadingButtonAdd.js') }}"></script>
-    @elseif(request()->is('admin/event/edit/*'))
+    @elseif(request()->is('admin/event/*/*/edit'))
         <script src="{{ asset('js/manageEvents/toggleEarlyBirdFieldsEdit.js') }}"></script>
         <script src="{{ asset('js/manageEvents/loadingButtonEdit.js') }}"></script>
     @else

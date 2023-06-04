@@ -76,8 +76,10 @@ class RegistrantsList extends Component
                 // get pass type
                 if ($mainDelegate->pass_type == 'member') {
                     $passType = "Member";
+                } else if ($mainDelegate->pass_type == 'nonMember') {
+                    $passType = "Non-Member"; 
                 } else {
-                    $passType = "Non-Member";
+                    $passType = "Full Member"; 
                 }
 
                 // get reg status
@@ -85,8 +87,10 @@ class RegistrantsList extends Component
                     $regStatus = "Confirmed";
                 } else if ($mainDelegate->registration_status == 'pending') {
                     $regStatus = "Pending";
-                } else {
+                } else if ($mainDelegate->registration_status == 'droppedOut') {
                     $regStatus = "Dropped out";
+                } else {
+                    $regStatus = "Cancelled";
                 }
 
                 // get payment status
@@ -94,8 +98,22 @@ class RegistrantsList extends Component
                     $payStatus = "Paid";
                 } else if ($mainDelegate->payment_status == 'free') {
                     $payStatus = "Free";
-                } else {
+                } else if ($mainDelegate->payment_status == 'unpaid') {
                     $payStatus = "Unpaid";
+                } else {
+                    $payStatus = "Refunded";
+                }
+
+                $totalDelegates = 0;
+                if ($mainDelegate->delegate_replaced_by_id == null && (!$mainDelegate->delegate_refunded)) {
+                    $totalDelegates++;
+                }
+
+                $additionalDelegates = AdditionalDelegates::where('main_delegate_id', $mainDelegate->id)->get();
+                foreach ($additionalDelegates as $additionalDelegate) {
+                    if ($additionalDelegate->delegate_replaced_by_id == null && (!$additionalDelegate->delegate_refunded)) {
+                        $totalDelegates++;
+                    }
                 }
 
                 array_push($this->finalListOfRegistrants, [
@@ -106,7 +124,7 @@ class RegistrantsList extends Component
                     'country' => $mainDelegate->company_country,
                     'city' => $mainDelegate->company_city,
                     'passType' => $passType,
-                    'quantity' => $mainDelegate->quantity,
+                    'quantity' => $totalDelegates,
                     'totalAmount' => $mainDelegate->total_amount,
                     'regDateTime' => Carbon::parse($mainDelegate->registered_date_time)->format('M j, Y g:iA'),
                     'regStatus' => $regStatus,
@@ -120,7 +138,7 @@ class RegistrantsList extends Component
 
     public function render()
     {
-        return view('livewire.registrants.registrants-list');
+        return view('livewire.admin.events.transactions.registrants-list');
     }
 
     public function filter()

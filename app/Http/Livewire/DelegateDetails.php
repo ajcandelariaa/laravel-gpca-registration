@@ -50,7 +50,7 @@ class DelegateDetails extends Component
 
     public function render()
     {
-        return view('livewire.delegates.delegate-details');
+        return view('livewire.admin.events.delegates.delegate-details');
     }
 
 

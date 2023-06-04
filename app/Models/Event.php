@@ -22,10 +22,12 @@ class Event extends Model
         'logo',
 
         'eb_end_date',
+        'eb_full_member_rate',
         'eb_member_rate',
         'eb_nmember_rate',
 
         'std_start_date',
+        'std_full_member_rate',
         'std_member_rate',
         'std_nmember_rate',
         

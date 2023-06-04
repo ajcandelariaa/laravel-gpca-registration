@@ -4,7 +4,6 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\DelegateController;
-use App\Http\Controllers\GatewayController;
 use App\Http\Controllers\RegistrationController;
 use Illuminate\Support\Facades\Route;
 
@@ -28,7 +27,13 @@ Route::prefix('admin')->group(function () {
 
         Route::prefix('event')->group(function () {
             Route::get('/', [EventController::class, 'manageEventView'])->name('admin.event.view');
+            Route::get('/add', [EventController::class, 'addEventView'])->name('admin.event.add.view');
+            Route::post('/add', [EventController::class, 'addEvent'])->name('admin.event.add.post');
+
             Route::prefix('{eventCategory}/{eventId}')->group(function (){
+                Route::get('/edit', [EventController::class, 'eventEditView'])->name('admin.event.edit.view');
+                Route::post('/edit', [EventController::class, 'updateEvent'])->name('admin.event.edit.post');
+
                 Route::get('/dashboard', [EventController::class, 'eventDashboardView'])->name('admin.event.dashboard.view');
                 Route::get('/detail', [EventController::class, 'eventDetailView'])->name('admin.event.detail.view');
                 Route::get('/registration-type', [EventController::class, 'eventRegistrationType'])->name('admin.event.registration-type.view');
@@ -38,7 +43,6 @@ Route::prefix('admin')->group(function () {
                     Route::get('/', [RegistrationController::class, 'eventRegistrantsView'])->name('admin.event.registrants.view');
                     Route::get('/export', [RegistrationController::class, 'eventRegistrantsExportData'])->name('admin.event.registrants.exportData');
                     Route::get('/{registrantId}', [RegistrationController::class, 'registrantDetailView'])->name('admin.event.registrants.detail.view');
-                    Route::get('/{registrantId}/download-invoice', [RegistrationController::class, 'registrantDownloadInvoice'])->name('admin.event.registrants.download.invoice');
                     Route::get('/{registrantId}/view-invoice', [RegistrationController::class, 'registrantViewInvoice'])->name('admin.event.registrants.view.invoice');
                 });
                 Route::prefix('delegate')->group(function () {
@@ -47,10 +51,6 @@ Route::prefix('admin')->group(function () {
                     Route::get('/{delegateType}/{delegateId}/print-badge', [DelegateController::class, 'delegateDetailPrintBadge'])->name('admin.event.delegates.detail.printBadge');
                 });
             });
-            Route::get('/edit/{eventCategory}/{eventId}', [EventController::class, 'eventEditView'])->name('admin.event.edit.view');
-            Route::get('/add', [EventController::class, 'addEventView'])->name('admin.event.add.view');
-            Route::post('/add', [EventController::class, 'addEvent'])->name('admin.event.add.post');
-            Route::post('/edit/{eventCategory}/{eventId}', [EventController::class, 'updateEvent'])->name('admin.event.edit.post');
         });
 
         Route::get('/member', [MemberController::class, 'manageMemberView'])->name('admin.member.view');
@@ -62,23 +62,15 @@ Route::prefix('admin')->group(function () {
     Route::post('/login', [AdminController::class, 'login'])->name('admin.login.post');
 });
 
+Route::prefix('register/{eventYear}/{eventCategory}/{eventId}')->group(function (){
+    Route::get('/', [RegistrationController::class, 'registrationView'])->name('register.view');
+    Route::get('/otp', [RegistrationController::class, 'registrationOTPView'])->name('register.otp.view');
+    Route::get('/{mainDelegateId}/{status}/loading', [RegistrationController::class, 'registrationLoadingView'])->name('register.loading.view');
+    Route::get('/{mainDelegateId}/success', [RegistrationController::class, 'registrationSuccessView'])->name('register.success.view');
+    Route::get('/{mainDelegateId}/failed', [RegistrationController::class, 'registrationFailedView'])->name('register.failed.view');
+});
+
+Route::post('capturePayment', [RegistrationController::class, 'capturePayment'])->name('register.capture.payment');
 
 Route::get('/{eventCategory}/{eventId}/view-invoice/{registrantId}', [RegistrationController::class, 'generatePublicInvoice'])->name('generate-public-invoice');
 Route::get('/{eventCategory}/{eventId}/view-badge/{delegateType}/{delegateId}', [DelegateController::class, 'delegateDetailPrintBadge'])->name('generate-public-badge');
-
-Route::get('/check', [DelegateController::class, 'checkPhpInfo']);
-
-Route::get('/register/{eventYear}/{eventCategory}/{eventId}', [RegistrationController::class, 'registrationView'])->name('register.view');
-Route::get('/register/{eventYear}/{eventCategory}/{eventId}/otp', [RegistrationController::class, 'registrationOTPView'])->name('register.otp.view');
-Route::post('capturePayment', [RegistrationController::class, 'capturePayment'])->name('register.capture.payment');
-Route::get('/register/{eventYear}/{eventCategory}/{eventId}/{mainDelegateId}/{status}/loading', [RegistrationController::class, 'registrationLoading'])->name('register.loading.view');
-Route::get('/register/{eventYear}/{eventCategory}/{eventId}/{mainDelegateId}/success', [RegistrationController::class, 'registrationSuccessView'])->name('register.success.view');
-Route::get('/register/{eventYear}/{eventCategory}/{eventId}/{mainDelegateId}/failed', [RegistrationController::class, 'registrationFailedView'])->name('register.failed.view');
-
-// Route::get('/getSessionId', [GatewayController::class, 'getSessionId']);
-// Route::get('/updateSession', [GatewayController::class, 'updateSession']);
-// Route::get('/cardDetails', [GatewayController::class, 'cardDetails']);
-// Route::get('/initiateAuthentication', [GatewayController::class, 'initiateAuthentication']);
-// Route::get('/initiateAuthenticationPayerRequest', [GatewayController::class, 'initiateAuthenticationPayerRequest']);
-// Route::get('/testViewOTP', [GatewayController::class, 'testViewOTP']);
-// Route::post('/payNow', [GatewayController::class, 'payNow']);

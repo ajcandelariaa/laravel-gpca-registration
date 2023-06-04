@@ -30,7 +30,7 @@ class EventRegistrationType extends Component
     public function render()
     {
         $this->registrationTypes = EventRegistrationTypes::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->get();
-        return view('livewire.registration_type.event-registration-type');
+        return view('livewire.admin.events.registration-type.event-registration-type');
     }
 
     public function addRegistrationTypeConfirmation()

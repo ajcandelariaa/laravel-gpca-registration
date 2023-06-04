@@ -50,7 +50,21 @@ class MainDelegate extends Model
         'confirmation_date_time',
         'confirmation_status',
 
+
         'pc_attending_nd',
         'scc_attending_nd',
+
+
+        'registration_method',
+        'transaction_remarks',
+
+        'delegate_cancelled',
+        'delegate_replaced',
+        'delegate_refunded',
+
+        'delegate_replaced_by_id',
+        'delegate_cancelled_datetime',
+        'delegate_refunded_datetime',
+        'delegate_replaced_datetime',
     ];
 }

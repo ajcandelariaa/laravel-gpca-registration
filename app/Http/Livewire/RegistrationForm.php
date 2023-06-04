@@ -24,17 +24,6 @@ class RegistrationForm extends Component
     public $countries;
     public $companySectors;
     public $salutations;
-    public $badgeTypes = [
-        'VVIP',
-        'VIP',
-        'Speaker',
-        'Commitee',
-        'Sponsor',
-        'Exhibitor',
-        'Delegate',
-        'Media partner',
-        'Organizer',
-    ];
 
     public $members, $event, $delegateFees;
 
@@ -137,7 +126,10 @@ class RegistrationForm extends Component
         // CHECK UNIT PRICE
         if ($this->event->eb_end_date != null && $this->event->eb_member_rate != null && $this->event->eb_nmember_rate != null) {
             if ($today->lte(Carbon::parse($this->event->eb_end_date))) {
-                if ($this->delegatePassType == "member") {
+                if ($this->delegatePassType == "fullMember") {
+                    $this->rateTypeString = "Early Bird Full Member Rate";
+                    $this->finalUnitPrice = $this->event->eb_full_member_rate;
+                } else if ($this->delegatePassType == "member") {
                     $this->rateTypeString = "Early Bird Member Rate";
                     $this->finalUnitPrice = $this->event->eb_member_rate;
                 } else {
@@ -146,9 +138,12 @@ class RegistrationForm extends Component
                 }
                 $this->rateType = "Early Bird";
             } else {
-                if ($this->delegatePassType == "member") {
+                if ($this->delegatePassType == "fullMember") {
+                    $this->rateTypeString = "Standard Full Member Rate";
+                    $this->finalUnitPrice = $this->event->std_full_member_rate;
+                } else if ($this->delegatePassType == "member") {
                     $this->rateTypeString = "Standard Member Rate";
-                    $this->finalUnitPrice = $this->event->std_member_rate;
+                    $this->finalUnitPrice = $this->event->std_full_member_rate;
                 } else {
                     $this->rateTypeString = "Standard Non-Member Rate";
                     $this->finalUnitPrice = $this->event->std_nmember_rate;
@@ -156,7 +151,10 @@ class RegistrationForm extends Component
                 $this->rateType = "Standard";
             }
         } else {
-            if ($this->delegatePassType == "member") {
+            if ($this->delegatePassType == "fullMember") {
+                $this->rateTypeString = "Standard Full Member Rate";
+                $this->finalUnitPrice = $this->event->std_full_member_rate;
+            } else if ($this->delegatePassType == "member") {
                 $this->rateTypeString = "Standard Member Rate";
                 $this->finalUnitPrice = $this->event->std_member_rate;
             } else {
@@ -268,8 +266,6 @@ class RegistrationForm extends Component
                 $this->delegatePassTypeError = "Delegate pass type is required";
             }
         } else if ($this->currentStep == 2) {
-            $this->resetCalculations();
-            $this->paymentMethod = null;
             $this->validate(
                 [
                     'companySector' => 'required',
@@ -288,14 +284,13 @@ class RegistrationForm extends Component
                     'assistantEmailAddress.email' => 'Assistant\'s email address must be a valid email',
                 ]
             );
-
             $this->currentStep += 1;
         } else if ($this->currentStep == 3) {
             $this->resetCalculations();
             $this->paymentMethod = null;
             $this->emailMainAlreadyUsedError = null;
             $this->emailMainExistingError = null;
-            
+
             $this->validate(
                 [
                     'firstName' => 'required',
@@ -314,12 +309,11 @@ class RegistrationForm extends Component
                     'nationality.required' => "Nationality is required",
                     'mobileNumber.required' => "Mobile number is required",
                     'jobTitle.required' => "Job title is required",
-                    'badgeType.required' => "Badge type is required",
+                    'badgeType.required' => "Registration type is required",
                 ]
             );
 
             $this->dispatchBrowserEvent('swal:add-step3-registration-loading-screen');
-
         } else if ($this->currentStep == 4) {
             if ($this->paymentMethod == null) {
                 $this->paymentMethodError = "Please choose your payment method first";
@@ -341,7 +335,8 @@ class RegistrationForm extends Component
         }
     }
 
-    public function submitStep3(){
+    public function submitStep3()
+    {
         if ($this->checkEmailIfUsedAlreadyMain($this->emailAddress)) {
             $this->emailMainAlreadyUsedError = "You already used this email!";
         } else {
@@ -801,11 +796,24 @@ class RegistrationForm extends Component
         }
     }
 
+    public function fullMemberClicked()
+    {
+        $this->companyName = null;
+        if ($this->delegatePassType == 'member' || $this->delegatePassType == 'nonMember') {
+            $this->delegatePassType = 'fullMember';
+        } else if ($this->delegatePassType == 'fullMember'){
+            $this->delegatePassType = null;
+        } else {
+            $this->delegatePassType = 'fullMember';
+        }
+    }
+
     public function memberClicked()
     {
-        if ($this->delegatePassType == 'nonMember') {
+        $this->companyName = null;
+        if ($this->delegatePassType == 'fullMember' || $this->delegatePassType == 'nonMember') {
             $this->delegatePassType = 'member';
-        } else if ($this->delegatePassType == 'member') {
+        } else if ($this->delegatePassType == 'member'){
             $this->delegatePassType = null;
         } else {
             $this->delegatePassType = 'member';
@@ -814,9 +822,10 @@ class RegistrationForm extends Component
 
     public function nonMemberClicked()
     {
-        if ($this->delegatePassType == 'member') {
+        $this->companyName = null;
+        if ($this->delegatePassType == 'fullMember' || $this->delegatePassType == 'member') {
             $this->delegatePassType = 'nonMember';
-        } else if ($this->delegatePassType == 'nonMember') {
+        } else if ($this->delegatePassType == 'nonMember'){
             $this->delegatePassType = null;
         } else {
             $this->delegatePassType = 'nonMember';
@@ -980,7 +989,7 @@ class RegistrationForm extends Component
     {
         $this->emailSubAlreadyUsedError = null;
         $this->emailSubExistingError = null;
-        
+
         $this->validate(
             [
                 'subFirstNameEdit' => 'required',
@@ -1053,28 +1062,25 @@ class RegistrationForm extends Component
 
     public function applyPromoCodeMain()
     {
-        if ($this->badgeType == null) {
-            $this->promoCodeFailMain = "Please choose your registration type first.";
+        if ($this->promoCode == null) {
+            $this->promoCodeFailMain = "Promo code is required.";
         } else {
-            if ($this->promoCode == null) {
-                $this->promoCodeFailMain = "Promo code is required.";
+            $promoCode = PromoCodes::where('event_id', $this->event->id)->where('event_category', $this->event->category)->where('active', true)->where('promo_code', $this->promoCode)->first();
+            if ($promoCode == null) {
+                $this->promoCodeFailMain = "Invalid code";
             } else {
-                $promoCode = PromoCodes::where('event_id', $this->event->id)->where('event_category', $this->event->category)->where('active', true)->where('promo_code', $this->promoCode)->where('badge_type', $this->badgeType)->first();
-                if ($promoCode == null) {
-                    $this->promoCodeFailMain = "Invalid code";
-                } else {
-                    if ($promoCode->total_usage < $promoCode->number_of_codes) {
-                        $validityDateTime = Carbon::parse($promoCode->validity);
-                        if (Carbon::now()->lt($validityDateTime)) {
-                            $this->promoCodeFailMain = null;
-                            $this->promoCodeDiscount = $promoCode->discount;
-                            $this->promoCodeSuccessMain = "$promoCode->discount% discount will be availed upon submitting the registration";
-                        } else {
-                            $this->promoCodeFailMain = "Code is expired already";
-                        }
+                if ($promoCode->total_usage < $promoCode->number_of_codes) {
+                    $validityDateTime = Carbon::parse($promoCode->validity);
+                    if (Carbon::now()->lt($validityDateTime)) {
+                        $this->promoCodeFailMain = null;
+                        $this->badgeType = $promoCode->badge_type;
+                        $this->promoCodeDiscount = $promoCode->discount;
+                        $this->promoCodeSuccessMain = "$promoCode->discount% discount will be availed upon submitting the registration";
                     } else {
-                        $this->promoCodeFailMain = "Code has reached its capacity";
+                        $this->promoCodeFailMain = "Code is expired already";
                     }
+                } else {
+                    $this->promoCodeFailMain = "Code has reached its capacity";
                 }
             }
         }
@@ -1090,28 +1096,25 @@ class RegistrationForm extends Component
 
     public function applyPromoCodeSub()
     {
-        if ($this->subBadgeType == null) {
-            $this->promoCodeFailSub = "Please choose your registration type first.";
+        if ($this->subPromoCode == null) {
+            $this->promoCodeFailSub = "Promo code is required.";
         } else {
-            if ($this->subPromoCode == null) {
-                $this->promoCodeFailSub = "Promo code is required.";
+            $promoCode = PromoCodes::where('event_id', $this->event->id)->where('event_category', $this->event->category)->where('active', true)->where('promo_code', $this->subPromoCode)->first();
+            if ($promoCode == null) {
+                $this->promoCodeFailSub = "Invalid code";
             } else {
-                $promoCode = PromoCodes::where('event_id', $this->event->id)->where('event_category', $this->event->category)->where('active', true)->where('promo_code', $this->subPromoCode)->where('badge_type', $this->subBadgeType)->first();
-                if ($promoCode == null) {
-                    $this->promoCodeFailSub = "Invalid code";
-                } else {
-                    if ($promoCode->total_usage < $promoCode->number_of_codes) {
-                        $validityDateTime = Carbon::parse($promoCode->validity);
-                        if (Carbon::now()->lt($validityDateTime)) {
-                            $this->subPromoCodeDiscount = $promoCode->discount;
-                            $this->promoCodeSuccessSub = "$promoCode->discount% discount will be availed upon submitting the registration";
-                            $this->promoCodeFailSub = null;
-                        } else {
-                            $this->promoCodeFailSub = "Code is expired already";
-                        }
+                if ($promoCode->total_usage < $promoCode->number_of_codes) {
+                    $validityDateTime = Carbon::parse($promoCode->validity);
+                    if (Carbon::now()->lt($validityDateTime)) {
+                        $this->subPromoCodeDiscount = $promoCode->discount;
+                        $this->subBadgeType = $promoCode->badge_type;
+                        $this->promoCodeSuccessSub = "$promoCode->discount% discount will be availed upon submitting the registration";
+                        $this->promoCodeFailSub = null;
                     } else {
-                        $this->promoCodeFailSub = "Code has reached its capacity";
+                        $this->promoCodeFailSub = "Code is expired already";
                     }
+                } else {
+                    $this->promoCodeFailSub = "Code has reached its capacity";
                 }
             }
         }
@@ -1127,28 +1130,25 @@ class RegistrationForm extends Component
 
     public function applyPromoCodeSubEdit()
     {
-        if ($this->subBadgeTypeEdit == null) {
-            $this->promoCodeFailSubEdit = "Please choose your registration type first.";
+        if ($this->subPromoCodeEdit == null) {
+            $this->promoCodeFailSubEdit = "Promo code is required.";
         } else {
-            if ($this->subPromoCodeEdit == null) {
-                $this->promoCodeFailSubEdit = "Promo code is required.";
+            $promoCode = PromoCodes::where('event_id', $this->event->id)->where('event_category', $this->event->category)->where('active', true)->where('promo_code', $this->subPromoCodeEdit)->first();
+            if ($promoCode == null) {
+                $this->promoCodeFailSubEdit = "Invalid code";
             } else {
-                $promoCode = PromoCodes::where('event_id', $this->event->id)->where('event_category', $this->event->category)->where('active', true)->where('promo_code', $this->subPromoCodeEdit)->where('badge_type', $this->subBadgeTypeEdit)->first();
-                if ($promoCode == null) {
-                    $this->promoCodeFailSubEdit = "Invalid code";
-                } else {
-                    if ($promoCode->total_usage < $promoCode->number_of_codes) {
-                        $validityDateTime = Carbon::parse($promoCode->validity);
-                        if (Carbon::now()->lt($validityDateTime)) {
-                            $this->subPromoCodeDiscountEdit = $promoCode->discount;
-                            $this->promoCodeSuccessSubEdit = "$promoCode->discount% discount will be availed upon submitting the registration";
-                            $this->promoCodeFailSubEdit = null;
-                        } else {
-                            $this->promoCodeFailSubEdit = "Code is expired already";
-                        }
+                if ($promoCode->total_usage < $promoCode->number_of_codes) {
+                    $validityDateTime = Carbon::parse($promoCode->validity);
+                    if (Carbon::now()->lt($validityDateTime)) {
+                        $this->subPromoCodeDiscountEdit = $promoCode->discount;
+                        $this->subBadgeTypeEdit = $promoCode->badge_type;
+                        $this->promoCodeSuccessSubEdit = "$promoCode->discount% discount will be availed upon submitting the registration";
+                        $this->promoCodeFailSubEdit = null;
                     } else {
-                        $this->promoCodeFailSubEdit = "Code has reached its capacity";
+                        $this->promoCodeFailSubEdit = "Code is expired already";
                     }
+                } else {
+                    $this->promoCodeFailSubEdit = "Code has reached its capacity";
                 }
             }
         }
@@ -1180,7 +1180,7 @@ class RegistrationForm extends Component
                     $subDelegate = AdditionalDelegates::where('id', $delegate->delegate_id)->where('email_address', $emailAddress)->first();
                     if ($subDelegate != null) {
                         $registrationStatsMain = MainDelegates::where('id', $subDelegate->main_delegate_id)->value('registration_status');
-                        if($registrationStatsMain != "droppedOut"){
+                        if ($registrationStatsMain != "droppedOut") {
                             $countSubDelegate++;
                         }
                     }

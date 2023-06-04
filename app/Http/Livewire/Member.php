@@ -10,7 +10,7 @@ class Member extends Component
 {
     use WithFileUploads;
 
-    public $members, $name, $logo, $sector;
+    public $members, $name, $logo, $sector, $type;
     public $updateMember = false;
     public $oldImage, $memberId;
     public $searchTerm;
@@ -36,7 +36,7 @@ class Member extends Component
                 ->orderBy('created_at', 'ASC')
                 ->get();
         }
-        return view('livewire.members.member');
+        return view('livewire.admin.members.member');
     }
 
     public function addMember()
@@ -45,10 +45,12 @@ class Member extends Component
         $this->validate(
             [
                 'name' => 'required',
+                'type' => 'required',
                 'logo' => 'nullable|mimes:jpeg,png,jpg,gif',
             ],
             [
                 'name.required' => 'Name is required',
+                'type.required' => 'Member type is required',
                 'logo.mimes' => 'Logo must be in jpeg, png, jpg, gif format',
             ]
         );
@@ -61,6 +63,7 @@ class Member extends Component
         Members::create([
             'name' => $this->name,
             'sector' => $this->sector,
+            'type' => $this->type,
             'logo' => $image,
             'active' => true,
         ]);
@@ -90,6 +93,7 @@ class Member extends Component
         $member = Members::findOrFail($memberId);
         $this->name = $member->name;
         $this->sector = $member->sector;
+        $this->type = $member->type;
         $this->oldImage = $member->logo;
         $this->memberId = $member->id;
         $this->updateMember = true;
@@ -108,10 +112,12 @@ class Member extends Component
         $this->validate(
             [
                 'name' => 'required',
+                'type' => 'required',
                 'logo' => 'nullable|mimes:jpeg,png,jpg,gif',
             ],
             [
                 'name.required' => 'Name is required',
+                'type.required' => 'Member type is required',
                 'logo.mimes' => 'Logo must be in jpeg, png, jpg, gif format',
             ]
         );
@@ -121,18 +127,18 @@ class Member extends Component
             Members::find($this->memberId)->fill([
                 'name' => $this->name,
                 'sector' => $this->sector,
+                'type' => $this->type,
                 'logo' => $image,
             ])->save();
         } else {
             Members::find($this->memberId)->fill([
                 'name' => $this->name,
                 'sector' => $this->sector,
+                'type' => $this->type,
             ])->save();
         }
 
-        session()->flash('member_updated', 'Member updated successfully!!');
         $this->reset();
-
         $this->dispatchBrowserEvent('swal:update-member', [
             'type' => 'success',
             'message' => 'Member Updated Successfully!',
