@@ -124,12 +124,12 @@
             @if (count($arrayCountryTotal) > 0)
                 <div class="bg-white rounded-lg shadow-md text-center">
                     <h2 class="text-lg font-semibold bg-blue-700 text-white px-6 py-4 rounded-t-lg">Country</h2>
-                    <div class="grid grid-cols-2 bg-blue-500">
+                    <div class="grid grid-cols-2 justify-center items-center bg-blue-500">
                         <p class="py-3 px-6 font-medium text-sm text-white">Name</p>
                         <p class="py-3 px-6 font-medium text-sm text-white">Total</p>
                     </div>
                     @foreach ($arrayCountryTotal as $country)
-                        <div class="grid grid-cols-2">
+                        <div class="grid grid-cols-2 justify-center items-center">
                             <p class="py-4 px-6 border-b">{{ $country['name'] }}</p>
                             <p class="py-4 px-6 border-b">{{ $country['total'] }}</p>
                         </div>
@@ -141,12 +141,12 @@
             @if (count($arrayCompanyTotal) > 0)
                 <div class="bg-white rounded-lg shadow-md text-center">
                     <h2 class="text-lg font-semibold bg-blue-700 text-white px-6 py-4 rounded-t-lg">Company</h2>
-                    <div class="grid grid-cols-2 bg-blue-500">
+                    <div class="grid grid-cols-2 justify-center items-center bg-blue-500">
                         <p class="py-3 px-6 font-medium text-sm text-white">Name</p>
                         <p class="py-3 px-6 font-medium text-sm text-white">Total</p>
                     </div>
                     @foreach ($arrayCompanyTotal as $company)
-                        <div class="grid grid-cols-2">
+                        <div class="grid grid-cols-2 justify-center items-center">
                             <p class="py-4 px-6 border-b">{{ $company['name'] }}</p>
                             <p class="py-4 px-6 border-b">{{ $company['total'] }}</p>
                         </div>
@@ -158,12 +158,12 @@
             @if (count($arrayRegistrationTypeTotal) > 0)
                 <div class="bg-white rounded-lg shadow-md text-center">
                     <h2 class="text-lg font-semibold bg-blue-700 text-white px-6 py-4 rounded-t-lg">Registration Type</h2>
-                    <div class="grid grid-cols-2 bg-blue-500">
+                    <div class="grid grid-cols-2 justify-center items-center bg-blue-500">
                         <p class="py-3 px-6 font-medium text-sm text-white">Name</p>
                         <p class="py-3 px-6 font-medium text-sm text-white">Total</p>
                     </div>
                     @foreach ($arrayRegistrationTypeTotal as $registrationType)
-                        <div class="grid grid-cols-2">
+                        <div class="grid grid-cols-2 justify-center items-center">
                             <p class="py-4 px-6 border-b">{{ $registrationType['name'] }}</p>
                             <p class="py-4 px-6 border-b">{{ $registrationType['total'] }}</p>
                         </div>

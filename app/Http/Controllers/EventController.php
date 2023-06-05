@@ -169,7 +169,7 @@ class EventController extends Controller
                             $totalDroppedOut++;
                         }
 
-                        if (in_array($mainDelegate->company_country, $arrayCountryTotal)) {
+                        if($this->checkIfCountryExist($mainDelegate->company_country, $arrayCountryTotal)){
                             foreach ($arrayCountryTotal as $country) {
                                 if ($country['name'] == $mainDelegate->company_country) {
                                     $country['total'] += 1;
@@ -279,7 +279,8 @@ class EventController extends Controller
 
 
 
-                                if (in_array($mainDelegate->company_country, $arrayCountryTotal)) {
+
+                                if($this->checkIfCountryExist($mainDelegate->company_country, $arrayCountryTotal)){
                                     foreach ($arrayCountryTotal as $country) {
                                         if ($country['name'] == $mainDelegate->company_country) {
                                             $country['total'] += 1;
@@ -333,7 +334,7 @@ class EventController extends Controller
 
                     if ($noRefund > 0 && $mainDelegate->payment_status == "paid") {
                         $totalAmountPaid += $mainDelegate->total_amount;
-                        
+
                         $delegatePaidDate = Carbon::parse($mainDelegate->paid_date_time);
                         if ($dateToday->isSameDay($delegatePaidDate)) {
                             $totalAmountPaidToday += $mainDelegate->total_amount;
@@ -777,6 +778,21 @@ class EventController extends Controller
             return redirect()->route('admin.event.detail.view', ['eventCategory' => $event->category, 'eventId' => $event->id])->with('success', 'Event updated successfully.');
         } else {
             abort(404, 'The URL is incorrect');
+        }
+    }
+
+    public function checkIfCountryExist($companyCountry, $arrayCountries){
+        $checker = 0;
+        foreach($arrayCountries as $country){
+            if($country['name'] == $companyCountry){
+                $checker++;
+            }
+        }
+
+        if($checker > 0){
+            return true;
+        } else {
+            return false;
         }
     }
 }
