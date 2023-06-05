@@ -183,10 +183,12 @@ class EventController extends Controller
                         }
 
 
-                        if (in_array($mainDelegate->company_name, $arrayCompanyTotal)) {
-                            foreach ($arrayCompanyTotal as $company) {
+                        
+
+                        if($this->checkIfCompanyExist($mainDelegate->company_name, $arrayCompanyTotal)){
+                            foreach ($arrayCompanyTotal as $index => $company) {
                                 if ($company['name'] == $mainDelegate->company_name) {
-                                    $company['total'] += 1;
+                                    $arrayCompanyTotal[$index]['total'] = $company['total'] + 1;
                                 }
                             }
                         } else {
@@ -197,10 +199,10 @@ class EventController extends Controller
                         }
 
 
-                        if (in_array($mainDelegate->badge_type, $arrayRegistrationTypeTotal)) {
-                            foreach ($arrayRegistrationTypeTotal as $registrationType) {
+                        if($this->checkIfRegistrationTypeExist($mainDelegate->badge_type, $arrayRegistrationTypeTotal)){
+                            foreach ($arrayRegistrationTypeTotal as $index => $registrationType) {
                                 if ($registrationType['name'] == $mainDelegate->badge_type) {
-                                    $registrationType['total'] += 1;
+                                    $arrayRegistrationTypeTotal[$index]['total'] = $registrationType['total'] + 1;
                                 }
                             }
                         } else {
@@ -294,10 +296,10 @@ class EventController extends Controller
                                 }
 
 
-                                if (in_array($mainDelegate->company_name, $arrayCompanyTotal)) {
-                                    foreach ($arrayCompanyTotal as $company) {
+                                if($this->checkIfCompanyExist($mainDelegate->company_name, $arrayCompanyTotal)){
+                                    foreach ($arrayCompanyTotal as $index => $company) {
                                         if ($company['name'] == $mainDelegate->company_name) {
-                                            $company['total'] += 1;
+                                            $arrayCompanyTotal[$index]['total'] = $company['total'] + 1;
                                         }
                                     }
                                 } else {
@@ -308,10 +310,10 @@ class EventController extends Controller
                                 }
 
 
-                                if (in_array($additionalDelegate->badge_type, $arrayRegistrationTypeTotal)) {
-                                    foreach ($arrayRegistrationTypeTotal as $registrationType) {
+                                if($this->checkIfRegistrationTypeExist($additionalDelegate->badge_type, $arrayRegistrationTypeTotal)){
+                                    foreach ($arrayRegistrationTypeTotal as $index => $registrationType) {
                                         if ($registrationType['name'] == $additionalDelegate->badge_type) {
-                                            $registrationType['total'] += 1;
+                                            $arrayRegistrationTypeTotal[$index]['total'] = $registrationType['total'] + 1;
                                         }
                                     }
                                 } else {
@@ -785,6 +787,38 @@ class EventController extends Controller
         $checker = 0;
         foreach($arrayCountries as $country){
             if($country['name'] == $companyCountry){
+                $checker++;
+            }
+        }
+
+        if($checker > 0){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    
+    public function checkIfCompanyExist($companyName, $arrayCompanies){
+        $checker = 0;
+        foreach($arrayCompanies as $company){
+            if($company['name'] == $companyName){
+                $checker++;
+            }
+        }
+
+        if($checker > 0){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    
+    public function checkIfRegistrationTypeExist($registrationType, $arrayRegistrationTypes){
+        $checker = 0;
+        foreach($arrayRegistrationTypes as $type){
+            if($type['name'] == $registrationType){
                 $checker++;
             }
         }
