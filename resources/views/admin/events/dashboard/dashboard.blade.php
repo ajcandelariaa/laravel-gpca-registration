@@ -6,7 +6,14 @@
     </div>
 
     <div class="container mx-auto my-10">
-        <div class="grid grid-cols-2 gap-4 text-center">
+        <div class="grid grid-cols-1 gap-4 text-center">
+            <div class="bg-blue-500 p-4 rounded-lg shadow-lg">
+                <h3 class="text-lg font-semibold text-white">Confirmed delegates</h3>
+                <p class="text-4xl font-bold text-white">{{ $totalConfirmedDelegates }}</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 text-center mt-10">
             <div class="bg-blue-500 p-4 rounded-lg shadow-lg">
                 <h3 class="text-lg font-semibold text-white">Total delegates</h3>
                 <p class="text-4xl font-bold text-white">{{ $totalDelegates }}</p>
@@ -21,15 +28,15 @@
         <div class="grid grid-cols-3 gap-4 text-center mt-10">
             <div class="bg-green-500 p-4 rounded-lg shadow-lg">
                 <h3 class="text-lg font-semibold text-white">Total amount paid</h3>
-                <p class="text-4xl font-bold text-white">{{ $totalAmountPaid }}</p>
+                <p class="text-4xl font-bold text-white">$ {{ number_format($totalAmountPaid, 2, '.', ',') }}</p>
             </div>
             <div class="bg-green-500 p-4 rounded-lg shadow-lg">
                 <h3 class="text-lg font-semibold text-white">Paid today</h3>
                 <p class="text-4xl font-bold text-white">{{ $totalPaidToday }}</p>
             </div>
             <div class="bg-green-500 p-4 rounded-lg shadow-lg">
-                <h3 class="text-lg font-semibold text-white">Revenue Today</h3>
-                <p class="text-4xl font-bold text-white">{{ $totalAmountPaidToday }}</p>
+                <h3 class="text-lg font-semibold text-white">Revenue today</h3>
+                <p class="text-4xl font-bold text-white">$ {{ number_format($totalAmountPaidToday, 2, '.', ',') }}</p>
             </div>
         </div>
 
@@ -50,7 +57,7 @@
         </div>
 
 
-        <div class="grid grid-cols-8 gap-4 text-center mt-10">
+        <div class="grid grid-cols-8 gap-4 mt-10">
             <div class="bg-emerald-500 p-4 rounded-lg shadow-lg">
                 <h3 class="text-lg font-semibold text-white">Paid</h3>
                 <p class="text-4xl font-bold text-white">{{ $totalPaid }}</p>

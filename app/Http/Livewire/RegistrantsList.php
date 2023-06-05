@@ -29,7 +29,7 @@ class RegistrantsList extends Component
     public $showImportModal = false;
 
     // COMPANY INFO
-    public $delegatePassType = "member", $companyName, $companySector, $companyAddress, $companyCountry, $companyCity, $companyLandlineNumber, $assistantEmailAddress, $companyMobileNumber, $heardWhere;
+    public $delegatePassType = "member", $companyName, $companySector, $companyAddress, $companyCountry, $companyCity, $companyLandlineNumber, $assistantEmailAddress, $companyMobileNumber, $heardWhere, $paid;
     public $csvFile;
     public $rateType;
     public $rateTypeString;
@@ -104,6 +104,12 @@ class RegistrantsList extends Component
                     $payStatus = "Refunded";
                 }
 
+                if($mainDelegate->mode_of_payment == "bankTransfer"){
+                    $paymentMethod = "Bank Transfer";
+                } else {
+                    $paymentMethod = "Credit Card";
+                }
+
                 $totalDelegates = 0;
                 if ($mainDelegate->delegate_replaced_by_id == null && (!$mainDelegate->delegate_refunded)) {
                     $totalDelegates++;
@@ -119,7 +125,6 @@ class RegistrantsList extends Component
                 array_push($this->finalListOfRegistrants, [
                     'mainDelegateId' => $mainDelegate->id,
                     'invoiceNumber' => $tempInvoiceNumber,
-                    'transactionId' => $tempTransactionId,
                     'companyName' => $mainDelegate->company_name,
                     'country' => $mainDelegate->company_country,
                     'city' => $mainDelegate->company_city,
@@ -129,6 +134,7 @@ class RegistrantsList extends Component
                     'regDateTime' => Carbon::parse($mainDelegate->registered_date_time)->format('M j, Y g:iA'),
                     'regStatus' => $regStatus,
                     'payStatus' => $payStatus,
+                    'paymentMethod' => $paymentMethod,
                 ]);
             }
 
@@ -222,6 +228,7 @@ class RegistrantsList extends Component
             'companyCountry' => 'required',
             'companyCity' => 'required',
             'companyMobileNumber' => 'required',
+            'paid' => 'required',
             'csvFile' => 'required',
         ]);
 

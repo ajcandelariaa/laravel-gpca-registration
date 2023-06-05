@@ -23,6 +23,7 @@
                                 <div>
                                     <select wire:model="delegatePassType"
                                         class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                                        <option value="fullMember">Full Member</option>
                                         <option value="member">Member</option>
                                         <option value="nonMember">Non-Member</option>
                                     </select>
@@ -175,21 +176,23 @@
                                         class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                                 </div>
                             </div>
-
+                            
                             <div class="space-y-2">
                                 <div class="text-registrationPrimaryColor">
-                                    Where did you hear about us?
+                                    Paid? <span class="text-red-500">*</span>
                                 </div>
                                 <div>
-                                    <select wire:model="heardWhere"
+                                    <select wire:model="paid"
                                         class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                                         <option value=""></option>
-                                        <option value="Social Media">Social Media</option>
-                                        <option value="Friends">Friends</option>
-                                        <option value="Family">Family</option>
-                                        <option value="News">News</option>
-                                        <option value="Others">Others</option>
+                                        <option value="Yes">Yes</option>
+                                        <option value="No">No</option>
                                     </select>
+                                    @error('paid')
+                                        <div class="text-red-500 text-xs italic mt-1">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
                                 </div>
                             </div>
                         </div>
@@ -212,41 +215,39 @@
                                     </div>
                                 @enderror
 
-                                @if($csvFileError != null)
+                                @if ($csvFileError != null)
                                     <div class="text-red-500 text-xs italic mt-1">
                                         {{ $csvFileError }}
                                     </div>
                                 @endif
-                                
-                                @if(count($incompleDetails) > 0)
+
+                                @if (count($incompleDetails) > 0)
                                     <div class="text-red-500 text-xs italic mt-1">
                                         @foreach ($incompleDetails as $error)
                                             <p>{{ $error }}</p>
-                                            
-                                        @endforeach
-                                    </div>
-                                @endif
-                                
-                                @if(count($emailYouAlreadyUsed) > 0)
-                                    <div class="text-red-500 text-xs italic mt-1">
-                                        @foreach ($emailYouAlreadyUsed as $error)
-                                            <p>{{ $error }}</p>
-                                            
                                         @endforeach
                                     </div>
                                 @endif
 
-                                
-                                @if(count($emailAlreadyExisting) > 0)
+                                @if (count($emailYouAlreadyUsed) > 0)
+                                    <div class="text-red-500 text-xs italic mt-1">
+                                        @foreach ($emailYouAlreadyUsed as $error)
+                                            <p>{{ $error }}</p>
+                                        @endforeach
+                                    </div>
+                                @endif
+
+
+                                @if (count($emailAlreadyExisting) > 0)
                                     <div class="text-red-500 text-xs italic mt-1">
                                         @foreach ($emailAlreadyExisting as $error)
                                             <p>{{ $error }}</p>
                                         @endforeach
                                     </div>
                                 @endif
-                                
 
-                                @if(count($promoCodeErrors) > 0)
+
+                                @if (count($promoCodeErrors) > 0)
                                     <div class="text-red-500 text-xs italic mt-1">
                                         @foreach ($promoCodeErrors as $error)
                                             <p>{{ $error }}</p>

@@ -788,7 +788,9 @@ class RegistrationController extends Controller
                     }
 
                     array_push($finalExcelData, [
-                        'transaction_id' => $mainTransactionId,
+                        'transaction_id' => $tempBookReference,
+                        'id' => $mainDelegate->id,
+                        'delegateType' => 'Main',
                         'event' => $eventCategory,
                         'pass_type' => $mainDelegate->pass_type,
                         'rate_type' => ($netAMount == 0) ? 'Complementary' : $mainDelegate->rate_type,
@@ -827,6 +829,23 @@ class RegistrationController extends Controller
                         'reference_number' => $tempBookReference,
                         'registration_date_time' => $mainDelegate->registered_date_time,
                         'paid_date_time' => $mainDelegate->paid_date_time,
+
+                        // NEW june 6 2023
+                        'registration_method' => $mainDelegate->registration_method,
+                        'transaction_remarks' => $mainDelegate->transaction_remarks,
+
+                        'delegate_cancelled' => $mainDelegate->delegate_cancelled,
+                        'delegate_replaced' => $mainDelegate->delegate_replaced,
+                        'delegate_refunded' => $mainDelegate->delegate_refunded,
+
+                        'delegate_replaced_type' => null,
+                        'delegate_original_from_id' => null,
+                        'delegate_replaced_from_id' => null,
+                        'delegate_replaced_by_id' => $mainDelegate->delegate_replaced_by_id,
+                        
+                        'delegate_cancelled_datetime' => $mainDelegate->delegate_cancelled_datetime,
+                        'delegate_refunded_datetime' => $mainDelegate->delegate_refunded_datetime,
+                        'delegate_replaced_datetime' => $mainDelegate->delegate_replaced_datetime,
                     ]);
 
                     $subDelegates = AdditionalDelegate::where('main_delegate_id', $mainDelegate->id)->get();
@@ -849,8 +868,13 @@ class RegistrationController extends Controller
                                 $netAMount = $mainDelegate->unit_price;
                             }
 
+                            $lastDigit = 1000 + intval($subTransactionId);
+                            $tempBookReferenceSub = "$event->year" . "$getEventcode" . "$lastDigit";
+
                             array_push($finalExcelData, [
-                                'transaction_id' => $subTransactionId,
+                                'transaction_id' => $tempBookReferenceSub,
+                                'id' => $subDelegate->id,
+                                'delegateType' => 'Sub',
                                 'event' => $eventCategory,
                                 'pass_type' => $mainDelegate->pass_type,
                                 'rate_type' => $mainDelegate->rate_type,
@@ -889,6 +913,23 @@ class RegistrationController extends Controller
                                 'reference_number' => $tempBookReference,
                                 'registration_date_time' => $mainDelegate->registered_date_time,
                                 'paid_date_time' => $mainDelegate->paid_date_time,
+
+                                // NEW june 6 2023
+                                'registration_method' => $mainDelegate->registration_method,
+                                'transaction_remarks' => $mainDelegate->transaction_remarks,
+        
+                                'delegate_cancelled' => $subDelegate->delegate_cancelled,
+                                'delegate_replaced' => $subDelegate->delegate_replaced,
+                                'delegate_refunded' => $subDelegate->delegate_refunded,
+
+                                'delegate_replaced_type' => $subDelegate->delegate_replaced_type,
+                                'delegate_original_from_id' => $subDelegate->delegate_original_from_id,
+                                'delegate_replaced_from_id' => $subDelegate->delegate_replaced_from_id,
+                                'delegate_replaced_by_id' => $subDelegate->delegate_replaced_by_id,
+                                
+                                'delegate_cancelled_datetime' => $subDelegate->delegate_cancelled_datetime,
+                                'delegate_refunded_datetime' => $subDelegate->delegate_refunded_datetime,
+                                'delegate_replaced_datetime' => $subDelegate->delegate_replaced_datetime,
                             ]);
                         }
                     }
@@ -906,6 +947,8 @@ class RegistrationController extends Controller
 
             $columns = array(
                 'Transaction Id',
+                'ID',
+                'Delegate Type',
                 'Event',
                 'Pass Type',
                 'Rate Type',
@@ -943,6 +986,23 @@ class RegistrationController extends Controller
                 'Printed badge',
 
                 'Company Sector',
+
+                'Registration Method',
+                'Transaction Remarks',
+
+                'Delegate Cancelled',
+                'Delegate Replaced',
+                'Delegate Refunded',
+
+                'Delegate Replaced Type',
+                'Delegate Original From Id',
+                'Delegate Replaced From Id',
+                'Delegate Replaced By Id',
+
+                'Delegate Cancelled Date & Time',
+                'Delegate Refunded Date & Time',
+                'Delegate Replaced Date & Time',
+
             );
 
             $callback = function () use ($finalExcelData, $columns) {
@@ -954,6 +1014,8 @@ class RegistrationController extends Controller
                         $file,
                         array(
                             $data['transaction_id'],
+                            $data['id'],
+                            $data['delegateType'],
                             $data['event'],
                             $data['pass_type'],
                             $data['rate_type'],
@@ -992,6 +1054,23 @@ class RegistrationController extends Controller
                             $data['printed_badge_date'],
 
                             $data['company_sector'],
+
+                            $data['registration_method'],
+                            $data['transaction_remarks'],
+
+                            $data['delegate_cancelled'],
+                            $data['delegate_replaced'],
+                            $data['delegate_refunded'],
+
+                            $data['delegate_replaced_type'],
+                            $data['delegate_original_from_id'],
+                            $data['delegate_replaced_from_id'],
+                            $data['delegate_replaced_by_id'],
+
+                            $data['delegate_cancelled_datetime'],
+                            $data['delegate_refunded_datetime'],
+                            $data['delegate_replaced_datetime'],
+
                         )
                     );
                 }

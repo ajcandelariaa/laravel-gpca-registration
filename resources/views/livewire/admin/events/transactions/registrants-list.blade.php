@@ -9,9 +9,9 @@
                     target="_blank"
                     class="bg-green-600 hover:bg-green-700 text-white py-2 px-5 rounded-md text-lg text-center">Export
                     Data to Excel</a>
-                <button type="button" wire:click="openImportModal" wire:key="openImportModal"
+                {{-- <button type="button" wire:click="openImportModal" wire:key="openImportModal"
                     class="bg-sky-600 hover:bg-sky-700 text-white py-2 px-5 rounded-md text-lg text-center">Import
-                    Data</button>
+                    Data</button> --}}
             </div>
             <div class="flex items-center gap-2">
                 <div class="relative">
@@ -70,7 +70,6 @@
 
             <div class="grid grid-cols-12 pt-4 pb-2 text-center items-center gap-10">
                 <div class="col-span-1">Invoice Number</div>
-                <div class="col-span-1">Transaction Id</div>
                 <div class="col-span-1">Company</div>
                 <div class="col-span-1">Country</div>
                 <div class="col-span-1">City</div>
@@ -80,6 +79,7 @@
                 <div class="col-span-1">Registered Date & Time</div>
                 <div class="col-span-1">Registration Status</div>
                 <div class="col-span-1">Payment Status</div>
+                <div class="col-span-1">Payment Method</div>
                 <div class="col-span-1">Action</div>
             </div>
 
@@ -96,7 +96,6 @@
                     <div
                         class="grid grid-cols-12 gap-10 pt-2 pb-2 mb-1 text-center items-center text-sm {{ $count % 2 == 0 ? 'bg-registrationInputFieldsBGColor' : 'bg-registrationCardBGColor' }}">
                         <div class="col-span-1">{{ $finalListOfRegistrant['invoiceNumber'] }}</div>
-                        <div class="col-span-1">{{ $finalListOfRegistrant['transactionId'] }}</div>
                         <div class="col-span-1">{{ $finalListOfRegistrant['companyName'] }}</div>
                         <div class="col-span-1">{{ $finalListOfRegistrant['country'] }}</div>
                         <div class="col-span-1">{{ $finalListOfRegistrant['city'] }}</div>
@@ -107,7 +106,7 @@
                         <div class="col-span-1">{{ $finalListOfRegistrant['regDateTime'] }}</div>
                         <div class="col-span-1">{{ $finalListOfRegistrant['regStatus'] }}</div>
                         <div class="col-span-1">{{ $finalListOfRegistrant['payStatus'] }}</div>
-
+                        <div class="col-span-1">{{ $finalListOfRegistrant['paymentMethod'] }}</div>
                         <div class="col-span-1">
                             <a href="{{ route('admin.event.registrants.detail.view', ['eventCategory' => $eventCategory, 'eventId' => $eventId, 'registrantId' => $finalListOfRegistrant['mainDelegateId']]) }}"
                                 class="cursor-pointer hover:text-gray-600 text-gray-500" target="_blank">

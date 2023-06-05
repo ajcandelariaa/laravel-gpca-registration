@@ -76,6 +76,7 @@ class EventController extends Controller
             $generalData = array();
             $specificData = array();
 
+            $totalConfirmedDelegates = 0;
             $totalDelegates = 0;
             $totalRegisteredToday = 0;
             $totalPaidToday = 0;
@@ -115,6 +116,10 @@ class EventController extends Controller
                     }
 
                     if ($mainDelegate->delegate_replaced_by_id == null && (!$mainDelegate->delegate_refunded)) {
+                        if($mainDelegate->registration_status == "confirmed"){
+                            $totalConfirmedDelegates++;
+                        }
+
                         $totalDelegates++;
 
                         if ($mainDelegate->pass_type == "fullMember") {
@@ -218,6 +223,10 @@ class EventController extends Controller
                     if ($additionalDelegates->isNotEmpty()) {
                         foreach ($additionalDelegates as $additionalDelegate) {
                             if ($additionalDelegate->delegate_replaced_by_id == null && (!$additionalDelegate->delegate_refunded)) {
+                                if($mainDelegate->registration_status == "confirmed"){
+                                    $totalConfirmedDelegates++;
+                                }
+                                
                                 $totalDelegates++;
 
 
@@ -339,6 +348,7 @@ class EventController extends Controller
                 "eventId" => $eventId,
                 "event" => $event,
                 
+                'totalConfirmedDelegates' => $totalConfirmedDelegates,
                 'totalDelegates' => $totalDelegates,
                 'totalRegisteredToday' => $totalRegisteredToday,
                 'totalPaidToday' => $totalPaidToday,
