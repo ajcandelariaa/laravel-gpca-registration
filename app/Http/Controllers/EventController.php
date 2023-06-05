@@ -170,9 +170,9 @@ class EventController extends Controller
                         }
 
                         if($this->checkIfCountryExist($mainDelegate->company_country, $arrayCountryTotal)){
-                            foreach ($arrayCountryTotal as $country) {
+                            foreach ($arrayCountryTotal as $index => $country) {
                                 if ($country['name'] == $mainDelegate->company_country) {
-                                    $country['total'] += 1;
+                                    $arrayCountryTotal[$index]['total'] = $country['total'] + 1;
                                 }
                             }
                         } else {
@@ -281,9 +281,9 @@ class EventController extends Controller
 
 
                                 if($this->checkIfCountryExist($mainDelegate->company_country, $arrayCountryTotal)){
-                                    foreach ($arrayCountryTotal as $country) {
+                                    foreach ($arrayCountryTotal as $index => $country) {
                                         if ($country['name'] == $mainDelegate->company_country) {
-                                            $country['total'] += 1;
+                                            $arrayCountryTotal[$index]['total'] = $country['total'] + 1;
                                         }
                                     }
                                 } else {
