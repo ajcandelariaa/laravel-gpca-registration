@@ -331,9 +331,9 @@ class EventController extends Controller
                         }
                     }
 
-                    if ($noRefund > 0) {
+                    if ($noRefund > 0 && $mainDelegate->payment_status == "paid") {
                         $totalAmountPaid += $mainDelegate->total_amount;
-
+                        
                         $delegatePaidDate = Carbon::parse($mainDelegate->paid_date_time);
                         if ($dateToday->isSameDay($delegatePaidDate)) {
                             $totalAmountPaidToday += $mainDelegate->total_amount;
