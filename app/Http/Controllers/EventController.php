@@ -358,26 +358,11 @@ class EventController extends Controller
                 'totalAmountPaidToday' => $totalAmountPaidToday,
                 'totalAmountPaid' => $totalAmountPaid,
 
-                'totalFullMember' => $totalFullMember,
-                'totalMember' => $totalMember,
-                'totalNonMember' => $totalNonMember,
-
-                'totalPaid' => $totalPaid,
-                'totalFree' => $totalFree,
-                'totalUnpaid' => $totalUnpaid,
-                'totalRefunded' => $totalRefunded,
-
-                'totalConfirmed' => $totalConfirmed,
-                'totalPending' => $totalPending,
-                'totalDroppedOut' => $totalDroppedOut,
-                'totalCancelled' => $totalCancelled,
-
-                'totalOnline' => $totalOnline,
-                'totalImported' => $totalImported,
-                'totalOnsite' => $totalOnsite,
-
-                'totalCreditCard' => $totalCreditCard,
-                'totalBankTransfer' => $totalBankTransfer,
+                'passType' => [$totalFullMember, $totalMember, $totalNonMember],
+                'paymentStatus' => [$totalPaid, $totalFree, $totalUnpaid, $totalRefunded],
+                'registrationStatus' => [$totalConfirmed, $totalPending, $totalDroppedOut, $totalCancelled],
+                'registrationMethod' => [$totalOnline, $totalImported, $totalOnsite],
+                'paymentMethod' => [$totalCreditCard, $totalBankTransfer],
 
                 'arrayCountryTotal' => $arrayCountryTotal,
                 'arrayCompanyTotal' => $arrayCompanyTotal,

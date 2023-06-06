@@ -6,14 +6,12 @@
     </div>
 
     <div class="container mx-auto my-10">
-        <div class="grid grid-cols-1 gap-4 text-center">
+
+        <div class="grid grid-cols-3 gap-4 text-center">
             <div class="bg-blue-500 p-4 rounded-lg shadow-lg">
                 <h3 class="text-lg font-semibold text-white">Confirmed delegates</h3>
                 <p class="text-4xl font-bold text-white">{{ $totalConfirmedDelegates }}</p>
             </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-4 text-center mt-10">
             <div class="bg-blue-500 p-4 rounded-lg shadow-lg">
                 <h3 class="text-lg font-semibold text-white">Total delegates</h3>
                 <p class="text-4xl font-bold text-white">{{ $totalDelegates }}</p>
@@ -23,7 +21,6 @@
                 <p class="text-4xl font-bold text-white">{{ $totalRegisteredToday }}</p>
             </div>
         </div>
-
 
         <div class="grid grid-cols-3 gap-4 text-center mt-10">
             <div class="bg-green-500 p-4 rounded-lg shadow-lg">
@@ -40,84 +37,49 @@
             </div>
         </div>
 
+        <div class="grid grid-cols-3 gap-5 mt-10">
+            <div class="border border-gray-200">
+                <p class="py-2 bg-registrationPrimaryColor text-xl text-white text-center">Pass Type</p>
+                <div class="p-5">
+                    <canvas id="passType"></canvas>
+                </div>
+            </div>
 
-        <div class="grid grid-cols-3 gap-4 text-center mt-10">
-            <div class="bg-yellow-500 p-4 rounded-lg shadow-lg">
-                <h3 class="text-lg font-semibold text-white">Full Member</h3>
-                <p class="text-4xl font-bold text-white">{{ $totalFullMember }}</p>
+            <div class="border border-gray-200">
+                <p class="py-2 bg-registrationPrimaryColor text-xl text-white text-center">Payment Status</p>
+                <div class="p-5">
+                    <canvas id="paymentStatus"></canvas>
+                </div>
             </div>
-            <div class="bg-yellow-500 p-4 rounded-lg shadow-lg">
-                <h3 class="text-lg font-semibold text-white">Member</h3>
-                <p class="text-4xl font-bold text-white">{{ $totalMember }}</p>
+
+            <div class="border border-gray-200">
+                <p class="py-2 bg-registrationPrimaryColor text-xl text-white text-center">Registration Status</p>
+                <div class="p-5">
+                    <canvas id="registrationStatus"></canvas>
+                </div>
             </div>
-            <div class="bg-yellow-500 p-4 rounded-lg shadow-lg">
-                <h3 class="text-lg font-semibold text-white">Non-Member</h3>
-                <p class="text-4xl font-bold text-white">{{ $totalNonMember }}</p>
+        </div>
+
+        <div class="flex justify-center items-center">
+
+            <div class="grid grid-cols-2 gap-5 mt-10">
+                <div class="border border-gray-200">
+                    <p class="py-2 bg-registrationPrimaryColor text-xl text-white text-center">Registration Method</p>
+                    <div class="p-5">
+                        <canvas id="registrationMethod"></canvas>
+                    </div>
+                </div>
+    
+                <div class="border border-gray-200">
+                    <p class="py-2 bg-registrationPrimaryColor text-xl text-white text-center">Payment Method</p>
+                    <div class="p-5">
+                        <canvas id="paymentMethod"></canvas>
+                    </div>
+                </div>
             </div>
         </div>
 
 
-        <div class="grid grid-cols-8 gap-4 mt-10">
-            <div class="bg-emerald-500 p-4 rounded-lg shadow-lg">
-                <h3 class="text-lg font-semibold text-white">Paid</h3>
-                <p class="text-4xl font-bold text-white">{{ $totalPaid }}</p>
-            </div>
-            <div class="bg-emerald-500 p-4 rounded-lg shadow-lg">
-                <h3 class="text-lg font-semibold text-white">Free</h3>
-                <p class="text-4xl font-bold text-white">{{ $totalFree }}</p>
-            </div>
-            <div class="bg-emerald-500 p-4 rounded-lg shadow-lg">
-                <h3 class="text-lg font-semibold text-white">Unpaid</h3>
-                <p class="text-4xl font-bold text-white">{{ $totalUnpaid }}</p>
-            </div>
-            <div class="bg-emerald-500 p-4 rounded-lg shadow-lg">
-                <h3 class="text-lg font-semibold text-white">Refunded</h3>
-                <p class="text-4xl font-bold text-white">{{ $totalRefunded }}</p>
-            </div>
-
-            <div class="bg-teal-500 p-4 rounded-lg shadow-lg">
-                <h3 class="text-lg font-semibold text-white">Confirmed</h3>
-                <p class="text-4xl font-bold text-white">{{ $totalConfirmed }}</p>
-            </div>
-            <div class="bg-teal-500 p-4 rounded-lg shadow-lg">
-                <h3 class="text-lg font-semibold text-white">Pending</h3>
-                <p class="text-4xl font-bold text-white">{{ $totalPending }}</p>
-            </div>
-            <div class="bg-teal-500 p-4 rounded-lg shadow-lg">
-                <h3 class="text-lg font-semibold text-white">Dropped Out</h3>
-                <p class="text-4xl font-bold text-white">{{ $totalDroppedOut }}</p>
-            </div>
-            <div class="bg-teal-500 p-4 rounded-lg shadow-lg">
-                <h3 class="text-lg font-semibold text-white">Cancelled</h3>
-                <p class="text-4xl font-bold text-white">{{ $totalCancelled }}</p>
-            </div>
-        </div>
-
-
-
-
-        <div class="grid grid-cols-5 gap-4 text-center mt-10">
-            <div class="bg-indigo-500 p-4 rounded-lg shadow-lg">
-                <h3 class="text-lg font-semibold text-white">Online</h3>
-                <p class="text-4xl font-bold text-white">{{ $totalOnline }}</p>
-            </div>
-            <div class="bg-indigo-500 p-4 rounded-lg shadow-lg">
-                <h3 class="text-lg font-semibold text-white">Imported</h3>
-                <p class="text-4xl font-bold text-white">{{ $totalImported }}</p>
-            </div>
-            <div class="bg-indigo-500 p-4 rounded-lg shadow-lg">
-                <h3 class="text-lg font-semibold text-white">Onsite</h3>
-                <p class="text-4xl font-bold text-white">{{ $totalOnsite }}</p>
-            </div>
-            <div class="bg-indigo-500 p-4 rounded-lg shadow-lg">
-                <h3 class="text-lg font-semibold text-white">Credit Card</h3>
-                <p class="text-4xl font-bold text-white">{{ $totalCreditCard }}</p>
-            </div>
-            <div class="bg-indigo-500 p-4 rounded-lg shadow-lg">
-                <h3 class="text-lg font-semibold text-white">Bank Transfer</h3>
-                <p class="text-4xl font-bold text-white">{{ $totalBankTransfer }}</p>
-            </div>
-        </div>
 
 
         <div class="grid grid-cols-3 gap-8 mt-10">
@@ -172,4 +134,120 @@
             @endif
         </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const passType = document.getElementById('passType');
+        const paymentStatus = document.getElementById('paymentStatus');
+        const registrationStatus = document.getElementById('registrationStatus');
+        const registrationMethod = document.getElementById('registrationMethod');
+        const paymentMethod = document.getElementById('paymentMethod');
+
+        new Chart(passType, {
+            type: 'doughnut',
+            data: {
+                labels: [
+                    'Full Member',
+                    'Member',
+                    'Non-Member',
+                ],
+                datasets: [{
+                    label: 'Pass Type',
+                    data: @json($passType),
+                    backgroundColor: [
+                        'rgb(255, 99, 132)',
+                        'rgb(54, 162, 235)',
+                        'rgb(255, 205, 86)',
+                    ],
+                    hoverOffset: 4
+                }]
+            },
+        });
+
+        new Chart(paymentStatus, {
+            type: 'doughnut',
+            data: {
+                labels: [
+                    'Paid',
+                    'Free',
+                    'Unpaid',
+                    'Refunded',
+                ],
+                datasets: [{
+                    label: 'Payment Status',
+                    data: @json($paymentStatus),
+                    backgroundColor: [
+                        'rgb(255, 99, 132)',
+                        'rgb(54, 162, 235)',
+                        'rgb(255, 205, 86)',
+                        'rgb(255, 105, 86)',
+                    ],
+                    hoverOffset: 4
+                }]
+            },
+        });
+
+        new Chart(registrationStatus, {
+            type: 'doughnut',
+            data: {
+                labels: [
+                    'Confirmed',
+                    'Pending',
+                    'Dropped Out',
+                    'Cancelled',
+                ],
+                datasets: [{
+                    label: 'Registration Status',
+                    data: @json($registrationStatus),
+                    backgroundColor: [
+                        'rgb(255, 99, 132)',
+                        'rgb(54, 162, 235)',
+                        'rgb(255, 205, 86)',
+                        'rgb(255, 105, 86)',
+                    ],
+                    hoverOffset: 4
+                }]
+            },
+        });
+
+        new Chart(registrationMethod, {
+            type: 'doughnut',
+            data: {
+                labels: [
+                    'Online',
+                    'Imported',
+                    'Onsite',
+                ],
+                datasets: [{
+                    label: 'Registration Method',
+                    data: @json($registrationMethod),
+                    backgroundColor: [
+                        'rgb(255, 99, 132)',
+                        'rgb(54, 162, 235)',
+                        'rgb(255, 205, 86)',
+                    ],
+                    hoverOffset: 4
+                }]
+            },
+        });
+
+        new Chart(paymentMethod, {
+            type: 'doughnut',
+            data: {
+                labels: [
+                    'Credit Card',
+                    'Bank Transfer',
+                ],
+                datasets: [{
+                    label: 'Payment Method',
+                    data: @json($paymentMethod),
+                    backgroundColor: [
+                        'rgb(255, 99, 132)',
+                        'rgb(54, 162, 235)',
+                    ],
+                    hoverOffset: 4
+                }]
+            },
+        });
+    </script>
 @endsection

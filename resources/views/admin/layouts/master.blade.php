@@ -99,6 +99,8 @@
     @elseif(request()->is('admin/event/*/*/edit'))
         <script src="{{ asset('js/manageEvents/toggleEarlyBirdFieldsEdit.js') }}"></script>
         <script src="{{ asset('js/manageEvents/loadingButtonEdit.js') }}"></script>
+    {{-- @elseif (request()->is('admin/event/*/*/dashboard'))
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> --}}
     @else
     @endif
 
