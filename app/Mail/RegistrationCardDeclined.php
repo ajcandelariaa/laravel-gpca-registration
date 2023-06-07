@@ -33,7 +33,7 @@ class RegistrationCardDeclined extends Mailable
      */
     public function envelope()
     {
-        $subject = $this->details['eventName'].' - Card Declined';
+        $subject = 'Your payment registration for the '. $this->details['eventName'].' has been declined';
         return new Envelope(
             from: new Address('forumregistration@gpca.org.ae', 'GPCA Events Registration'),
             subject: $subject,

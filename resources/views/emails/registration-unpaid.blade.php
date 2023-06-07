@@ -3,13 +3,19 @@
 
 <p>Greetings from GPCA!</p>
 
-<p>Thank you for your registration to attend the <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a> that is taking place from {{ $details['eventDates'] }} at the {{ $details['eventLocation'] }}.</p>
+<p>Thank you for registering to attend the <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a> which will be held on {{ $details['eventDates'] }} at the {{ $details['eventLocation'] }}.</p>
 
 <p style="color: red;">
-    Please note that NO BADGE will be issued without prior payment on your registration. Kindly ensure to process your payment before the event date. Onsite payment is available on a <strong><em>CASH BASIS</em></strong> only.
+    This is a kind reminder to process your registration invoice to complete your delegate registration.
 </p>
 
-<p>Please present your business card as a reference to ease the verification process. Your badge details will appear as the below. To request changes, kindly respond to this email at the earliest to rectify your badge. </p>
+<p>To take advantage of the early bird discount, please ensure to settle your invoice on or before {{ $details['earlyBirdValidityDate'] }}. Standard rate will be applied after {{ $details['earlyBirdValidityDate'] }}.</p>
+
+<p>
+    Note: <strong><em>NO BADGE</em></strong> will be issued unless payment has been settled and confirmed. Onsite payment is available on a <strong><em>CASH BASIS</em></strong> only.
+</p>
+
+<p>Your registration details as follows:</p>
 
 <span>
     Delegate Full name: <strong>{{  $details['name'] }}</strong>
@@ -28,7 +34,9 @@ Download invoice
 </x-mail::button>
 <span>&nbsp;</span>
 
-<h1>GENERAL INFORMATION</h1>
+<p>To request changes, kindly respond to this email at the earliest, to rectify your badge.</p>
+
+{{-- <h1>GENERAL INFORMATION</h1>
 
 @if ($details['eventCategory'] == "IPAW")
 <h3>HOTEL AND ACCOMMODATION</h3>
@@ -64,7 +72,7 @@ Download invoice
     <li>Special rates are subject to availability.</li>
     <li>All rates are valid only from May 13 – 18 2023.</li>
 </ul>
-@endif
+@endif --}}
 
 <p>For the latest updates on the event, please visit the event website at <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a>.</p>
 

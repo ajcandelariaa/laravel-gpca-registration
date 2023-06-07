@@ -1,9 +1,11 @@
 <x-mail::message>
 <p>Dear {{ $details['name'] }},</p>
 
-<p>Thank you for registering to attend the <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a> taking place from {{ $details['eventDates'] }} at the {{ $details['eventLocation'] }}.</p>
+<p>We regret to inform you that your payment registration for the <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a> has been declined.</p>
 
-<p>Due to the problem with your card, we have been unable to charge your account. Here are the possible reasons for the declined payment are the following: </p>
+<p>We apologize for the inconvenience, but we have encountered a problem charging your account due to issues with your card. </p>
+
+<p>Here are the possible reasons for the declined payment:</p>
 
 <ul>
     <li style="mso-special-format:bullet;">Your Card or personal details entered do not match the information held by your card Issuer.</li>
@@ -20,22 +22,9 @@ Download invoice
 </x-mail::button>
 <span>&nbsp;</span>
 
+<p>Please contact your bank for further information regarding the declined payment. Alternatively, you can reach out to Analee Candelaria at <a href="mailto:analee@gpca.org.ae">analee@gpca.org.ae</a> or +971 4 451 0666 ext. 116 to explore alternative payment options that may be available to you.</p>
+
 <p>Although your registration is saved in our system. You can still pay by bank transfer through the below bank account.</p>
-
-<span>In favor of: <strong>Gulf Petrochemicals & Chemicals Association</strong></span>
-<br>
-<span>Mashreq Bank</span>
-<br>
-<span>Riqa Branch, Deira, P.O. Box 5511, Dubai</span>
-<br><br>
-<span>USD Acct No. <strong>{{ $details['bankDetails']['accountNumber'] }}</strong></span>
-<br>
-<span>IBAN No. <strong>{{ $details['bankDetails']['ibanNumber'] }}</strong></span>
-<br>
-<span>Swift Code <strong>BOMLAEAD</strong></span>
-
-<br><br>
-<p>For more information or queries please contact Analee Candelaria at <a href="mailto:analee@gpca.org.ae">analee@gpca.org.ae</a> | +971 4 451 0666 Ext 116.</p>
 
 Kind regards,
 <br><br>

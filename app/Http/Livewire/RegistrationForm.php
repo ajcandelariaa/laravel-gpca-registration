@@ -520,6 +520,12 @@ class RegistrationForm extends Component
         $tempTransactionId = $this->event->year . "$getEventcode" . "$lastDigit";
         $invoiceLink = env('APP_URL') . '/' . $this->event->category . '/' . $this->event->id . '/view-invoice/' . $this->currentMainDelegateId;
 
+        if($this->event->eb_end_date == null){
+            $earlyBirdValidityDate = Carbon::createFromFormat('Y-m-d', $this->event->std_start_date)->subDay();
+        } else {
+            $earlyBirdValidityDate = Carbon::createFromFormat('Y-m-d', $this->event->eb_end_date);
+        }
+
         $details1 = [
             'name' => $this->salutation . " " . $this->firstName . " " . $this->middleName . " " . $this->lastName,
             'eventLink' => $this->event->link,
@@ -533,6 +539,7 @@ class RegistrationForm extends Component
             'amountPaid' => 0,
             'transactionId' => $tempTransactionId,
             'invoiceLink' => $invoiceLink,
+            'earlyBirdValidityDate' => $earlyBirdValidityDate->format('jS F'),
         ];
 
         $details2 = [
@@ -584,6 +591,7 @@ class RegistrationForm extends Component
                     'amountPaid' => 0,
                     'transactionId' => $tempTransactionId,
                     'invoiceLink' => $invoiceLink,
+                    'earlyBirdValidityDate' => $earlyBirdValidityDate->format('jS F'),
                 ];
 
                 $details2 = [

@@ -173,7 +173,7 @@
                         class="bg-orange-800 hover:bg-orange-900 text-white py-2 rounded-md text-lg text-center"
                         target="_blank">View Invoice</a>
 
-                    @if ($finalData['payment_status'] != 'paid' && $finalData['payment_status'] != 'refunded' && $finalData['paid_date_time'] == null)
+                    @if ($finalData['payment_status'] != 'paid' && $finalData['payment_status'] != 'refunded' && $finalData['paid_date_time'] == "N/A")
                         <button wire:click="openMarkAsPaidModal"
                             class="bg-green-600 hover:bg-green-700 text-white py-2 rounded-md text-lg text-center">Mark
                             as
@@ -185,7 +185,7 @@
                             Paid</button>
                     @endif
 
-                    @if ($finalData['payment_status'] != 'paid' && $finalData['payment_status'] != 'refunded' && $finalData['paid_date_time'] == null)
+                    @if ($finalData['payment_status'] != 'paid' && $finalData['payment_status'] != 'refunded' && $finalData['paid_date_time'] == "N/A")
                         <button wire:click="sendEmailReminderConfirmation"
                             class="col-span-1 bg-sky-600 hover:bg-sky-700 text-white py-2 rounded-md text-lg text-center">Send
                             Payment Reminder</button>

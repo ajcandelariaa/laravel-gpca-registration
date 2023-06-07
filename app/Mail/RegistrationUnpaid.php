@@ -33,7 +33,7 @@ class RegistrationUnpaid extends Mailable
      */
     public function envelope()
     {
-        $subject = $this->details['eventName'].' - Unpaid Registration';
+        $subject = 'Outstanding payment for your '. $this->details['eventName'].' registration';
         return new Envelope(
             from: new Address('forumregistration@gpca.org.ae', 'GPCA Events Registration'),
             subject: $subject,

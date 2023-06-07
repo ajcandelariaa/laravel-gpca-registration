@@ -379,8 +379,7 @@ class RegistrantDetails extends Component
 
         $eventFormattedData = Carbon::parse($this->event->event_start_date)->format('d') . '-' . Carbon::parse($this->event->event_end_date)->format('d M Y');
 
-        $allDelegatesArrayLength = count($this->finalData['allDelegates']);
-        foreach ($this->finalData['allDelegates'] as $index => $delegates) {
+        foreach ($this->finalData['allDelegates'] as $delegates) {
             foreach ($delegates as $innerDelegate) {
                 if (end($delegates) == $innerDelegate) {
                     $details1 = [
@@ -409,15 +408,13 @@ class RegistrantDetails extends Component
 
                     Mail::to($innerDelegate['email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaid($details1));
                     Mail::to($innerDelegate['email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaymentConfirmation($details2));
-
-                    if(($index - 1) == $allDelegatesArrayLength){
-                        if ($this->finalData['assistant_email_address'] != null) {
-                            Mail::to($this->finalData['assistant_email_address'])->queue(new RegistrationPaid($details1));
-                            Mail::to($this->finalData['assistant_email_address'])->queue(new RegistrationPaymentConfirmation($details2));
-                        }
-                    }
                 }
             }
+        }
+
+        if ($this->finalData['assistant_email_address'] != null) {
+            Mail::to($this->finalData['assistant_email_address'])->queue(new RegistrationPaid($details1));
+            Mail::to($this->finalData['assistant_email_address'])->queue(new RegistrationPaymentConfirmation($details2));
         }
 
         $this->finalData['registration_status'] = "confirmed";
@@ -641,33 +638,30 @@ class RegistrantDetails extends Component
     public function sendEmailReminder()
     {
         $invoiceLink = env('APP_URL') . '/' . $this->eventCategory . '/' . $this->eventId . '/view-invoice/' . $this->registrantId;
+        if ($this->event->eb_end_date == null) {
+            $earlyBirdValidityDate = Carbon::createFromFormat('Y-m-d', $this->event->std_start_date)->subDay();
+        } else {
+            $earlyBirdValidityDate = Carbon::createFromFormat('Y-m-d', $this->event->eb_end_date);
+        }
 
-        $details = [
-            'name' => $this->finalData['name'],
-            'eventName' => $this->event->name,
-            'eventLink' => $this->event->link,
-            'invoiceLink' => $invoiceLink,
-        ];
-
-        Mail::to($this->finalData['email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaymentReminder($details));
+        foreach ($this->finalData['allDelegates'] as $delegates) {
+            foreach ($delegates as $innerDelegate) {
+                if (end($delegates) == $innerDelegate) {
+                    $details = [
+                        'name' => $innerDelegate['name'],
+                        'eventName' => $this->event->name,
+                        'eventLink' => $this->event->link,
+                        'invoiceLink' => $invoiceLink,
+                        'earlyBirdValidityDate' => $earlyBirdValidityDate->format('jS F'),
+                    ];
+                    Mail::to($innerDelegate['email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaymentReminder($details));
+                }
+            }
+        }
 
         if ($this->finalData['assistant_email_address'] != null) {
             Mail::to($this->finalData['assistant_email_address'])->queue(new RegistrationPaymentReminder($details));
         }
-
-        if (count($this->finalData['subDelegates']) > 0) {
-            foreach ($this->finalData['subDelegates'] as $subDelegate) {
-                $details = [
-                    'name' => $subDelegate['name'],
-                    'eventName' => $this->event->name,
-                    'eventLink' => $this->event->link,
-                    'invoiceLink' => $invoiceLink,
-                ];
-
-                Mail::to($subDelegate['email_address'])->queue(new RegistrationPaymentReminder($details));
-            }
-        }
-
 
         $this->dispatchBrowserEvent('swal:payment-reminder-success', [
             'type' => 'success',

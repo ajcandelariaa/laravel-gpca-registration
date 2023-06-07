@@ -1,9 +1,9 @@
 <x-mail::message>
 <p>Dear {{ $details['name'] }},</p>
 
-<p>Thank you for your registration for the <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a>. Your payment has been received successfully.</p>
+<p>Thank you for your registering for the <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a>. We have successfully received your payment.</p>
 
-<p>Below is the summary of your payment for your reference.</p>
+<p>Please find below a summary of your payment for your reference.</p>
 
 <table style="border-collapse: collapse; width: 100%;">
     <thead>
@@ -31,11 +31,9 @@ Download invoice
 </x-mail::button>
 <span>&nbsp;</span>
 
-<p>For further queries, you may contact below.</p>
+<p>For further information, you may contact the following:</p>
 
 <span>
-    Best regards,
-    <br><br>
     <strong>Analee Candelaria</strong>
     <br>
     <em>Senior Events Accounts Specialist</em>
@@ -45,5 +43,12 @@ Download invoice
     Email: <a href="mailto:analee@gpca.org.ae">analee@gpca.org.ae</a>
     <br>
     <a href="https://www.gpca.org.ae/" target="_blank">www.gpca.org.ae</a>
+    <br>
 </span>
+
+<p>Thank you.</p>
+
+<p>Kind regards,</p>
+
+<p>GPCA Team</p>
 </x-mail::message>
