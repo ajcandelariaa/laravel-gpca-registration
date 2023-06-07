@@ -20,8 +20,11 @@
                                 Pass Type <span class="text-red-500">*</span>
                             </div>
                             <div>
-                                <select wire:model="delegatePassType"
+                                <select wire:model.lazy="delegatePassType"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                                    @if ($event->eb_full_member_rate != null || $event->std_full_member_rate != null)
+                                        <option value="fullMember" {{ $delegatePassType == 'fullMember' ? 'selected' : '' }}>Full Member</option>
+                                    @endif
                                     <option value="member" {{ $delegatePassType == 'member' ? 'selected' : '' }}>Member</option>
                                     <option value="nonMember" {{ $delegatePassType == 'nonMember' ? 'selected' : '' }}>Non-Member</option>
                                 </select>
@@ -34,7 +37,7 @@
                             </div>
                             <div>
                                 @if ($delegatePassType == 'member')
-                                    <select wire:model="companyName"
+                                    <select wire:model.lazy="companyName"
                                         class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                                         <option value=""></option>
                                         @foreach ($members as $member)
@@ -43,7 +46,7 @@
                                         @endforeach
                                     </select>
                                 @else
-                                    <input placeholder="Company Name" type="text" wire:model="companyName"
+                                    <input placeholder="Company Name" type="text" wire:model.lazy="companyName"
                                         class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                                 @endif
 
@@ -61,7 +64,7 @@
                                 Company Sector <span class="text-red-500">*</span>
                             </div>
                             <div>
-                                <select wire:model="companySector"
+                                <select wire:model.lazy="companySector"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                                     <option value=""></option>
                                     @foreach ($companySectors as $companySectorOpt)
@@ -83,7 +86,7 @@
                                 Company Address <span class="text-red-500">*</span>
                             </div>
                             <div>
-                                <input placeholder="Please enter Complete Company Address" type="text" wire:model="companyAddress"
+                                <input placeholder="Please enter Complete Company Address" type="text" wire:model.lazy="companyAddress"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                                 @error('companyAddress')
                                     <div class="text-red-500 text-xs italic mt-1">
@@ -100,7 +103,7 @@
                                 Country <span class="text-red-500">*</span>
                             </div>
                             <div>
-                                <select wire:model="companyCountry"
+                                <select wire:model.lazy="companyCountry"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                                     <option value=""></option>
                                     @foreach ($countries as $country)
@@ -122,7 +125,7 @@
                                 City <span class="text-red-500">*</span>
                             </div>
                             <div>
-                                <input placeholder="City" type="text" wire:model="companyCity"
+                                <input placeholder="City" type="text" wire:model.lazy="companyCity"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                 
                                 @error('companyCity')
@@ -140,7 +143,7 @@
                                 Landline Number
                             </div>
                             <div>
-                                <input placeholder="xxxxxxx" type="text" wire:model="companyLandlineNumber"
+                                <input placeholder="xxxxxxx" type="text" wire:model.lazy="companyLandlineNumber"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                 
                                 @error('companyLandlineNumber')
@@ -156,7 +159,7 @@
                                 Mobile Number <span class="text-red-500">*</span>
                             </div>
                             <div>
-                                <input placeholder="xxxxxxx" type="text" wire:model="companyMobileNumber"
+                                <input placeholder="xxxxxxx" type="text" wire:model.lazy="companyMobileNumber"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                                 @error('companyMobileNumber')
                                     <div class="text-red-500 text-xs italic mt-1">
@@ -172,7 +175,7 @@
                                 Assistant's email address
                             </div>
                             <div>
-                                <input placeholder="Email Address" type="text" wire:model="assistantEmailAddress"
+                                <input placeholder="Email Address" type="text" wire:model.lazy="assistantEmailAddress"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                             </div>
                         </div>

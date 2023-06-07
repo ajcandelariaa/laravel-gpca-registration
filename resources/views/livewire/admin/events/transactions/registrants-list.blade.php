@@ -32,8 +32,9 @@
         <div class="mt-5 flex flex-row gap-6">
             <div>
                 <label>Pass type: </label>
-                <select wire:model="filterByPassType" class="border border-gray-300 bg-white rounded-md py-1">
+                <select wire:model.lazy="filterByPassType" class="border border-gray-300 bg-white rounded-md py-1">
                     <option value=""></option>
+                    <option value="Full Member">Full Member</option>
                     <option value="Member">Member</option>
                     <option value="Non-Member">Non-Member</option>
                 </select>
@@ -41,27 +42,31 @@
 
             <div>
                 <label>Registration status: </label>
-                <select wire:model="filterByRegStatus" class="border border-gray-300 bg-white rounded-md py-1">
+                <select wire:model.lazy="filterByRegStatus" class="border border-gray-300 bg-white rounded-md py-1">
                     <option value=""></option>
                     <option value="Confirmed">Confirmed</option>
                     <option value="Pending">Pending</option>
                     <option value="Dropped out">Dropped out</option>
+                    <option value="Cancelled">Cancelled</option>
                 </select>
             </div>
 
             <div>
                 <label>Payment status:</label>
-                <select wire:model="filterByPayStatus" class="border border-gray-300 bg-white rounded-md py-1">
+                <select wire:model.lazy="filterByPayStatus" class="border border-gray-300 bg-white rounded-md py-1">
                     <option value=""></option>
                     <option value="Free">Free</option>
                     <option value="Paid">Paid</option>
                     <option value="Unpaid">Unpaid</option>
+                    <option value="Refunded">Refunded</option>
                 </select>
             </div>
 
             <div>
-                <button wire:click="filter"
-                    class="bg-registrationPrimaryColorHover hover:bg-registrationPrimaryColor text-white py-1 px-4 rounded-md">Filter</button>
+                <button wire:click="filter" class="bg-registrationPrimaryColorHover hover:bg-registrationPrimaryColor text-white py-1 px-4 rounded-md">Filter</button>
+                @if ($filterByPassType != null || $filterByRegStatus != null || $filterByPayStatus != null)
+                    <button wire:click="clearFilter" class="bg-red-700 hover:bg-red-800 text-white py-1 px-4 rounded-md">Clear Filter</button>
+                @endif
             </div>
         </div>
 

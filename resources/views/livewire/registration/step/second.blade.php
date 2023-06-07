@@ -11,7 +11,7 @@
                 Company name <span class="text-red-500">*</span>
             </div>
             <div>
-                <input readonly placeholder="Company name" type="text" wire:model="companyName"
+                <input readonly placeholder="Company name" type="text" wire:model.lazy="companyName"
                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-none">
             </div>
         </div>
@@ -21,7 +21,7 @@
                 Company sector <span class="text-red-500">*</span>
             </div>
             <div>
-                <select wire:model="companySector"
+                <select wire:model.lazy="companySector"
                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                     <option value=""></option>
                     @foreach ($companySectors as $companySector)
@@ -43,7 +43,7 @@
                 Company address <span class="text-red-500">*</span>
             </div>
             <div>
-                <input placeholder="Please enter complete company address" type="text" wire:model="companyAddress"
+                <input placeholder="Please enter complete company address" type="text" wire:model.lazy="companyAddress"
                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                 @error('companyAddress')
                     <div class="text-red-500 text-xs italic mt-1">
@@ -59,7 +59,7 @@
                 Country <span class="text-red-500">*</span>
             </div>
             <div>
-                <select wire:model="companyCountry"
+                <select wire:model.lazy="companyCountry"
                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                     <option value=""></option>
                     @foreach ($countries as $country)
@@ -82,7 +82,7 @@
                 City <span class="text-red-500">*</span>
             </div>
             <div>
-                <input placeholder="City" type="text" wire:model="companyCity"
+                <input placeholder="City" type="text" wire:model.lazy="companyCity"
                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
 
                 @error('companyCity')
@@ -99,7 +99,7 @@
                 Landline number <span class="italic">(optional)</span>
             </div>
             <div>
-                <input placeholder="xxxxxxx" type="text" wire:model="companyLandlineNumber"
+                <input placeholder="xxxxxxx" type="text" wire:model.lazy="companyLandlineNumber"
                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
 
                 @error('companyLandlineNumber')
@@ -115,7 +115,7 @@
                 Mobile number <span class="text-red-500">*</span>
             </div>
             <div>
-                <input placeholder="xxxxxxx" type="text" wire:model="companyMobileNumber"
+                <input placeholder="xxxxxxx" type="text" wire:model.lazy="companyMobileNumber"
                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                 @error('companyMobileNumber')
                     <div class="text-red-500 text-xs italic mt-1">
@@ -132,7 +132,7 @@
                 Assistant's email address
             </div>
             <div>
-                <input placeholder="Email address" type="text" wire:model="assistantEmailAddress"
+                <input placeholder="Email address" type="text" wire:model.lazy="assistantEmailAddress"
                     wire:key="assistantEmailAddress"
                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                 @error('assistantEmailAddress')
@@ -148,7 +148,7 @@
                 Where did you hear about us?
             </div>
             <div>
-                <select wire:model="heardWhere"
+                <select wire:model.lazy="heardWhere"
                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                     <option value=""></option>
                     <option value="Email">Email</option>
@@ -175,7 +175,7 @@
                     Would you be attending the Networking Gala Dinner and Plastics Circul-A-Thon Awards 14<sup>th</sup> May 2023?
                 </div>
                 <div>
-                    <select wire:model="pcAttendingND"
+                    <select wire:model.lazy="pcAttendingND"
                         class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                         <option value=""></option>
                         <option value="Yes">Yes</option>
@@ -189,7 +189,7 @@
                     Would you be attending the Networking Gala Dinner and SC Excellence Awards on 16<sup>th</sup> May 2013?
                 </div>
                 <div>
-                    <select wire:model="sccAttendingND"
+                    <select wire:model.lazy="sccAttendingND"
                         class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                         <option value=""></option>
                         <option value="Yes">Yes</option>

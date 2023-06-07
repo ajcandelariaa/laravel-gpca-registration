@@ -5,7 +5,7 @@
             Salutation
         </div>
         <div>
-            <select wire:model="replaceSalutation"
+            <select wire:model.lazy="replaceSalutation"
                 class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                 <option value=""></option>
                 @foreach ($salutations as $salutationOpT)
@@ -20,7 +20,7 @@
             First Name <span class="text-red-500">*</span>
         </div>
         <div>
-            <input placeholder="First Name" type="text" wire:model="replaceFirstName"
+            <input placeholder="First Name" type="text" wire:model.lazy="replaceFirstName"
                 class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
             @error('replaceFirstName')
                 <div class="text-red-500 text-xs italic mt-1">
@@ -36,7 +36,7 @@
             Middle Name
         </div>
         <div>
-            <input placeholder="Middle Name" type="text" wire:model="replaceMiddleName"
+            <input placeholder="Middle Name" type="text" wire:model.lazy="replaceMiddleName"
                 class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
         </div>
     </div>
@@ -46,7 +46,7 @@
             Last Name <span class="text-red-500">*</span>
         </div>
         <div>
-            <input placeholder="Last Name" type="text" wire:model="replaceLastName"
+            <input placeholder="Last Name" type="text" wire:model.lazy="replaceLastName"
                 class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
             @error('replaceLastName')
                 <div class="text-red-500 text-xs italic mt-1">
@@ -63,7 +63,7 @@
             Email Address <span class="text-red-500">*</span>
         </div>
         <div>
-            <input placeholder="Email Address" type="text" wire:model="replaceEmailAddress"
+            <input placeholder="Email Address" type="text" wire:model.lazy="replaceEmailAddress"
                 class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
             @error('replaceEmailAddress')
                 <div class="text-red-500 text-xs italic mt-1">
@@ -84,7 +84,7 @@
             Mobile Number <span class="text-red-500">*</span>
         </div>
         <div>
-            <input placeholder="xxxxxxx" type="text" wire:model="replaceMobileNumber"
+            <input placeholder="xxxxxxx" type="text" wire:model.lazy="replaceMobileNumber"
                 class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
             @error('replaceMobileNumber')
                 <div class="text-red-500 text-xs italic mt-1">
@@ -101,7 +101,7 @@
             Nationality <span class="text-red-500">*</span>
         </div>
         <div>
-            <input placeholder="Nationality" type="text" wire:model="replaceNationality"
+            <input placeholder="Nationality" type="text" wire:model.lazy="replaceNationality"
                 class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
             @error('replaceNationality')
                 <div class="text-red-500 text-xs italic mt-1">
@@ -116,7 +116,7 @@
             Job Title <span class="text-red-500">*</span>
         </div>
         <div>
-            <input placeholder="Job Title" type="text" wire:model="replaceJobTitle"
+            <input placeholder="Job Title" type="text" wire:model.lazy="replaceJobTitle"
                 class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
             @error('replaceJobTitle')
                 <div class="text-red-500 text-xs italic mt-1">
@@ -134,10 +134,10 @@
         </div>
 
         @if ($replacePromoCodeSuccess != null)
-            <input readonly wire:model="replaceBadgeType" type="text"
+            <input readonly wire:model.lazy="replaceBadgeType" type="text"
                 class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-none cursor-not-allowed">
         @else
-            <select wire:model="replaceBadgeType"
+            <select wire:model.lazy="replaceBadgeType"
                 class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                 <option value=""></option>
                 @foreach ($registrationTypes as $registrationType)
@@ -159,13 +159,13 @@
 
         <div class="flex">
             @if ($replacePromoCodeSuccess != null)
-                <input readonly type="text" wire:model="replacePromoCode"
+                <input readonly type="text" wire:model.lazy="replacePromoCode"
                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-none cursor-not-allowed">
 
                 <button wire:click.prevent="replaceRemovePromoCode" wire:key="btnReplaceRemovePromoCodeEdit"
                     type="button" class="bg-red-300 px-5 ml-2">Remove</button>
             @else
-                <input placeholder="Enter your promo code here" type="text" wire:model="replacePromoCode"
+                <input placeholder="Enter your promo code here" type="text" wire:model.lazy="replacePromoCode"
                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
 
                 <button wire:click.prevent="replaceApplyPromoCode" wire:key="btnReplaceApplyPromoCodeEdit"

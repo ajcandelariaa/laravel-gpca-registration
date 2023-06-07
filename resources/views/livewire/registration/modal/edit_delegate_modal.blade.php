@@ -20,7 +20,7 @@
                                 Salutation
                             </div>
                             <div>
-                                <select wire:model="subSalutationEdit"
+                                <select wire:model.lazy="subSalutationEdit"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                                     <option value=""></option>
                                     @foreach ($salutations as $salutation)
@@ -37,7 +37,7 @@
                                 First name <span class="text-red-500">*</span>
                             </div>
                             <div>
-                                <input placeholder="First name" type="text" wire:model="subFirstNameEdit"
+                                <input placeholder="First name" type="text" wire:model.lazy="subFirstNameEdit"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                                 @error('subFirstNameEdit')
                                     <div class="text-red-500 text-xs italic mt-1">
@@ -53,7 +53,7 @@
                                 Middle name
                             </div>
                             <div>
-                                <input placeholder="Middle name" type="text" wire:model="subMiddleNameEdit"
+                                <input placeholder="Middle name" type="text" wire:model.lazy="subMiddleNameEdit"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                             </div>
                         </div>
@@ -63,7 +63,7 @@
                                 Last name <span class="text-red-500">*</span>
                             </div>
                             <div>
-                                <input placeholder="Last name" type="text" wire:model="subLastNameEdit"
+                                <input placeholder="Last name" type="text" wire:model.lazy="subLastNameEdit"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                                 @error('subLastNameEdit')
                                     <div class="text-red-500 text-xs italic mt-1">
@@ -80,7 +80,7 @@
                                 Email address <span class="text-red-500">*</span>
                             </div>
                             <div>
-                                <input placeholder="Email address" type="text" wire:model="subEmailAddressEdit"
+                                <input placeholder="Email address" type="text" wire:model.lazy="subEmailAddressEdit"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                                 @error('subEmailAddressEdit')
                                     <div class="text-red-500 text-xs italic mt-1">
@@ -108,7 +108,7 @@
                                 Mobile number <span class="text-red-500">*</span>
                             </div>
                             <div>
-                                <input placeholder="xxxxxxx" type="text" wire:model="subMobileNumberEdit"
+                                <input placeholder="xxxxxxx" type="text" wire:model.lazy="subMobileNumberEdit"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                                 @error('subMobileNumberEdit')
                                     <div class="text-red-500 text-xs italic mt-1">
@@ -126,7 +126,7 @@
                             </div>
                             <div>
                                 
-                                <select wire:model="subNationalityEdit"
+                                <select wire:model.lazy="subNationalityEdit"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                                     <option value=""></option>
                                     @foreach ($countries as $country)
@@ -149,7 +149,7 @@
                                 Job title <span class="text-red-500">*</span>
                             </div>
                             <div>
-                                <input placeholder="Job title" type="text" wire:model="subJobTitleEdit"
+                                <input placeholder="Job title" type="text" wire:model.lazy="subJobTitleEdit"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                                 @error('subJobTitleEdit')
                                     <div class="text-red-500 text-xs italic mt-1">
@@ -167,7 +167,7 @@
 
                             <div class="flex">
                                 @if ($promoCodeSuccessSubEdit != null)
-                                    <input readonly type="text" wire:model="subPromoCodeEdit"
+                                    <input readonly type="text" wire:model.lazy="subPromoCodeEdit"
                                         class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-none cursor-not-allowed">
 
                                     <button wire:click.prevent="removePromoCodeSubEdit"
@@ -175,7 +175,7 @@
                                         class="bg-red-300 px-5 ml-2">Remove</button>
                                 @else
                                     <input placeholder="Enter your promo code here" type="text"
-                                        wire:model="subPromoCodeEdit"
+                                        wire:model.lazy="subPromoCodeEdit"
                                         class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
 
                                     <button wire:click.prevent="applyPromoCodeSubEdit"

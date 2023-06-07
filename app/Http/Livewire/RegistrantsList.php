@@ -71,7 +71,6 @@ class RegistrantsList extends Component
                 $tempYear = Carbon::parse($mainDelegate->registered_date_time)->format('y');
                 $lastDigit = 1000 + intval($transactionId);
                 $tempInvoiceNumber = $this->event->category . $tempYear . "/" . $lastDigit;
-                $tempTransactionId = $this->event->year . $this->getEventCode . $lastDigit;
 
                 // get pass type
                 if ($mainDelegate->pass_type == 'member') {
@@ -137,7 +136,6 @@ class RegistrantsList extends Component
                     'paymentMethod' => $paymentMethod,
                 ]);
             }
-
             $this->finalListOfRegistrantsConst = $this->finalListOfRegistrants;
         }
     }
@@ -145,6 +143,13 @@ class RegistrantsList extends Component
     public function render()
     {
         return view('livewire.admin.events.transactions.registrants-list');
+    }
+
+    public function clearFilter(){
+        $this->filterByPassType = null;
+        $this->filterByRegStatus = null;
+        $this->filterByPayStatus = null;
+        $this->filter();
     }
 
     public function filter()
@@ -201,12 +206,13 @@ class RegistrantsList extends Component
         } else {
             $this->finalListOfRegistrants = collect($this->finalListOfRegistrantsConst)
                 ->filter(function ($item) {
-                    return str_contains(strtolower($item['companyName']), strtolower($this->searchTerm)) ||
+                    return str_contains(strtolower($item['invoiceNumber']), strtolower($this->searchTerm)) ||
+                        str_contains(strtolower($item['companyName']), strtolower($this->searchTerm)) ||
                         str_contains(strtolower($item['country']), strtolower($this->searchTerm)) ||
                         str_contains(strtolower($item['city']), strtolower($this->searchTerm)) ||
-                        str_contains(strtolower($item['invoiceNumber']), strtolower($this->searchTerm)) ||
-                        str_contains(strtolower($item['transactionId']), strtolower($this->searchTerm)) ||
-                        str_contains(strtolower($item['regDateTime']), strtolower($this->searchTerm));
+                        str_contains(strtolower($item['totalAmount']), strtolower($this->searchTerm)) ||
+                        str_contains(strtolower($item['regDateTime']), strtolower($this->searchTerm)) ||
+                        str_contains(strtolower($item['paymentMethod']), strtolower($this->searchTerm));
                 })
                 ->all();
         }
@@ -600,7 +606,10 @@ class RegistrantsList extends Component
         // CHECK UNIT PRICE
         if ($this->event->eb_end_date != null && $this->event->eb_member_rate != null && $this->event->eb_nmember_rate != null) {
             if ($today->lte(Carbon::parse($this->event->eb_end_date))) {
-                if ($this->delegatePassType == "member") {
+                if ($this->delegatePassType == "fullMember") {
+                    $this->rateTypeString = "Early Bird Full Member Rate";
+                    $this->finalUnitPrice = $this->event->eb_full_member_rate;
+                } else if ($this->delegatePassType == "member") {
                     $this->rateTypeString = "Early Bird Member Rate";
                     $this->finalUnitPrice = $this->event->eb_member_rate;
                 } else {
@@ -609,7 +618,10 @@ class RegistrantsList extends Component
                 }
                 $this->rateType = "Early Bird";
             } else {
-                if ($this->delegatePassType == "member") {
+                if ($this->delegatePassType == "fullMember") {
+                    $this->rateTypeString = "Standard Full Member Rate";
+                    $this->finalUnitPrice = $this->event->std_full_member_rate;
+                } else if ($this->delegatePassType == "member") {
                     $this->rateTypeString = "Standard Member Rate";
                     $this->finalUnitPrice = $this->event->std_member_rate;
                 } else {
@@ -619,7 +631,10 @@ class RegistrantsList extends Component
                 $this->rateType = "Standard";
             }
         } else {
-            if ($this->delegatePassType == "member") {
+            if ($this->delegatePassType == "fullMember") {
+                $this->rateTypeString = "Standard Full Member Rate";
+                $this->finalUnitPrice = $this->event->std_full_member_rate;
+            } else if ($this->delegatePassType == "member") {
                 $this->rateTypeString = "Standard Member Rate";
                 $this->finalUnitPrice = $this->event->std_member_rate;
             } else {

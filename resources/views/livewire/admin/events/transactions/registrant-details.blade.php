@@ -1,6 +1,6 @@
 <div>
     <div>
-        <img src="{{ Storage::url($eventBanner) }}" alt="" class="w-full object-cover">
+        <img src="{{ Storage::url($event->banner) }}" alt="" class="w-full object-cover">
     </div>
 
     <div class="container mx-auto my-10">
@@ -34,7 +34,9 @@
                     <div class="grid grid-cols-2 bg-white py-3 px-4 gap-4">
                         <p>Pass Type:</p>
 
-                        @if ($finalData['pass_type'] == 'member')
+                        @if ($finalData['pass_type'] == 'fullMember')
+                            <p class="font-bold">Full Member</p>
+                        @elseif ($finalData['pass_type'] == 'member')
                             <p class="font-bold">Member</p>
                         @else
                             <p class="font-bold">Non-Member</p>
@@ -81,13 +83,13 @@
                             @endif
                         </p>
 
-                        @if ($eventCategory == 'PC' && $eventYear == '2023')
+                        @if ($eventCategory == 'PC' && $event->year == '2023')
                             <p> Would you be attending the Networking Gala Dinner and Plastics Circul-A-Thon Awards
                                 14<sup>th</sup> May 2023?</p>
                             <p class="font-bold"> {{ $finalData['pc_attending_nd'] }} </p>
                         @endif
 
-                        @if ($eventCategory == 'SCC' && $eventYear == '2023')
+                        @if ($eventCategory == 'SCC' && $event->year == '2023')
                             <p>Would you be attending the Networking Gala Dinner and SC Excellence Awards on
                                 16<sup>th</sup> May 2013?</p>
                             <p class="font-bold"> {{ $finalData['scc_attending_nd'] }} </p>
@@ -166,8 +168,12 @@
                     </p>
                 </div>
 
-                <div class="grid grid-cols-2 gap-3 mt-5">
-                    @if ($finalData['payment_status'] != 'paid' && $finalData['payment_status'] != 'refunded')
+                <div class="grid grid-cols-1 gap-3 mt-5">
+                    <a href="{{ route('admin.event.registrants.view.invoice', ['eventCategory' => $eventCategory, 'eventId' => $eventId, 'registrantId' => $registrantId]) }}"
+                        class="bg-orange-800 hover:bg-orange-900 text-white py-2 rounded-md text-lg text-center"
+                        target="_blank">View Invoice</a>
+
+                    @if ($finalData['payment_status'] != 'paid' && $finalData['payment_status'] != 'refunded' && $finalData['paid_date_time'] == null)
                         <button wire:click="openMarkAsPaidModal"
                             class="bg-green-600 hover:bg-green-700 text-white py-2 rounded-md text-lg text-center">Mark
                             as
@@ -178,15 +184,8 @@
                             as
                             Paid</button>
                     @endif
-                    <button wire:click="calculateTotal"
-                        class="bg-registrationPrimaryColorHover hover:bg-registrationPrimaryColor text-white py-2 rounded-md text-lg text-center">Calculate
-                        Total</button>
 
-                    <a href="{{ route('admin.event.registrants.view.invoice', ['eventCategory' => $eventCategory, 'eventId' => $eventId, 'registrantId' => $registrantId]) }}"
-                        class="bg-orange-800 hover:bg-orange-900 text-white py-2 rounded-md text-lg text-center"
-                        target="_blank">View Invoice</a>
-
-                    @if ($finalData['payment_status'] != 'paid' && $finalData['payment_status'] != 'refunded')
+                    @if ($finalData['payment_status'] != 'paid' && $finalData['payment_status'] != 'refunded' && $finalData['paid_date_time'] == null)
                         <button wire:click="sendEmailReminderConfirmation"
                             class="col-span-1 bg-sky-600 hover:bg-sky-700 text-white py-2 rounded-md text-lg text-center">Send
                             Payment Reminder</button>
@@ -268,6 +267,10 @@
                                             @else
                                                 <p class="font-bold">Cancelled but not refunded</p>
                                             @endif
+
+                                            <p>Cancelled date & time: </p>
+                                            <p class="font-bold">{{ $innerDelegate['delegate_cancelled_datetime'] }}
+                                            </p>
                                         @else
                                             <button
                                                 wire:click="openDelegateCancellationModal({{ $index }}, {{ $innerIndex }})"

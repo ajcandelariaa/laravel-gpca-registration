@@ -21,9 +21,8 @@ class RegistrantDetails extends Component
 {
     public $countries, $companySectors, $salutations, $registrationTypes;
 
-    public $eventCategory, $eventId, $eventYear, $registrantId, $finalData, $members, $eventBanner;
+    public $eventCategory, $eventId, $registrantId, $finalData, $members, $event;
 
-    // DELEGATE PASS TYPE
     public $rateType, $finalUnitPrice;
 
     // COMPANY INFO
@@ -32,9 +31,7 @@ class RegistrantDetails extends Component
     // DELEGATE DETAILS
     public $mainDelegateId, $delegateId, $salutation, $firstName, $middleName, $lastName, $emailAddress, $mobileNumber, $nationality, $jobTitle, $badgeType, $promoCode, $promoCodeDiscount, $promoCodeSuccess, $promoCodeFail, $type, $delegateIndex, $delegateInnerIndex;
 
-    public $transactionRemarks;
-    public $delegateCancellationStep = 1, $replaceDelegate;
-    public $delegateRefund;
+    public $transactionRemarks, $delegateCancellationStep = 1, $replaceDelegate, $delegateRefund;
 
     public $replaceDelegateIndex, $replaceDelegateInnerIndex, $replaceSalutation, $replaceFirstName, $replaceMiddleName, $replaceLastName, $replaceEmailAddress, $replaceMobileNumber, $replaceNationality, $replaceJobTitle, $replaceBadgeType, $replacePromoCode, $replacePromoCodeDiscount, $replacePromoCodeSuccess, $replacePromoCodeFail, $replaceEmailAlreadyUsedError;
 
@@ -54,10 +51,9 @@ class RegistrantDetails extends Component
         $this->countries = config('app.countries');
         $this->companySectors = config('app.companySectors');
         $this->salutations = config('app.salutations');
-        $this->eventBanner = Events::where('id', $eventId)->where('category', $eventCategory)->value('banner');
         $this->registrationTypes = EventRegistrationTypes::where('event_id', $eventId)->where('event_category', $eventCategory)->where('active', true)->get();
 
-        $this->eventYear = Events::where('id', $eventId)->where('category', $eventCategory)->value('year');
+        $this->event = Events::where('id', $eventId)->where('category', $eventCategory)->first();
         $this->eventCategory = $eventCategory;
         $this->eventId = $eventId;
         $this->registrantId = $registrantId;
@@ -92,6 +88,8 @@ class RegistrantDetails extends Component
                 'badgeType.required' => "Registration type is required",
             ]
         );
+
+        // PUT CONFIRMATION HERE
 
         if ($this->promoCodeSuccess != null) {
             PromoCodes::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->where('active', true)->where('promo_code', $this->promoCode)->where('badge_type', $this->badgeType)->increment('total_usage');
@@ -141,6 +139,8 @@ class RegistrantDetails extends Component
         $this->finalData['allDelegates'][$this->delegateIndex][$this->delegateInnerIndex]['badge_type'] = $this->badgeType;
         $this->finalData['allDelegates'][$this->delegateIndex][$this->delegateInnerIndex]['pcode_used'] = $this->promoCode;
         $this->finalData['allDelegates'][$this->delegateIndex][$this->delegateInnerIndex]['discount'] = $this->promoCodeDiscount;
+
+        $this->calculateTotal();
 
         $this->showDelegateModal = false;
         $this->resetEditModalFields();
@@ -252,13 +252,17 @@ class RegistrantDetails extends Component
         ]);
 
         if ($this->finalData['rate_type'] == "Standard") {
-            if ($this->delegatePassType == "member") {
+            if ($this->delegatePassType == "fullMember") {
+                $this->rateTypeString = "Standard Full Member Rate";
+            } else if ($this->delegatePassType == "member") {
                 $this->rateTypeString = "Standard Member Rate";
             } else {
                 $this->rateTypeString = "Standard Non-Member Rate";
             }
         } else {
-            if ($this->delegatePassType == "member") {
+            if ($this->delegatePassType == "fullMember") {
+                $this->rateTypeString = "Early Bird Full Member Rate";
+            } else if ($this->delegatePassType == "member") {
                 $this->rateTypeString = "Early Bird Member Rate";
             } else {
                 $this->rateTypeString = "Early Bird Non-Member Rate";
@@ -288,6 +292,8 @@ class RegistrantDetails extends Component
         $this->finalData['company_telephone_number'] = $this->companyLandlineNumber;
         $this->finalData['company_mobile_number'] = $this->companyMobileNumber;
         $this->finalData['assistant_email_address'] = $this->assistantEmailAddress;
+
+        $this->calculateTotal();
 
         $this->resetEditCompanyModalFields();
         $this->showCompanyModal = false;
@@ -371,8 +377,7 @@ class RegistrantDetails extends Component
             'paid_date_time' => Carbon::now(),
         ])->save();
 
-        $event = Events::where('id', $this->eventId)->where('category', $this->eventCategory)->first();
-        $eventFormattedData = Carbon::parse($event->event_start_date)->format('d') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');
+        $eventFormattedData = Carbon::parse($this->event->event_start_date)->format('d') . '-' . Carbon::parse($this->event->event_end_date)->format('d M Y');
 
         $allDelegatesArrayLength = count($this->finalData['allDelegates']);
         foreach ($this->finalData['allDelegates'] as $index => $delegates) {
@@ -380,11 +385,11 @@ class RegistrantDetails extends Component
                 if (end($delegates) == $innerDelegate) {
                     $details1 = [
                         'name' => $innerDelegate['name'],
-                        'eventLink' => $event->link,
-                        'eventName' => $event->name,
+                        'eventLink' => $this->event->link,
+                        'eventName' => $this->event->name,
                         'eventDates' => $eventFormattedData,
-                        'eventLocation' => $event->location,
-                        'eventCategory' => $event->category,
+                        'eventLocation' => $this->event->location,
+                        'eventCategory' => $this->event->category,
 
                         'jobTitle' => $innerDelegate['job_title'],
                         'companyName' => $this->finalData['company_name'],
@@ -394,8 +399,8 @@ class RegistrantDetails extends Component
 
                     $details2 = [
                         'name' => $innerDelegate['name'],
-                        'eventLink' => $event->link,
-                        'eventName' => $event->name,
+                        'eventLink' => $this->event->link,
+                        'eventName' => $this->event->name,
 
                         'invoiceAmount' => $this->finalData['invoiceData']['total_amount'],
                         'amountPaid' => $this->finalData['invoiceData']['total_amount'],
@@ -430,40 +435,31 @@ class RegistrantDetails extends Component
     }
 
 
-    public function calculateTotal()
-    {
-        $this->getInvoice();
-    }
-
-
     public function checkUnitPrice()
     {
         // CHECK UNIT PRICE
-        $event = Events::where('id', $this->eventId)->where('category', $this->eventCategory)->first();
-
         if ($this->finalData['rate_type'] == "Standard") {
             if ($this->finalData['pass_type'] == "fullMember") {
-                return $event->std_full_member_rate;
+                return $this->event->std_full_member_rate;
             } else if ($this->finalData['pass_type'] == "member") {
-                return $event->std_member_rate;
+                return $this->event->std_member_rate;
             } else {
-                return $event->std_nmember_rate;
+                return $this->event->std_nmember_rate;
             }
         } else {
             if ($this->finalData['pass_type'] == "fullMember") {
-                return $event->eb_full_member_rate;
+                return $this->event->eb_full_member_rate;
             } else if ($this->finalData['pass_type'] == "member") {
-                return $event->eb_member_rate;
+                return $this->event->eb_member_rate;
             } else {
-                return $event->eb_nmember_rate;
+                return $this->event->eb_nmember_rate;
             }
         }
     }
 
 
-    public function getInvoice()
+    public function calculateTotal()
     {
-        $event = Events::where('id', $this->eventId)->where('category', $this->eventCategory)->first();
         $invoiceDetails = array();
         $countFinalQuantity = 0;
 
@@ -589,7 +585,7 @@ class RegistrantDetails extends Component
             $net_amount += $invoiceDetail['totalNetAmount'];
             $discount_price += $invoiceDetail['totalDiscount'];
         }
-        $totalVat = $net_amount * ($event->event_vat / 100);
+        $totalVat = $net_amount * ($this->event->event_vat / 100);
         $totalAmount = $net_amount + $totalVat;
 
         $this->finalData['invoiceData']['vat_price'] = $totalVat;
@@ -644,14 +640,12 @@ class RegistrantDetails extends Component
 
     public function sendEmailReminder()
     {
-        $event = Events::where('id', $this->eventId)->where('category', $this->eventCategory)->first();
-
         $invoiceLink = env('APP_URL') . '/' . $this->eventCategory . '/' . $this->eventId . '/view-invoice/' . $this->registrantId;
 
         $details = [
             'name' => $this->finalData['name'],
-            'eventName' => $event->name,
-            'eventLink' => $event->link,
+            'eventName' => $this->event->name,
+            'eventLink' => $this->event->link,
             'invoiceLink' => $invoiceLink,
         ];
 
@@ -665,8 +659,8 @@ class RegistrantDetails extends Component
             foreach ($this->finalData['subDelegates'] as $subDelegate) {
                 $details = [
                     'name' => $subDelegate['name'],
-                    'eventName' => $event->name,
-                    'eventLink' => $event->link,
+                    'eventName' => $this->event->name,
+                    'eventLink' => $this->event->link,
                     'invoiceLink' => $invoiceLink,
                 ];
 
@@ -846,8 +840,8 @@ class RegistrantDetails extends Component
 
             $this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['delegate_cancelled'] = true;
             $this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['delegate_refunded'] = true;
-            $this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['delegate_cancelled_datetime'] = Carbon::now();
-            $this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['delegate_refunded_datetime'] = Carbon::now();
+            $this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['delegate_cancelled_datetime'] = Carbon::parse(Carbon::now())->format('M j, Y g:i A');
+            $this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['delegate_refunded_datetime'] = Carbon::parse(Carbon::now())->format('M j, Y g:i A');
 
             if ($this->finalData['finalQuantity'] == 1) {
                 MainDelegates::find($this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['mainDelegateId'])->fill([
@@ -857,6 +851,7 @@ class RegistrantDetails extends Component
 
                 $this->finalData['registration_status'] = 'cancelled';
                 $this->finalData['payment_status'] = 'refunded';
+                $this->finalData['finalQuantity'] = 0;
             }
 
             $this->dispatchBrowserEvent('swal:delegate-cancel-refund-success', [
@@ -879,7 +874,7 @@ class RegistrantDetails extends Component
             }
 
             $this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['delegate_cancelled'] = true;
-            $this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['delegate_cancelled_datetime'] = Carbon::now();
+            $this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['delegate_cancelled_datetime'] = Carbon::parse(Carbon::now())->format('M j, Y g:i A');
 
             if ($this->finalData['finalQuantity'] == 1) {
                 MainDelegates::find($this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['mainDelegateId'])->fill([
@@ -895,6 +890,7 @@ class RegistrantDetails extends Component
                 'text' => "",
             ]);
         }
+        $this->calculateTotal();
         $this->showDelegateCancellationModal = false;
     }
 
@@ -935,14 +931,13 @@ class RegistrantDetails extends Component
             'delegate_type' => "sub",
         ]);
 
-        $eventYear = Events::where('id', $this->eventId)->value('year');
         foreach (config('app.eventCategories') as $eventCategoryC => $code) {
             if ($this->eventCategory == $eventCategoryC) {
                 $eventCode = $code;
             }
         }
         $lastDigit = 1000 + intval($transaction->id);
-        $finalTransactionId = $eventYear . $eventCode . $lastDigit;
+        $finalTransactionId = $this->event->year . $eventCode . $lastDigit;
 
         array_push($this->finalData['allDelegates'][$this->replaceDelegateIndex], [
             'transactionId' => $finalTransactionId,
@@ -1001,15 +996,15 @@ class RegistrantDetails extends Component
 
         $this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['delegate_cancelled'] = true;
         $this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['delegate_replaced'] = true;
-        $this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['delegate_cancelled_datetime'] = Carbon::now();
-        $this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['delegate_replaced_datetime'] = Carbon::now();
+        $this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['delegate_cancelled_datetime'] = Carbon::parse(Carbon::now())->format('M j, Y g:i A');
+        $this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['delegate_replaced_datetime'] = Carbon::parse(Carbon::now())->format('M j, Y g:i A');
 
         $this->dispatchBrowserEvent('swal:delegate-cancel-replace-success', [
             'type' => 'success',
             'message' => 'Delegate replaced succesfully!',
             'text' => "",
         ]);
-
+        $this->calculateTotal();
         $this->removeReplaceData();
         $this->showDelegateCancellationModal = false;
     }

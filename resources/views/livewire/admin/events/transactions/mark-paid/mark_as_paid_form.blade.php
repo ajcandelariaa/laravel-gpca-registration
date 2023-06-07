@@ -18,7 +18,7 @@
                                 Payment method <span class="text-red-500">*</span>
                             </div>
                             <div>
-                                <select wire:model="mapPaymentMethod"
+                                <select wire:model.lazy="mapPaymentMethod"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                                     <option value=""></option>
                                     <option value="bankTransfer">Bank Transfer</option>

@@ -141,7 +141,7 @@
                             <div>
                                 @if ($event->eb_full_member_rate != null || $event->std_full_member_rate != null)
                                     @if ($delegatePassType == 'fullMember')
-                                        <select wire:model="companyName"
+                                        <select wire:model.lazy="companyName"
                                             class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                                             <option value=""></option>
                                             @foreach ($members as $member)
@@ -152,7 +152,7 @@
                                             @endforeach
                                         </select>
                                     @elseif($delegatePassType == 'member')
-                                        <select wire:model="companyName"
+                                        <select wire:model.lazy="companyName"
                                             class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                                             <option value=""></option>
                                             @foreach ($members as $member)
@@ -163,12 +163,12 @@
                                             @endforeach
                                         </select>
                                     @else
-                                        <input placeholder="Company Name" type="text" wire:model="companyName"
+                                        <input placeholder="Company Name" type="text" wire:model.lazy="companyName"
                                             class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                                     @endif
                                 @else
                                     @if ($delegatePassType == 'member')
-                                        <select wire:model="companyName"
+                                        <select wire:model.lazy="companyName"
                                             class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                                             <option value=""></option>
                                             @foreach ($members as $member)
@@ -177,7 +177,7 @@
                                             @endforeach
                                         </select>
                                     @else
-                                        <input placeholder="Company Name" type="text" wire:model="companyName"
+                                        <input placeholder="Company Name" type="text" wire:model.lazy="companyName"
                                             class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                                     @endif
                                 @endif

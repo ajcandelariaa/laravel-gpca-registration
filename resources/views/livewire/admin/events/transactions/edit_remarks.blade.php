@@ -12,7 +12,7 @@
                     <div class="text-registrationPrimaryColor italic font-bold text-xl">
                         Remarks
                     </div>
-                    <textarea wire:model="transactionRemarks" placeholder="Please type here..." rows="10"
+                    <textarea wire:model.lazy="transactionRemarks" placeholder="Please type here..." rows="10"
                         class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor mt-2">{{ $transactionRemarks }}</textarea>
                 </div>
 

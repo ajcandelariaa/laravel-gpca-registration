@@ -21,7 +21,7 @@
                                 Salutation
                             </div>
                             <div>
-                                <select wire:model="subSalutation"
+                                <select wire:model.lazy="subSalutation"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                                     <option value=""></option>
                                     @foreach ($salutations as $salutation)
@@ -36,7 +36,7 @@
                                 First name <span class="text-red-500">*</span>
                             </div>
                             <div>
-                                <input placeholder="First name" type="text" wire:model="subFirstName"
+                                <input placeholder="First name" type="text" wire:model.lazy="subFirstName"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                                 @error('subFirstName')
                                     <div class="text-red-500 text-xs italic mt-1">
@@ -52,7 +52,7 @@
                                 Middle name
                             </div>
                             <div>
-                                <input placeholder="Middle name" type="text" wire:model="subMiddleName"
+                                <input placeholder="Middle name" type="text" wire:model.lazy="subMiddleName"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                             </div>
                         </div>
@@ -62,7 +62,7 @@
                                 Last name <span class="text-red-500">*</span>
                             </div>
                             <div>
-                                <input placeholder="Last name" type="text" wire:model="subLastName"
+                                <input placeholder="Last name" type="text" wire:model.lazy="subLastName"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                                 @error('subLastName')
                                     <div class="text-red-500 text-xs italic mt-1">
@@ -79,7 +79,7 @@
                                 Email address <span class="text-red-500">*</span>
                             </div>
                             <div>
-                                <input placeholder="Email address" type="text" wire:model="subEmailAddress"
+                                <input placeholder="Email address" type="text" wire:model.lazy="subEmailAddress"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                                 @error('subEmailAddress')
                                     <div class="text-red-500 text-xs italic mt-1">
@@ -107,7 +107,7 @@
                                 Mobile number <span class="text-red-500">*</span>
                             </div>
                             <div>
-                                <input placeholder="xxxxxxx" type="text" wire:model="subMobileNumber"
+                                <input placeholder="xxxxxxx" type="text" wire:model.lazy="subMobileNumber"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                                 @error('subMobileNumber')
                                     <div class="text-red-500 text-xs italic mt-1">
@@ -124,7 +124,7 @@
                                 Nationality <span class="text-red-500">*</span>
                             </div>
                             <div>
-                                <select wire:model="subNationality"
+                                <select wire:model.lazy="subNationality"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                                     <option value=""></option>
                                     @foreach ($countries as $country)
@@ -147,7 +147,7 @@
                                 Job title <span class="text-red-500">*</span>
                             </div>
                             <div>
-                                <input placeholder="Job title" type="text" wire:model="subJobTitle"
+                                <input placeholder="Job title" type="text" wire:model.lazy="subJobTitle"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                                 @error('subJobTitle')
                                     <div class="text-red-500 text-xs italic mt-1">
@@ -166,14 +166,14 @@
 
                             <div class="flex">
                                 @if ($promoCodeSuccessSub != null)
-                                    <input readonly type="text" wire:model="subPromoCode"
+                                    <input readonly type="text" wire:model.lazy="subPromoCode"
                                         class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-none cursor-not-allowed">
 
                                     <button wire:click.prevent="removePromoCodeSub" wire:key="btnRemovePromoCodeSub"
                                         type="button" class="bg-red-300 px-5 ml-2">Remove</button>
                                 @else
                                     <input placeholder="Enter your promo code here" type="text"
-                                        wire:model="subPromoCode"
+                                        wire:model.lazy="subPromoCode"
                                         class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
 
                                     <button wire:click.prevent="applyPromoCodeSub" wire:key="btnApplyPromoCodeSub"

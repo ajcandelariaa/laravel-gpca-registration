@@ -19,7 +19,7 @@
                                 Do you want to replace it with a new delegate? <span class="text-red-500">*</span>
                             </div>
                             <div class="mt-3">
-                                <select wire:model="replaceDelegate"
+                                <select wire:model.lazy="replaceDelegate"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                                     <option value="Yes">Yes</option>
                                     <option value="No">No</option>
@@ -35,7 +35,7 @@
                                     Is this gonna be a refund? <span class="text-red-500">*</span>
                                 </div>
                                 <div class="mt-3">
-                                    <select wire:model="delegateRefund"
+                                    <select wire:model.lazy="delegateRefund"
                                         class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                                         <option value=""></option>
                                         <option value="Yes">Yes</option>
