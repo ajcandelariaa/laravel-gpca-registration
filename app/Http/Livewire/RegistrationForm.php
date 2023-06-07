@@ -92,7 +92,7 @@ class RegistrationForm extends Component
         $this->subBadgeType = "Delegate";
         $this->subBadgeTypeEdit = "Delegate";
 
-        $this->members = Members::where('active', true)->get();
+        $this->members = Members::where('active', true)->orderBy('name', 'ASC')->get();
         $this->delegateFees = EventDelegateFee::where('event_id', $data->id)->where('event_category', $data->category)->get();
 
         $this->cardDetails = false;
@@ -467,7 +467,7 @@ class RegistrationForm extends Component
     public function decreaseStep()
     {
         if ($this->currentStep == 2) {
-            $this->members = Members::where('active', true)->get();
+            $this->members = Members::where('active', true)->orderBy('name', 'ASC')->get();
             $this->resetCalculations();
         }
 

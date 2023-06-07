@@ -474,8 +474,6 @@ return [
         'ANC' => "03",
         'RIC' => "04",
         'RCC' => "05",
-        'AF' => "06", 
-        'IPAW' => "20",
     ],
 
     'bankDetails' => [
