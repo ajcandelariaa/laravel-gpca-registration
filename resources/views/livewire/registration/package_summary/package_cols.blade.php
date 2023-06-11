@@ -29,7 +29,7 @@
         <div class="grid grid-cols-6 gap-2">
             <div class="col-span-2 bg-white p-4">
                 @if ($count == 1)
-                    <p>{{ $event->name }} – {{ $finalEventStartDate . ' - ' . $finalEventEndDate }} at
+                    <p>{{ $event->name }} – {{ $eventFormattedDate }} at
                         {{ $event->location }}</p>
                     <p class="mt-10">{{ $delegatInvoiceDetail['delegateDescription'] }}</p>
                 @else
