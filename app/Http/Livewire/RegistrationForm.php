@@ -70,6 +70,7 @@ class RegistrationForm extends Component
     public $pcAttendingND;
     public $sccAttendingND;
 
+    public $eventFormattedDate;
 
     protected $listeners = ['registrationConfirmed' => 'addtoDatabase', 'emitInitiateAuth' => 'initiateAuthenticationCC', 'emitSubmit' => 'submitBankTransfer', 'emitSubmitStep3' => 'submitStep3'];
 
@@ -112,6 +113,9 @@ class RegistrationForm extends Component
         $this->finalStdStartDate = Carbon::parse($this->event->std_start_date)->format('d M Y');
         $this->finalEventStartDate = Carbon::parse($this->event->event_start_date)->format('d M Y');
         $this->finalEventEndDate = Carbon::parse($this->event->event_end_date)->format('d M Y');
+        
+
+        $this->eventFormattedDate = Carbon::parse($this->event->event_start_date)->format('d') . '-' . Carbon::parse($this->event->event_end_date)->format('d M Y');
     }
 
     public function render()
@@ -143,7 +147,7 @@ class RegistrationForm extends Component
                     $this->finalUnitPrice = $this->event->std_full_member_rate;
                 } else if ($this->delegatePassType == "member") {
                     $this->rateTypeString = "Standard Member Rate";
-                    $this->finalUnitPrice = $this->event->std_full_member_rate;
+                    $this->finalUnitPrice = $this->event->std_member_rate;
                 } else {
                     $this->rateTypeString = "Standard Non-Member Rate";
                     $this->finalUnitPrice = $this->event->std_nmember_rate;
@@ -177,7 +181,7 @@ class RegistrationForm extends Component
         array_push($this->delegatInvoiceDetails, [
             'delegateDescription' => "Delegate Registration Fee - {$this->rateTypeString} - {$this->badgeType} {$promoCodeMainDiscountString}",
             'delegateNames' => [
-                $this->salutation . " " . $this->firstName . " " . $this->middleName . " " . $this->lastName,
+                $this->firstName . " " . $this->middleName . " " . $this->lastName,
             ],
             'badgeType' => $this->badgeType,
             'quantity' => 1,
@@ -202,7 +206,7 @@ class RegistrationForm extends Component
                 if ($checkIfExisting) {
                     array_push(
                         $this->delegatInvoiceDetails[$existingIndex]['delegateNames'],
-                        $this->additionalDelegates[$i]['subSalutation'] . " " . $this->additionalDelegates[$i]['subFirstName'] . " " . $this->additionalDelegates[$i]['subMiddleName'] . " " . $this->additionalDelegates[$i]['subLastName']
+                        $this->additionalDelegates[$i]['subFirstName'] . " " . $this->additionalDelegates[$i]['subMiddleName'] . " " . $this->additionalDelegates[$i]['subLastName']
                     );
 
                     $quantityTemp = $this->delegatInvoiceDetails[$existingIndex]['quantity'] + 1;
@@ -217,7 +221,7 @@ class RegistrationForm extends Component
                     array_push($this->delegatInvoiceDetails, [
                         'delegateDescription' => "Delegate Registration Fee - {$this->rateTypeString} - {$this->additionalDelegates[$i]['subBadgeType']}{$promoCodeSubDiscountString}",
                         'delegateNames' => [
-                            $this->additionalDelegates[$i]['subSalutation'] . " " . $this->additionalDelegates[$i]['subFirstName'] . " " . $this->additionalDelegates[$i]['subMiddleName'] . " " . $this->additionalDelegates[$i]['subLastName'],
+                            $this->additionalDelegates[$i]['subFirstName'] . " " . $this->additionalDelegates[$i]['subMiddleName'] . " " . $this->additionalDelegates[$i]['subLastName'],
                         ],
                         'badgeType' => $this->additionalDelegates[$i]['subBadgeType'],
                         'quantity' => 1,
