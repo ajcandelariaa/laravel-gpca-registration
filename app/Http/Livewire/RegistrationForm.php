@@ -115,7 +115,7 @@ class RegistrationForm extends Component
         $this->finalEventEndDate = Carbon::parse($this->event->event_end_date)->format('d M Y');
         
 
-        $this->eventFormattedDate = Carbon::parse($this->event->event_start_date)->format('d') . '-' . Carbon::parse($this->event->event_end_date)->format('d M Y');
+        $this->eventFormattedDate = Carbon::parse($this->event->event_start_date)->format('j') . '-' . Carbon::parse($this->event->event_end_date)->format('j F Y');
     }
 
     public function render()
