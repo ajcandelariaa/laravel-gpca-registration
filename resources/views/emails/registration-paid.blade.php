@@ -66,6 +66,10 @@ Download invoice
 </ul>
 @endif --}}
 
+<h3>HOTEL AND ACCOMMODATION</h3>
+
+<p>For hotel accommodation kindly contact my colleague <a href="mailto:abel@gpca.org.ae">abel@gpca.org.ae</a> or call +971 4 451 0666 ext. 102.</p>
+
 <p>For the latest updates on the event, please visit the event website at <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a>.</p>
 
 Best regards,
