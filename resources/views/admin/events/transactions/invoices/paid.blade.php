@@ -206,10 +206,10 @@
    <table class="invoice-main-footer">
        <tr>
             <td class="left">
-                <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('/assets/images/invoice_footer_left.png'))) }}" alt="invoice-footer" width="200">
+                <img src="data:image/PNG;base64,{{ base64_encode(file_get_contents(public_path('/assets/images/invoice_footer_left.PNG'))) }}" alt="invoice-footer" width="200">
             </td>
             <td class="right">
-                <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('/assets/images/invoice_footer_right.png'))) }}" alt="invoice-footer" width="150">
+                <img src="data:image/PNG;base64,{{ base64_encode(file_get_contents(public_path('/assets/images/invoice_footer_right.PNG'))) }}" alt="invoice-footer" width="150">
             </td>
        </tr>
    </table>
