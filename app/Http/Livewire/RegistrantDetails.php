@@ -378,6 +378,7 @@ class RegistrantDetails extends Component
         ])->save();
 
         $eventFormattedData = Carbon::parse($this->event->event_start_date)->format('d') . '-' . Carbon::parse($this->event->event_end_date)->format('d M Y');
+        $invoiceLink = env('APP_URL') . '/' . $this->event->category . '/' . $this->event->id . '/view-invoice/' . $this->finalData['mainDelegateId'];
 
         foreach ($this->finalData['allDelegates'] as $delegates) {
             foreach ($delegates as $innerDelegate) {
@@ -394,6 +395,7 @@ class RegistrantDetails extends Component
                         'companyName' => $this->finalData['company_name'],
                         'amountPaid' => $this->finalData['invoiceData']['total_amount'],
                         'transactionId' => $innerDelegate['transactionId'],
+                        'invoiceLink' => $invoiceLink,
                     ];
 
                     $details2 = [
@@ -404,6 +406,7 @@ class RegistrantDetails extends Component
                         'invoiceAmount' => $this->finalData['invoiceData']['total_amount'],
                         'amountPaid' => $this->finalData['invoiceData']['total_amount'],
                         'balance' => 0,
+                        'invoiceLink' => $invoiceLink,
                     ];
 
                     Mail::to($innerDelegate['email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaid($details1));
@@ -491,7 +494,7 @@ class RegistrantDetails extends Component
             array_push($invoiceDetails, [
                 'delegateDescription' => $delegateDescription,
                 'delegateNames' => [
-                    $mainDelegate->salutation . " " . $mainDelegate->first_name . " " . $mainDelegate->middle_name . " " . $mainDelegate->last_name,
+                    $mainDelegate->first_name . " " . $mainDelegate->middle_name . " " . $mainDelegate->last_name,
                 ],
                 'badgeType' => $mainDelegate->badge_type,
                 'quantity' => 1,
@@ -535,7 +538,7 @@ class RegistrantDetails extends Component
                     if ($checkIfExisting) {
                         array_push(
                             $invoiceDetails[$existingIndex]['delegateNames'],
-                            $subDelegate->salutation . " " . $subDelegate->first_name . " " . $subDelegate->middle_name . " " . $subDelegate->last_name
+                            $subDelegate->first_name . " " . $subDelegate->middle_name . " " . $subDelegate->last_name
                         );
 
                         $quantityTemp = $invoiceDetails[$existingIndex]['quantity'] + 1;
@@ -562,7 +565,7 @@ class RegistrantDetails extends Component
                         array_push($invoiceDetails, [
                             'delegateDescription' => $subDelegateDescription,
                             'delegateNames' => [
-                                $subDelegate->salutation . " " . $subDelegate->first_name . " " . $subDelegate->middle_name . " " . $subDelegate->last_name,
+                                $subDelegate->first_name . " " . $subDelegate->middle_name . " " . $subDelegate->last_name,
                             ],
                             'badgeType' => $subDelegate->badge_type,
                             'quantity' => 1,
@@ -650,6 +653,7 @@ class RegistrantDetails extends Component
                     $details = [
                         'name' => $innerDelegate['name'],
                         'eventName' => $this->event->name,
+                        'eventCategory' => $this->event->category,
                         'eventLink' => $this->event->link,
                         'invoiceLink' => $invoiceLink,
                         'earlyBirdValidityDate' => $earlyBirdValidityDate->format('jS F'),
