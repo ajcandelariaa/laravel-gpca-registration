@@ -794,7 +794,7 @@ class RegistrationForm extends Component
                 $this->dispatchBrowserEvent('swal:remove-loading-button');
                 $this->dispatchBrowserEvent('swal:registration-error-authentication', [
                     'type' => 'error',
-                    'message' => 'Authentication Error',
+                    'message' => 'Authentication Error 2',
                     'text' => 'There was a problem authenticating your card, please try again!'
                 ]);
             }
@@ -802,7 +802,7 @@ class RegistrationForm extends Component
             $this->dispatchBrowserEvent('swal:remove-loading-button');
             $this->dispatchBrowserEvent('swal:registration-error-authentication', [
                 'type' => 'error',
-                'message' => 'Authentication Error',
+                'message' => 'Authentication Error 1',
                 'text' => 'There was a problem authenticating your card, please try again!'
             ]);
         }

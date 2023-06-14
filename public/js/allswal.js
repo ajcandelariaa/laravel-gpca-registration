@@ -260,10 +260,12 @@ window.addEventListener("swal:remove-loading-button", () => {
       let payButton = document.getElementById('payButton');
       let processingButton = document.getElementById('processingButton');
       let registrationLloadingScreen = document.getElementById('registration-loading-screen');
+      let registrationLloadingScreen2 = document.getElementById('registration-loading-screen-2');
       
       processingButton.classList.add('hidden');
       payButton.classList.remove('hidden');
       registrationLloadingScreen.classList.add('hidden');
+      registrationLloadingScreen2.classList.add('hidden');
 });
 
 window.addEventListener("swal:hide-pay-button", () => {
