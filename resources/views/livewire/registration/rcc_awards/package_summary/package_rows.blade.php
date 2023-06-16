@@ -5,10 +5,10 @@
             <p class="font-bold text-registrationPrimaryColor text-lg pb-2">Description</p>
             <div class="bg-white p-4">
                 <p>{{ $event->name }} – {{ $eventFormattedStartDate }} at {{ $event->location }}</p>
-                <p class="mt-10">Participant registration fee - {{ $rateTypeString }}</p>
+                <p class="mt-5">Awards Submission fee</p>
 
                 <ul class="mt-2 list-decimal ml-4">
-                    <li>{{ $firstName }} {{ $middleName }} {{ $lastName }}</li>
+                    <li>Category: {{ $category }}</li>
                 </ul>
             </div>
         </div>
