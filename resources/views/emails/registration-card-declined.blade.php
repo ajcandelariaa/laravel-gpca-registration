@@ -24,8 +24,6 @@ Download invoice
 
 <p>Please contact your bank for further information regarding the declined payment. Alternatively, you can reach out to Analee Candelaria at <a href="mailto:analee@gpca.org.ae">analee@gpca.org.ae</a> or +971 4 451 0666 ext. 116 to explore alternative payment options that may be available to you.</p>
 
-<p>Although your registration is saved in our system. You can still pay by bank transfer through the below bank account.</p>
-
 Kind regards,
 <br><br>
 GPCA Team

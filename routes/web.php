@@ -74,3 +74,5 @@ Route::post('capturePayment', [RegistrationController::class, 'capturePayment'])
 
 Route::get('/{eventCategory}/{eventId}/view-invoice/{registrantId}', [RegistrationController::class, 'generatePublicInvoice'])->name('generate-public-invoice');
 Route::get('/{eventCategory}/{eventId}/view-badge/{delegateType}/{delegateId}', [DelegateController::class, 'delegateDetailPrintBadge'])->name('generate-public-badge');
+
+Route::get('/download-file/{documentId}', [RegistrationController::class, 'downloadFile'])->name('download-file');

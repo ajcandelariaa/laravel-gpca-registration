@@ -33,7 +33,13 @@ class RegistrationUnpaid extends Mailable
      */
     public function envelope()
     {
-        $subject = 'Outstanding payment for your '. $this->details['eventName'].' registration';
+        
+        if ($this->details['eventCategory'] == "RCCA") {
+            $subject = 'Outstanding payment for your entry submission on the '. $this->details['eventName'];
+        } else {
+            $subject = 'Outstanding payment for your '. $this->details['eventName'].' registration';
+        }
+        
         return new Envelope(
             from: new Address('forumregistration@gpca.org.ae', 'GPCA Events Registration'),
             subject: $subject,
@@ -47,9 +53,19 @@ class RegistrationUnpaid extends Mailable
      */
     public function content()
     {
-        return new Content(
-            markdown: 'emails.registration-unpaid',
-        );
+        if ($this->details['eventCategory'] == "AFS") {
+            return new Content(
+                markdown: 'emails.spouse.registration-unpaid',
+            );
+        } else if ($this->details['eventCategory'] == "RCCA") {
+            return new Content(
+                markdown: 'emails.rcca.registration-unpaid',
+            );
+        } else {
+            return new Content(
+                markdown: 'emails.registration-unpaid',
+            );
+        }
     }
 
     /**

@@ -888,7 +888,6 @@ class RegistrantDetails extends Component
                 'text' => "",
             ]);
         }
-        $this->calculateTotal();
         $this->showDelegateCancellationModal = false;
     }
 
@@ -939,7 +938,7 @@ class RegistrantDetails extends Component
 
         array_push($this->finalData['allDelegates'][$this->replaceDelegateIndex], [
             'transactionId' => $finalTransactionId,
-            'main_delegate_id' => $this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['mainDelegateId'],
+            'mainDelegateId' => $this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['mainDelegateId'],
             'delegateId' => $replacedDelegate->id,
             'delegateType' => "sub",
 

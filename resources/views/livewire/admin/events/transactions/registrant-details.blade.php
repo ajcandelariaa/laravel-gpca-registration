@@ -320,7 +320,7 @@
                                 <div class="col-span-2 bg-white p-4">
                                     @if ($count == 1)
                                         <p>{{ $finalData['invoiceData']['eventName'] }} –
-                                            {{ $finalData['invoiceData']['finalEventStartDate'] . ' - ' . $finalData['invoiceData']['finalEventEndDate'] }}
+                                            {{ $finalData['invoiceData']['eventFormattedData'] }}
                                             at {{ $finalData['invoiceData']['eventLocation'] }}</p>
                                         <p class="mt-10">{{ $delegatInvoiceDetail['delegateDescription'] }}</p>
                                     @else
@@ -386,15 +386,15 @@
         </div>
 
         @if ($showDelegateModal)
-            @include('livewire.admin.events.transactions.edit_delegate_form')
+            @include('livewire.admin.events.transactions.edit-forms.edit_delegate_form')
         @endif
 
         @if ($showCompanyModal)
-            @include('livewire.admin.events.transactions.edit_company_form')
+            @include('livewire.admin.events.transactions.edit-forms.edit_company_form')
         @endif
 
         @if ($showTransactionRemarksModal)
-            @include('livewire.admin.events.transactions.edit_remarks')
+            @include('livewire.admin.events.transactions.edit-forms.edit_remarks')
         @endif
 
         @if ($showDelegateCancellationModal)

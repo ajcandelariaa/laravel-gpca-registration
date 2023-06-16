@@ -33,7 +33,7 @@ class RegistrationPaymentReminder extends Mailable
      */
     public function envelope()
     {
-        $subject = "Payment reminder for your delegate registration on the " .$this->details['eventName'];
+        $subject = "Payment reminder for your registration on the " . $this->details['eventName'];
         return new Envelope(
             from: new Address('forumregistration@gpca.org.ae', 'GPCA Events Registration'),
             subject: $subject,
@@ -47,9 +47,19 @@ class RegistrationPaymentReminder extends Mailable
      */
     public function content()
     {
-        return new Content(
-            markdown: 'emails.registration-payment-reminder',
-        );
+        if ($this->details['eventCategory'] == "AFS") {
+            return new Content(
+                markdown: 'emails.spouse.registration-payment-reminder',
+            );
+        } else if ($this->details['eventCategory'] == "RCCA") {
+            return new Content(
+                markdown: 'emails.rcca.registration-payment-reminder',
+            );
+        } else {
+            return new Content(
+                markdown: 'emails.registration-payment-reminder',
+            );
+        }
     }
 
     /**

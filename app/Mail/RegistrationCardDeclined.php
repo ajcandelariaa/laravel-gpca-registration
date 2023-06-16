@@ -33,7 +33,12 @@ class RegistrationCardDeclined extends Mailable
      */
     public function envelope()
     {
-        $subject = 'Your payment registration for the '. $this->details['eventName'].' has been declined';
+        if ($this->details['eventCategory'] == "RCCA") {
+            $subject = 'Declined payment for your entry submission on the '. $this->details['eventName'];
+        } else {
+            $subject = 'Your payment registration for the '. $this->details['eventName'].' has been declined';
+        }
+        
         return new Envelope(
             from: new Address('forumregistration@gpca.org.ae', 'GPCA Events Registration'),
             subject: $subject,

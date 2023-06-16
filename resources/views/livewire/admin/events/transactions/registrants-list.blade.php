@@ -126,7 +126,7 @@
             @endif
         </div>
         @if ($showImportModal)
-            @include('livewire.admin.events.transactions.import_registrants_form')
+            @include('livewire.admin.events.transactions.import-form.import_registrants_form')
         @endif
     </div>
 </div>

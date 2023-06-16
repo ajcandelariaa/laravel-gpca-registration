@@ -64,14 +64,11 @@
                     <a href="{{ route('admin.dashboard.view') }}"
                         class="{{ request()->is('admin/dashboard*') ? 'text-dashboardNavItemHoverColor' : 'hover:underline' }}">Dashboard</a>
                     <a href="{{ route('admin.event.view') }}"
-                        class="{{ request()->is('admin/event*') ? 'text-dashboardNavItemHoverColor' : 'hover:underline' }}">Manage
-                        Events</a>
+                        class="{{ request()->is('admin/event*') ? 'text-dashboardNavItemHoverColor' : 'hover:underline' }}">Events</a>
                     <a href="{{ route('admin.member.view') }}"
-                        class="{{ request()->is('admin/member*') ? 'text-dashboardNavItemHoverColor' : 'hover:underline' }}">Manage
-                        Members</a>
+                        class="{{ request()->is('admin/member*') ? 'text-dashboardNavItemHoverColor' : 'hover:underline' }}">Members</a>
                     <a href="{{ route('admin.delegate.view') }}"
-                        class="{{ request()->is('admin/delegate*') ? 'text-dashboardNavItemHoverColor' : 'hover:underline' }}">Manage
-                        Delegates</a>
+                        class="{{ request()->is('admin/delegate*') ? 'text-dashboardNavItemHoverColor' : 'hover:underline' }}">Delegates</a>
                     <a href="{{ route('admin.logout') }}" class="hover:underline">Logout</a>
                     <br><br>
                 </div>

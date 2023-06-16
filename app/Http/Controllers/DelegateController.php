@@ -28,7 +28,7 @@ class DelegateController extends Controller
 
     public function eventDelegateView($eventCategory, $eventId)
     {
-        if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {
+        if (Event::where('category', $eventCategory)->where('id', $eventId)->exists() && $eventCategory != "AFS" && $eventCategory != "AFV" && $eventCategory != "RCCA") {
             return view('admin.events.delegates.delegates', [
                 "pageTitle" => "Event Delegates",
                 "eventCategory" => $eventCategory,
@@ -39,9 +39,9 @@ class DelegateController extends Controller
         }
     }
 
-    public function delegateDetailView($eventCategory, $eventId, $delegateType, $delegateId, Request $request)
+    public function delegateDetailView($eventCategory, $eventId, $delegateType, $delegateId)
     {
-        if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {
+        if (Event::where('category', $eventCategory)->where('id', $eventId)->exists() && $eventCategory != "AFS" && $eventCategory != "AFV" && $eventCategory != "RCCA") {
             $finalDelegate = array();
             $tempDelegate = array();
 

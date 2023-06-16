@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\AdditionalDelegate;
+use App\Models\AdditionalSpouse;
 use App\Models\Event;
 use App\Models\EventRegistrationType;
 use App\Models\MainDelegate;
+use App\Models\MainSpouse;
 use App\Models\Transaction;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -73,304 +75,532 @@ class EventController extends Controller
         if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {
             $event = Event::where('category', $eventCategory)->where('id', $eventId)->first();
 
-            $generalData = array();
-            $specificData = array();
-
-            $totalConfirmedDelegates = 0;
-            $totalDelegates = 0;
-            $totalRegisteredToday = 0;
-            $totalPaidToday = 0;
-            $totalAmountPaidToday = 0;
-            $totalAmountPaid = 0;
-            $totalFullMember = 0;
-            $totalMember = 0;
-            $totalNonMember = 0;
-            $totalBankTransfer = 0;
-            $totalCreditCard = 0;
-            $totalPaid = 0;
-            $totalFree = 0;
-            $totalUnpaid = 0;
-            $totalRefunded = 0;
-            $totalOnline = 0;
-            $totalImported = 0;
-            $totalOnsite = 0;
-            $totalConfirmed = 0;
-            $totalPending = 0;
-            $totalDroppedOut = 0;
-            $totalCancelled = 0;
-            $arrayCountryTotal = array();
-            $arrayCompanyTotal = array();
-            $arrayRegistrationTypeTotal = array();
-
-            $dateToday = Carbon::now();
-            $noRefund = 0;
-
-            $mainDelegates = MainDelegate::where('event_id', $eventId)->get();
-
-            if ($mainDelegates->isNotEmpty()) {
-                foreach ($mainDelegates as $mainDelegate) {
-
-                    $delegateRegisteredDate = Carbon::parse($mainDelegate->registered_date_time);
-                    if ($dateToday->isSameDay($delegateRegisteredDate)) {
-                        $totalRegisteredToday++;
-                    }
-
-                    if ($mainDelegate->delegate_replaced_by_id == null && (!$mainDelegate->delegate_refunded)) {
-                        if($mainDelegate->registration_status == "confirmed"){
-                            $totalConfirmedDelegates++;
-                        }
-
-                        $totalDelegates++;
-
-                        if ($mainDelegate->pass_type == "fullMember") {
-                            $totalFullMember++;
-                        } else if ($mainDelegate->pass_type == "member") {
-                            $totalMember++;
-                        } else {
-                            $totalNonMember++;
-                        }
-
-                        if ($mainDelegate->mode_of_payment == "creditCard") {
-                            $totalCreditCard++;
-                        } else {
-                            $totalBankTransfer++;
-                        }
-
-                        if ($mainDelegate->payment_status == "paid") {
-                            $delegatePaidDate = Carbon::parse($mainDelegate->paid_date_time);
-                            if ($dateToday->isSameDay($delegatePaidDate)) {
-                                $totalPaidToday++;
-                            }
-
-                            $noRefund++;
-                            $totalPaid++;
-                        } else if ($mainDelegate->payment_status == "free") {
-                            $totalFree++;
-                        } else if ($mainDelegate->payment_status == "unpaid") {
-                            $totalUnpaid++;
-                        } else {
-                        }
-
-
-                        if ($mainDelegate->registration_method == "online") {
-                            $totalOnline++;
-                        } else if ($mainDelegate->registration_method == "imported") {
-                            $totalImported++;
-                        } else {
-                            $totalOnsite++;
-                        }
-
-
-                        if ($mainDelegate->registration_status == "confirmed") {
-                            $totalConfirmed++;
-                        } else if ($mainDelegate->registration_status == "pending") {
-                            $totalPending++;
-                        } else if ($mainDelegate->registration_status == "droppedOut") {
-                            $totalDroppedOut++;
-                        }
-
-                        if($this->checkIfCountryExist($mainDelegate->company_country, $arrayCountryTotal)){
-                            foreach ($arrayCountryTotal as $index => $country) {
-                                if ($country['name'] == $mainDelegate->company_country) {
-                                    $arrayCountryTotal[$index]['total'] = $country['total'] + 1;
-                                }
-                            }
-                        } else {
-                            array_push($arrayCountryTotal, [
-                                'name' => $mainDelegate->company_country,
-                                'total' => 1,
-                            ]);
-                        }
-
-
-                        
-
-                        if($this->checkIfCompanyExist($mainDelegate->company_name, $arrayCompanyTotal)){
-                            foreach ($arrayCompanyTotal as $index => $company) {
-                                if ($company['name'] == $mainDelegate->company_name) {
-                                    $arrayCompanyTotal[$index]['total'] = $company['total'] + 1;
-                                }
-                            }
-                        } else {
-                            array_push($arrayCompanyTotal, [
-                                'name' => $mainDelegate->company_name,
-                                'total' => 1,
-                            ]);
-                        }
-
-
-                        if($this->checkIfRegistrationTypeExist($mainDelegate->badge_type, $arrayRegistrationTypeTotal)){
-                            foreach ($arrayRegistrationTypeTotal as $index => $registrationType) {
-                                if ($registrationType['name'] == $mainDelegate->badge_type) {
-                                    $arrayRegistrationTypeTotal[$index]['total'] = $registrationType['total'] + 1;
-                                }
-                            }
-                        } else {
-                            array_push($arrayRegistrationTypeTotal, [
-                                'name' => $mainDelegate->badge_type,
-                                'total' => 1,
-                            ]);
-                        }
-                    } else {
-                        if ($mainDelegate->delegate_refunded) {
-                            $totalRefunded++;
-                        }
-
-                        if ($mainDelegate->delegate_cancelled) {
-                            $totalCancelled++;
-                        }
-                    }
-
-                    $additionalDelegates = AdditionalDelegate::where('main_delegate_id', $mainDelegate->id)->get();
-                    if ($additionalDelegates->isNotEmpty()) {
-                        foreach ($additionalDelegates as $additionalDelegate) {
-                            if ($additionalDelegate->delegate_replaced_by_id == null && (!$additionalDelegate->delegate_refunded)) {
-                                if($mainDelegate->registration_status == "confirmed"){
-                                    $totalConfirmedDelegates++;
-                                }
-                                
-                                $totalDelegates++;
-
-
-                                if ($mainDelegate->pass_type == "fullMember") {
-                                    $totalFullMember++;
-                                } else if ($mainDelegate->pass_type == "member") {
-                                    $totalMember++;
-                                } else {
-                                    $totalNonMember++;
-                                }
-
-                                if ($mainDelegate->mode_of_payment == "creditCard") {
-                                    $totalCreditCard++;
-                                } else {
-                                    $totalBankTransfer++;
-                                }
-
-
-                                if ($mainDelegate->payment_status == "paid") {
-                                    $delegatePaidDate = Carbon::parse($mainDelegate->paid_date_time);
-                                    if ($dateToday->isSameDay($delegatePaidDate)) {
-                                        $totalPaidToday++;
-                                    }
-
-                                    $noRefund++;
-                                    $totalPaid++;
-                                } else if ($mainDelegate->payment_status == "free") {
-                                    $totalFree++;
-                                } else if ($mainDelegate->payment_status == "unpaid") {
-                                    $totalUnpaid++;
-                                } else {
-                                }
-
-                                if ($mainDelegate->registration_method == "online") {
-                                    $totalOnline++;
-                                } else if ($mainDelegate->registration_method == "imported") {
-                                    $totalImported++;
-                                } else {
-                                    $totalOnsite++;
-                                }
-
-
-                                if ($mainDelegate->registration_status == "confirmed") {
-                                    $totalConfirmed++;
-                                } else if ($mainDelegate->registration_status == "pending") {
-                                    $totalPending++;
-                                } else if ($mainDelegate->registration_status == "droppedOut") {
-                                    $totalDroppedOut++;
-                                }
-
-
-
-
-                                if($this->checkIfCountryExist($mainDelegate->company_country, $arrayCountryTotal)){
-                                    foreach ($arrayCountryTotal as $index => $country) {
-                                        if ($country['name'] == $mainDelegate->company_country) {
-                                            $arrayCountryTotal[$index]['total'] = $country['total'] + 1;
-                                        }
-                                    }
-                                } else {
-                                    array_push($arrayCountryTotal, [
-                                        'name' => $mainDelegate->company_country,
-                                        'total' => 1,
-                                    ]);
-                                }
-
-
-                                if($this->checkIfCompanyExist($mainDelegate->company_name, $arrayCompanyTotal)){
-                                    foreach ($arrayCompanyTotal as $index => $company) {
-                                        if ($company['name'] == $mainDelegate->company_name) {
-                                            $arrayCompanyTotal[$index]['total'] = $company['total'] + 1;
-                                        }
-                                    }
-                                } else {
-                                    array_push($arrayCompanyTotal, [
-                                        'name' => $mainDelegate->company_name,
-                                        'total' => 1,
-                                    ]);
-                                }
-
-
-                                if($this->checkIfRegistrationTypeExist($additionalDelegate->badge_type, $arrayRegistrationTypeTotal)){
-                                    foreach ($arrayRegistrationTypeTotal as $index => $registrationType) {
-                                        if ($registrationType['name'] == $additionalDelegate->badge_type) {
-                                            $arrayRegistrationTypeTotal[$index]['total'] = $registrationType['total'] + 1;
-                                        }
-                                    }
-                                } else {
-                                    array_push($arrayRegistrationTypeTotal, [
-                                        'name' => $additionalDelegate->badge_type,
-                                        'total' => 1,
-                                    ]);
-                                }
-                            } else {
-                                if ($additionalDelegate->delegate_refunded) {
-                                    $totalRefunded++;
-                                }
-
-                                if ($additionalDelegate->delegate_cancelled) {
-                                    $totalCancelled++;
-                                }
-                            }
-                        }
-                    }
-
-                    if ($noRefund > 0 && $mainDelegate->payment_status == "paid") {
-                        $totalAmountPaid += $mainDelegate->total_amount;
-
-                        $delegatePaidDate = Carbon::parse($mainDelegate->paid_date_time);
-                        if ($dateToday->isSameDay($delegatePaidDate)) {
-                            $totalAmountPaidToday += $mainDelegate->total_amount;
-                        }
-                    }
-                }
+            if ($eventCategory == "AFS") {
+                $finalData = $this->eventDasbhoardSpouseData($eventId);
+                return view('admin.events.dashboard.spouse.dashboard', [
+                    "pageTitle" => "Event Dashboard",
+                    "eventCategory" => $eventCategory,
+                    "eventId" => $eventId,
+                    "event" => $event,
+                    "finalData" => $finalData,
+                ]);
+            } else {
+                $finalData = $this->eventDasbhoardEventsData($eventId);
+                return view('admin.events.dashboard.dashboard', [
+                    "pageTitle" => "Event Dashboard",
+                    "eventCategory" => $eventCategory,
+                    "eventId" => $eventId,
+                    "event" => $event,
+                    "finalData" => $finalData,
+                ]);
             }
-
-            return view('admin.events.dashboard.dashboard', [
-                "pageTitle" => "Event Dashboard",
-                "eventCategory" => $eventCategory,
-                "eventId" => $eventId,
-                "event" => $event,
-                
-                'totalConfirmedDelegates' => $totalConfirmedDelegates,
-                'totalDelegates' => $totalDelegates,
-                'totalRegisteredToday' => $totalRegisteredToday,
-                'totalPaidToday' => $totalPaidToday,
-                'totalAmountPaidToday' => $totalAmountPaidToday,
-                'totalAmountPaid' => $totalAmountPaid,
-
-                'passType' => [$totalFullMember, $totalMember, $totalNonMember],
-                'paymentStatus' => [$totalPaid, $totalFree, $totalUnpaid, $totalRefunded],
-                'registrationStatus' => [$totalConfirmed, $totalPending, $totalDroppedOut, $totalCancelled],
-                'registrationMethod' => [$totalOnline, $totalImported, $totalOnsite],
-                'paymentMethod' => [$totalCreditCard, $totalBankTransfer],
-
-                'arrayCountryTotal' => $arrayCountryTotal,
-                'arrayCompanyTotal' => $arrayCompanyTotal,
-                'arrayRegistrationTypeTotal' => $arrayRegistrationTypeTotal,
-            ]);
         } else {
             abort(404, 'The URL is incorrect');
         }
+    }
+
+    public function eventDasbhoardEventsData($eventId)
+    {
+        $totalConfirmedDelegates = 0;
+        $totalDelegates = 0;
+        $totalRegisteredToday = 0;
+        $totalPaidToday = 0;
+        $totalAmountPaidToday = 0;
+        $totalAmountPaid = 0;
+        $totalFullMember = 0;
+        $totalMember = 0;
+        $totalNonMember = 0;
+        $totalBankTransfer = 0;
+        $totalCreditCard = 0;
+        $totalPaid = 0;
+        $totalFree = 0;
+        $totalUnpaid = 0;
+        $totalRefunded = 0;
+        $totalOnline = 0;
+        $totalImported = 0;
+        $totalOnsite = 0;
+        $totalConfirmed = 0;
+        $totalPending = 0;
+        $totalDroppedOut = 0;
+        $totalCancelled = 0;
+        $arrayCountryTotal = array();
+        $arrayCompanyTotal = array();
+        $arrayRegistrationTypeTotal = array();
+
+        $dateToday = Carbon::now();
+        $noRefund = 0;
+
+        $mainDelegates = MainDelegate::where('event_id', $eventId)->get();
+
+        if ($mainDelegates->isNotEmpty()) {
+            foreach ($mainDelegates as $mainDelegate) {
+
+                $delegateRegisteredDate = Carbon::parse($mainDelegate->registered_date_time);
+                if ($dateToday->isSameDay($delegateRegisteredDate)) {
+                    $totalRegisteredToday++;
+                }
+
+                if ($mainDelegate->delegate_replaced_by_id == null && (!$mainDelegate->delegate_refunded)) {
+                    if ($mainDelegate->registration_status == "confirmed") {
+                        $totalConfirmedDelegates++;
+                    }
+
+                    $totalDelegates++;
+
+                    if ($mainDelegate->pass_type == "fullMember") {
+                        $totalFullMember++;
+                    } else if ($mainDelegate->pass_type == "member") {
+                        $totalMember++;
+                    } else {
+                        $totalNonMember++;
+                    }
+
+                    if ($mainDelegate->mode_of_payment == "creditCard") {
+                        $totalCreditCard++;
+                    } else {
+                        $totalBankTransfer++;
+                    }
+
+                    if ($mainDelegate->payment_status == "paid") {
+                        $delegatePaidDate = Carbon::parse($mainDelegate->paid_date_time);
+                        if ($dateToday->isSameDay($delegatePaidDate)) {
+                            $totalPaidToday++;
+                        }
+
+                        $noRefund++;
+                        $totalPaid++;
+                    } else if ($mainDelegate->payment_status == "free") {
+                        $totalFree++;
+                    } else if ($mainDelegate->payment_status == "unpaid") {
+                        $totalUnpaid++;
+                    } else {
+                    }
+
+
+                    if ($mainDelegate->registration_method == "online") {
+                        $totalOnline++;
+                    } else if ($mainDelegate->registration_method == "imported") {
+                        $totalImported++;
+                    } else {
+                        $totalOnsite++;
+                    }
+
+
+                    if ($mainDelegate->registration_status == "confirmed") {
+                        $totalConfirmed++;
+                    } else if ($mainDelegate->registration_status == "pending") {
+                        $totalPending++;
+                    } else if ($mainDelegate->registration_status == "droppedOut") {
+                        $totalDroppedOut++;
+                    }
+
+                    if ($this->checkIfCountryExist($mainDelegate->company_country, $arrayCountryTotal)) {
+                        foreach ($arrayCountryTotal as $index => $country) {
+                            if ($country['name'] == $mainDelegate->company_country) {
+                                $arrayCountryTotal[$index]['total'] = $country['total'] + 1;
+                            }
+                        }
+                    } else {
+                        array_push($arrayCountryTotal, [
+                            'name' => $mainDelegate->company_country,
+                            'total' => 1,
+                        ]);
+                    }
+
+
+
+
+                    if ($this->checkIfCompanyExist($mainDelegate->company_name, $arrayCompanyTotal)) {
+                        foreach ($arrayCompanyTotal as $index => $company) {
+                            if ($company['name'] == $mainDelegate->company_name) {
+                                $arrayCompanyTotal[$index]['total'] = $company['total'] + 1;
+                            }
+                        }
+                    } else {
+                        array_push($arrayCompanyTotal, [
+                            'name' => $mainDelegate->company_name,
+                            'total' => 1,
+                        ]);
+                    }
+
+
+                    if ($this->checkIfRegistrationTypeExist($mainDelegate->badge_type, $arrayRegistrationTypeTotal)) {
+                        foreach ($arrayRegistrationTypeTotal as $index => $registrationType) {
+                            if ($registrationType['name'] == $mainDelegate->badge_type) {
+                                $arrayRegistrationTypeTotal[$index]['total'] = $registrationType['total'] + 1;
+                            }
+                        }
+                    } else {
+                        array_push($arrayRegistrationTypeTotal, [
+                            'name' => $mainDelegate->badge_type,
+                            'total' => 1,
+                        ]);
+                    }
+                } else {
+                    if ($mainDelegate->delegate_refunded) {
+                        $totalRefunded++;
+                    }
+
+                    if ($mainDelegate->delegate_cancelled) {
+                        $totalCancelled++;
+                    }
+                }
+
+                $additionalDelegates = AdditionalDelegate::where('main_delegate_id', $mainDelegate->id)->get();
+                if ($additionalDelegates->isNotEmpty()) {
+                    foreach ($additionalDelegates as $additionalDelegate) {
+                        if ($additionalDelegate->delegate_replaced_by_id == null && (!$additionalDelegate->delegate_refunded)) {
+                            if ($mainDelegate->registration_status == "confirmed") {
+                                $totalConfirmedDelegates++;
+                            }
+
+                            $totalDelegates++;
+
+
+                            if ($mainDelegate->pass_type == "fullMember") {
+                                $totalFullMember++;
+                            } else if ($mainDelegate->pass_type == "member") {
+                                $totalMember++;
+                            } else {
+                                $totalNonMember++;
+                            }
+
+                            if ($mainDelegate->mode_of_payment == "creditCard") {
+                                $totalCreditCard++;
+                            } else {
+                                $totalBankTransfer++;
+                            }
+
+
+                            if ($mainDelegate->payment_status == "paid") {
+                                $delegatePaidDate = Carbon::parse($mainDelegate->paid_date_time);
+                                if ($dateToday->isSameDay($delegatePaidDate)) {
+                                    $totalPaidToday++;
+                                }
+
+                                $noRefund++;
+                                $totalPaid++;
+                            } else if ($mainDelegate->payment_status == "free") {
+                                $totalFree++;
+                            } else if ($mainDelegate->payment_status == "unpaid") {
+                                $totalUnpaid++;
+                            } else {
+                            }
+
+                            if ($mainDelegate->registration_method == "online") {
+                                $totalOnline++;
+                            } else if ($mainDelegate->registration_method == "imported") {
+                                $totalImported++;
+                            } else {
+                                $totalOnsite++;
+                            }
+
+
+                            if ($mainDelegate->registration_status == "confirmed") {
+                                $totalConfirmed++;
+                            } else if ($mainDelegate->registration_status == "pending") {
+                                $totalPending++;
+                            } else if ($mainDelegate->registration_status == "droppedOut") {
+                                $totalDroppedOut++;
+                            }
+
+
+
+
+                            if ($this->checkIfCountryExist($mainDelegate->company_country, $arrayCountryTotal)) {
+                                foreach ($arrayCountryTotal as $index => $country) {
+                                    if ($country['name'] == $mainDelegate->company_country) {
+                                        $arrayCountryTotal[$index]['total'] = $country['total'] + 1;
+                                    }
+                                }
+                            } else {
+                                array_push($arrayCountryTotal, [
+                                    'name' => $mainDelegate->company_country,
+                                    'total' => 1,
+                                ]);
+                            }
+
+
+                            if ($this->checkIfCompanyExist($mainDelegate->company_name, $arrayCompanyTotal)) {
+                                foreach ($arrayCompanyTotal as $index => $company) {
+                                    if ($company['name'] == $mainDelegate->company_name) {
+                                        $arrayCompanyTotal[$index]['total'] = $company['total'] + 1;
+                                    }
+                                }
+                            } else {
+                                array_push($arrayCompanyTotal, [
+                                    'name' => $mainDelegate->company_name,
+                                    'total' => 1,
+                                ]);
+                            }
+
+
+                            if ($this->checkIfRegistrationTypeExist($additionalDelegate->badge_type, $arrayRegistrationTypeTotal)) {
+                                foreach ($arrayRegistrationTypeTotal as $index => $registrationType) {
+                                    if ($registrationType['name'] == $additionalDelegate->badge_type) {
+                                        $arrayRegistrationTypeTotal[$index]['total'] = $registrationType['total'] + 1;
+                                    }
+                                }
+                            } else {
+                                array_push($arrayRegistrationTypeTotal, [
+                                    'name' => $additionalDelegate->badge_type,
+                                    'total' => 1,
+                                ]);
+                            }
+                        } else {
+                            if ($additionalDelegate->delegate_refunded) {
+                                $totalRefunded++;
+                            }
+
+                            if ($additionalDelegate->delegate_cancelled) {
+                                $totalCancelled++;
+                            }
+                        }
+                    }
+                }
+
+                if ($noRefund > 0 && $mainDelegate->payment_status == "paid") {
+                    $totalAmountPaid += $mainDelegate->total_amount;
+
+                    $delegatePaidDate = Carbon::parse($mainDelegate->paid_date_time);
+                    if ($dateToday->isSameDay($delegatePaidDate)) {
+                        $totalAmountPaidToday += $mainDelegate->total_amount;
+                    }
+                }
+            }
+        }
+
+        $finalData = [
+            'totalConfirmedDelegates' => $totalConfirmedDelegates,
+            'totalDelegates' => $totalDelegates,
+            'totalRegisteredToday' => $totalRegisteredToday,
+            'totalPaidToday' => $totalPaidToday,
+            'totalAmountPaidToday' => $totalAmountPaidToday,
+            'totalAmountPaid' => $totalAmountPaid,
+
+            'passType' => [$totalFullMember, $totalMember, $totalNonMember],
+            'paymentStatus' => [$totalPaid, $totalFree, $totalUnpaid, $totalRefunded],
+            'registrationStatus' => [$totalConfirmed, $totalPending, $totalDroppedOut, $totalCancelled],
+            'registrationMethod' => [$totalOnline, $totalImported, $totalOnsite],
+            'paymentMethod' => [$totalCreditCard, $totalBankTransfer],
+
+            'arrayCountryTotal' => $arrayCountryTotal,
+            'arrayCompanyTotal' => $arrayCompanyTotal,
+            'arrayRegistrationTypeTotal' => $arrayRegistrationTypeTotal,
+        ];
+
+        return $finalData;
+    }
+
+
+    public function eventDasbhoardSpouseData($eventId)
+    {
+        $totalConfirmedSpouses = 0;
+        $totalSpouses = 0;
+        $totalRegisteredToday = 0;
+        $totalPaidToday = 0;
+        $totalAmountPaidToday = 0;
+        $totalAmountPaid = 0;
+        $totalBankTransfer = 0;
+        $totalCreditCard = 0;
+        $totalPaid = 0;
+        $totalFree = 0;
+        $totalUnpaid = 0;
+        $totalRefunded = 0;
+        $totalOnline = 0;
+        $totalImported = 0;
+        $totalOnsite = 0;
+        $totalConfirmed = 0;
+        $totalPending = 0;
+        $totalDroppedOut = 0;
+        $totalCancelled = 0;
+        $arrayCountryTotal = array();
+
+        $dateToday = Carbon::now();
+        $noRefund = 0;
+
+        $mainSpouses = MainSpouse::where('event_id', $eventId)->get();
+
+        if ($mainSpouses->isNotEmpty()) {
+            foreach ($mainSpouses as $mainSpouse) {
+
+                $spouseRegisteredDate = Carbon::parse($mainSpouse->registered_date_time);
+                if ($dateToday->isSameDay($spouseRegisteredDate)) {
+                    $totalRegisteredToday++;
+                }
+
+                if ($mainSpouse->spouse_replaced_by_id == null && (!$mainSpouse->spouse_refunded)) {
+                    if ($mainSpouse->registration_status == "confirmed") {
+                        $totalConfirmedSpouses++;
+                    }
+
+                    $totalSpouses++;
+
+                    if ($mainSpouse->mode_of_payment == "creditCard") {
+                        $totalCreditCard++;
+                    } else {
+                        $totalBankTransfer++;
+                    }
+
+                    if ($mainSpouse->payment_status == "paid") {
+                        $spousePaidDate = Carbon::parse($mainSpouse->paid_date_time);
+                        if ($dateToday->isSameDay($spousePaidDate)) {
+                            $totalPaidToday++;
+                        }
+
+                        $noRefund++;
+                        $totalPaid++;
+                    } else if ($mainSpouse->payment_status == "free") {
+                        $totalFree++;
+                    } else if ($mainSpouse->payment_status == "unpaid") {
+                        $totalUnpaid++;
+                    } else {
+                    }
+
+
+                    if ($mainSpouse->registration_method == "online") {
+                        $totalOnline++;
+                    } else if ($mainSpouse->registration_method == "imported") {
+                        $totalImported++;
+                    } else {
+                        $totalOnsite++;
+                    }
+
+
+                    if ($mainSpouse->registration_status == "confirmed") {
+                        $totalConfirmed++;
+                    } else if ($mainSpouse->registration_status == "pending") {
+                        $totalPending++;
+                    } else if ($mainSpouse->registration_status == "droppedOut") {
+                        $totalDroppedOut++;
+                    }
+
+                    if ($this->checkIfCountryExist($mainSpouse->country, $arrayCountryTotal)) {
+                        foreach ($arrayCountryTotal as $index => $country) {
+                            if ($country['name'] == $mainSpouse->country) {
+                                $arrayCountryTotal[$index]['total'] = $country['total'] + 1;
+                            }
+                        }
+                    } else {
+                        array_push($arrayCountryTotal, [
+                            'name' => $mainSpouse->country,
+                            'total' => 1,
+                        ]);
+                    }
+                } else {
+                    if ($mainSpouse->spouse_refunded) {
+                        $totalRefunded++;
+                    }
+
+                    if ($mainSpouse->spouse_cancelled) {
+                        $totalCancelled++;
+                    }
+                }
+
+                $additionalSpouses = AdditionalSpouse::where('main_spouse_id', $mainSpouse->id)->get();
+                if ($additionalSpouses->isNotEmpty()) {
+                    foreach ($additionalSpouses as $additionalSpouse) {
+                        if ($additionalSpouse->spouse_replaced_by_id == null && (!$additionalSpouse->spouse_refunded)) {
+                            if ($mainSpouse->registration_status == "confirmed") {
+                                $totalConfirmedSpouses++;
+                            }
+
+                            $totalSpouses++;
+
+                            if ($mainSpouse->mode_of_payment == "creditCard") {
+                                $totalCreditCard++;
+                            } else {
+                                $totalBankTransfer++;
+                            }
+
+
+                            if ($mainSpouse->payment_status == "paid") {
+                                $spousePaidDate = Carbon::parse($mainSpouse->paid_date_time);
+                                if ($dateToday->isSameDay($spousePaidDate)) {
+                                    $totalPaidToday++;
+                                }
+
+                                $noRefund++;
+                                $totalPaid++;
+                            } else if ($mainSpouse->payment_status == "free") {
+                                $totalFree++;
+                            } else if ($mainSpouse->payment_status == "unpaid") {
+                                $totalUnpaid++;
+                            } else {
+                            }
+
+                            if ($mainSpouse->registration_method == "online") {
+                                $totalOnline++;
+                            } else if ($mainSpouse->registration_method == "imported") {
+                                $totalImported++;
+                            } else {
+                                $totalOnsite++;
+                            }
+
+
+                            if ($mainSpouse->registration_status == "confirmed") {
+                                $totalConfirmed++;
+                            } else if ($mainSpouse->registration_status == "pending") {
+                                $totalPending++;
+                            } else if ($mainSpouse->registration_status == "droppedOut") {
+                                $totalDroppedOut++;
+                            }
+
+
+
+
+                            if ($this->checkIfCountryExist($mainSpouse->country, $arrayCountryTotal)) {
+                                foreach ($arrayCountryTotal as $index => $country) {
+                                    if ($country['name'] == $mainSpouse->country) {
+                                        $arrayCountryTotal[$index]['total'] = $country['total'] + 1;
+                                    }
+                                }
+                            } else {
+                                array_push($arrayCountryTotal, [
+                                    'name' => $mainSpouse->country,
+                                    'total' => 1,
+                                ]);
+                            }
+                        } else {
+                            if ($additionalSpouse->spouse_refunded) {
+                                $totalRefunded++;
+                            }
+
+                            if ($additionalSpouse->spouse_cancelled) {
+                                $totalCancelled++;
+                            }
+                        }
+                    }
+                }
+
+                if ($noRefund > 0 && $mainSpouse->payment_status == "paid") {
+                    $totalAmountPaid += $mainSpouse->total_amount;
+
+                    $spousePaidDate = Carbon::parse($mainSpouse->paid_date_time);
+                    if ($dateToday->isSameDay($spousePaidDate)) {
+                        $totalAmountPaidToday += $mainSpouse->total_amount;
+                    }
+                }
+            }
+        }
+
+        $finalData = [
+            'totalConfirmedSpouses' => $totalConfirmedSpouses,
+            'totalSpouses' => $totalSpouses,
+            'totalRegisteredToday' => $totalRegisteredToday,
+            'totalPaidToday' => $totalPaidToday,
+            'totalAmountPaidToday' => $totalAmountPaidToday,
+            'totalAmountPaid' => $totalAmountPaid,
+
+            'paymentStatus' => [$totalPaid, $totalFree, $totalUnpaid, $totalRefunded],
+            'registrationStatus' => [$totalConfirmed, $totalPending, $totalDroppedOut, $totalCancelled],
+            'registrationMethod' => [$totalOnline, $totalImported, $totalOnsite],
+            'paymentMethod' => [$totalCreditCard, $totalBankTransfer],
+
+            'arrayCountryTotal' => $arrayCountryTotal,
+        ];
+
+        return $finalData;
     }
 
     public function eventDetailView($eventCategory, $eventId)
@@ -413,7 +643,7 @@ class EventController extends Controller
 
     public function eventRegistrationType($eventCategory, $eventId)
     {
-        if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {
+        if (Event::where('category', $eventCategory)->where('id', $eventId)->exists() && $eventCategory != 'AFS' && $eventCategory != 'RCCA') {
             return view('admin.events.registration-type.registration_type', [
                 "pageTitle" => "Event Registration Type",
                 "eventCategory" => $eventCategory,
@@ -426,7 +656,7 @@ class EventController extends Controller
 
     public function eventDelegateFeesView($eventCategory, $eventId)
     {
-        if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {
+        if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()  && $eventCategory != 'AFS' && $eventCategory != 'RCCA') {
             return view('admin.events.delegate-fees.delegate_fees', [
                 "pageTitle" => "Event Delegate Fees",
                 "eventCategory" => $eventCategory,
@@ -439,7 +669,7 @@ class EventController extends Controller
 
     public function eventPromoCodeView($eventCategory, $eventId)
     {
-        if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {
+        if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()  && $eventCategory != "AFS" && $eventCategory != 'RCCA') {
             return view('admin.events.promo-codes.promo_codes', [
                 "pageTitle" => "Event Promo Codes",
                 "eventCategory" => $eventCategory,
@@ -768,47 +998,50 @@ class EventController extends Controller
         }
     }
 
-    public function checkIfCountryExist($companyCountry, $arrayCountries){
+    public function checkIfCountryExist($countryTemp, $arrayCountries)
+    {
         $checker = 0;
-        foreach($arrayCountries as $country){
-            if($country['name'] == $companyCountry){
+        foreach ($arrayCountries as $country) {
+            if ($country['name'] == $countryTemp) {
                 $checker++;
             }
         }
 
-        if($checker > 0){
+        if ($checker > 0) {
             return true;
         } else {
             return false;
         }
     }
 
-    
-    public function checkIfCompanyExist($companyName, $arrayCompanies){
+
+    public function checkIfCompanyExist($companyName, $arrayCompanies)
+    {
         $checker = 0;
-        foreach($arrayCompanies as $company){
-            if($company['name'] == $companyName){
+        foreach ($arrayCompanies as $company) {
+            if ($company['name'] == $companyName) {
                 $checker++;
             }
         }
 
-        if($checker > 0){
+        if ($checker > 0) {
             return true;
         } else {
             return false;
         }
     }
 
-    
-    public function checkIfRegistrationTypeExist($registrationType, $arrayRegistrationTypes){
+
+    public function checkIfRegistrationTypeExist($registrationType, $arrayRegistrationTypes)
+    {
         $checker = 0;
-        foreach($arrayRegistrationTypes as $type){
-            if($type['name'] == $registrationType){
+        foreach ($arrayRegistrationTypes as $type) {
+            if ($type['name'] == $registrationType) {
                 $checker++;
             }
         }
 
-        if($checker > 0){
+        if ($checker > 0) {
             return true;
         } else {
             return false;

@@ -6,16 +6,27 @@ use App\Mail\RegistrationCardDeclined;
 use App\Mail\RegistrationPaid;
 use App\Mail\RegistrationPaymentConfirmation;
 use App\Models\AdditionalDelegate;
+use App\Models\AdditionalSpouse;
 use App\Models\PromoCode;
 use App\Models\Event;
 use App\Models\MainDelegate;
+use App\Models\MainSpouse;
+use App\Models\RccAwardsAdditionalParticipant;
+use App\Models\RccAwardsDocument;
+use App\Models\RccAwardsMainParticipant;
+use App\Models\RccAwardsParticipantTransaction;
+use App\Models\SpouseTransaction;
 use App\Models\Transaction;
 use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Session as Session;
+use Illuminate\Support\Facades\Storage;
 use NumberFormatter;
+use Illuminate\Support\Str;
+
 
 class RegistrationController extends Controller
 {
@@ -68,37 +79,27 @@ class RegistrationController extends Controller
     public function registrationFailedView($eventYear, $eventCategory, $eventId, $mainDelegateId)
     {
         if (Event::where('year', $eventYear)->where('category', $eventCategory)->where('id', $eventId)->exists()) {
-            $mainDelegate = MainDelegate::where('id', $mainDelegateId)->first();
+            $event = Event::where('id', $eventId)->first();
 
-            if ($mainDelegate->confirmation_status == "failed" || $mainDelegate->confirmation_date_time == null) {
-                $event = Event::where('id', $eventId)->first();
+            if ($eventCategory == "AFS") {
+                $finalData = $this->registrationFailedViewSpouse($eventCategory, $eventId, $mainDelegateId);
                 $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('d') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');
-                $invoiceLink = env('APP_URL') . '/' . $eventCategory . '/' . $eventId . '/view-invoice/' . $mainDelegateId;
-
-                if ($eventCategory == "AF") {
-                    $bankDetails = config('app.bankDetails.AF');
-                } else {
-                    $bankDetails = config('app.bankDetails.DEFAULT');
-                }
-
-                if ($mainDelegate->confirmation_date_time == null) {
-                    MainDelegate::find($mainDelegateId)->fill([
-                        'confirmation_date_time' => Carbon::now(),
-                        'confirmation_status' => "failed",
-                    ])->save();
-                }
-
-                return view('registration.success-messages.registration_failed_message', [
-                    'pageTitle' => "Registration Failed",
-                    'event' => $event,
-                    'mainDelegate' => $mainDelegate,
-                    'eventFormattedDate' =>  $eventFormattedDate,
-                    'invoiceLink' => $invoiceLink,
-                    'bankDetails' => $bankDetails,
-                ]);
+            } else if ($eventCategory == "RCCA") {
+                $finalData = $this->registrationFailedViewRccAwards($eventCategory, $eventId, $mainDelegateId);
+                $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('j F Y');
             } else {
-                abort(404, 'The URL is incorrect');
+                $finalData = $this->registrationFailedViewEvents($eventCategory, $eventId, $mainDelegateId);
+                $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('d') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');
             }
+
+            return view('registration.success-messages.registration_failed_message', [
+                'pageTitle' => "Registration Failed",
+                'event' => $event,
+                'eventFormattedDate' =>  $eventFormattedDate,
+                'invoiceLink' => $finalData['invoiceLink'],
+                'bankDetails' => $finalData['bankDetails'],
+                'paymentStatus' => $finalData['paymentStatus'],
+            ]);
         } else {
             abort(404, 'The URL is incorrect');
         }
@@ -107,37 +108,27 @@ class RegistrationController extends Controller
     public function registrationSuccessView($eventYear, $eventCategory, $eventId, $mainDelegateId)
     {
         if (Event::where('year', $eventYear)->where('category', $eventCategory)->where('id', $eventId)->exists()) {
-            $mainDelegate = MainDelegate::where('id', $mainDelegateId)->first();
+            $event = Event::where('id', $eventId)->first();
 
-            if ($mainDelegate->confirmation_status == "success" || $mainDelegate->confirmation_date_time == null) {
-                $event = Event::where('id', $eventId)->first();
+            if ($eventCategory == "AFS") {
+                $finalData = $this->registrationSuccessViewSpouse($eventCategory, $eventId, $mainDelegateId);
                 $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('d') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');
-                $invoiceLink = env('APP_URL') . '/' . $eventCategory . '/' . $eventId . '/view-invoice/' . $mainDelegateId;
-
-                if ($eventCategory == "AF") {
-                    $bankDetails = config('app.bankDetails.AF');
-                } else {
-                    $bankDetails = config('app.bankDetails.DEFAULT');
-                }
-
-                if ($mainDelegate->confirmation_date_time == null) {
-                    MainDelegate::find($mainDelegateId)->fill([
-                        'confirmation_date_time' => Carbon::now(),
-                        'confirmation_status' => "success",
-                    ])->save();
-                }
-
-                return view('registration.success-messages.registration_success_message', [
-                    'pageTitle' => "Registration Success",
-                    'event' => $event,
-                    'mainDelegate' => $mainDelegate,
-                    'eventFormattedDate' =>  $eventFormattedDate,
-                    'invoiceLink' => $invoiceLink,
-                    'bankDetails' => $bankDetails,
-                ]);
+            } else if ($eventCategory == "RCCA") {
+                $finalData = $this->registrationSuccessViewRccAwards($eventCategory, $eventId, $mainDelegateId);
+                $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('j F Y');
             } else {
-                abort(404, 'The URL is incorrect');
+                $finalData = $this->registrationSuccessViewEvents($eventCategory, $eventId, $mainDelegateId);
+                $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('d') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');
             }
+
+            return view('registration.success-messages.registration_success_message', [
+                'pageTitle' => "Registration Success",
+                'event' => $event,
+                'eventFormattedDate' =>  $eventFormattedDate,
+                'invoiceLink' => $finalData['invoiceLink'],
+                'bankDetails' => $finalData['bankDetails'],
+                'paymentStatus' => $finalData['paymentStatus'],
+            ]);
         } else {
             abort(404, 'The URL is incorrect');
         }
@@ -202,147 +193,259 @@ class RegistrationController extends Controller
     public function registrantDetailView($eventCategory, $eventId, $registrantId)
     {
         if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {
-            if (MainDelegate::where('id', $registrantId)->where('event_id', $eventId)->exists()) {
-                $finalData = array();
+            if ($eventCategory == "AFS") {
+                $finalData = $this->registrantDetailSpousesView($eventCategory, $eventId, $registrantId);
+            } else if ($eventCategory == "RCCA") {
+                $finalData = $this->registrantDetailRCCAwardsView($eventCategory, $eventId, $registrantId);
+            } else {
+                $finalData = $this->registrantDetailEventsView($eventCategory, $eventId, $registrantId);
+            }
+            // dd($finalData);
+            return view('admin.events.transactions.registrants_detail', [
+                "pageTitle" => "Transaction Details",
+                "eventCategory" => $eventCategory,
+                "eventId" => $eventId,
+                "registrantId" => $registrantId,
+                "finalData" => $finalData,
+            ]);
+        } else {
+            abort(404, 'The URL is incorrect');
+        }
+    }
 
-                $subDelegatesArray = array();
-                $subDelegatesReplacementArray = array();
-                $allDelegatesArray = array();
+    public function registrantDetailEventsView($eventCategory, $eventId, $registrantId)
+    {
+        if (MainDelegate::where('id', $registrantId)->where('event_id', $eventId)->exists()) {
+            $finalData = array();
+
+            $subDelegatesArray = array();
+            $subDelegatesReplacementArray = array();
+            $allDelegatesArray = array();
+            $allDelegatesArrayTemp = array();
+
+            $countFinalQuantity = 0;
+
+            $eventYear = Event::where('id', $eventId)->value('year');
+            $mainDelegate = MainDelegate::where('id', $registrantId)->where('event_id', $eventId)->first();
+            $mainDiscount = PromoCode::where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $mainDelegate->pcode_used)->where('badge_type', $mainDelegate->badge_type)->value('discount');
+
+            foreach (config('app.eventCategories') as $eventCategoryC => $code) {
+                if ($eventCategory == $eventCategoryC) {
+                    $eventCode = $code;
+                }
+            }
+
+            $tempYear = Carbon::parse($mainDelegate->registered_date_time)->format('y');
+            $transactionId = Transaction::where('delegate_id', $mainDelegate->id)->where('delegate_type', "main")->value('id');
+            $lastDigit = 1000 + intval($transactionId);
+            $invoiceNumber = $eventCategory . $tempYear . "/" . $lastDigit;
+
+
+            if ($mainDelegate->delegate_replaced_by_id == null && (!$mainDelegate->delegate_refunded)) {
+                $countFinalQuantity++;
+            }
+
+            $subDelegates = AdditionalDelegate::where('main_delegate_id', $registrantId)->get();
+            if (!$subDelegates->isEmpty()) {
+                foreach ($subDelegates as $subDelegate) {
+                    if ($subDelegate->delegate_replaced_by_id == null && (!$subDelegate->delegate_refunded)) {
+                        $countFinalQuantity++;
+                    }
+
+                    $subDiscount = PromoCode::where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $subDelegate->pcode_used)->where('badge_type', $subDelegate->badge_type)->value('discount');
+
+                    if ($subDelegate->delegate_replaced_from_id != null) {
+                        array_push($subDelegatesReplacementArray, [
+                            'subDelegateId' => $subDelegate->id,
+                            'name' => $subDelegate->salutation . " " . $subDelegate->first_name . " " . $subDelegate->middle_name . " " . $subDelegate->last_name,
+                            'salutation' => $subDelegate->salutation,
+                            'first_name' => $subDelegate->first_name,
+                            'middle_name' => $subDelegate->middle_name,
+                            'last_name' => $subDelegate->last_name,
+                            'email_address' => $subDelegate->email_address,
+                            'mobile_number' => $subDelegate->mobile_number,
+                            'nationality' => $subDelegate->nationality,
+                            'job_title' => $subDelegate->job_title,
+                            'badge_type' => $subDelegate->badge_type,
+                            'pcode_used' => $subDelegate->pcode_used,
+                            'discount' => $subDiscount,
+
+                            'delegate_cancelled' => $subDelegate->delegate_cancelled,
+                            'delegate_replaced' => $subDelegate->delegate_replaced,
+                            'delegate_refunded' => $subDelegate->delegate_refunded,
+
+                            'delegate_replaced_type' => $subDelegate->delegate_replaced_type,
+                            'delegate_original_from_id' => $subDelegate->delegate_original_from_id,
+                            'delegate_replaced_from_id' => $subDelegate->delegate_replaced_from_id,
+                            'delegate_replaced_by_id' => $subDelegate->delegate_replaced_by_id,
+
+                            'delegate_cancelled_datetime' => $subDelegate->delegate_cancelled_datetime,
+                            'delegate_refunded_datetime' => $subDelegate->delegate_refunded_datetime,
+                            'delegate_replaced_datetime' => $subDelegate->delegate_replaced_datetime,
+                        ]);
+                    } else {
+                        array_push($subDelegatesArray, [
+                            'subDelegateId' => $subDelegate->id,
+                            'name' => $subDelegate->salutation . " " . $subDelegate->first_name . " " . $subDelegate->middle_name . " " . $subDelegate->last_name,
+                            'salutation' => $subDelegate->salutation,
+                            'first_name' => $subDelegate->first_name,
+                            'middle_name' => $subDelegate->middle_name,
+                            'last_name' => $subDelegate->last_name,
+                            'email_address' => $subDelegate->email_address,
+                            'mobile_number' => $subDelegate->mobile_number,
+                            'nationality' => $subDelegate->nationality,
+                            'job_title' => $subDelegate->job_title,
+                            'badge_type' => $subDelegate->badge_type,
+                            'pcode_used' => $subDelegate->pcode_used,
+                            'discount' => $subDiscount,
+
+                            'delegate_cancelled' => $subDelegate->delegate_cancelled,
+                            'delegate_replaced' => $subDelegate->delegate_replaced,
+                            'delegate_refunded' => $subDelegate->delegate_refunded,
+
+                            'delegate_replaced_type' => $subDelegate->delegate_replaced_type,
+                            'delegate_original_from_id' => $subDelegate->delegate_original_from_id,
+                            'delegate_replaced_from_id' => $subDelegate->delegate_replaced_from_id,
+                            'delegate_replaced_by_id' => $subDelegate->delegate_replaced_by_id,
+
+                            'delegate_cancelled_datetime' => $subDelegate->delegate_cancelled_datetime,
+                            'delegate_refunded_datetime' => $subDelegate->delegate_refunded_datetime,
+                            'delegate_replaced_datetime' => $subDelegate->delegate_replaced_datetime,
+                        ]);
+                    }
+                }
+            }
+
+
+            $finalTransactionId = $eventYear . $eventCode . $lastDigit;
+
+            array_push($allDelegatesArrayTemp, [
+                'transactionId' => $finalTransactionId,
+                'mainDelegateId' => $mainDelegate->id,
+                'delegateId' => $mainDelegate->id,
+                'delegateType' => "main",
+
+                'name' => $mainDelegate->salutation . " " . $mainDelegate->first_name . " " . $mainDelegate->middle_name . " " . $mainDelegate->last_name,
+                'salutation' => $mainDelegate->salutation,
+                'first_name' => $mainDelegate->first_name,
+                'middle_name' => $mainDelegate->middle_name,
+                'last_name' => $mainDelegate->last_name,
+                'email_address' => $mainDelegate->email_address,
+                'mobile_number' => $mainDelegate->mobile_number,
+                'nationality' => $mainDelegate->nationality,
+                'job_title' => $mainDelegate->job_title,
+                'badge_type' => $mainDelegate->badge_type,
+                'pcode_used' => $mainDelegate->pcode_used,
+                'discount' => $mainDiscount,
+
+                'is_replacement' => false,
+                'delegate_cancelled' => $mainDelegate->delegate_cancelled,
+                'delegate_replaced' => $mainDelegate->delegate_replaced,
+                'delegate_refunded' => $mainDelegate->delegate_refunded,
+
+                'delegate_replaced_type' => "main",
+                'delegate_original_from_id' => $mainDelegate->id,
+                'delegate_replaced_from_id' => null,
+                'delegate_replaced_by_id' => $mainDelegate->delegate_replaced_by_id,
+
+                'delegate_cancelled_datetime' => ($mainDelegate->delegate_cancelled_datetime == null) ? "N/A" : Carbon::parse($mainDelegate->delegate_cancelled_datetime)->format('M j, Y g:i A'),
+                'delegate_refunded_datetime' => ($mainDelegate->delegate_refunded_datetime == null) ? "N/A" : Carbon::parse($mainDelegate->delegate_refunded_datetime)->format('M j, Y g:i A'),
+                'delegate_replaced_datetime' => ($mainDelegate->delegate_replaced_datetime == null) ? "N/A" : Carbon::parse($mainDelegate->delegate_replaced_datetime)->format('M j, Y g:i A'),
+            ]);
+
+            if ($mainDelegate->delegate_replaced_by_id != null) {
+                foreach ($subDelegatesReplacementArray as $subDelegateReplacement) {
+                    if ($mainDelegate->id == $subDelegateReplacement['delegate_original_from_id'] && $subDelegateReplacement['delegate_replaced_type'] == "main") {
+
+                        $transactionId = Transaction::where('delegate_id', $subDelegateReplacement['subDelegateId'])->where('delegate_type', "sub")->value('id');
+                        $lastDigit = 1000 + intval($transactionId);
+                        $finalTransactionId = $eventYear . $eventCode . $lastDigit;
+
+                        array_push($allDelegatesArrayTemp, [
+                            'transactionId' => $finalTransactionId,
+                            'mainDelegateId' => $mainDelegate->id,
+                            'delegateId' => $subDelegateReplacement['subDelegateId'],
+                            'delegateType' => "sub",
+
+                            'name' => $subDelegateReplacement['salutation'] . " " . $subDelegateReplacement['first_name'] . " " . $subDelegateReplacement['middle_name'] . " " . $subDelegateReplacement['last_name'],
+                            'salutation' => $subDelegateReplacement['salutation'],
+                            'first_name' => $subDelegateReplacement['first_name'],
+                            'middle_name' => $subDelegateReplacement['middle_name'],
+                            'last_name' => $subDelegateReplacement['last_name'],
+                            'email_address' => $subDelegateReplacement['email_address'],
+                            'mobile_number' => $subDelegateReplacement['mobile_number'],
+                            'nationality' => $subDelegateReplacement['nationality'],
+                            'job_title' => $subDelegateReplacement['job_title'],
+                            'badge_type' => $subDelegateReplacement['badge_type'],
+                            'pcode_used' => $subDelegateReplacement['pcode_used'],
+                            'discount' => $subDelegateReplacement['discount'],
+
+                            'is_replacement' => true,
+                            'delegate_cancelled' => $subDelegateReplacement['delegate_cancelled'],
+                            'delegate_replaced' => $subDelegateReplacement['delegate_replaced'],
+                            'delegate_refunded' => $subDelegateReplacement['delegate_refunded'],
+
+                            'delegate_replaced_type' => $subDelegateReplacement['delegate_replaced_type'],
+                            'delegate_original_from_id' => $subDelegateReplacement['delegate_original_from_id'],
+                            'delegate_replaced_from_id' => $subDelegateReplacement['delegate_replaced_from_id'],
+                            'delegate_replaced_by_id' => $subDelegateReplacement['delegate_replaced_by_id'],
+
+                            'delegate_cancelled_datetime' => ($subDelegateReplacement['delegate_cancelled_datetime'] == null) ? "N/A" : Carbon::parse($subDelegateReplacement['delegate_cancelled_datetime'])->format('M j, Y g:i A'),
+                            'delegate_refunded_datetime' => ($subDelegateReplacement['delegate_refunded_datetime'] == null) ? "N/A" : Carbon::parse($subDelegateReplacement['delegate_refunded_datetime'])->format('M j, Y g:i A'),
+                            'delegate_replaced_datetime' => ($subDelegateReplacement['delegate_replaced_datetime'] == null) ? "N/A" : Carbon::parse($subDelegateReplacement['delegate_replaced_datetime'])->format('M j, Y g:i A'),
+                        ]);
+                    }
+                }
+            }
+
+            array_push($allDelegatesArray, $allDelegatesArrayTemp);
+
+            $allDelegatesArrayTemp = array();
+
+            foreach ($subDelegatesArray as $subDelegate) {
                 $allDelegatesArrayTemp = array();
 
-                $countFinalQuantity = 0;
-
-                $eventYear = Event::where('id', $eventId)->value('year');
-                $mainDelegate = MainDelegate::where('id', $registrantId)->where('event_id', $eventId)->first();
-                $mainDiscount = PromoCode::where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $mainDelegate->pcode_used)->where('badge_type', $mainDelegate->badge_type)->value('discount');
-
-                foreach (config('app.eventCategories') as $eventCategoryC => $code) {
-                    if ($eventCategory == $eventCategoryC) {
-                        $eventCode = $code;
-                    }
-                }
-
-                $tempYear = Carbon::parse($mainDelegate->registered_date_time)->format('y');
-                $transactionId = Transaction::where('delegate_id', $mainDelegate->id)->where('delegate_type', "main")->value('id');
+                $transactionId = Transaction::where('delegate_id', $subDelegate['subDelegateId'])->where('delegate_type', "sub")->value('id');
                 $lastDigit = 1000 + intval($transactionId);
-                $invoiceNumber = $eventCategory . $tempYear . "/" . $lastDigit;
-
-
-                if ($mainDelegate->delegate_replaced_by_id == null && (!$mainDelegate->delegate_refunded)) {
-                    $countFinalQuantity++;
-                }
-
-                $subDelegates = AdditionalDelegate::where('main_delegate_id', $registrantId)->get();
-                if (!$subDelegates->isEmpty()) {
-                    foreach ($subDelegates as $subDelegate) {
-                        if ($subDelegate->delegate_replaced_by_id == null && (!$subDelegate->delegate_refunded)) {
-                            $countFinalQuantity++;
-                        }
-
-                        $subDiscount = PromoCode::where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $subDelegate->pcode_used)->where('badge_type', $subDelegate->badge_type)->value('discount');
-
-                        if ($subDelegate->delegate_replaced_from_id != null) {
-                            array_push($subDelegatesReplacementArray, [
-                                'subDelegateId' => $subDelegate->id,
-                                'name' => $subDelegate->salutation . " " . $subDelegate->first_name . " " . $subDelegate->middle_name . " " . $subDelegate->last_name,
-                                'salutation' => $subDelegate->salutation,
-                                'first_name' => $subDelegate->first_name,
-                                'middle_name' => $subDelegate->middle_name,
-                                'last_name' => $subDelegate->last_name,
-                                'email_address' => $subDelegate->email_address,
-                                'mobile_number' => $subDelegate->mobile_number,
-                                'nationality' => $subDelegate->nationality,
-                                'job_title' => $subDelegate->job_title,
-                                'badge_type' => $subDelegate->badge_type,
-                                'pcode_used' => $subDelegate->pcode_used,
-                                'discount' => $subDiscount,
-
-                                'delegate_cancelled' => $subDelegate->delegate_cancelled,
-                                'delegate_replaced' => $subDelegate->delegate_replaced,
-                                'delegate_refunded' => $subDelegate->delegate_refunded,
-
-                                'delegate_replaced_type' => $subDelegate->delegate_replaced_type,
-                                'delegate_original_from_id' => $subDelegate->delegate_original_from_id,
-                                'delegate_replaced_from_id' => $subDelegate->delegate_replaced_from_id,
-                                'delegate_replaced_by_id' => $subDelegate->delegate_replaced_by_id,
-
-                                'delegate_cancelled_datetime' => $subDelegate->delegate_cancelled_datetime,
-                                'delegate_refunded_datetime' => $subDelegate->delegate_refunded_datetime,
-                                'delegate_replaced_datetime' => $subDelegate->delegate_replaced_datetime,
-                            ]);
-                        } else {
-                            array_push($subDelegatesArray, [
-                                'subDelegateId' => $subDelegate->id,
-                                'name' => $subDelegate->salutation . " " . $subDelegate->first_name . " " . $subDelegate->middle_name . " " . $subDelegate->last_name,
-                                'salutation' => $subDelegate->salutation,
-                                'first_name' => $subDelegate->first_name,
-                                'middle_name' => $subDelegate->middle_name,
-                                'last_name' => $subDelegate->last_name,
-                                'email_address' => $subDelegate->email_address,
-                                'mobile_number' => $subDelegate->mobile_number,
-                                'nationality' => $subDelegate->nationality,
-                                'job_title' => $subDelegate->job_title,
-                                'badge_type' => $subDelegate->badge_type,
-                                'pcode_used' => $subDelegate->pcode_used,
-                                'discount' => $subDiscount,
-
-                                'delegate_cancelled' => $subDelegate->delegate_cancelled,
-                                'delegate_replaced' => $subDelegate->delegate_replaced,
-                                'delegate_refunded' => $subDelegate->delegate_refunded,
-
-                                'delegate_replaced_type' => $subDelegate->delegate_replaced_type,
-                                'delegate_original_from_id' => $subDelegate->delegate_original_from_id,
-                                'delegate_replaced_from_id' => $subDelegate->delegate_replaced_from_id,
-                                'delegate_replaced_by_id' => $subDelegate->delegate_replaced_by_id,
-
-                                'delegate_cancelled_datetime' => $subDelegate->delegate_cancelled_datetime,
-                                'delegate_refunded_datetime' => $subDelegate->delegate_refunded_datetime,
-                                'delegate_replaced_datetime' => $subDelegate->delegate_replaced_datetime,
-                            ]);
-                        }
-                    }
-                }
-
-
                 $finalTransactionId = $eventYear . $eventCode . $lastDigit;
 
                 array_push($allDelegatesArrayTemp, [
                     'transactionId' => $finalTransactionId,
                     'mainDelegateId' => $mainDelegate->id,
-                    'delegateId' => $mainDelegate->id,
-                    'delegateType' => "main",
+                    'delegateId' => $subDelegate['subDelegateId'],
+                    'delegateType' => "sub",
 
-                    'name' => $mainDelegate->salutation . " " . $mainDelegate->first_name . " " . $mainDelegate->middle_name . " " . $mainDelegate->last_name,
-                    'salutation' => $mainDelegate->salutation,
-                    'first_name' => $mainDelegate->first_name,
-                    'middle_name' => $mainDelegate->middle_name,
-                    'last_name' => $mainDelegate->last_name,
-                    'email_address' => $mainDelegate->email_address,
-                    'mobile_number' => $mainDelegate->mobile_number,
-                    'nationality' => $mainDelegate->nationality,
-                    'job_title' => $mainDelegate->job_title,
-                    'badge_type' => $mainDelegate->badge_type,
-                    'pcode_used' => $mainDelegate->pcode_used,
-                    'discount' => $mainDiscount,
+                    'name' => $subDelegate['salutation'] . " " . $subDelegate['first_name'] . " " . $subDelegate['middle_name'] . " " . $subDelegate['last_name'],
+                    'salutation' => $subDelegate['salutation'],
+                    'first_name' => $subDelegate['first_name'],
+                    'middle_name' => $subDelegate['middle_name'],
+                    'last_name' => $subDelegate['last_name'],
+                    'email_address' => $subDelegate['email_address'],
+                    'mobile_number' => $subDelegate['mobile_number'],
+                    'nationality' => $subDelegate['nationality'],
+                    'job_title' => $subDelegate['job_title'],
+                    'badge_type' => $subDelegate['badge_type'],
+                    'pcode_used' => $subDelegate['pcode_used'],
+                    'discount' => $subDelegate['discount'],
 
                     'is_replacement' => false,
-                    'delegate_cancelled' => $mainDelegate->delegate_cancelled,
-                    'delegate_replaced' => $mainDelegate->delegate_replaced,
-                    'delegate_refunded' => $mainDelegate->delegate_refunded,
+                    'delegate_cancelled' => $subDelegate['delegate_cancelled'],
+                    'delegate_replaced' => $subDelegate['delegate_replaced'],
+                    'delegate_refunded' => $subDelegate['delegate_refunded'],
 
-                    'delegate_replaced_type' => "main",
-                    'delegate_original_from_id' => $mainDelegate->id,
+                    'delegate_replaced_type' => "sub",
+                    'delegate_original_from_id' => $subDelegate['subDelegateId'],
                     'delegate_replaced_from_id' => null,
-                    'delegate_replaced_by_id' => $mainDelegate->delegate_replaced_by_id,
+                    'delegate_replaced_by_id' => $subDelegate['delegate_replaced_by_id'],
 
-                    'delegate_cancelled_datetime' => ($mainDelegate->delegate_cancelled_datetime == null) ? "N/A" : Carbon::parse($mainDelegate->delegate_cancelled_datetime)->format('M j, Y g:i A'),
-                    'delegate_refunded_datetime' => ($mainDelegate->delegate_refunded_datetime == null) ? "N/A" : Carbon::parse($mainDelegate->delegate_refunded_datetime)->format('M j, Y g:i A'),
-                    'delegate_replaced_datetime' => ($mainDelegate->delegate_replaced_datetime == null) ? "N/A" : Carbon::parse($mainDelegate->delegate_replaced_datetime)->format('M j, Y g:i A'),
+                    'delegate_cancelled_datetime' => ($subDelegate['delegate_cancelled_datetime'] == null) ? "N/A" : Carbon::parse($subDelegate['delegate_cancelled_datetime'])->format('M j, Y g:i A'),
+                    'delegate_refunded_datetime' => ($subDelegate['delegate_refunded_datetime'] == null) ? "N/A" : Carbon::parse($subDelegate['delegate_refunded_datetime'])->format('M j, Y g:i A'),
+                    'delegate_replaced_datetime' => ($subDelegate['delegate_replaced_datetime'] == null) ? "N/A" : Carbon::parse($subDelegate['delegate_replaced_datetime'])->format('M j, Y g:i A'),
                 ]);
 
-                if ($mainDelegate->delegate_replaced_by_id != null) {
+                if ($subDelegate['delegate_replaced_by_id'] != null) {
                     foreach ($subDelegatesReplacementArray as $subDelegateReplacement) {
-                        if ($mainDelegate->id == $subDelegateReplacement['delegate_original_from_id'] && $subDelegateReplacement['delegate_replaced_type'] == "main") {
+                        if ($subDelegate['subDelegateId']  == $subDelegateReplacement['delegate_original_from_id'] && $subDelegateReplacement['delegate_replaced_type'] == "sub") {
 
                             $transactionId = Transaction::where('delegate_id', $subDelegateReplacement['subDelegateId'])->where('delegate_type', "sub")->value('id');
                             $lastDigit = 1000 + intval($transactionId);
@@ -372,8 +475,8 @@ class RegistrationController extends Controller
                                 'delegate_replaced' => $subDelegateReplacement['delegate_replaced'],
                                 'delegate_refunded' => $subDelegateReplacement['delegate_refunded'],
 
-                                'delegate_replaced_type' => $subDelegateReplacement['delegate_replaced_type'],
-                                'delegate_original_from_id' => $subDelegateReplacement['delegate_original_from_id'],
+                                'delegate_replaced_type' => "sub",
+                                'delegate_original_from_id' => $subDelegate['subDelegateId'],
                                 'delegate_replaced_from_id' => $subDelegateReplacement['delegate_replaced_from_id'],
                                 'delegate_replaced_by_id' => $subDelegateReplacement['delegate_replaced_by_id'],
 
@@ -384,145 +487,538 @@ class RegistrationController extends Controller
                         }
                     }
                 }
-
                 array_push($allDelegatesArray, $allDelegatesArrayTemp);
+            }
 
-                $allDelegatesArrayTemp = array();
+            // dd($allDelegatesArray);
 
-                foreach ($subDelegatesArray as $subDelegate) {
-                    $allDelegatesArrayTemp = array();
+            $finalData = [
+                'mainDelegateId' => $mainDelegate->id,
+                'pass_type' => $mainDelegate->pass_type,
+                'rate_type' => $mainDelegate->rate_type,
+                'rate_type_string' => $mainDelegate->rate_type_string,
+                'company_name' => $mainDelegate->company_name,
+                'company_sector' => $mainDelegate->company_sector,
+                'company_address' => $mainDelegate->company_address,
+                'company_country' => $mainDelegate->company_country,
+                'company_city' => $mainDelegate->company_city,
+                'company_telephone_number' => $mainDelegate->company_telephone_number,
+                'company_mobile_number' => $mainDelegate->company_mobile_number,
+                'assistant_email_address' => $mainDelegate->assistant_email_address,
+                'heard_where' => $mainDelegate->heard_where,
+                'quantity' => $mainDelegate->quantity,
+                'finalQuantity' => $countFinalQuantity,
+                'pc_attending_nd' => $mainDelegate->pc_attending_nd,
+                'scc_attending_nd' => $mainDelegate->scc_attending_nd,
 
-                    $transactionId = Transaction::where('delegate_id', $subDelegate['subDelegateId'])->where('delegate_type', "sub")->value('id');
-                    $lastDigit = 1000 + intval($transactionId);
-                    $finalTransactionId = $eventYear . $eventCode . $lastDigit;
+                'mode_of_payment' => $mainDelegate->mode_of_payment,
+                'registration_status' => "$mainDelegate->registration_status",
+                'payment_status' => $mainDelegate->payment_status,
+                'registered_date_time' => Carbon::parse($mainDelegate->registered_date_time)->format('M j, Y g:i A'),
+                'paid_date_time' => ($mainDelegate->paid_date_time == null) ? "N/A" : Carbon::parse($mainDelegate->paid_date_time)->format('M j, Y g:i A'),
 
-                    array_push($allDelegatesArrayTemp, [
-                        'transactionId' => $finalTransactionId,
-                        'mainDelegateId' => $mainDelegate->id,
-                        'delegateId' => $subDelegate['subDelegateId'],
-                        'delegateType' => "sub",
+                'registration_method' => $mainDelegate->registration_method,
+                'transaction_remarks' => $mainDelegate->transaction_remarks,
 
-                        'name' => $subDelegate['salutation'] . " " . $subDelegate['first_name'] . " " . $subDelegate['middle_name'] . " " . $subDelegate['last_name'],
-                        'salutation' => $subDelegate['salutation'],
-                        'first_name' => $subDelegate['first_name'],
-                        'middle_name' => $subDelegate['middle_name'],
-                        'last_name' => $subDelegate['last_name'],
-                        'email_address' => $subDelegate['email_address'],
-                        'mobile_number' => $subDelegate['mobile_number'],
-                        'nationality' => $subDelegate['nationality'],
-                        'job_title' => $subDelegate['job_title'],
-                        'badge_type' => $subDelegate['badge_type'],
-                        'pcode_used' => $subDelegate['pcode_used'],
-                        'discount' => $subDelegate['discount'],
+                'invoiceNumber' => $invoiceNumber,
+                'allDelegates' => $allDelegatesArray,
 
-                        'is_replacement' => false,
-                        'delegate_cancelled' => $subDelegate['delegate_cancelled'],
-                        'delegate_replaced' => $subDelegate['delegate_replaced'],
-                        'delegate_refunded' => $subDelegate['delegate_refunded'],
+                'invoiceData' => $this->getInvoice($eventCategory, $eventId, $registrantId),
+            ];
 
-                        'delegate_replaced_type' => "sub",
-                        'delegate_original_from_id' => $subDelegate['subDelegateId'],
-                        'delegate_replaced_from_id' => null,
-                        'delegate_replaced_by_id' => $subDelegate['delegate_replaced_by_id'],
+            return $finalData;
+        } else {
+            abort(404, 'The URL is incorrect');
+        }
+    }
 
-                        'delegate_cancelled_datetime' => ($subDelegate['delegate_cancelled_datetime'] == null) ? "N/A" : Carbon::parse($subDelegate['delegate_cancelled_datetime'])->format('M j, Y g:i A'),
-                        'delegate_refunded_datetime' => ($subDelegate['delegate_refunded_datetime'] == null) ? "N/A" : Carbon::parse($subDelegate['delegate_refunded_datetime'])->format('M j, Y g:i A'),
-                        'delegate_replaced_datetime' => ($subDelegate['delegate_replaced_datetime'] == null) ? "N/A" : Carbon::parse($subDelegate['delegate_replaced_datetime'])->format('M j, Y g:i A'),
-                    ]);
+    public function registrantDetailSpousesView($eventCategory, $eventId, $registrantId)
+    {
+        if (MainSpouse::where('id', $registrantId)->where('event_id', $eventId)->exists()) {
+            $finalData = array();
 
-                    if ($subDelegate['delegate_replaced_by_id'] != null) {
-                        foreach ($subDelegatesReplacementArray as $subDelegateReplacement) {
-                            if ($subDelegate['subDelegateId']  == $subDelegateReplacement['delegate_original_from_id'] && $subDelegateReplacement['delegate_replaced_type'] == "sub") {
+            $subSpousesArray = array();
+            $subSpousesReplacementArray = array();
+            $allSpousesArray = array();
+            $allSpousesArrayTemp = array();
 
-                                $transactionId = Transaction::where('delegate_id', $subDelegateReplacement['subDelegateId'])->where('delegate_type', "sub")->value('id');
-                                $lastDigit = 1000 + intval($transactionId);
-                                $finalTransactionId = $eventYear . $eventCode . $lastDigit;
+            $countFinalQuantity = 0;
 
-                                array_push($allDelegatesArrayTemp, [
-                                    'transactionId' => $finalTransactionId,
-                                    'mainDelegateId' => $mainDelegate->id,
-                                    'delegateId' => $subDelegateReplacement['subDelegateId'],
-                                    'delegateType' => "sub",
+            $eventYear = Event::where('id', $eventId)->value('year');
+            $mainSpouse = MainSpouse::where('id', $registrantId)->where('event_id', $eventId)->first();
 
-                                    'name' => $subDelegateReplacement['salutation'] . " " . $subDelegateReplacement['first_name'] . " " . $subDelegateReplacement['middle_name'] . " " . $subDelegateReplacement['last_name'],
-                                    'salutation' => $subDelegateReplacement['salutation'],
-                                    'first_name' => $subDelegateReplacement['first_name'],
-                                    'middle_name' => $subDelegateReplacement['middle_name'],
-                                    'last_name' => $subDelegateReplacement['last_name'],
-                                    'email_address' => $subDelegateReplacement['email_address'],
-                                    'mobile_number' => $subDelegateReplacement['mobile_number'],
-                                    'nationality' => $subDelegateReplacement['nationality'],
-                                    'job_title' => $subDelegateReplacement['job_title'],
-                                    'badge_type' => $subDelegateReplacement['badge_type'],
-                                    'pcode_used' => $subDelegateReplacement['pcode_used'],
-                                    'discount' => $subDelegateReplacement['discount'],
+            foreach (config('app.eventCategories') as $eventCategoryC => $code) {
+                if ($eventCategory == $eventCategoryC) {
+                    $eventCode = $code;
+                }
+            }
 
-                                    'is_replacement' => true,
-                                    'delegate_cancelled' => $subDelegateReplacement['delegate_cancelled'],
-                                    'delegate_replaced' => $subDelegateReplacement['delegate_replaced'],
-                                    'delegate_refunded' => $subDelegateReplacement['delegate_refunded'],
+            $tempYear = Carbon::parse($mainSpouse->registered_date_time)->format('y');
+            $transactionId = SpouseTransaction::where('spouse_id', $mainSpouse->id)->where('spouse_type', "main")->value('id');
+            $lastDigit = 1000 + intval($transactionId);
+            $invoiceNumber = $eventCategory . $tempYear . "/" . $lastDigit;
 
-                                    'delegate_replaced_type' => "sub",
-                                    'delegate_original_from_id' => $subDelegate['subDelegateId'],
-                                    'delegate_replaced_from_id' => $subDelegateReplacement['delegate_replaced_from_id'],
-                                    'delegate_replaced_by_id' => $subDelegateReplacement['delegate_replaced_by_id'],
 
-                                    'delegate_cancelled_datetime' => ($subDelegateReplacement['delegate_cancelled_datetime'] == null) ? "N/A" : Carbon::parse($subDelegateReplacement['delegate_cancelled_datetime'])->format('M j, Y g:i A'),
-                                    'delegate_refunded_datetime' => ($subDelegateReplacement['delegate_refunded_datetime'] == null) ? "N/A" : Carbon::parse($subDelegateReplacement['delegate_refunded_datetime'])->format('M j, Y g:i A'),
-                                    'delegate_replaced_datetime' => ($subDelegateReplacement['delegate_replaced_datetime'] == null) ? "N/A" : Carbon::parse($subDelegateReplacement['delegate_replaced_datetime'])->format('M j, Y g:i A'),
-                                ]);
-                            }
+            if ($mainSpouse->spouse_replaced_by_id == null && (!$mainSpouse->spouse_refunded)) {
+                $countFinalQuantity++;
+            }
+
+            $subSpouses = AdditionalSpouse::where('main_spouse_id', $registrantId)->get();
+            if (!$subSpouses->isEmpty()) {
+                foreach ($subSpouses as $subSpouse) {
+                    if ($subSpouse->spouse_replaced_by_id == null && (!$subSpouse->spouse_refunded)) {
+                        $countFinalQuantity++;
+                    }
+
+                    if ($subSpouse->spouse_replaced_from_id != null) {
+                        array_push($subSpousesReplacementArray, [
+                            'subSpouseId' => $subSpouse->id,
+                            'name' => $subSpouse->salutation . " " . $subSpouse->first_name . " " . $subSpouse->middle_name . " " . $subSpouse->last_name,
+                            'salutation' => $subSpouse->salutation,
+                            'first_name' => $subSpouse->first_name,
+                            'middle_name' => $subSpouse->middle_name,
+                            'last_name' => $subSpouse->last_name,
+                            'email_address' => $subSpouse->email_address,
+                            'mobile_number' => $subSpouse->mobile_number,
+                            'nationality' => $subSpouse->nationality,
+                            'country' => $subSpouse->country,
+                            'city' => $subSpouse->city,
+
+                            'spouse_cancelled' => $subSpouse->spouse_cancelled,
+                            'spouse_replaced' => $subSpouse->spouse_replaced,
+                            'spouse_refunded' => $subSpouse->spouse_refunded,
+
+                            'spouse_replaced_type' => $subSpouse->spouse_replaced_type,
+                            'spouse_original_from_id' => $subSpouse->spouse_original_from_id,
+                            'spouse_replaced_from_id' => $subSpouse->spouse_replaced_from_id,
+                            'spouse_replaced_by_id' => $subSpouse->spouse_replaced_by_id,
+
+                            'spouse_cancelled_datetime' => $subSpouse->spouse_cancelled_datetime,
+                            'spouse_refunded_datetime' => $subSpouse->spouse_refunded_datetime,
+                            'spouse_replaced_datetime' => $subSpouse->spouse_replaced_datetime,
+                        ]);
+                    } else {
+                        array_push($subSpousesArray, [
+                            'subSpouseId' => $subSpouse->id,
+                            'name' => $subSpouse->salutation . " " . $subSpouse->first_name . " " . $subSpouse->middle_name . " " . $subSpouse->last_name,
+                            'salutation' => $subSpouse->salutation,
+                            'first_name' => $subSpouse->first_name,
+                            'middle_name' => $subSpouse->middle_name,
+                            'last_name' => $subSpouse->last_name,
+                            'email_address' => $subSpouse->email_address,
+                            'mobile_number' => $subSpouse->mobile_number,
+                            'nationality' => $subSpouse->nationality,
+                            'country' => $subSpouse->country,
+                            'city' => $subSpouse->city,
+
+                            'spouse_cancelled' => $subSpouse->spouse_cancelled,
+                            'spouse_replaced' => $subSpouse->spouse_replaced,
+                            'spouse_refunded' => $subSpouse->spouse_refunded,
+
+                            'spouse_replaced_type' => $subSpouse->spouse_replaced_type,
+                            'spouse_original_from_id' => $subSpouse->spouse_original_from_id,
+                            'spouse_replaced_from_id' => $subSpouse->spouse_replaced_from_id,
+                            'spouse_replaced_by_id' => $subSpouse->spouse_replaced_by_id,
+
+                            'spouse_cancelled_datetime' => $subSpouse->spouse_cancelled_datetime,
+                            'spouse_refunded_datetime' => $subSpouse->spouse_refunded_datetime,
+                            'spouse_replaced_datetime' => $subSpouse->spouse_replaced_datetime,
+                        ]);
+                    }
+                }
+            }
+
+
+            $finalTransactionId = $eventYear . $eventCode . $lastDigit;
+
+            array_push($allSpousesArrayTemp, [
+                'transactionId' => $finalTransactionId,
+                'mainSpouseId' => $mainSpouse->id,
+                'spouseId' => $mainSpouse->id,
+                'spouseType' => "main",
+
+                'name' => $mainSpouse->salutation . " " . $mainSpouse->first_name . " " . $mainSpouse->middle_name . " " . $mainSpouse->last_name,
+                'salutation' => $mainSpouse->salutation,
+                'first_name' => $mainSpouse->first_name,
+                'middle_name' => $mainSpouse->middle_name,
+                'last_name' => $mainSpouse->last_name,
+                'email_address' => $mainSpouse->email_address,
+                'mobile_number' => $mainSpouse->mobile_number,
+                'nationality' => $mainSpouse->nationality,
+                'country' => $mainSpouse->country,
+                'city' => $mainSpouse->city,
+
+                'is_replacement' => false,
+                'spouse_cancelled' => $mainSpouse->spouse_cancelled,
+                'spouse_replaced' => $mainSpouse->spouse_replaced,
+                'spouse_refunded' => $mainSpouse->spouse_refunded,
+
+                'spouse_replaced_type' => "main",
+                'spouse_original_from_id' => $mainSpouse->id,
+                'spouse_replaced_from_id' => null,
+                'spouse_replaced_by_id' => $mainSpouse->spouse_replaced_by_id,
+
+                'spouse_cancelled_datetime' => ($mainSpouse->spouse_cancelled_datetime == null) ? "N/A" : Carbon::parse($mainSpouse->spouse_cancelled_datetime)->format('M j, Y g:i A'),
+                'spouse_refunded_datetime' => ($mainSpouse->spouse_refunded_datetime == null) ? "N/A" : Carbon::parse($mainSpouse->spouse_refunded_datetime)->format('M j, Y g:i A'),
+                'spouse_replaced_datetime' => ($mainSpouse->spouse_replaced_datetime == null) ? "N/A" : Carbon::parse($mainSpouse->spouse_replaced_datetime)->format('M j, Y g:i A'),
+            ]);
+
+            if ($mainSpouse->spouse_replaced_by_id != null) {
+                foreach ($subSpousesReplacementArray as $subSpouseReplacement) {
+                    if ($mainSpouse->id == $subSpouseReplacement['spouse_original_from_id'] && $subSpouseReplacement['spouse_replaced_type'] == "main") {
+
+                        $transactionId = SpouseTransaction::where('spouse_id', $subSpouseReplacement['subSpouseId'])->where('spouse_type', "sub")->value('id');
+                        $lastDigit = 1000 + intval($transactionId);
+                        $finalTransactionId = $eventYear . $eventCode . $lastDigit;
+
+                        array_push($allSpousesArrayTemp, [
+                            'transactionId' => $finalTransactionId,
+                            'mainSpouseId' => $mainSpouse->id,
+                            'spouseId' => $subSpouseReplacement['subSpouseId'],
+                            'spouseType' => "sub",
+
+                            'name' => $subSpouseReplacement['salutation'] . " " . $subSpouseReplacement['first_name'] . " " . $subSpouseReplacement['middle_name'] . " " . $subSpouseReplacement['last_name'],
+                            'salutation' => $subSpouseReplacement['salutation'],
+                            'first_name' => $subSpouseReplacement['first_name'],
+                            'middle_name' => $subSpouseReplacement['middle_name'],
+                            'last_name' => $subSpouseReplacement['last_name'],
+                            'email_address' => $subSpouseReplacement['email_address'],
+                            'mobile_number' => $subSpouseReplacement['mobile_number'],
+                            'nationality' => $subSpouseReplacement['nationality'],
+                            'country' => $subSpouseReplacement['country'],
+                            'city' => $subSpouseReplacement['city'],
+
+                            'is_replacement' => true,
+                            'spouse_cancelled' => $subSpouseReplacement['spouse_cancelled'],
+                            'spouse_replaced' => $subSpouseReplacement['spouse_replaced'],
+                            'spouse_refunded' => $subSpouseReplacement['spouse_refunded'],
+
+                            'spouse_replaced_type' => $subSpouseReplacement['spouse_replaced_type'],
+                            'spouse_original_from_id' => $subSpouseReplacement['spouse_original_from_id'],
+                            'spouse_replaced_from_id' => $subSpouseReplacement['spouse_replaced_from_id'],
+                            'spouse_replaced_by_id' => $subSpouseReplacement['spouse_replaced_by_id'],
+
+                            'spouse_cancelled_datetime' => ($subSpouseReplacement['spouse_cancelled_datetime'] == null) ? "N/A" : Carbon::parse($subSpouseReplacement['spouse_cancelled_datetime'])->format('M j, Y g:i A'),
+                            'spouse_refunded_datetime' => ($subSpouseReplacement['spouse_refunded_datetime'] == null) ? "N/A" : Carbon::parse($subSpouseReplacement['spouse_refunded_datetime'])->format('M j, Y g:i A'),
+                            'spouse_replaced_datetime' => ($subSpouseReplacement['spouse_replaced_datetime'] == null) ? "N/A" : Carbon::parse($subSpouseReplacement['spouse_replaced_datetime'])->format('M j, Y g:i A'),
+                        ]);
+                    }
+                }
+            }
+
+            array_push($allSpousesArray, $allSpousesArrayTemp);
+
+            $allSpousesArrayTemp = array();
+
+            foreach ($subSpousesArray as $subSpouse) {
+                $allSpousesArrayTemp = array();
+
+                $transactionId = SpouseTransaction::where('spouse_id', $subSpouse['subSpouseId'])->where('spouse_type', "sub")->value('id');
+                $lastDigit = 1000 + intval($transactionId);
+                $finalTransactionId = $eventYear . $eventCode . $lastDigit;
+
+                array_push($allSpousesArrayTemp, [
+                    'transactionId' => $finalTransactionId,
+                    'mainSpouseId' => $mainSpouse->id,
+                    'spouseId' => $subSpouse['subSpouseId'],
+                    'spouseType' => "sub",
+
+                    'name' => $subSpouse['salutation'] . " " . $subSpouse['first_name'] . " " . $subSpouse['middle_name'] . " " . $subSpouse['last_name'],
+                    'salutation' => $subSpouse['salutation'],
+                    'first_name' => $subSpouse['first_name'],
+                    'middle_name' => $subSpouse['middle_name'],
+                    'last_name' => $subSpouse['last_name'],
+                    'email_address' => $subSpouse['email_address'],
+                    'mobile_number' => $subSpouse['mobile_number'],
+                    'nationality' => $subSpouse['nationality'],
+                    'country' => $subSpouse['country'],
+                    'city' => $subSpouse['city'],
+
+                    'is_replacement' => false,
+                    'spouse_cancelled' => $subSpouse['spouse_cancelled'],
+                    'spouse_replaced' => $subSpouse['spouse_replaced'],
+                    'spouse_refunded' => $subSpouse['spouse_refunded'],
+
+                    'spouse_replaced_type' => "sub",
+                    'spouse_original_from_id' => $subSpouse['subSpouseId'],
+                    'spouse_replaced_from_id' => null,
+                    'spouse_replaced_by_id' => $subSpouse['spouse_replaced_by_id'],
+
+                    'spouse_cancelled_datetime' => ($subSpouse['spouse_cancelled_datetime'] == null) ? "N/A" : Carbon::parse($subSpouse['spouse_cancelled_datetime'])->format('M j, Y g:i A'),
+                    'spouse_refunded_datetime' => ($subSpouse['spouse_refunded_datetime'] == null) ? "N/A" : Carbon::parse($subSpouse['spouse_refunded_datetime'])->format('M j, Y g:i A'),
+                    'spouse_replaced_datetime' => ($subSpouse['spouse_replaced_datetime'] == null) ? "N/A" : Carbon::parse($subSpouse['spouse_replaced_datetime'])->format('M j, Y g:i A'),
+                ]);
+
+                if ($subSpouse['spouse_replaced_by_id'] != null) {
+                    foreach ($subSpousesReplacementArray as $subSpouseReplacement) {
+                        if ($subSpouse['subSpouseId'] == $subSpouseReplacement['spouse_original_from_id'] && $subSpouseReplacement['spouse_replaced_type'] == "sub") {
+
+                            $transactionId = SpouseTransaction::where('spouse_id', $subSpouseReplacement['subSpouseId'])->where('spouse_type', "sub")->value('id');
+                            $lastDigit = 1000 + intval($transactionId);
+                            $finalTransactionId = $eventYear . $eventCode . $lastDigit;
+
+                            array_push($allSpousesArrayTemp, [
+                                'transactionId' => $finalTransactionId,
+                                'mainSpouseId' => $mainSpouse->id,
+                                'spouseId' => $subSpouseReplacement['subSpouseId'],
+                                'spouseType' => "sub",
+
+                                'name' => $subSpouseReplacement['salutation'] . " " . $subSpouseReplacement['first_name'] . " " . $subSpouseReplacement['middle_name'] . " " . $subSpouseReplacement['last_name'],
+                                'salutation' => $subSpouseReplacement['salutation'],
+                                'first_name' => $subSpouseReplacement['first_name'],
+                                'middle_name' => $subSpouseReplacement['middle_name'],
+                                'last_name' => $subSpouseReplacement['last_name'],
+                                'email_address' => $subSpouseReplacement['email_address'],
+                                'mobile_number' => $subSpouseReplacement['mobile_number'],
+                                'nationality' => $subSpouseReplacement['nationality'],
+                                'country' => $subSpouseReplacement['country'],
+                                'city' => $subSpouseReplacement['city'],
+
+                                'is_replacement' => true,
+                                'spouse_cancelled' => $subSpouseReplacement['spouse_cancelled'],
+                                'spouse_replaced' => $subSpouseReplacement['spouse_replaced'],
+                                'spouse_refunded' => $subSpouseReplacement['spouse_refunded'],
+
+                                'spouse_replaced_type' => "sub",
+                                'spouse_original_from_id' => $subSpouse['subSpouseId'],
+                                'spouse_replaced_from_id' => $subSpouseReplacement['spouse_replaced_from_id'],
+                                'spouse_replaced_by_id' => $subSpouseReplacement['spouse_replaced_by_id'],
+
+                                'spouse_cancelled_datetime' => ($subSpouseReplacement['spouse_cancelled_datetime'] == null) ? "N/A" : Carbon::parse($subSpouseReplacement['spouse_cancelled_datetime'])->format('M j, Y g:i A'),
+                                'spouse_refunded_datetime' => ($subSpouseReplacement['spouse_refunded_datetime'] == null) ? "N/A" : Carbon::parse($subSpouseReplacement['spouse_refunded_datetime'])->format('M j, Y g:i A'),
+                                'spouse_replaced_datetime' => ($subSpouseReplacement['spouse_replaced_datetime'] == null) ? "N/A" : Carbon::parse($subSpouseReplacement['spouse_replaced_datetime'])->format('M j, Y g:i A'),
+                            ]);
                         }
                     }
-                    array_push($allDelegatesArray, $allDelegatesArrayTemp);
                 }
-
-                // dd($allDelegatesArray);
-
-                $finalData = [
-                    'mainDelegateId' => $mainDelegate->id,
-                    'pass_type' => $mainDelegate->pass_type,
-                    'rate_type' => $mainDelegate->rate_type,
-                    'rate_type_string' => $mainDelegate->rate_type_string,
-                    'company_name' => $mainDelegate->company_name,
-                    'company_sector' => $mainDelegate->company_sector,
-                    'company_address' => $mainDelegate->company_address,
-                    'company_country' => $mainDelegate->company_country,
-                    'company_city' => $mainDelegate->company_city,
-                    'company_telephone_number' => $mainDelegate->company_telephone_number,
-                    'company_mobile_number' => $mainDelegate->company_mobile_number,
-                    'assistant_email_address' => $mainDelegate->assistant_email_address,
-                    'heard_where' => $mainDelegate->heard_where,
-                    'quantity' => $mainDelegate->quantity,
-                    'finalQuantity' => $countFinalQuantity,
-                    'pc_attending_nd' => $mainDelegate->pc_attending_nd,
-                    'scc_attending_nd' => $mainDelegate->scc_attending_nd,
-
-                    'mode_of_payment' => $mainDelegate->mode_of_payment,
-                    'registration_status' => "$mainDelegate->registration_status",
-                    'payment_status' => $mainDelegate->payment_status,
-                    'registered_date_time' => Carbon::parse($mainDelegate->registered_date_time)->format('M j, Y g:i A'),
-                    'paid_date_time' => ($mainDelegate->paid_date_time == null) ? "N/A" : Carbon::parse($mainDelegate->paid_date_time)->format('M j, Y g:i A'),
-
-                    'registration_method' => $mainDelegate->registration_method,
-                    'transaction_remarks' => $mainDelegate->transaction_remarks,
-
-                    'invoiceNumber' => $invoiceNumber,
-                    'allDelegates' => $allDelegatesArray,
-
-                    'invoiceData' => $this->getInvoice($eventCategory, $eventId, $registrantId),
-                ];
-
-                return view('admin.events.transactions.registrants_detail', [
-                    "pageTitle" => "Transaction Details",
-                    "eventCategory" => $eventCategory,
-                    "eventId" => $eventId,
-                    "registrantId" => $registrantId,
-                    "finalData" => $finalData,
-                ]);
-            } else {
-                abort(404, 'The URL is incorrect');
+                array_push($allSpousesArray, $allSpousesArrayTemp);
             }
+
+            $finalData = [
+                'mainSpouseId' => $mainSpouse->id,
+                'reference_delegate_name' => $mainSpouse->reference_delegate_name,
+                'heard_where' => $mainSpouse->heard_where,
+                'quantity' => $mainSpouse->quantity,
+                'finalQuantity' => $countFinalQuantity,
+
+                'mode_of_payment' => $mainSpouse->mode_of_payment,
+                'registration_status' => $mainSpouse->registration_status,
+                'payment_status' => $mainSpouse->payment_status,
+                'registered_date_time' => Carbon::parse($mainSpouse->registered_date_time)->format('M j, Y g:i A'),
+                'paid_date_time' => ($mainSpouse->paid_date_time == null) ? "N/A" : Carbon::parse($mainSpouse->paid_date_time)->format('M j, Y g:i A'),
+
+                'registration_method' => $mainSpouse->registration_method,
+                'transaction_remarks' => $mainSpouse->transaction_remarks,
+
+                'invoiceNumber' => $invoiceNumber,
+                'allSpouses' => $allSpousesArray,
+
+                'invoiceData' => $this->getInvoice($eventCategory, $eventId, $registrantId),
+            ];
+            // dd($finalData);
+            return $finalData;
+        } else {
+            abort(404, 'The URL is incorrect');
+        }
+    }
+
+    public function registrantDetailRCCAwardsView($eventCategory, $eventId, $registrantId)
+    {
+        if (RccAwardsMainParticipant::where('id', $registrantId)->where('event_id', $eventId)->exists()) {
+            $finalData = array();
+
+            $subParticipantReplacementArray = array();
+            $allParticipantsArray = array();
+            $allParticipantsArrayTemp = array();
+
+            $countFinalQuantity = 0;
+
+            $eventYear = Event::where('id', $eventId)->value('year');
+            $mainParticipant = RccAwardsMainParticipant::where('id', $registrantId)->where('event_id', $eventId)->first();
+
+            foreach (config('app.eventCategories') as $eventCategoryC => $code) {
+                if ($eventCategory == $eventCategoryC) {
+                    $eventCode = $code;
+                }
+            }
+
+            $tempYear = Carbon::parse($mainParticipant->registered_date_time)->format('y');
+            $transactionId = RccAwardsParticipantTransaction::where('participant_id', $mainParticipant->id)->where('participant_type', "main")->value('id');
+            $lastDigit = 1000 + intval($transactionId);
+            $invoiceNumber = $eventCategory . $tempYear . "/" . $lastDigit;
+
+            if ($mainParticipant->participant_replaced_by_id == null && (!$mainParticipant->participant_refunded)) {
+                $countFinalQuantity++;
+            }
+
+            $subParticipants = RccAwardsAdditionalParticipant::where('main_participant_id', $registrantId)->get();
+            if (!$subParticipants->isEmpty()) {
+                foreach ($subParticipants as $subParticipant) {
+                    if ($subParticipant->participant_replaced_by_id == null && (!$subParticipant->participant_refunded)) {
+                        $countFinalQuantity++;
+                    }
+
+                    if ($subParticipant->participant_replaced_from_id != null) {
+                        array_push($subParticipantReplacementArray, [
+                            'subParticipantId' => $subParticipant->id,
+                            'name' => $subParticipant->salutation . " " . $subParticipant->first_name . " " . $subParticipant->middle_name . " " . $subParticipant->last_name,
+                            'salutation' => $subParticipant->salutation,
+                            'first_name' => $subParticipant->first_name,
+                            'middle_name' => $subParticipant->middle_name,
+                            'last_name' => $subParticipant->last_name,
+                            'email_address' => $subParticipant->email_address,
+                            'mobile_number' => $subParticipant->mobile_number,
+                            'address' => $subParticipant->address,
+                            'country' => $subParticipant->country,
+                            'city' => $subParticipant->city,
+                            'job_title' => $subParticipant->job_title,
+
+                            'participant_cancelled' => $subParticipant->participant_cancelled,
+                            'participant_replaced' => $subParticipant->participant_replaced,
+                            'participant_refunded' => $subParticipant->participant_refunded,
+
+                            'participant_replaced_type' => $subParticipant->participant_replaced_type,
+                            'participant_original_from_id' => $subParticipant->participant_original_from_id,
+                            'participant_replaced_from_id' => $subParticipant->participant_replaced_from_id,
+                            'participant_replaced_by_id' => $subParticipant->participant_replaced_by_id,
+
+                            'participant_cancelled_datetime' => $subParticipant->participant_cancelled_datetime,
+                            'participant_refunded_datetime' => $subParticipant->participant_refunded_datetime,
+                            'participant_replaced_datetime' => $subParticipant->participant_replaced_datetime,
+                        ]);
+                    }
+                }
+            }
+
+
+            $finalTransactionId = $eventYear . $eventCode . $lastDigit;
+
+            array_push($allParticipantsArrayTemp, [
+                'transactionId' => $finalTransactionId,
+                'mainParticipantId' => $mainParticipant->id,
+                'participantId' => $mainParticipant->id,
+                'participantType' => "main",
+
+                'name' => $mainParticipant->salutation . " " . $mainParticipant->first_name . " " . $mainParticipant->middle_name . " " . $mainParticipant->last_name,
+                'salutation' => $mainParticipant->salutation,
+                'first_name' => $mainParticipant->first_name,
+                'middle_name' => $mainParticipant->middle_name,
+                'last_name' => $mainParticipant->last_name,
+                'email_address' => $mainParticipant->email_address,
+                'mobile_number' => $mainParticipant->mobile_number,
+                'address' => $mainParticipant->address,
+                'country' => $mainParticipant->country,
+                'city' => $mainParticipant->city,
+                'job_title' => $mainParticipant->job_title,
+
+                'is_replacement' => false,
+                'participant_cancelled' => $mainParticipant->participant_cancelled,
+                'participant_replaced' => $mainParticipant->participant_replaced,
+                'participant_refunded' => $mainParticipant->participant_refunded,
+
+                'participant_replaced_type' => "main",
+                'participant_original_from_id' => $mainParticipant->id,
+                'participant_replaced_from_id' => null,
+                'participant_replaced_by_id' => $mainParticipant->participant_replaced_by_id,
+
+                'participant_cancelled_datetime' => ($mainParticipant->participant_cancelled_datetime == null) ? "N/A" : Carbon::parse($mainParticipant->participant_cancelled_datetime)->format('M j, Y g:i A'),
+                'participant_refunded_datetime' => ($mainParticipant->participant_refunded_datetime == null) ? "N/A" : Carbon::parse($mainParticipant->participant_refunded_datetime)->format('M j, Y g:i A'),
+                'participant_replaced_datetime' => ($mainParticipant->participant_replaced_datetime == null) ? "N/A" : Carbon::parse($mainParticipant->participant_replaced_datetime)->format('M j, Y g:i A'),
+            ]);
+
+            if ($mainParticipant->participant_replaced_by_id != null) {
+                foreach ($subParticipantReplacementArray as $subParticipantReplacement) {
+                    if ($mainParticipant->id == $subParticipantReplacement['participant_original_from_id'] && $subParticipantReplacement['participant_replaced_type'] == "main") {
+
+                        $transactionId = RccAwardsParticipantTransaction::where('participant_id', $subParticipantReplacement['subParticipantId'])->where('participant_type', "sub")->value('id');
+                        $lastDigit = 1000 + intval($transactionId);
+                        $finalTransactionId = $eventYear . $eventCode . $lastDigit;
+
+                        array_push($allParticipantsArrayTemp, [
+                            'transactionId' => $finalTransactionId,
+                            'mainParticipantId' => $mainParticipant->id,
+                            'participantId' => $subParticipantReplacement['subParticipantId'],
+                            'participantType' => "sub",
+
+                            'name' => $subParticipantReplacement['salutation'] . " " . $subParticipantReplacement['first_name'] . " " . $subParticipantReplacement['middle_name'] . " " . $subParticipantReplacement['last_name'],
+                            'salutation' => $subParticipantReplacement['salutation'],
+                            'first_name' => $subParticipantReplacement['first_name'],
+                            'middle_name' => $subParticipantReplacement['middle_name'],
+                            'last_name' => $subParticipantReplacement['last_name'],
+                            'email_address' => $subParticipantReplacement['email_address'],
+                            'mobile_number' => $subParticipantReplacement['mobile_number'],
+                            'address' => $subParticipantReplacement['address'],
+                            'country' => $subParticipantReplacement['country'],
+                            'city' => $subParticipantReplacement['city'],
+                            'job_title' => $subParticipantReplacement['job_title'],
+
+                            'is_replacement' => true,
+                            'participant_cancelled' => $subParticipantReplacement['participant_cancelled'],
+                            'participant_replaced' => $subParticipantReplacement['participant_replaced'],
+                            'participant_refunded' => $subParticipantReplacement['participant_refunded'],
+
+                            'participant_replaced_type' => $subParticipantReplacement['participant_replaced_type'],
+                            'participant_original_from_id' => $subParticipantReplacement['participant_original_from_id'],
+                            'participant_replaced_from_id' => $subParticipantReplacement['participant_replaced_from_id'],
+                            'participant_replaced_by_id' => $subParticipantReplacement['participant_replaced_by_id'],
+
+                            'participant_cancelled_datetime' => ($subParticipantReplacement['participant_cancelled_datetime'] == null) ? "N/A" : Carbon::parse($subParticipantReplacement['participant_cancelled_datetime'])->format('M j, Y g:i A'),
+                            'participant_refunded_datetime' => ($subParticipantReplacement['participant_refunded_datetime'] == null) ? "N/A" : Carbon::parse($subParticipantReplacement['participant_refunded_datetime'])->format('M j, Y g:i A'),
+                            'participant_replaced_datetime' => ($subParticipantReplacement['participant_replaced_datetime'] == null) ? "N/A" : Carbon::parse($subParticipantReplacement['participant_replaced_datetime'])->format('M j, Y g:i A'),
+                        ]);
+                    }
+                }
+            }
+
+            array_push($allParticipantsArray, $allParticipantsArrayTemp);
+
+            $entryFormId = RccAwardsDocument::where('event_id', $eventId)->where('participant_id', $mainParticipant->id)->where('document_type', 'entryForm')->value('id');
+
+            $getSupportingDocumentFiles = RccAwardsDocument::where('event_id', $eventId)->where('participant_id', $mainParticipant->id)->where('document_type', 'supportingDocument')->get();
+
+            $supportingDocumentsDownloadId = [];
+
+            if ($getSupportingDocumentFiles->isNotEmpty()) {
+                foreach ($getSupportingDocumentFiles as $supportingDocument) {
+                    $supportingDocumentsDownloadId[] = $supportingDocument->id;
+                }
+            }
+
+            $finalData = [
+                'mainParticipantId' => $mainParticipant->id,
+
+                'pass_type' => $mainParticipant->pass_type,
+                'rate_type' => $mainParticipant->rate_type,
+                'rate_type_string' => $mainParticipant->rate_type_string,
+
+                'category' => $mainParticipant->category,
+                'sub_category' => $mainParticipant->sub_category,
+                'company_name' => $mainParticipant->company_name,
+
+                'entryFormId' => $entryFormId,
+                'supportingDocumentsDownloadId' => $supportingDocumentsDownloadId,
+
+                'heard_where' => $mainParticipant->heard_where,
+
+                'quantity' => $mainParticipant->quantity,
+                'finalQuantity' => $countFinalQuantity,
+
+                'mode_of_payment' => $mainParticipant->mode_of_payment,
+                'registration_status' => $mainParticipant->registration_status,
+                'payment_status' => $mainParticipant->payment_status,
+                'registered_date_time' => Carbon::parse($mainParticipant->registered_date_time)->format('M j, Y g:i A'),
+                'paid_date_time' => ($mainParticipant->paid_date_time == null) ? "N/A" : Carbon::parse($mainParticipant->paid_date_time)->format('M j, Y g:i A'),
+
+                'registration_method' => $mainParticipant->registration_method,
+                'transaction_remarks' => $mainParticipant->transaction_remarks,
+
+                'invoiceNumber' => $invoiceNumber,
+                'allParticipants' => $allParticipantsArray,
+
+                'invoiceData' => $this->getInvoice($eventCategory, $eventId, $registrantId),
+            ];
+            // dd($finalData);
+            return $finalData;
         } else {
             abort(404, 'The URL is incorrect');
         }
@@ -573,178 +1069,14 @@ class RegistrationController extends Controller
     public function getInvoice($eventCategory, $eventId, $registrantId)
     {
         if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {
-            if (MainDelegate::where('id', $registrantId)->where('event_id', $eventId)->exists()) {
-                $event = Event::where('category', $eventCategory)->where('id', $eventId)->first();
-                $invoiceDetails = array();
-                $countFinalQuantity = 0;
-
-                $mainDelegate = MainDelegate::where('id', $registrantId)->where('event_id', $eventId)->first();
-
-                $addMainDelegate = true;
-                if ($mainDelegate->delegate_cancelled) {
-                    if ($mainDelegate->delegate_refunded || $mainDelegate->delegate_replaced) {
-                        $addMainDelegate = false;
-                    }
-                }
-
-                if ($mainDelegate->delegate_replaced_by_id == null & (!$mainDelegate->delegate_refunded)) {
-                    $countFinalQuantity++;
-                }
-
-                if ($addMainDelegate) {
-                    $mainDiscount = PromoCode::where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $mainDelegate->pcode_used)->where('badge_type', $mainDelegate->badge_type)->value('discount');
-
-                    if ($mainDiscount != null) {
-                        if ($mainDiscount == 100) {
-                            $delegateDescription = "Delegate Registration Fee - Complimentary";
-                        } else if ($mainDiscount > 0 && $mainDiscount < 100) {
-                            $delegateDescription = "Delegate Registration Fee - " . $mainDelegate->rate_type_string . " (" . $mainDiscount . "% discount)";
-                        } else {
-                            $delegateDescription = "Delegate Registration Fee - {$mainDelegate->rate_type_string}";
-                        }
-                    } else {
-                        $delegateDescription = "Delegate Registration Fee - {$mainDelegate->rate_type_string}";
-                    }
-
-
-                    array_push($invoiceDetails, [
-                        'delegateDescription' => $delegateDescription,
-                        'delegateNames' => [
-                            $mainDelegate->first_name . " " . $mainDelegate->middle_name . " " . $mainDelegate->last_name,
-                        ],
-                        'badgeType' => $mainDelegate->badge_type,
-                        'quantity' => 1,
-                        'totalDiscount' => $mainDelegate->unit_price * ($mainDiscount / 100),
-                        'totalNetAmount' =>  $mainDelegate->unit_price - ($mainDelegate->unit_price * ($mainDiscount / 100)),
-                        'promoCodeDiscount' => $mainDiscount,
-                    ]);
-                }
-
-
-                $subDelegates = AdditionalDelegate::where('main_delegate_id', $registrantId)->get();
-                if (!$subDelegates->isEmpty()) {
-                    foreach ($subDelegates as $subDelegate) {
-
-                        if ($subDelegate->delegate_replaced_by_id == null & (!$subDelegate->delegate_refunded)) {
-                            $countFinalQuantity++;
-                        }
-
-                        $addSubDelegate = true;
-                        if ($subDelegate->delegate_cancelled) {
-                            if ($subDelegate->delegate_refunded || $subDelegate->delegate_replaced) {
-                                $addSubDelegate = false;
-                            }
-                        }
-
-                        if ($addSubDelegate) {
-                            $subDiscount = PromoCode::where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $subDelegate->pcode_used)->where('badge_type', $subDelegate->badge_type)->value('discount');
-
-                            $checkIfExisting = false;
-                            $existingIndex = 0;
-
-                            for ($j = 0; $j < count($invoiceDetails); $j++) {
-                                if ($subDelegate->badge_type == $invoiceDetails[$j]['badgeType'] && $subDiscount == $invoiceDetails[$j]['promoCodeDiscount']) {
-                                    $existingIndex = $j;
-                                    $checkIfExisting = true;
-                                    break;
-                                }
-                            }
-
-                            if ($checkIfExisting) {
-                                array_push(
-                                    $invoiceDetails[$existingIndex]['delegateNames'],
-                                    $subDelegate->first_name . " " . $subDelegate->middle_name . " " . $subDelegate->last_name
-                                );
-
-                                $quantityTemp = $invoiceDetails[$existingIndex]['quantity'] + 1;
-                                $totalDiscountTemp = ($mainDelegate->unit_price * ($invoiceDetails[$existingIndex]['promoCodeDiscount'] / 100)) * $quantityTemp;
-                                $totalNetAmountTemp = ($mainDelegate->unit_price * $quantityTemp) - $totalDiscountTemp;
-
-                                $invoiceDetails[$existingIndex]['quantity'] = $quantityTemp;
-                                $invoiceDetails[$existingIndex]['totalDiscount'] = $totalDiscountTemp;
-                                $invoiceDetails[$existingIndex]['totalNetAmount'] = $totalNetAmountTemp;
-                            } else {
-
-                                if ($subDiscount != null) {
-                                    if ($subDiscount == 100) {
-                                        $subDelegateDescription = "Delegate Registration Fee - Complimentary";
-                                    } else if ($subDiscount > 0 && $subDiscount < 100) {
-                                        $subDelegateDescription = "Delegate Registration Fee - " . $mainDelegate->rate_type_string . " (" . $subDiscount . "% discount)";
-                                    } else {
-                                        $subDelegateDescription = "Delegate Registration Fee - {$mainDelegate->rate_type_string}";
-                                    }
-                                } else {
-                                    $subDelegateDescription = "Delegate Registration Fee - {$mainDelegate->rate_type_string}";
-                                }
-
-                                array_push($invoiceDetails, [
-                                    'delegateDescription' => $subDelegateDescription,
-                                    'delegateNames' => [
-                                        $subDelegate->first_name . " " . $subDelegate->middle_name . " " . $subDelegate->last_name,
-                                    ],
-                                    'badgeType' => $subDelegate->badge_type,
-                                    'quantity' => 1,
-                                    'totalDiscount' => $mainDelegate->unit_price * ($subDiscount / 100),
-                                    'totalNetAmount' =>  $mainDelegate->unit_price - ($mainDelegate->unit_price * ($subDiscount / 100)),
-                                    'promoCodeDiscount' => $subDiscount,
-                                ]);
-                            }
-                        }
-                    }
-                }
-
-                $transactionId = Transaction::where('delegate_id', $mainDelegate->id)->where('delegate_type', "main")->value('id');
-
-                $tempYear = Carbon::parse($mainDelegate->registered_date_time)->format('y');
-                $lastDigit = 1000 + intval($transactionId);
-
-                foreach (config('app.eventCategories') as $eventCategoryC => $code) {
-                    if ($event->category == $eventCategoryC) {
-                        $getEventcode = $code;
-                    }
-                }
-
-                $tempInvoiceNumber = "$event->category" . "$tempYear" . "/" . "$lastDigit";
-                $tempBookReference = "$event->year" . "$getEventcode" . "$lastDigit";
-
-
-                if ($eventCategory == "AF") {
-                    $bankDetails = config('app.bankDetails.AF');
-                } else {
-                    $bankDetails = config('app.bankDetails.DEFAULT');
-                }
-
-                $eventFormattedData = Carbon::parse($event->event_start_date)->format('d') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');
-
-                $invoiceData = [
-                    "finalEventStartDate" => Carbon::parse($event->event_start_date)->format('d M Y'),
-                    "finalEventEndDate" => Carbon::parse($event->event_end_date)->format('d M Y'),
-                    "eventFormattedData" => $eventFormattedData,
-                    "companyName" => $mainDelegate->company_name,
-                    "companyAddress" => $mainDelegate->company_address,
-                    "companyCity" => $mainDelegate->company_city,
-                    "companyCountry" => $mainDelegate->company_country,
-                    "invoiceDate" => Carbon::parse($mainDelegate->registered_date_time)->format('d/m/Y'),
-                    "invoiceNumber" => $tempInvoiceNumber,
-                    "bookRefNumber" => $tempBookReference,
-                    "paymentStatus" => $mainDelegate->payment_status,
-                    "eventName" => $event->name,
-                    "eventLocation" => $event->location,
-                    "eventVat" => $event->event_vat,
-                    'vat_price' => $mainDelegate->vat_price,
-                    'net_amount' => $mainDelegate->net_amount,
-                    'total_amount' => $mainDelegate->total_amount,
-                    'unit_price' => $mainDelegate->unit_price,
-                    'invoiceDetails' => $invoiceDetails,
-                    'bankDetails' => $bankDetails,
-                    'finalQuantity' => $countFinalQuantity,
-                    'total_amount_string' => ucwords($this->numberToWords($mainDelegate->total_amount)),
-                ];
-
-                return $invoiceData;
+            if ($eventCategory == "AFS") {
+                $invoiceData = $this->getInvoiceSpouse($eventCategory, $eventId, $registrantId);
+            } else if ($eventCategory == "RCCA") {
+                $invoiceData = $this->getInvoiceRccAwards($eventCategory, $eventId, $registrantId);
             } else {
-                abort(404, 'The URL is incorrect');
+                $invoiceData = $this->getInvoiceEvents($eventCategory, $eventId, $registrantId);
             }
+            return $invoiceData;
         } else {
             abort(404, 'The URL is incorrect');
         }
@@ -842,7 +1174,7 @@ class RegistrationController extends Controller
                         'delegate_original_from_id' => null,
                         'delegate_replaced_from_id' => null,
                         'delegate_replaced_by_id' => $mainDelegate->delegate_replaced_by_id,
-                        
+
                         'delegate_cancelled_datetime' => $mainDelegate->delegate_cancelled_datetime,
                         'delegate_refunded_datetime' => $mainDelegate->delegate_refunded_datetime,
                         'delegate_replaced_datetime' => $mainDelegate->delegate_replaced_datetime,
@@ -917,7 +1249,7 @@ class RegistrationController extends Controller
                                 // NEW june 6 2023
                                 'registration_method' => $mainDelegate->registration_method,
                                 'transaction_remarks' => $mainDelegate->transaction_remarks,
-        
+
                                 'delegate_cancelled' => $subDelegate->delegate_cancelled,
                                 'delegate_replaced' => $subDelegate->delegate_replaced,
                                 'delegate_refunded' => $subDelegate->delegate_refunded,
@@ -926,7 +1258,7 @@ class RegistrationController extends Controller
                                 'delegate_original_from_id' => $subDelegate->delegate_original_from_id,
                                 'delegate_replaced_from_id' => $subDelegate->delegate_replaced_from_id,
                                 'delegate_replaced_by_id' => $subDelegate->delegate_replaced_by_id,
-                                
+
                                 'delegate_cancelled_datetime' => $subDelegate->delegate_cancelled_datetime,
                                 'delegate_refunded_datetime' => $subDelegate->delegate_refunded_datetime,
                                 'delegate_replaced_datetime' => $subDelegate->delegate_replaced_datetime,
@@ -1084,153 +1416,209 @@ class RegistrationController extends Controller
 
     public function capturePayment()
     {
-        $mainDelegateId = request()->query('mainDelegateId');
-        $sessionId = request()->query('sessionId');
+        $registrationFormType = request()->query('registrationFormType');
 
-        if (
-            request()->input('response_gatewayRecommendation') == "PROCEED" &&
-            request()->input('result') == "SUCCESS" &&
-            request()->input('order_id') &&
-            request()->input('transaction_id') &&
-            request()->query('sessionId') &&
-            request()->query('mainDelegateId')
-        ) {
-            $orderId = request()->input('order_id');
-            $oldTransactionId = request()->input('transaction_id');
-            $newTransactionId = substr(uniqid(), -8);
-
-            $apiEndpoint = env('MERCHANT_API_URL');
-            $merchantId = env('MERCHANT_ID');
-            $authPass = env('MERCHANT_AUTH_PASSWORD');
-
-            $client = new Client();
-            $response = $client->request('PUT', $apiEndpoint . '/order/' . $orderId . '/transaction/' . $newTransactionId, [
-                'auth' => [
-                    'merchant.' . $merchantId,
-                    $authPass,
-                ],
-                'headers' => [
-                    'Content-Type' => 'application/json'
-                ],
-                'json' => [
-                    'apiOperation' => "PAY",
-                    "authentication" => [
-                        "transactionId" => $oldTransactionId,
-                    ],
-                    "order" => [
-                        "reference" => $orderId,
-                    ],
-                    "session" => [
-                        'id' => $sessionId,
-                    ],
-                    "transaction" => [
-                        "reference" => $orderId,
-                    ],
-                ]
-            ]);
-            $body = $response->getBody()->getContents();
-            $data = json_decode($body, true);
-
+        if ($registrationFormType == "events") {
+            $mainDelegateId = request()->query('mainDelegateId');
+            $sessionId = request()->query('sessionId');
             if (
-                $data['response']['gatewayCode'] == "APPROVED" &&
-                $data['response']['gatewayRecommendation'] == "NO_ACTION" &&
-                $data['transaction']['authenticationStatus'] == "AUTHENTICATION_SUCCESSFUL" &&
-                $data['transaction']['type'] == "PAYMENT"
+                request()->input('response_gatewayRecommendation') == "PROCEED" &&
+                request()->input('result') == "SUCCESS" &&
+                request()->input('order_id') &&
+                request()->input('transaction_id') &&
+                request()->query('sessionId') &&
+                request()->query('mainDelegateId') &&
+                request()->query('registrationFormType')
             ) {
-                MainDelegate::find($mainDelegateId)->fill([
-                    'registration_status' => "confirmed",
-                    'payment_status' => "paid",
-                    'paid_date_time' => Carbon::now(),
-                ])->save();
+                $orderId = request()->input('order_id');
+                $oldTransactionId = request()->input('transaction_id');
+                $newTransactionId = substr(uniqid(), -8);
 
-                $mainDelegate = MainDelegate::where('id', $mainDelegateId)->first();
-                $event = Event::where('id', $mainDelegate->event_id)->first();
-                $eventFormattedData = Carbon::parse($event->event_start_date)->format('d') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');
+                $apiEndpoint = env('MERCHANT_API_URL');
+                $merchantId = env('MERCHANT_ID');
+                $authPass = env('MERCHANT_AUTH_PASSWORD');
 
-                $transactionId = Transaction::where('delegate_id', $mainDelegateId)->where('delegate_type', "main")->value('id');
-                $lastDigit = 1000 + intval($transactionId);
+                $client = new Client();
+                $response = $client->request('PUT', $apiEndpoint . '/order/' . $orderId . '/transaction/' . $newTransactionId, [
+                    'auth' => [
+                        'merchant.' . $merchantId,
+                        $authPass,
+                    ],
+                    'headers' => [
+                        'Content-Type' => 'application/json'
+                    ],
+                    'json' => [
+                        'apiOperation' => "PAY",
+                        "authentication" => [
+                            "transactionId" => $oldTransactionId,
+                        ],
+                        "order" => [
+                            "reference" => $orderId,
+                        ],
+                        "session" => [
+                            'id' => $sessionId,
+                        ],
+                        "transaction" => [
+                            "reference" => $orderId,
+                        ],
+                    ]
+                ]);
+                $body = $response->getBody()->getContents();
+                $data = json_decode($body, true);
 
-                foreach (config('app.eventCategories') as $eventCategoryC => $code) {
-                    if ($event->category == $eventCategoryC) {
-                        $getEventcode = $code;
+                if (
+                    $data['response']['gatewayCode'] == "APPROVED" &&
+                    $data['response']['gatewayRecommendation'] == "NO_ACTION" &&
+                    $data['transaction']['authenticationStatus'] == "AUTHENTICATION_SUCCESSFUL" &&
+                    $data['transaction']['type'] == "PAYMENT"
+                ) {
+                    MainDelegate::find($mainDelegateId)->fill([
+                        'registration_status' => "confirmed",
+                        'payment_status' => "paid",
+                        'paid_date_time' => Carbon::now(),
+                    ])->save();
+
+                    $mainDelegate = MainDelegate::where('id', $mainDelegateId)->first();
+                    $event = Event::where('id', $mainDelegate->event_id)->first();
+                    $eventFormattedData = Carbon::parse($event->event_start_date)->format('d') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');
+
+                    $transactionId = Transaction::where('delegate_id', $mainDelegateId)->where('delegate_type', "main")->value('id');
+                    $lastDigit = 1000 + intval($transactionId);
+
+                    foreach (config('app.eventCategories') as $eventCategoryC => $code) {
+                        if ($event->category == $eventCategoryC) {
+                            $getEventcode = $code;
+                        }
                     }
-                }
 
-                $tempTransactionId = "$event->year" . "$getEventcode" . "$lastDigit";
-                $invoiceLink = env('APP_URL') . '/' . $event->category . '/' . $event->id . '/view-invoice/' . $mainDelegateId;
+                    $tempTransactionId = "$event->year" . "$getEventcode" . "$lastDigit";
+                    $invoiceLink = env('APP_URL') . '/' . $event->category . '/' . $event->id . '/view-invoice/' . $mainDelegateId;
 
-                $details1 = [
-                    'name' => $mainDelegate->salutation . " " . $mainDelegate->first_name . " " . $mainDelegate->middle_name . " " . $mainDelegate->last_name,
-                    'eventLink' => $event->link,
-                    'eventName' => $event->name,
-                    'eventDates' => $eventFormattedData,
-                    'eventLocation' => $event->location,
-                    'eventCategory' => $event->category,
+                    $details1 = [
+                        'name' => $mainDelegate->salutation . " " . $mainDelegate->first_name . " " . $mainDelegate->middle_name . " " . $mainDelegate->last_name,
+                        'eventLink' => $event->link,
+                        'eventName' => $event->name,
+                        'eventDates' => $eventFormattedData,
+                        'eventLocation' => $event->location,
+                        'eventCategory' => $event->category,
 
-                    'jobTitle' => $mainDelegate->job_title,
-                    'companyName' => $mainDelegate->company_name,
-                    'amountPaid' => $mainDelegate->total_amount,
-                    'transactionId' => $tempTransactionId,
-                    'invoiceLink' => $invoiceLink,
-                ];
+                        'jobTitle' => $mainDelegate->job_title,
+                        'companyName' => $mainDelegate->company_name,
+                        'amountPaid' => $mainDelegate->total_amount,
+                        'transactionId' => $tempTransactionId,
+                        'invoiceLink' => $invoiceLink,
+                    ];
 
-                $details2 = [
-                    'name' => $mainDelegate->salutation . " " . $mainDelegate->first_name . " " . $mainDelegate->middle_name . " " . $mainDelegate->last_name,
-                    'eventLink' => $event->link,
-                    'eventName' => $event->name,
+                    $details2 = [
+                        'name' => $mainDelegate->salutation . " " . $mainDelegate->first_name . " " . $mainDelegate->middle_name . " " . $mainDelegate->last_name,
+                        'eventLink' => $event->link,
+                        'eventName' => $event->name,
 
-                    'invoiceAmount' => $mainDelegate->total_amount,
-                    'amountPaid' => $mainDelegate->total_amount,
-                    'balance' => 0,
-                    'invoiceLink' => $invoiceLink,
-                ];
+                        'invoiceAmount' => $mainDelegate->total_amount,
+                        'amountPaid' => $mainDelegate->total_amount,
+                        'balance' => 0,
+                        'invoiceLink' => $invoiceLink,
+                    ];
 
-                Mail::to($mainDelegate->email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaid($details1));
-                Mail::to($mainDelegate->email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaymentConfirmation($details2));
+                    Mail::to($mainDelegate->email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaid($details1));
+                    Mail::to($mainDelegate->email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaymentConfirmation($details2));
 
-                if ($mainDelegate->assistant_email_address != null) {
-                    Mail::to($mainDelegate->assistant_email_address)->queue(new RegistrationPaid($details1));
-                    Mail::to($mainDelegate->assistant_email_address)->queue(new RegistrationPaymentConfirmation($details2));
-                }
-
-                $additionalDelegates = AdditionalDelegate::where('main_delegate_id', $mainDelegateId)->get();
-
-                if (!$additionalDelegates->isEmpty()) {
-                    foreach ($additionalDelegates as $additionalDelegate) {
-                        $transactionId = Transaction::where('delegate_id', $additionalDelegate->id)->where('delegate_type', "sub")->value('id');
-                        $lastDigit = 1000 + intval($transactionId);
-                        $tempTransactionId = "$event->year" . "$getEventcode" . "$lastDigit";
-
-                        $details1 = [
-                            'name' => $additionalDelegate->salutation . " " . $additionalDelegate->first_name . " " . $additionalDelegate->middle_name . " " . $additionalDelegate->last_name,
-                            'eventLink' => $event->link,
-                            'eventName' => $event->name,
-                            'eventDates' => $eventFormattedData,
-                            'eventLocation' => $event->location,
-                            'eventCategory' => $event->category,
-
-                            'jobTitle' => $additionalDelegate->job_title,
-                            'companyName' => $mainDelegate->company_name,
-                            'amountPaid' => $mainDelegate->total_amount,
-                            'transactionId' => $tempTransactionId,
-                            'invoiceLink' => $invoiceLink,
-                        ];
-
-                        $details2 = [
-                            'name' => $additionalDelegate->salutation . " " . $additionalDelegate->first_name . " " . $additionalDelegate->middle_name . " " . $additionalDelegate->last_name,
-                            'eventLink' => $event->link,
-                            'eventName' => $event->name,
-
-                            'invoiceAmount' => $mainDelegate->total_amount,
-                            'amountPaid' => $mainDelegate->total_amount,
-                            'balance' => 0,
-                            'invoiceLink' => $invoiceLink,
-                        ];
-                        Mail::to($additionalDelegate->email_address)->queue(new RegistrationPaid($details1));
-                        Mail::to($additionalDelegate->email_address)->queue(new RegistrationPaymentConfirmation($details2));
+                    if ($mainDelegate->assistant_email_address != null) {
+                        Mail::to($mainDelegate->assistant_email_address)->queue(new RegistrationPaid($details1));
+                        Mail::to($mainDelegate->assistant_email_address)->queue(new RegistrationPaymentConfirmation($details2));
                     }
+
+                    $additionalDelegates = AdditionalDelegate::where('main_delegate_id', $mainDelegateId)->get();
+
+                    if (!$additionalDelegates->isEmpty()) {
+                        foreach ($additionalDelegates as $additionalDelegate) {
+                            $transactionId = Transaction::where('delegate_id', $additionalDelegate->id)->where('delegate_type', "sub")->value('id');
+                            $lastDigit = 1000 + intval($transactionId);
+                            $tempTransactionId = "$event->year" . "$getEventcode" . "$lastDigit";
+
+                            $details1 = [
+                                'name' => $additionalDelegate->salutation . " " . $additionalDelegate->first_name . " " . $additionalDelegate->middle_name . " " . $additionalDelegate->last_name,
+                                'eventLink' => $event->link,
+                                'eventName' => $event->name,
+                                'eventDates' => $eventFormattedData,
+                                'eventLocation' => $event->location,
+                                'eventCategory' => $event->category,
+
+                                'jobTitle' => $additionalDelegate->job_title,
+                                'companyName' => $mainDelegate->company_name,
+                                'amountPaid' => $mainDelegate->total_amount,
+                                'transactionId' => $tempTransactionId,
+                                'invoiceLink' => $invoiceLink,
+                            ];
+
+                            $details2 = [
+                                'name' => $additionalDelegate->salutation . " " . $additionalDelegate->first_name . " " . $additionalDelegate->middle_name . " " . $additionalDelegate->last_name,
+                                'eventLink' => $event->link,
+                                'eventName' => $event->name,
+
+                                'invoiceAmount' => $mainDelegate->total_amount,
+                                'amountPaid' => $mainDelegate->total_amount,
+                                'balance' => 0,
+                                'invoiceLink' => $invoiceLink,
+                            ];
+                            Mail::to($additionalDelegate->email_address)->queue(new RegistrationPaid($details1));
+                            Mail::to($additionalDelegate->email_address)->queue(new RegistrationPaymentConfirmation($details2));
+                        }
+                    }
+                    return redirect()->route('register.loading.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'eventYear' => $event->year, 'mainDelegateId' => $mainDelegateId, 'status' => "success"]);
+                } else {
+                    // (This is the part where we will send them email notification failed and redirect them)
+                    MainDelegate::find($mainDelegateId)->fill([
+                        'registration_status' => "pending",
+                        'payment_status' => "unpaid",
+                    ])->save();
+
+                    $mainDelegate = MainDelegate::where('id', $mainDelegateId)->first();
+                    $event = Event::where('id', $mainDelegate->event_id)->first();
+                    $eventFormattedData = Carbon::parse($event->event_start_date)->format('d') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');
+
+                    if ($event->category == "AF") {
+                        $bankDetails = config('app.bankDetails.AF');
+                    } else {
+                        $bankDetails = config('app.bankDetails.DEFAULT');
+                    }
+
+                    $invoiceLink = env('APP_URL') . '/' . $event->category . '/' . $event->id . '/view-invoice/' . $mainDelegateId;
+
+                    $details = [
+                        'name' => $mainDelegate->salutation . " " . $mainDelegate->first_name . " " . $mainDelegate->middle_name . " " . $mainDelegate->last_name,
+                        'eventLink' => $event->link,
+                        'eventName' => $event->name,
+                        'eventDates' => $eventFormattedData,
+                        'eventLocation' => $event->location,
+                        'bankDetails' => $bankDetails,
+                        'invoiceLink' => $invoiceLink,
+                    ];
+
+                    Mail::to($mainDelegate->email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationCardDeclined($details));
+
+                    if ($mainDelegate->assistant_email_address != null) {
+                        Mail::to($mainDelegate->assistant_email_address)->queue(new RegistrationCardDeclined($details));
+                    }
+
+                    $additionalDelegates = AdditionalDelegate::where('main_delegate_id', $mainDelegateId)->get();
+
+                    if (!$additionalDelegates->isEmpty()) {
+                        foreach ($additionalDelegates as $additionalDelegate) {
+                            $details = [
+                                'name' => $additionalDelegate->salutation . " " . $additionalDelegate->first_name . " " . $additionalDelegate->middle_name . " " . $additionalDelegate->last_name,
+                                'eventLink' => $event->link,
+                                'eventName' => $event->name,
+                                'eventDates' => $eventFormattedData,
+                                'eventLocation' => $event->location,
+                                'bankDetails' => $bankDetails,
+                                'invoiceLink' => $invoiceLink,
+                            ];
+                            Mail::to($additionalDelegate->email_address)->queue(new RegistrationCardDeclined($details));
+                        }
+                    }
+                    return redirect()->route('register.loading.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'eventYear' => $event->year, 'mainDelegateId' => $mainDelegateId, 'status' => "failed"]);
                 }
-                return redirect()->route('register.loading.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'eventYear' => $event->year, 'mainDelegateId' => $mainDelegateId, 'status' => "success"]);
             } else {
                 // (This is the part where we will send them email notification failed and redirect them)
                 MainDelegate::find($mainDelegateId)->fill([
@@ -1284,47 +1672,173 @@ class RegistrationController extends Controller
                 }
                 return redirect()->route('register.loading.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'eventYear' => $event->year, 'mainDelegateId' => $mainDelegateId, 'status' => "failed"]);
             }
-        } else {
-            // (This is the part where we will send them email notification failed and redirect them)
-            MainDelegate::find($mainDelegateId)->fill([
-                'registration_status' => "pending",
-                'payment_status' => "unpaid",
-            ])->save();
+        } else if ($registrationFormType == "spouse") {
+            $mainDelegateId = request()->query('mainDelegateId');
+            $sessionId = request()->query('sessionId');
+            if (
+                request()->input('response_gatewayRecommendation') == "PROCEED" &&
+                request()->input('result') == "SUCCESS" &&
+                request()->input('order_id') &&
+                request()->input('transaction_id') &&
+                request()->query('sessionId') &&
+                request()->query('mainDelegateId') &&
+                request()->query('registrationFormType')
+            ) {
+                $orderId = request()->input('order_id');
+                $oldTransactionId = request()->input('transaction_id');
+                $newTransactionId = substr(uniqid(), -8);
 
-            $mainDelegate = MainDelegate::where('id', $mainDelegateId)->first();
-            $event = Event::where('id', $mainDelegate->event_id)->first();
-            $eventFormattedData = Carbon::parse($event->event_start_date)->format('d') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');
+                $apiEndpoint = env('MERCHANT_API_URL');
+                $merchantId = env('MERCHANT_ID');
+                $authPass = env('MERCHANT_AUTH_PASSWORD');
 
-            if ($event->category == "AF") {
-                $bankDetails = config('app.bankDetails.AF');
-            } else {
-                $bankDetails = config('app.bankDetails.DEFAULT');
-            }
+                $client = new Client();
+                $response = $client->request('PUT', $apiEndpoint . '/order/' . $orderId . '/transaction/' . $newTransactionId, [
+                    'auth' => [
+                        'merchant.' . $merchantId,
+                        $authPass,
+                    ],
+                    'headers' => [
+                        'Content-Type' => 'application/json'
+                    ],
+                    'json' => [
+                        'apiOperation' => "PAY",
+                        "authentication" => [
+                            "transactionId" => $oldTransactionId,
+                        ],
+                        "order" => [
+                            "reference" => $orderId,
+                        ],
+                        "session" => [
+                            'id' => $sessionId,
+                        ],
+                        "transaction" => [
+                            "reference" => $orderId,
+                        ],
+                    ]
+                ]);
+                $body = $response->getBody()->getContents();
+                $data = json_decode($body, true);
 
-            $invoiceLink = env('APP_URL') . '/' . $event->category . '/' . $event->id . '/view-invoice/' . $mainDelegateId;
+                if (
+                    $data['response']['gatewayCode'] == "APPROVED" &&
+                    $data['response']['gatewayRecommendation'] == "NO_ACTION" &&
+                    $data['transaction']['authenticationStatus'] == "AUTHENTICATION_SUCCESSFUL" &&
+                    $data['transaction']['type'] == "PAYMENT"
+                ) {
+                    MainSpouse::find($mainDelegateId)->fill([
+                        'registration_status' => "confirmed",
+                        'payment_status' => "paid",
+                        'paid_date_time' => Carbon::now(),
+                    ])->save();
 
-            $details = [
-                'name' => $mainDelegate->salutation . " " . $mainDelegate->first_name . " " . $mainDelegate->middle_name . " " . $mainDelegate->last_name,
-                'eventLink' => $event->link,
-                'eventName' => $event->name,
-                'eventDates' => $eventFormattedData,
-                'eventLocation' => $event->location,
-                'bankDetails' => $bankDetails,
-                'invoiceLink' => $invoiceLink,
-            ];
+                    $mainSpouse = MainSpouse::where('id', $mainDelegateId)->first();
+                    $event = Event::where('id', $mainSpouse->event_id)->first();
+                    $eventFormattedData = Carbon::parse($event->event_start_date)->format('d') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');
 
-            Mail::to($mainDelegate->email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationCardDeclined($details));
+                    $transactionId = SpouseTransaction::where('spouse_id', $mainDelegateId)->where('spouse_type', "main")->value('id');
+                    $lastDigit = 1000 + intval($transactionId);
 
-            if ($mainDelegate->assistant_email_address != null) {
-                Mail::to($mainDelegate->assistant_email_address)->queue(new RegistrationCardDeclined($details));
-            }
+                    foreach (config('app.eventCategories') as $eventCategoryC => $code) {
+                        if ($event->category == $eventCategoryC) {
+                            $getEventcode = $code;
+                        }
+                    }
 
-            $additionalDelegates = AdditionalDelegate::where('main_delegate_id', $mainDelegateId)->get();
+                    $tempTransactionId = "$event->year" . "$getEventcode" . "$lastDigit";
+                    $invoiceLink = env('APP_URL') . '/' . $event->category . '/' . $event->id . '/view-invoice/' . $mainDelegateId;
 
-            if (!$additionalDelegates->isEmpty()) {
-                foreach ($additionalDelegates as $additionalDelegate) {
+                    $details1 = [
+                        'name' => $mainSpouse->salutation . " " . $mainSpouse->first_name . " " . $mainSpouse->middle_name . " " . $mainSpouse->last_name,
+                        'eventLink' => $event->link,
+                        'eventName' => $event->name,
+                        'eventDates' => $eventFormattedData,
+                        'eventLocation' => $event->location,
+                        'eventCategory' => $event->category,
+
+                        'nationality' => $mainSpouse->nationality,
+                        'country' => $mainSpouse->country,
+                        'city' => $mainSpouse->city,
+                        'amountPaid' => $mainSpouse->total_amount,
+                        'transactionId' => $tempTransactionId,
+                        'invoiceLink' => $invoiceLink,
+                    ];
+
+                    $details2 = [
+                        'name' => $mainSpouse->salutation . " " . $mainSpouse->first_name . " " . $mainSpouse->middle_name . " " . $mainSpouse->last_name,
+                        'eventLink' => $event->link,
+                        'eventName' => $event->name,
+
+                        'invoiceAmount' => $mainSpouse->total_amount,
+                        'amountPaid' => $mainSpouse->total_amount,
+                        'balance' => 0,
+                        'invoiceLink' => $invoiceLink,
+                    ];
+
+                    Mail::to($mainSpouse->email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaid($details1));
+                    Mail::to($mainSpouse->email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaymentConfirmation($details2));
+
+
+                    $additionalSpouses = AdditionalSpouse::where('main_spouse_id', $mainDelegateId)->get();
+
+                    if (!$additionalSpouses->isEmpty()) {
+                        foreach ($additionalSpouses as $additionalSpouse) {
+                            $transactionId = SpouseTransaction::where('spouse_id', $additionalSpouse->id)->where('spouse_type', "sub")->value('id');
+                            $lastDigit = 1000 + intval($transactionId);
+                            $tempTransactionId = "$event->year" . "$getEventcode" . "$lastDigit";
+
+                            $details1 = [
+                                'name' => $additionalSpouse->salutation . " " . $additionalSpouse->first_name . " " . $additionalSpouse->middle_name . " " . $additionalSpouse->last_name,
+                                'eventLink' => $event->link,
+                                'eventName' => $event->name,
+                                'eventDates' => $eventFormattedData,
+                                'eventLocation' => $event->location,
+                                'eventCategory' => $event->category,
+
+                                'nationality' => $additionalSpouse->nationality,
+                                'country' => $additionalSpouse->country,
+                                'city' => $additionalSpouse->city,
+                                'amountPaid' => $mainSpouse->total_amount,
+                                'transactionId' => $tempTransactionId,
+                                'invoiceLink' => $invoiceLink,
+                            ];
+
+                            $details2 = [
+                                'name' => $additionalSpouse->salutation . " " . $additionalSpouse->first_name . " " . $additionalSpouse->middle_name . " " . $additionalSpouse->last_name,
+                                'eventLink' => $event->link,
+                                'eventName' => $event->name,
+
+                                'invoiceAmount' => $mainSpouse->total_amount,
+                                'amountPaid' => $mainSpouse->total_amount,
+                                'balance' => 0,
+                                'invoiceLink' => $invoiceLink,
+                            ];
+                            Mail::to($additionalSpouse->email_address)->queue(new RegistrationPaid($details1));
+                            Mail::to($additionalSpouse->email_address)->queue(new RegistrationPaymentConfirmation($details2));
+                        }
+                    }
+                    return redirect()->route('register.loading.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'eventYear' => $event->year, 'mainDelegateId' => $mainDelegateId, 'status' => "success"]);
+                } else {
+                    // (This is the part where we will send them email notification failed and redirect them)
+                    MainSpouse::find($mainDelegateId)->fill([
+                        'registration_status' => "pending",
+                        'payment_status' => "unpaid",
+                    ])->save();
+
+                    $mainSpouse = MainSpouse::where('id', $mainDelegateId)->first();
+                    $event = Event::where('id', $mainSpouse->event_id)->first();
+                    $eventFormattedData = Carbon::parse($event->event_start_date)->format('d') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');
+
+                    if ($event->category == "AF") {
+                        $bankDetails = config('app.bankDetails.AF');
+                    } else {
+                        $bankDetails = config('app.bankDetails.DEFAULT');
+                    }
+
+                    $invoiceLink = env('APP_URL') . '/' . $event->category . '/' . $event->id . '/view-invoice/' . $mainDelegateId;
+
                     $details = [
-                        'name' => $additionalDelegate->salutation . " " . $additionalDelegate->first_name . " " . $additionalDelegate->middle_name . " " . $additionalDelegate->last_name,
+                        'name' => $mainSpouse->salutation . " " . $mainSpouse->first_name . " " . $mainSpouse->middle_name . " " . $mainSpouse->last_name,
                         'eventLink' => $event->link,
                         'eventName' => $event->name,
                         'eventDates' => $eventFormattedData,
@@ -1332,10 +1846,948 @@ class RegistrationController extends Controller
                         'bankDetails' => $bankDetails,
                         'invoiceLink' => $invoiceLink,
                     ];
-                    Mail::to($additionalDelegate->email_address)->queue(new RegistrationCardDeclined($details));
+
+                    Mail::to($mainSpouse->email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationCardDeclined($details));
+
+                    $additionalSpouses = AdditionalSpouse::where('main_spouse_id', $mainDelegateId)->get();
+
+                    if (!$additionalSpouses->isEmpty()) {
+                        foreach ($additionalSpouses as $additionalSpouse) {
+                            $details = [
+                                'name' => $additionalSpouse->salutation . " " . $additionalSpouse->first_name . " " . $additionalSpouse->middle_name . " " . $additionalSpouse->last_name,
+                                'eventLink' => $event->link,
+                                'eventName' => $event->name,
+                                'eventDates' => $eventFormattedData,
+                                'eventLocation' => $event->location,
+                                'bankDetails' => $bankDetails,
+                                'invoiceLink' => $invoiceLink,
+                            ];
+                            Mail::to($additionalSpouse->email_address)->queue(new RegistrationCardDeclined($details));
+                        }
+                    }
+                    return redirect()->route('register.loading.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'eventYear' => $event->year, 'mainDelegateId' => $mainDelegateId, 'status' => "failed"]);
+                }
+            } else {
+                // (This is the part where we will send them email notification failed and redirect them)
+                MainSpouse::find($mainDelegateId)->fill([
+                    'registration_status' => "pending",
+                    'payment_status' => "unpaid",
+                ])->save();
+
+                $mainSpouse = MainSpouse::where('id', $mainDelegateId)->first();
+                $event = Event::where('id', $mainSpouse->event_id)->first();
+                $eventFormattedData = Carbon::parse($event->event_start_date)->format('d') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');
+
+                if ($event->category == "AF") {
+                    $bankDetails = config('app.bankDetails.AF');
+                } else {
+                    $bankDetails = config('app.bankDetails.DEFAULT');
+                }
+
+                $invoiceLink = env('APP_URL') . '/' . $event->category . '/' . $event->id . '/view-invoice/' . $mainDelegateId;
+
+                $details = [
+                    'name' => $mainSpouse->salutation . " " . $mainSpouse->first_name . " " . $mainSpouse->middle_name . " " . $mainSpouse->last_name,
+                    'eventLink' => $event->link,
+                    'eventName' => $event->name,
+                    'eventDates' => $eventFormattedData,
+                    'eventLocation' => $event->location,
+                    'bankDetails' => $bankDetails,
+                    'invoiceLink' => $invoiceLink,
+                ];
+
+                Mail::to($mainSpouse->email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationCardDeclined($details));
+
+                $additionalSpouses = AdditionalSpouse::where('main_spouse_id', $mainDelegateId)->get();
+
+                if (!$additionalSpouses->isEmpty()) {
+                    foreach ($additionalSpouses as $additionalSpouse) {
+                        $details = [
+                            'name' => $additionalSpouse->salutation . " " . $additionalSpouse->first_name . " " . $additionalSpouse->middle_name . " " . $additionalSpouse->last_name,
+                            'eventLink' => $event->link,
+                            'eventName' => $event->name,
+                            'eventDates' => $eventFormattedData,
+                            'eventLocation' => $event->location,
+                            'bankDetails' => $bankDetails,
+                            'invoiceLink' => $invoiceLink,
+                        ];
+                        Mail::to($additionalSpouse->email_address)->queue(new RegistrationCardDeclined($details));
+                    }
+                }
+                return redirect()->route('register.loading.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'eventYear' => $event->year, 'mainDelegateId' => $mainDelegateId, 'status' => "failed"]);
+            }
+        } else {
+            $mainDelegateId = request()->query('mainDelegateId');
+            $sessionId = request()->query('sessionId');
+            if (
+                request()->input('response_gatewayRecommendation') == "PROCEED" &&
+                request()->input('result') == "SUCCESS" &&
+                request()->input('order_id') &&
+                request()->input('transaction_id') &&
+                request()->query('sessionId') &&
+                request()->query('mainDelegateId') &&
+                request()->query('registrationFormType')
+            ) {
+                $orderId = request()->input('order_id');
+                $oldTransactionId = request()->input('transaction_id');
+                $newTransactionId = substr(uniqid(), -8);
+
+                $apiEndpoint = env('MERCHANT_API_URL');
+                $merchantId = env('MERCHANT_ID');
+                $authPass = env('MERCHANT_AUTH_PASSWORD');
+
+                $client = new Client();
+                $response = $client->request('PUT', $apiEndpoint . '/order/' . $orderId . '/transaction/' . $newTransactionId, [
+                    'auth' => [
+                        'merchant.' . $merchantId,
+                        $authPass,
+                    ],
+                    'headers' => [
+                        'Content-Type' => 'application/json'
+                    ],
+                    'json' => [
+                        'apiOperation' => "PAY",
+                        "authentication" => [
+                            "transactionId" => $oldTransactionId,
+                        ],
+                        "order" => [
+                            "reference" => $orderId,
+                        ],
+                        "session" => [
+                            'id' => $sessionId,
+                        ],
+                        "transaction" => [
+                            "reference" => $orderId,
+                        ],
+                    ]
+                ]);
+                $body = $response->getBody()->getContents();
+                $data = json_decode($body, true);
+
+                if (
+                    $data['response']['gatewayCode'] == "APPROVED" &&
+                    $data['response']['gatewayRecommendation'] == "NO_ACTION" &&
+                    $data['transaction']['authenticationStatus'] == "AUTHENTICATION_SUCCESSFUL" &&
+                    $data['transaction']['type'] == "PAYMENT"
+                ) {
+                    RccAwardsMainParticipant::find($mainDelegateId)->fill([
+                        'registration_status' => "confirmed",
+                        'payment_status' => "paid",
+                        'paid_date_time' => Carbon::now(),
+                    ])->save();
+
+                    $mainParticipant = RccAwardsMainParticipant::where('id', $mainDelegateId)->first();
+                    $event = Event::where('id', $mainParticipant->event_id)->first();
+
+                    $eventFormattedData = Carbon::parse($event->event_start_date)->format('j F Y');
+
+                    $transactionId = RccAwardsParticipantTransaction::where('participant_id', $mainDelegateId)->where('participant_type', "main")->value('id');
+                    $lastDigit = 1000 + intval($transactionId);
+
+                    foreach (config('app.eventCategories') as $eventCategoryC => $code) {
+                        if ($event->category == $eventCategoryC) {
+                            $getEventcode = $code;
+                        }
+                    }
+
+                    $tempTransactionId = "$event->year" . "$getEventcode" . "$lastDigit";
+                    $invoiceLink = env('APP_URL') . '/' . $event->category . '/' . $event->id . '/view-invoice/' . $mainDelegateId;
+
+                    $entryFormId = RccAwardsDocument::where('event_id', $event->id)->where('participant_id', $mainDelegateId)->where('document_type', 'entryForm')->value('id');
+
+                    $getSupportingDocumentFiles = RccAwardsDocument::where('event_id', $event->id)->where('participant_id', $mainDelegateId)->where('document_type', 'supportingDocument')->get();
+
+                    $supportingDocumentsDownloadId = [];
+
+                    if ($getSupportingDocumentFiles->isNotEmpty()) {
+                        foreach ($getSupportingDocumentFiles as $supportingDocument) {
+                            $supportingDocumentsDownloadId[] = $supportingDocument->id;
+                        }
+                    }
+
+                    $downloadLink = env('APP_URL') . '/download-file/';
+
+                    $details1 = [
+                        'name' => $mainParticipant->salutation . " " . $mainParticipant->first_name . " " . $mainParticipant->middle_name . " " . $mainParticipant->last_name,
+                        'eventLink' => $event->link,
+                        'eventName' => $event->name,
+                        'eventDates' => $eventFormattedData,
+                        'eventLocation' => $event->location,
+                        'eventCategory' => $event->category,
+
+                        'jobTitle' => $mainParticipant->job_title,
+                        'companyName' => $mainParticipant->company_name,
+                        'emailAddress' => $mainParticipant->email_address,
+                        'mobileNumber' => $mainParticipant->mobile_number,
+                        'city' => $mainParticipant->city,
+                        'country' => $mainParticipant->country,
+                        'category' => $mainParticipant->category,
+                        'subCategory' => ($mainParticipant->sub_category != null) ? $mainParticipant->sub_category : 'N/A',
+                        'entryFormId' => $entryFormId,
+                        'supportingDocumentsDownloadId' => $supportingDocumentsDownloadId,
+                        'downloadLink' => $downloadLink,
+
+                        'amountPaid' => $mainParticipant->total_amount,
+                        'transactionId' => $tempTransactionId,
+                        'invoiceLink' => $invoiceLink,
+                    ];
+
+                    $details2 = [
+                        'name' => $mainParticipant->salutation . " " . $mainParticipant->first_name . " " . $mainParticipant->middle_name . " " . $mainParticipant->last_name,
+                        'eventLink' => $event->link,
+                        'eventName' => $event->name,
+
+                        'invoiceAmount' => $mainParticipant->total_amount,
+                        'amountPaid' => $mainParticipant->total_amount,
+                        'balance' => 0,
+                        'invoiceLink' => $invoiceLink,
+                    ];
+
+                    Mail::to($mainParticipant->email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaid($details1));
+                    Mail::to($mainParticipant->email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaymentConfirmation($details2));
+
+
+                    return redirect()->route('register.loading.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'eventYear' => $event->year, 'mainDelegateId' => $mainDelegateId, 'status' => "success"]);
+                } else {
+                    // (This is the part where we will send them email notification failed and redirect them)
+                    RccAwardsMainParticipant::find($mainDelegateId)->fill([
+                        'registration_status' => "pending",
+                        'payment_status' => "unpaid",
+                    ])->save();
+
+                    $mainParticipant = RccAwardsMainParticipant::where('id', $mainDelegateId)->first();
+                    $event = Event::where('id', $mainParticipant->event_id)->first();
+                    $eventFormattedData = Carbon::parse($event->event_start_date)->format('j F Y');
+
+                    if ($event->category == "AF") {
+                        $bankDetails = config('app.bankDetails.AF');
+                    } else {
+                        $bankDetails = config('app.bankDetails.DEFAULT');
+                    }
+
+                    $invoiceLink = env('APP_URL') . '/' . $event->category . '/' . $event->id . '/view-invoice/' . $mainDelegateId;
+
+                    $details = [
+                        'name' => $mainParticipant->salutation . " " . $mainParticipant->first_name . " " . $mainParticipant->middle_name . " " . $mainParticipant->last_name,
+                        'eventLink' => $event->link,
+                        'eventName' => $event->name,
+                        'eventDates' => $eventFormattedData,
+                        'eventLocation' => $event->location,
+                        'bankDetails' => $bankDetails,
+                        'invoiceLink' => $invoiceLink,
+                    ];
+
+                    Mail::to($mainParticipant->email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationCardDeclined($details));
+
+                    return redirect()->route('register.loading.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'eventYear' => $event->year, 'mainDelegateId' => $mainDelegateId, 'status' => "failed"]);
+                }
+            } else {
+                // (This is the part where we will send them email notification failed and redirect them)
+                RccAwardsMainParticipant::find($mainDelegateId)->fill([
+                    'registration_status' => "pending",
+                    'payment_status' => "unpaid",
+                ])->save();
+
+                $mainParticipant = RccAwardsMainParticipant::where('id', $mainDelegateId)->first();
+                $event = Event::where('id', $mainParticipant->event_id)->first();
+                $eventFormattedData = Carbon::parse($event->event_start_date)->format('j F Y');
+
+                if ($event->category == "AF") {
+                    $bankDetails = config('app.bankDetails.AF');
+                } else {
+                    $bankDetails = config('app.bankDetails.DEFAULT');
+                }
+
+                $invoiceLink = env('APP_URL') . '/' . $event->category . '/' . $event->id . '/view-invoice/' . $mainDelegateId;
+
+                $details = [
+                    'name' => $mainParticipant->salutation . " " . $mainParticipant->first_name . " " . $mainParticipant->middle_name . " " . $mainParticipant->last_name,
+                    'eventLink' => $event->link,
+                    'eventName' => $event->name,
+                    'eventDates' => $eventFormattedData,
+                    'eventLocation' => $event->location,
+                    'bankDetails' => $bankDetails,
+                    'invoiceLink' => $invoiceLink,
+                ];
+
+                Mail::to($mainParticipant->email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationCardDeclined($details));
+
+                return redirect()->route('register.loading.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'eventYear' => $event->year, 'mainDelegateId' => $mainDelegateId, 'status' => "failed"]);
+            }
+        }
+    }
+
+    public function downloadFile($documentId)
+    {
+        if (RccAwardsDocument::where('id', $documentId)->exists()) {
+            $documentFilePathTemp = RccAwardsDocument::where('id', $documentId)->value('document');
+
+            $documentFilePath = Str::replace('public', 'storage', $documentFilePathTemp);
+
+            if (!Storage::url($documentFilePath)) {
+                abort(404, 'File not found');
+            }
+
+            $mimeType = Storage::mimeType($documentFilePath);
+
+            $path = parse_url($documentFilePath, PHP_URL_PATH);
+            $filename = basename($path);
+
+            $headers = [
+                'Content-Type' => $mimeType,
+                'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            ];
+
+            return Response::download($documentFilePath, $filename, $headers);
+        } else {
+            abort(404, 'File not found');
+        }
+    }
+
+
+
+
+
+
+
+    // SPOUSE FUNCTIONS
+    public function registrationFailedViewEvents($eventCategory, $eventId, $mainDelegateId)
+    {
+        $mainDelegate = MainDelegate::where('id', $mainDelegateId)->first();
+
+        if ($mainDelegate->confirmation_status == "failed" || $mainDelegate->confirmation_date_time == null) {
+            $invoiceLink = env('APP_URL') . '/' . $eventCategory . '/' . $eventId . '/view-invoice/' . $mainDelegateId;
+
+            if ($eventCategory == "AF") {
+                $bankDetails = config('app.bankDetails.AF');
+            } else {
+                $bankDetails = config('app.bankDetails.DEFAULT');
+            }
+
+            if ($mainDelegate->confirmation_date_time == null) {
+                MainDelegate::find($mainDelegateId)->fill([
+                    'confirmation_date_time' => Carbon::now(),
+                    'confirmation_status' => "failed",
+                ])->save();
+            }
+
+            return [
+                'invoiceLink' => $invoiceLink,
+                'bankDetails' => $bankDetails,
+                'paymentStatus' => $mainDelegate->payment_status,
+            ];
+        } else {
+            abort(404, 'The URL is incorrect');
+        }
+    }
+
+    public function registrationFailedViewSpouse($eventCategory, $eventId, $mainSpouseId)
+    {
+        $mainSpouse = MainSpouse::where('id', $mainSpouseId)->first();
+
+        if ($mainSpouse->confirmation_status == "failed" || $mainSpouse->confirmation_date_time == null) {
+            $invoiceLink = env('APP_URL') . '/' . $eventCategory . '/' . $eventId . '/view-invoice/' . $mainSpouseId;
+
+            if ($eventCategory == "AF" || $eventCategory == "AFS"  || $eventCategory == "AFV") {
+                $bankDetails = config('app.bankDetails.AF');
+            } else {
+                $bankDetails = config('app.bankDetails.DEFAULT');
+            }
+
+            if ($mainSpouse->confirmation_date_time == null) {
+                MainSpouse::find($mainSpouseId)->fill([
+                    'confirmation_date_time' => Carbon::now(),
+                    'confirmation_status' => "failed",
+                ])->save();
+            }
+
+            return [
+                'invoiceLink' => $invoiceLink,
+                'bankDetails' => $bankDetails,
+                'paymentStatus' => $mainSpouse->payment_status,
+            ];
+        } else {
+            abort(404, 'The URL is incorrect');
+        }
+    }
+
+    public function registrationFailedViewRccAwards($eventCategory, $eventId, $mainParticipantId)
+    {
+        $mainParticipant = RccAwardsMainParticipant::where('id', $mainParticipantId)->first();
+
+        if ($mainParticipant->confirmation_status == "failed" || $mainParticipant->confirmation_date_time == null) {
+            $invoiceLink = env('APP_URL') . '/' . $eventCategory . '/' . $eventId . '/view-invoice/' . $mainParticipantId;
+
+            if ($eventCategory == "AF" || $eventCategory == "AFS"  || $eventCategory == "AFV") {
+                $bankDetails = config('app.bankDetails.AF');
+            } else {
+                $bankDetails = config('app.bankDetails.DEFAULT');
+            }
+
+            if ($mainParticipant->confirmation_date_time == null) {
+                RccAwardsMainParticipant::find($mainParticipantId)->fill([
+                    'confirmation_date_time' => Carbon::now(),
+                    'confirmation_status' => "failed",
+                ])->save();
+            }
+
+            return [
+                'invoiceLink' => $invoiceLink,
+                'bankDetails' => $bankDetails,
+                'paymentStatus' => $mainParticipant->payment_status,
+            ];
+        } else {
+            abort(404, 'The URL is incorrect');
+        }
+    }
+
+
+    
+    public function registrationSuccessViewEvents($eventCategory, $eventId, $mainDelegateId)
+    {
+        $mainDelegate = MainDelegate::where('id', $mainDelegateId)->first();
+
+        if ($mainDelegate->confirmation_status == "success" || $mainDelegate->confirmation_date_time == null) {
+            $invoiceLink = env('APP_URL') . '/' . $eventCategory . '/' . $eventId . '/view-invoice/' . $mainDelegateId;
+
+            if ($eventCategory == "AF") {
+                $bankDetails = config('app.bankDetails.AF');
+            } else {
+                $bankDetails = config('app.bankDetails.DEFAULT');
+            }
+
+            if ($mainDelegate->confirmation_date_time == null) {
+                MainDelegate::find($mainDelegateId)->fill([
+                    'confirmation_date_time' => Carbon::now(),
+                    'confirmation_status' => "success",
+                ])->save();
+            }
+
+            return [
+                'invoiceLink' => $invoiceLink,
+                'bankDetails' => $bankDetails,
+                'paymentStatus' => $mainDelegate->payment_status,
+            ];
+        } else {
+            abort(404, 'The URL is incorrect');
+        }
+    }
+
+    public function registrationSuccessViewSpouse($eventCategory, $eventId, $mainSpouseId)
+    {
+        $mainSpouse = MainSpouse::where('id', $mainSpouseId)->first();
+
+        if ($mainSpouse->confirmation_status == "success" || $mainSpouse->confirmation_date_time == null) {
+            $invoiceLink = env('APP_URL') . '/' . $eventCategory . '/' . $eventId . '/view-invoice/' . $mainSpouseId;
+
+            if ($eventCategory == "AF") {
+                $bankDetails = config('app.bankDetails.AF');
+            } else {
+                $bankDetails = config('app.bankDetails.DEFAULT');
+            }
+
+            if ($mainSpouse->confirmation_date_time == null) {
+                MainSpouse::find($mainSpouseId)->fill([
+                    'confirmation_date_time' => Carbon::now(),
+                    'confirmation_status' => "success",
+                ])->save();
+            }
+
+            return [
+                'invoiceLink' => $invoiceLink,
+                'bankDetails' => $bankDetails,
+                'paymentStatus' => $mainSpouse->payment_status,
+            ];
+        } else {
+            abort(404, 'The URL is incorrect');
+        }
+    }
+
+    public function registrationSuccessViewRccAwards($eventCategory, $eventId, $mainParticipantId)
+    {
+        $mainParticipant = RccAwardsMainParticipant::where('id', $mainParticipantId)->first();
+
+        if ($mainParticipant->confirmation_status == "success" || $mainParticipant->confirmation_date_time == null) {
+            $invoiceLink = env('APP_URL') . '/' . $eventCategory . '/' . $eventId . '/view-invoice/' . $mainParticipantId;
+
+            if ($eventCategory == "AF") {
+                $bankDetails = config('app.bankDetails.AF');
+            } else {
+                $bankDetails = config('app.bankDetails.DEFAULT');
+            }
+
+            if ($mainParticipant->confirmation_date_time == null) {
+                RccAwardsMainParticipant::find($mainParticipantId)->fill([
+                    'confirmation_date_time' => Carbon::now(),
+                    'confirmation_status' => "success",
+                ])->save();
+            }
+
+            return [
+                'invoiceLink' => $invoiceLink,
+                'bankDetails' => $bankDetails,
+                'paymentStatus' => $mainParticipant->payment_status,
+            ];
+        } else {
+            abort(404, 'The URL is incorrect');
+        }
+    }
+
+
+
+    public function getInvoiceEvents($eventCategory, $eventId, $registrantId)
+    {
+
+        if (MainDelegate::where('id', $registrantId)->where('event_id', $eventId)->exists()) {
+            $event = Event::where('category', $eventCategory)->where('id', $eventId)->first();
+            $invoiceDetails = array();
+            $countFinalQuantity = 0;
+
+            $mainDelegate = MainDelegate::where('id', $registrantId)->where('event_id', $eventId)->first();
+
+            if ($mainDelegate->pass_type == "fullMember") {
+                $passType = "Full member";
+            } else if ($mainDelegate->pass_type == "member") {
+                $passType = "Member";
+            } else {
+                $passType = "Non-Member";
+            }
+
+            $addMainDelegate = true;
+            if ($mainDelegate->delegate_cancelled) {
+                if ($mainDelegate->delegate_refunded || $mainDelegate->delegate_replaced) {
+                    $addMainDelegate = false;
                 }
             }
-            return redirect()->route('register.loading.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'eventYear' => $event->year, 'mainDelegateId' => $mainDelegateId, 'status' => "failed"]);
+
+            if ($mainDelegate->delegate_replaced_by_id == null & (!$mainDelegate->delegate_refunded)) {
+                $countFinalQuantity++;
+            }
+
+            if ($addMainDelegate) {
+                $mainDiscount = PromoCode::where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $mainDelegate->pcode_used)->where('badge_type', $mainDelegate->badge_type)->value('discount');
+
+                if ($mainDelegate->badge_type == "Leaders of Tomorrow") {
+                    $delegateDescription = "Delegate Registration Fee - Leaders of Tomorrow";
+                } else {
+                    if ($mainDiscount != null) {
+                        if ($mainDiscount == 100) {
+                            $delegateDescription = "Delegate Registration Fee - Complimentary";
+                        } else if ($mainDiscount > 0 && $mainDiscount < 100) {
+                            $delegateDescription = "Delegate Registration Fee - " . $passType . " discounted rate";
+                        } else {
+                            $delegateDescription = "Delegate Registration Fee - {$mainDelegate->rate_type_string}";
+                        }
+                    } else {
+                        $delegateDescription = "Delegate Registration Fee - {$mainDelegate->rate_type_string}";
+                    }
+                }
+
+
+                array_push($invoiceDetails, [
+                    'delegateDescription' => $delegateDescription,
+                    'delegateNames' => [
+                        $mainDelegate->first_name . " " . $mainDelegate->middle_name . " " . $mainDelegate->last_name,
+                    ],
+                    'badgeType' => $mainDelegate->badge_type,
+                    'quantity' => 1,
+                    'totalDiscount' => $mainDelegate->unit_price * ($mainDiscount / 100),
+                    'totalNetAmount' =>  $mainDelegate->unit_price - ($mainDelegate->unit_price * ($mainDiscount / 100)),
+                    'promoCodeDiscount' => $mainDiscount,
+                ]);
+            }
+
+
+            $subDelegates = AdditionalDelegate::where('main_delegate_id', $registrantId)->get();
+            if (!$subDelegates->isEmpty()) {
+                foreach ($subDelegates as $subDelegate) {
+
+                    if ($subDelegate->delegate_replaced_by_id == null & (!$subDelegate->delegate_refunded)) {
+                        $countFinalQuantity++;
+                    }
+
+                    $addSubDelegate = true;
+                    if ($subDelegate->delegate_cancelled) {
+                        if ($subDelegate->delegate_refunded || $subDelegate->delegate_replaced) {
+                            $addSubDelegate = false;
+                        }
+                    }
+
+                    if ($addSubDelegate) {
+                        $subDiscount = PromoCode::where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $subDelegate->pcode_used)->where('badge_type', $subDelegate->badge_type)->value('discount');
+
+                        $checkIfExisting = false;
+                        $existingIndex = 0;
+
+                        for ($j = 0; $j < count($invoiceDetails); $j++) {
+                            if ($subDelegate->badge_type == $invoiceDetails[$j]['badgeType'] && $subDiscount == $invoiceDetails[$j]['promoCodeDiscount']) {
+                                $existingIndex = $j;
+                                $checkIfExisting = true;
+                                break;
+                            }
+                        }
+
+                        if ($checkIfExisting) {
+                            array_push(
+                                $invoiceDetails[$existingIndex]['delegateNames'],
+                                $subDelegate->first_name . " " . $subDelegate->middle_name . " " . $subDelegate->last_name
+                            );
+
+                            $quantityTemp = $invoiceDetails[$existingIndex]['quantity'] + 1;
+                            $totalDiscountTemp = ($mainDelegate->unit_price * ($invoiceDetails[$existingIndex]['promoCodeDiscount'] / 100)) * $quantityTemp;
+                            $totalNetAmountTemp = ($mainDelegate->unit_price * $quantityTemp) - $totalDiscountTemp;
+
+                            $invoiceDetails[$existingIndex]['quantity'] = $quantityTemp;
+                            $invoiceDetails[$existingIndex]['totalDiscount'] = $totalDiscountTemp;
+                            $invoiceDetails[$existingIndex]['totalNetAmount'] = $totalNetAmountTemp;
+                        } else {
+
+                            if ($subDelegate->badge_type == "Leaders of Tomorrow") {
+                                $subDelegateDescription = "Delegate Registration Fee - Leaders of Tomorrow";
+                            } else {
+                                if ($subDiscount != null) {
+                                    if ($subDiscount == 100) {
+                                        $subDelegateDescription = "Delegate Registration Fee - Complimentary";
+                                    } else if ($subDiscount > 0 && $subDiscount < 100) {
+                                        $subDelegateDescription = "Delegate Registration Fee - " . $passType . " discounted rate";
+                                    } else {
+                                        $subDelegateDescription = "Delegate Registration Fee - {$mainDelegate->rate_type_string}";
+                                    }
+                                } else {
+                                    $subDelegateDescription = "Delegate Registration Fee - {$mainDelegate->rate_type_string}";
+                                }
+                            }
+
+                            array_push($invoiceDetails, [
+                                'delegateDescription' => $subDelegateDescription,
+                                'delegateNames' => [
+                                    $subDelegate->first_name . " " . $subDelegate->middle_name . " " . $subDelegate->last_name,
+                                ],
+                                'badgeType' => $subDelegate->badge_type,
+                                'quantity' => 1,
+                                'totalDiscount' => $mainDelegate->unit_price * ($subDiscount / 100),
+                                'totalNetAmount' =>  $mainDelegate->unit_price - ($mainDelegate->unit_price * ($subDiscount / 100)),
+                                'promoCodeDiscount' => $subDiscount,
+                            ]);
+                        }
+                    }
+                }
+            }
+
+            $transactionId = Transaction::where('delegate_id', $mainDelegate->id)->where('delegate_type', "main")->value('id');
+
+            $tempYear = Carbon::parse($mainDelegate->registered_date_time)->format('y');
+            $lastDigit = 1000 + intval($transactionId);
+
+            foreach (config('app.eventCategories') as $eventCategoryC => $code) {
+                if ($event->category == $eventCategoryC) {
+                    $getEventcode = $code;
+                }
+            }
+
+            $tempInvoiceNumber = "$event->category" . "$tempYear" . "/" . "$lastDigit";
+            $tempBookReference = "$event->year" . "$getEventcode" . "$lastDigit";
+
+
+            if ($eventCategory == "AF") {
+                $bankDetails = config('app.bankDetails.AF');
+            } else {
+                $bankDetails = config('app.bankDetails.DEFAULT');
+            }
+
+            $eventFormattedData = Carbon::parse($event->event_start_date)->format('j') . '-' . Carbon::parse($event->event_end_date)->format('j F Y');
+
+            $invoiceData = [
+                "finalEventStartDate" => Carbon::parse($event->event_start_date)->format('d M Y'),
+                "finalEventEndDate" => Carbon::parse($event->event_end_date)->format('d M Y'),
+                "eventFormattedData" => $eventFormattedData,
+                "companyName" => $mainDelegate->company_name,
+                "companyAddress" => $mainDelegate->company_address,
+                "companyCity" => $mainDelegate->company_city,
+                "companyCountry" => $mainDelegate->company_country,
+                "invoiceDate" => Carbon::parse($mainDelegate->registered_date_time)->format('d/m/Y'),
+                "invoiceNumber" => $tempInvoiceNumber,
+                "bookRefNumber" => $tempBookReference,
+                "paymentStatus" => $mainDelegate->payment_status,
+                "eventName" => $event->name,
+                "eventLocation" => $event->location,
+                "eventVat" => $event->event_vat,
+                'vat_price' => $mainDelegate->vat_price,
+                'net_amount' => $mainDelegate->net_amount,
+                'total_amount' => $mainDelegate->total_amount,
+                'unit_price' => $mainDelegate->unit_price,
+                'invoiceDetails' => $invoiceDetails,
+                'bankDetails' => $bankDetails,
+                'finalQuantity' => $countFinalQuantity,
+                'total_amount_string' => ucwords($this->numberToWords($mainDelegate->total_amount)),
+            ];
+
+            return $invoiceData;
+        } else {
+            abort(404, 'The URL is incorrect');
+        }
+    }
+
+    public function getInvoiceSpouse($eventCategory, $eventId, $registrantId)
+    {
+        if (MainSpouse::where('id', $registrantId)->where('event_id', $eventId)->exists()) {
+            $event = Event::where('category', $eventCategory)->where('id', $eventId)->first();
+            $invoiceDetails = array();
+            $countFinalQuantity = 0;
+
+            $mainSpouse = MainSpouse::where('id', $registrantId)->where('event_id', $eventId)->first();
+
+            $addMainSpouse = true;
+            if ($mainSpouse->spouse_cancelled) {
+                if ($mainSpouse->spouse_refunded || $mainSpouse->spouse_replaced) {
+                    $addMainSpouse = false;
+                }
+            }
+
+            if ($mainSpouse->spouse_replaced_by_id == null & (!$mainSpouse->spouse_refunded)) {
+                $countFinalQuantity++;
+            }
+
+            if ($addMainSpouse) {
+                array_push($invoiceDetails, [
+                    'delegateDescription' => "Spouse Registration Fee",
+                    'delegateNames' => [
+                        $mainSpouse->first_name . " " . $mainSpouse->middle_name . " " . $mainSpouse->last_name,
+                    ],
+                    'badgeType' => null,
+                    'quantity' => 1,
+                    'totalDiscount' => 0,
+                    'totalNetAmount' =>  $mainSpouse->unit_price,
+                    'promoCodeDiscount' => 0,
+                ]);
+            }
+
+
+            $subSpouses = AdditionalSpouse::where('main_spouse_id', $registrantId)->get();
+            if (!$subSpouses->isEmpty()) {
+                foreach ($subSpouses as $subSpouse) {
+                    if ($subSpouse->spouse_replaced_by_id == null & (!$subSpouse->spouse_refunded)) {
+                        $countFinalQuantity++;
+                    }
+
+                    $addSubSpouse = true;
+                    if ($subSpouse->spouse_cancelled) {
+                        if ($subSpouse->spouse_refunded || $subSpouse->spouse_replaced) {
+                            $addSubSpouse = false;
+                        }
+                    }
+
+                    if ($addSubSpouse) {
+                        $existingIndex = 0;
+
+                        if (count($invoiceDetails) == 0) {
+                            array_push($invoiceDetails, [
+                                'delegateDescription' => "Spouse Registration Fee",
+                                'delegateNames' => [
+                                    $subSpouse->first_name . " " . $subSpouse->middle_name . " " . $subSpouse->last_name,
+                                ],
+                                'badgeType' => null,
+                                'quantity' => 1,
+                                'totalDiscount' => 0,
+                                'totalNetAmount' =>  $mainSpouse->unit_price,
+                                'promoCodeDiscount' => 0,
+                            ]);
+                        } else {
+                            array_push(
+                                $invoiceDetails[$existingIndex]['delegateNames'],
+                                $subSpouse->first_name . " " . $subSpouse->middle_name . " " . $subSpouse->last_name
+                            );
+
+                            $quantityTemp = $invoiceDetails[$existingIndex]['quantity'] + 1;
+                            $invoiceDetails[$existingIndex]['quantity'] = $quantityTemp;
+                            $invoiceDetails[$existingIndex]['totalNetAmount'] = $mainSpouse->unit_price * $quantityTemp;
+                        }
+                    }
+                }
+            }
+
+            $transactionId = SpouseTransaction::where('spouse_id', $mainSpouse->id)->where('spouse_type', "main")->value('id');
+
+            $tempYear = Carbon::parse($mainSpouse->registered_date_time)->format('y');
+            $lastDigit = 1000 + intval($transactionId);
+
+            foreach (config('app.eventCategories') as $eventCategoryC => $code) {
+                if ($event->category == $eventCategoryC) {
+                    $getEventcode = $code;
+                }
+            }
+
+            $tempInvoiceNumber = "$event->category" . "$tempYear" . "/" . "$lastDigit";
+            $tempBookReference = "$event->year" . "$getEventcode" . "$lastDigit";
+
+            if ($eventCategory == "AF") {
+                $bankDetails = config('app.bankDetails.AF');
+            } else {
+                $bankDetails = config('app.bankDetails.DEFAULT');
+            }
+
+            $eventFormattedData = Carbon::parse($event->event_start_date)->format('j') . '-' . Carbon::parse($event->event_end_date)->format('j F Y');
+            $fullname = $mainSpouse->first_name . ' ' . $mainSpouse->middle_name . ' ' . $mainSpouse->last_name;
+            $invoiceData = [
+                "finalEventStartDate" => Carbon::parse($event->event_start_date)->format('d M Y'),
+                "finalEventEndDate" => Carbon::parse($event->event_end_date)->format('d M Y'),
+                "eventFormattedData" => $eventFormattedData,
+                "companyName" => $fullname,
+                "companyAddress" => $mainSpouse->country,
+                "companyCity" => $mainSpouse->city,
+                "companyCountry" => null,
+                "invoiceDate" => Carbon::parse($mainSpouse->registered_date_time)->format('d/m/Y'),
+                "invoiceNumber" => $tempInvoiceNumber,
+                "bookRefNumber" => $tempBookReference,
+                "paymentStatus" => $mainSpouse->payment_status,
+                "eventName" => $event->name,
+                "eventLocation" => $event->location,
+                "eventVat" => $event->event_vat,
+                'vat_price' => $mainSpouse->vat_price,
+                'net_amount' => $mainSpouse->net_amount,
+                'total_amount' => $mainSpouse->total_amount,
+                'unit_price' => $mainSpouse->unit_price,
+                'invoiceDetails' => $invoiceDetails,
+                'bankDetails' => $bankDetails,
+                'finalQuantity' => $countFinalQuantity,
+                'total_amount_string' => ucwords($this->numberToWords($mainSpouse->total_amount)),
+            ];
+
+            return $invoiceData;
+        } else {
+            abort(404, 'The URL is incorrect');
+        }
+    }
+
+    public function getInvoiceRccAwards($eventCategory, $eventId, $registrantId)
+    {
+        if (RccAwardsMainParticipant::where('id', $registrantId)->where('event_id', $eventId)->exists()) {
+            $event = Event::where('category', $eventCategory)->where('id', $eventId)->first();
+            $invoiceDetails = array();
+            $countFinalQuantity = 0;
+
+            $mainParticipant = RccAwardsMainParticipant::where('id', $registrantId)->where('event_id', $eventId)->first();
+
+            $addMainParticipant = true;
+            if ($mainParticipant->participant_cancelled) {
+                if ($mainParticipant->participant_refunded || $mainParticipant->participant_replaced) {
+                    $addMainParticipant = false;
+                }
+            }
+
+            if ($mainParticipant->participant_replaced_by_id == null & (!$mainParticipant->participant_refunded)) {
+                $countFinalQuantity++;
+            }
+
+            if ($addMainParticipant) {
+                array_push($invoiceDetails, [
+                    'delegateDescription' => "Participant Registration Fee",
+                    'delegateNames' => [
+                        $mainParticipant->first_name . " " . $mainParticipant->middle_name . " " . $mainParticipant->last_name,
+                    ],
+                    'badgeType' => null,
+                    'quantity' => 1,
+                    'totalDiscount' => 0,
+                    'totalNetAmount' =>  $mainParticipant->unit_price,
+                    'promoCodeDiscount' => 0,
+                ]);
+            }
+
+
+            $subParticipants = RccAwardsAdditionalParticipant::where('main_participant_id', $registrantId)->get();
+            if (!$subParticipants->isEmpty()) {
+                foreach ($subParticipants as $subParticipant) {
+                    if ($subParticipant->participant_replaced_by_id == null & (!$subParticipant->participant_refunded)) {
+                        $countFinalQuantity++;
+                    }
+
+                    $addSubParticipant = true;
+                    if ($subParticipant->participant_cancelled) {
+                        if ($subParticipant->participant_refunded || $subParticipant->participant_replaced) {
+                            $addSubParticipant = false;
+                        }
+                    }
+
+                    if ($addSubParticipant) {
+                        $existingIndex = 0;
+
+                        if (count($invoiceDetails) == 0) {
+                            array_push($invoiceDetails, [
+                                'delegateDescription' => "Participant Registration Fee",
+                                'delegateNames' => [
+                                    $subParticipant->first_name . " " . $subParticipant->middle_name . " " . $subParticipant->last_name,
+                                ],
+                                'badgeType' => null,
+                                'quantity' => 1,
+                                'totalDiscount' => 0,
+                                'totalNetAmount' =>  $mainParticipant->unit_price,
+                                'promoCodeDiscount' => 0,
+                            ]);
+                        } 
+                        // else {
+                        //     array_push(
+                        //         $invoiceDetails[$existingIndex]['delegateNames'],
+                        //         $subParticipant->first_name . " " . $subParticipant->middle_name . " " . $subParticipant->last_name
+                        //     );
+
+                        //     $quantityTemp = $invoiceDetails[$existingIndex]['quantity'] + 1;
+                        //     $invoiceDetails[$existingIndex]['quantity'] = $quantityTemp;
+                        //     $invoiceDetails[$existingIndex]['totalNetAmount'] = $mainParticipant->unit_price * $quantityTemp;
+                        // }
+                    }
+                }
+            }
+
+            $transactionId = RccAwardsParticipantTransaction::where('participant_id', $mainParticipant->id)->where('participant_type', "main")->value('id');
+
+            $tempYear = Carbon::parse($mainParticipant->registered_date_time)->format('y');
+            $lastDigit = 1000 + intval($transactionId);
+
+            foreach (config('app.eventCategories') as $eventCategoryC => $code) {
+                if ($event->category == $eventCategoryC) {
+                    $getEventcode = $code;
+                }
+            }
+
+            $tempInvoiceNumber = "$event->category" . "$tempYear" . "/" . "$lastDigit";
+            $tempBookReference = "$event->year" . "$getEventcode" . "$lastDigit";
+
+            if ($eventCategory == "AF") {
+                $bankDetails = config('app.bankDetails.AF');
+            } else {
+                $bankDetails = config('app.bankDetails.DEFAULT');
+            }
+
+            $eventFormattedData = Carbon::parse($event->event_start_date)->format('j F Y');
+            $fullname = $mainParticipant->first_name . ' ' . $mainParticipant->middle_name . ' ' . $mainParticipant->last_name;
+            $invoiceData = [
+                "finalEventStartDate" => Carbon::parse($event->event_start_date)->format('d M Y'),
+                "finalEventEndDate" => Carbon::parse($event->event_end_date)->format('d M Y'),
+                "eventFormattedData" => $eventFormattedData,
+                "companyName" => $mainParticipant->company_name,
+                "companyAddress" => $fullname,
+                "companyCity" => null,
+                "companyCountry" => null,
+                "invoiceDate" => Carbon::parse($mainParticipant->registered_date_time)->format('d/m/Y'),
+                "invoiceNumber" => $tempInvoiceNumber,
+                "bookRefNumber" => $tempBookReference,
+                "paymentStatus" => $mainParticipant->payment_status,
+                "eventName" => $event->name,
+                "eventLocation" => $event->location,
+                "eventVat" => $event->event_vat,
+                'vat_price' => $mainParticipant->vat_price,
+                'net_amount' => $mainParticipant->net_amount,
+                'total_amount' => $mainParticipant->total_amount,
+                'unit_price' => $mainParticipant->unit_price,
+                'invoiceDetails' => $invoiceDetails,
+                'bankDetails' => $bankDetails,
+                'finalQuantity' => $countFinalQuantity,
+                'total_amount_string' => ucwords($this->numberToWords($mainParticipant->total_amount)),
+            ];
+
+            return $invoiceData;
+        } else {
+            abort(404, 'The URL is incorrect');
         }
     }
 }

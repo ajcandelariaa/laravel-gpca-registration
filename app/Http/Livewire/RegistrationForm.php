@@ -131,38 +131,38 @@ class RegistrationForm extends Component
         if ($this->event->eb_end_date != null && $this->event->eb_member_rate != null && $this->event->eb_nmember_rate != null) {
             if ($today->lte(Carbon::parse($this->event->eb_end_date))) {
                 if ($this->delegatePassType == "fullMember") {
-                    $this->rateTypeString = "Early Bird Full Member Rate";
+                    $this->rateTypeString = "Full member early bird rate";
                     $this->finalUnitPrice = $this->event->eb_full_member_rate;
                 } else if ($this->delegatePassType == "member") {
-                    $this->rateTypeString = "Early Bird Member Rate";
+                    $this->rateTypeString = "Member early bird rate";
                     $this->finalUnitPrice = $this->event->eb_member_rate;
                 } else {
-                    $this->rateTypeString = "Early Bird Non-Member Rate";
+                    $this->rateTypeString = "Non-Member early bird rate";
                     $this->finalUnitPrice = $this->event->eb_nmember_rate;
                 }
                 $this->rateType = "Early Bird";
             } else {
                 if ($this->delegatePassType == "fullMember") {
-                    $this->rateTypeString = "Standard Full Member Rate";
+                    $this->rateTypeString = "Full member standard rate";
                     $this->finalUnitPrice = $this->event->std_full_member_rate;
                 } else if ($this->delegatePassType == "member") {
-                    $this->rateTypeString = "Standard Member Rate";
+                    $this->rateTypeString = "Member standard rate";
                     $this->finalUnitPrice = $this->event->std_member_rate;
                 } else {
-                    $this->rateTypeString = "Standard Non-Member Rate";
+                    $this->rateTypeString = "Non-Member standard rate";
                     $this->finalUnitPrice = $this->event->std_nmember_rate;
                 }
                 $this->rateType = "Standard";
             }
         } else {
             if ($this->delegatePassType == "fullMember") {
-                $this->rateTypeString = "Standard Full Member Rate";
+                $this->rateTypeString = "Full member standard rate";
                 $this->finalUnitPrice = $this->event->std_full_member_rate;
             } else if ($this->delegatePassType == "member") {
-                $this->rateTypeString = "Standard Member Rate";
+                $this->rateTypeString = "Member standard rate";
                 $this->finalUnitPrice = $this->event->std_member_rate;
             } else {
-                $this->rateTypeString = "Standard Non-Member Rate";
+                $this->rateTypeString = "Non-Member standard rate";
                 $this->finalUnitPrice = $this->event->std_nmember_rate;
             }
             $this->rateType = "Standard";
@@ -467,7 +467,6 @@ class RegistrationForm extends Component
         $this->currentStep += 1;
     }
 
-
     public function decreaseStep()
     {
         if ($this->currentStep == 2) {
@@ -754,7 +753,7 @@ class RegistrationForm extends Component
                         'id' => $this->sessionId,
                     ],
                     "authentication" => [
-                        "redirectResponseUrl" => "$appUrl/capturePayment?sessionId=$this->sessionId&mainDelegateId=$this->currentMainDelegateId",
+                        "redirectResponseUrl" => "$appUrl/capturePayment?sessionId=$this->sessionId&mainDelegateId=$this->currentMainDelegateId&registrationFormType=events",
                     ],
                     "correlationId" => "test",
                     "device" =>  [

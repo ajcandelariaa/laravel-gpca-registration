@@ -10,30 +10,30 @@
         <div class="grid grid-cols-3 gap-4 text-center">
             <div class="bg-blue-500 p-4 rounded-lg shadow-lg">
                 <h3 class="text-lg font-semibold text-white">Confirmed delegates</h3>
-                <p class="text-4xl font-bold text-white">{{ $totalConfirmedDelegates }}</p>
+                <p class="text-4xl font-bold text-white">{{ $finalData['totalConfirmedDelegates'] }}</p>
             </div>
             <div class="bg-blue-500 p-4 rounded-lg shadow-lg">
                 <h3 class="text-lg font-semibold text-white">Total delegates</h3>
-                <p class="text-4xl font-bold text-white">{{ $totalDelegates }}</p>
+                <p class="text-4xl font-bold text-white">{{ $finalData['totalDelegates'] }}</p>
             </div>
             <div class="bg-blue-500 p-4 rounded-lg shadow-lg">
                 <h3 class="text-lg font-semibold text-white">Registered today</h3>
-                <p class="text-4xl font-bold text-white">{{ $totalRegisteredToday }}</p>
+                <p class="text-4xl font-bold text-white">{{ $finalData['totalRegisteredToday'] }}</p>
             </div>
         </div>
 
         <div class="grid grid-cols-3 gap-4 text-center mt-10">
             <div class="bg-green-500 p-4 rounded-lg shadow-lg">
                 <h3 class="text-lg font-semibold text-white">Total amount paid</h3>
-                <p class="text-4xl font-bold text-white">$ {{ number_format($totalAmountPaid, 2, '.', ',') }}</p>
+                <p class="text-4xl font-bold text-white">$ {{ number_format($finalData['totalAmountPaid'], 2, '.', ',') }}</p>
             </div>
             <div class="bg-green-500 p-4 rounded-lg shadow-lg">
                 <h3 class="text-lg font-semibold text-white">Paid today</h3>
-                <p class="text-4xl font-bold text-white">{{ $totalPaidToday }}</p>
+                <p class="text-4xl font-bold text-white">{{ $finalData['totalPaidToday'] }}</p>
             </div>
             <div class="bg-green-500 p-4 rounded-lg shadow-lg">
                 <h3 class="text-lg font-semibold text-white">Revenue today</h3>
-                <p class="text-4xl font-bold text-white">$ {{ number_format($totalAmountPaidToday, 2, '.', ',') }}</p>
+                <p class="text-4xl font-bold text-white">$ {{ number_format($finalData['totalAmountPaidToday'], 2, '.', ',') }}</p>
             </div>
         </div>
 
@@ -83,14 +83,14 @@
 
 
         <div class="grid grid-cols-3 gap-8 mt-10">
-            @if (count($arrayCountryTotal) > 0)
+            @if (count($finalData['arrayCountryTotal']) > 0)
                 <div class="bg-white rounded-lg shadow-md text-center">
                     <h2 class="text-lg font-semibold bg-blue-700 text-white px-6 py-4 rounded-t-lg">Country</h2>
                     <div class="grid grid-cols-2 justify-center items-center bg-blue-500">
                         <p class="py-3 px-6 font-medium text-sm text-white">Name</p>
                         <p class="py-3 px-6 font-medium text-sm text-white">Total</p>
                     </div>
-                    @foreach ($arrayCountryTotal as $country)
+                    @foreach ($finalData['arrayCountryTotal'] as $country)
                         <div class="grid grid-cols-2 justify-center items-center">
                             <p class="py-4 px-6 border-b">{{ $country['name'] }}</p>
                             <p class="py-4 px-6 border-b">{{ $country['total'] }}</p>
@@ -100,14 +100,14 @@
             @endif
 
 
-            @if (count($arrayCompanyTotal) > 0)
+            @if (count($finalData['arrayCompanyTotal']) > 0)
                 <div class="bg-white rounded-lg shadow-md text-center">
                     <h2 class="text-lg font-semibold bg-blue-700 text-white px-6 py-4 rounded-t-lg">Company</h2>
                     <div class="grid grid-cols-2 justify-center items-center bg-blue-500">
                         <p class="py-3 px-6 font-medium text-sm text-white">Name</p>
                         <p class="py-3 px-6 font-medium text-sm text-white">Total</p>
                     </div>
-                    @foreach ($arrayCompanyTotal as $company)
+                    @foreach ($finalData['arrayCompanyTotal'] as $company)
                         <div class="grid grid-cols-2 justify-center items-center">
                             <p class="py-4 px-6 border-b">{{ $company['name'] }}</p>
                             <p class="py-4 px-6 border-b">{{ $company['total'] }}</p>
@@ -117,14 +117,14 @@
             @endif
 
 
-            @if (count($arrayRegistrationTypeTotal) > 0)
+            @if (count($finalData['arrayRegistrationTypeTotal']) > 0)
                 <div class="bg-white rounded-lg shadow-md text-center">
                     <h2 class="text-lg font-semibold bg-blue-700 text-white px-6 py-4 rounded-t-lg">Registration Type</h2>
                     <div class="grid grid-cols-2 justify-center items-center bg-blue-500">
                         <p class="py-3 px-6 font-medium text-sm text-white">Name</p>
                         <p class="py-3 px-6 font-medium text-sm text-white">Total</p>
                     </div>
-                    @foreach ($arrayRegistrationTypeTotal as $registrationType)
+                    @foreach ($finalData['arrayRegistrationTypeTotal'] as $registrationType)
                         <div class="grid grid-cols-2 justify-center items-center">
                             <p class="py-4 px-6 border-b">{{ $registrationType['name'] }}</p>
                             <p class="py-4 px-6 border-b">{{ $registrationType['total'] }}</p>
@@ -153,7 +153,7 @@
                 ],
                 datasets: [{
                     label: 'Pass Type',
-                    data: @json($passType),
+                    data: @json($finalData['passType']),
                     backgroundColor: [
                         'rgb(255, 99, 132)',
                         'rgb(54, 162, 235)',
@@ -175,7 +175,7 @@
                 ],
                 datasets: [{
                     label: 'Payment Status',
-                    data: @json($paymentStatus),
+                    data: @json($finalData['paymentStatus']),
                     backgroundColor: [
                         'rgb(255, 99, 132)',
                         'rgb(54, 162, 235)',
@@ -198,7 +198,7 @@
                 ],
                 datasets: [{
                     label: 'Registration Status',
-                    data: @json($registrationStatus),
+                    data: @json($finalData['registrationStatus']),
                     backgroundColor: [
                         'rgb(255, 99, 132)',
                         'rgb(54, 162, 235)',
@@ -220,7 +220,7 @@
                 ],
                 datasets: [{
                     label: 'Registration Method',
-                    data: @json($registrationMethod),
+                    data: @json($finalData['registrationMethod']),
                     backgroundColor: [
                         'rgb(255, 99, 132)',
                         'rgb(54, 162, 235)',
@@ -240,7 +240,7 @@
                 ],
                 datasets: [{
                     label: 'Payment Method',
-                    data: @json($paymentMethod),
+                    data: @json($finalData['paymentMethod']),
                     backgroundColor: [
                         'rgb(255, 99, 132)',
                         'rgb(54, 162, 235)',

@@ -17,7 +17,7 @@
         <img src="{{ Storage::url($event->banner) }}" alt="" class="w-full object-fill object-center">
 
         <div class="my-10">
-            @if ($mainDelegate->payment_status == 'unpaid')
+            @if ($paymentStatus == 'unpaid')
                 @include('registration.success-messages.unpaid_message')
             @else
                 @include('registration.success-messages.paid_message')

@@ -113,7 +113,15 @@
         <img src="{{ Storage::url($event->banner) }}" alt="" class="w-full object-fill object-center">
     </div>
 
-    @livewire('registration-form', ['data' => $event])
+    @if ($event->category == 'AFS')
+        @livewire('spouse-registration-form', ['data' => $event])
+    @elseif ($event->category == 'AFV')
+
+    @elseif ($event->category == 'RCCA')
+        @livewire('rcc-awards-registration-form', ['data' => $event])
+    @else
+        @livewire('registration-form', ['data' => $event])
+    @endif
 
     <footer class="bg-registrationPrimaryColor w-full py-5 text-center text-white mt-auto">
         <p>Copyright © 2023 GPCA Registration</p>

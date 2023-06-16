@@ -14,23 +14,28 @@
                     class="{{ request()->is('admin/event/*/*/detail*') ? 'underline' : 'hover:underline' }} text-registrationPrimaryColor">Event
                     Detail</a>
 
-                <a href="{{ route('admin.event.registration-type.view', ['eventCategory' => $eventCategory, 'eventId' => $eventId]) }}"
-                    class="{{ request()->is('admin/event/*/*/registration-type*') ? 'underline' : 'hover:underline' }} text-registrationPrimaryColor">Registration Type</a>
+                @if ($eventCategory != 'AFS' && $eventCategory != 'RCCA')
+                    <a href="{{ route('admin.event.registration-type.view', ['eventCategory' => $eventCategory, 'eventId' => $eventId]) }}"
+                        class="{{ request()->is('admin/event/*/*/registration-type*') ? 'underline' : 'hover:underline' }} text-registrationPrimaryColor">Registration
+                        Type</a>
+                        
+                    <a href="{{ route('admin.event.delegate-fees.view', ['eventCategory' => $eventCategory, 'eventId' => $eventId]) }}"
+                        class="{{ request()->is('admin/event/*/*/delegate-fees*') ? 'underline' : 'hover:underline' }} text-registrationPrimaryColor">Delegate
+                        Fees</a>
 
-                <a href="{{ route('admin.event.delegate-fees.view', ['eventCategory' => $eventCategory, 'eventId' => $eventId]) }}"
-                    class="{{ request()->is('admin/event/*/*/delegate-fees*') ? 'underline' : 'hover:underline' }} text-registrationPrimaryColor">Delegate
-                    Fees</a>
+                    <a href="{{ route('admin.event.promo-codes.view', ['eventCategory' => $eventCategory, 'eventId' => $eventId]) }}"
+                        class="{{ request()->is('admin/event/*/*/promo-code*') ? 'underline' : 'hover:underline' }} text-registrationPrimaryColor">Promo
+                        Codes</a>
+                @endif
 
-                <a href="{{ route('admin.event.promo-codes.view', ['eventCategory' => $eventCategory, 'eventId' => $eventId]) }}"
-                    class="{{ request()->is('admin/event/*/*/promo-code*') ? 'underline' : 'hover:underline' }} text-registrationPrimaryColor">Promo
-                    Codes</a>
 
                 <a href="{{ route('admin.event.registrants.view', ['eventCategory' => $eventCategory, 'eventId' => $eventId]) }}"
                     class="{{ request()->is('admin/event/*/*/registrant*') ? 'underline' : 'hover:underline' }} text-registrationPrimaryColor">Transactions</a>
 
-                <a href="{{ route('admin.event.delegates.view', ['eventCategory' => $eventCategory, 'eventId' => $eventId]) }}"
-                    class="{{ request()->is('admin/event/*/*/delegate*') ? 'underline' : 'hover:underline' }} text-registrationPrimaryColor">Delegates</a>
-
+                @if ($eventCategory != 'AFS' && $eventCategory != 'RCCA')
+                    <a href="{{ route('admin.event.delegates.view', ['eventCategory' => $eventCategory, 'eventId' => $eventId]) }}"
+                        class="{{ request()->is('admin/event/*/*/delegate*') ? 'underline' : 'hover:underline' }} text-registrationPrimaryColor">Delegates</a>
+                @endif
             </div>
         </div>
     </div>

@@ -33,7 +33,13 @@ class RegistrationPaymentConfirmation extends Mailable
      */
     public function envelope()
     {
-        $subject = 'Payment confirmation for the '. $this->details['eventName'];
+        
+        if ($this->details['eventCategory'] == "RCCA") {
+            $subject = 'Payment confirmation for your entry submission on the '. $this->details['eventName'];
+        } else {
+            $subject = 'Payment confirmation for the '. $this->details['eventName'];
+        }
+        
         return new Envelope(
             from: new Address('forumregistration@gpca.org.ae', 'GPCA Events Registration'),
             subject: $subject,

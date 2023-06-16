@@ -474,6 +474,11 @@ return [
         'ANC' => "03",
         'RIC' => "04",
         'RCC' => "05",
+        'RCCA' => "51",
+        'AF' => "06", 
+        'IPAW' => "20",
+        'AFS' => "61",
+        'AFV' => "62",
     ],
 
     'bankDetails' => [
@@ -487,9 +492,26 @@ return [
         ],
     ],
 
-    'ccEmailNotif' => [
-        'analee@gpca.org.ae', 'jovelyn@gpca.org.ae', 'forumregistration@gpca.org.ae',
-    ],
+    // 'ccEmailNotif' => [
+    //     'analee@gpca.org.ae', 'jovelyn@gpca.org.ae', 'forumregistration@gpca.org.ae',
+    // ],
 
-    // 'ccEmailNotif' => ['aj@gpca.org.ae'],
+    'ccEmailNotif' => ['aj@gpca.org.ae'],
+
+    'rccAwardsCategories' => [
+        'Process Safety' => null,
+        'Sustainable Environmental Protection' => [
+            'Sustainable Energy',
+            'Green Technology',
+            'Conservation and Biodiversity',
+            'Waste Reduction and Management',
+        ],
+        'Rising Star Award' => null,
+        'Community Awareness' => [
+            'Environmental Stewardship',
+            'Community Engagement and Partnerships',
+            'Health and Safety',
+        ],
+        'Responsible Partner' => null,
+    ],
 ];
