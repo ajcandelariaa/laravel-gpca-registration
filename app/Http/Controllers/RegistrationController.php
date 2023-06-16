@@ -2681,9 +2681,12 @@ class RegistrationController extends Controller
 
             if ($addMainParticipant) {
                 array_push($invoiceDetails, [
-                    'delegateDescription' => "Participant Registration Fee",
+                    'delegateDescription' => "Awards Submission fee",
+                    // 'delegateNames' => [
+                    //     $mainParticipant->first_name . " " . $mainParticipant->middle_name . " " . $mainParticipant->last_name,
+                    // ],
                     'delegateNames' => [
-                        $mainParticipant->first_name . " " . $mainParticipant->middle_name . " " . $mainParticipant->last_name,
+                        "Category: " . $mainParticipant->category,
                     ],
                     'badgeType' => null,
                     'quantity' => 1,
@@ -2713,9 +2716,12 @@ class RegistrationController extends Controller
 
                         if (count($invoiceDetails) == 0) {
                             array_push($invoiceDetails, [
-                                'delegateDescription' => "Participant Registration Fee",
+                                'delegateDescription' => "Awards Submission fee",
+                                // 'delegateNames' => [
+                                //     $subParticipant->first_name . " " . $subParticipant->middle_name . " " . $subParticipant->last_name,
+                                // ],
                                 'delegateNames' => [
-                                    $subParticipant->first_name . " " . $subParticipant->middle_name . " " . $subParticipant->last_name,
+                                    "Category: " . $mainParticipant->category,
                                 ],
                                 'badgeType' => null,
                                 'quantity' => 1,
@@ -2724,16 +2730,6 @@ class RegistrationController extends Controller
                                 'promoCodeDiscount' => 0,
                             ]);
                         } 
-                        // else {
-                        //     array_push(
-                        //         $invoiceDetails[$existingIndex]['delegateNames'],
-                        //         $subParticipant->first_name . " " . $subParticipant->middle_name . " " . $subParticipant->last_name
-                        //     );
-
-                        //     $quantityTemp = $invoiceDetails[$existingIndex]['quantity'] + 1;
-                        //     $invoiceDetails[$existingIndex]['quantity'] = $quantityTemp;
-                        //     $invoiceDetails[$existingIndex]['totalNetAmount'] = $mainParticipant->unit_price * $quantityTemp;
-                        // }
                     }
                 }
             }
