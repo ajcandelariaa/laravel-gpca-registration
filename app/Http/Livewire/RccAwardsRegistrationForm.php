@@ -231,7 +231,7 @@ class RccAwardsRegistrationForm extends Component
             );
 
             if ($this->supportingDocuments != null) {
-                if (count($this->supportingDocuments) < 6) {
+                if (count($this->supportingDocuments) < 5) {
                     foreach ($this->supportingDocuments as $index => $document) {
                         $fileType = $document->getClientOriginalExtension();
                         if ($fileType != 'pdf' && $fileType != 'doc' && $fileType != 'docx') {
@@ -240,7 +240,7 @@ class RccAwardsRegistrationForm extends Component
                         }
                     }
                 } else {
-                    array_push($this->supportingDocumentsError, "Maximum 5 files only");
+                    array_push($this->supportingDocumentsError, "Maximum 4 files only");
                 }
             }
 

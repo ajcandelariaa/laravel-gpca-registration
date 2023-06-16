@@ -1,6 +1,6 @@
 <div class="mx-5">
     <div class="text-registrationPrimaryColor italic font-bold text-xl">
-        Delegate details
+        Participant details
     </div>
 
     <div class="mt-5 grid grid-cols-2 gap-y-3 gap-x-5">
@@ -247,7 +247,7 @@
             <div class="grid grid-cols-2 gap-x-5">
                 <div class="col-span-2 sm:col-span-1">
                     <div class="text-registrationPrimaryColor">
-                        Entry form <span class="text-red-500">*</span>
+                        Entry form <span class="text-red-500">*</span> <span class="italic text-xs text-red-600 ml-2">(PDF or word format only)</span> 
                     </div>
                     <div>
                         <input type="file" wire:model.lazy="entryForm"
@@ -263,7 +263,7 @@
 
                 <div class="col-span-2 sm:col-span-1">
                     <div class="text-registrationPrimaryColor">
-                        Supporting documents
+                        Supporting documents <span class="italic text-xs text-red-600">(You can choose up to 4 file in PDF or word format only)</span>
                     </div>
                     <div>
                         <input type="file" wire:model.lazy="supportingDocuments" multiple

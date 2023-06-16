@@ -60,9 +60,9 @@
                 </td>
             </tr>
             <tr>
-                <td class="text-black">
-                    <div class="bg-white py-4 font-bold mb-1 ml-1">
-                        Non-Member
+                <td class="text-black w-1/2">
+                    <div class="bg-white py-4 font-bold mb-1 ml-1 ">
+                        Non-Member <span class="text-xs italic text-red-600">(Responsible partner only)</span>
                     </div>
                 </td>
                 @if ($finalEbEndDate != null)
@@ -87,7 +87,7 @@
 
         <div class="col-span-2 lg:col-span-1">
             <div class="bg-gray-200 py-4 px-2">
-                <h1 class="text-2xl text-registrationPrimaryColor font-bold text-center">DELEGATE FEE INCLUDES:</h1>
+                <h1 class="text-2xl text-registrationPrimaryColor font-bold text-center">SELECT CATEGORY:</h1>
                 <div class="bg-white mx-1 mt-5 p-5">
                     <div class="text-registrationPrimaryColor">
                         Category <span class="text-red-500">*</span>
@@ -134,15 +134,6 @@
         </div>
 
         <div class="col-span-2 lg:col-span-1 flex flex-col gap-5">
-            <div class="bg-gray-200 py-4 px-2">
-                <h1 class="text-2xl text-registrationPrimaryColor font-bold text-center">DO YOU WISH TO BECOME A MEMBER?
-                </h1>
-                <div class="bg-white mx-1 mt-5 p-5 space-y-5">
-                    <p>Do you wish to become a member and avail preferred rates and other benefit?</p>
-                    <p>If <strong>YES</strong>, please contact our sales team: members@gpca.org.ae</p>
-                    <p>If <strong>NO</strong>, please proceed with the registration</p>
-                </div>
-            </div>
             @if ($category != null)
                 <div class="bg-gray-200 py-4 px-2">
                     <h1 class="text-2xl text-registrationPrimaryColor font-bold text-center">PARTICIPANT PASS TYPE</h1>
@@ -230,6 +221,16 @@
                     </div>
                 </div>
             @endif
+
+            <div class="bg-gray-200 py-4 px-2">
+                <h1 class="text-2xl text-registrationPrimaryColor font-bold text-center">DO YOU WISH TO BECOME A MEMBER?
+                </h1>
+                <div class="bg-white mx-1 mt-5 p-5 space-y-5">
+                    <p>Do you wish to become a member and avail preferred rates and other benefit?</p>
+                    <p>If <strong>YES</strong>, please contact our sales team: members@gpca.org.ae</p>
+                    <p>If <strong>NO</strong>, please proceed with the registration</p>
+                </div>
+            </div>
         </div>
     </div>
 </div>
