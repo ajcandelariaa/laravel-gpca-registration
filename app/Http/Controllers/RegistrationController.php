@@ -1034,31 +1034,39 @@ class RegistrationController extends Controller
         return $formatter->format($number);
     }
 
-    public function registrantViewInvoice($eventCategory, $eventId, $registrantId)
-    {
-        $finalData = $this->getInvoice($eventCategory, $eventId, $registrantId);
+    // public function registrantViewInvoice($eventCategory, $eventId, $registrantId)
+    // {
+    //     $finalData = $this->getInvoice($eventCategory, $eventId, $registrantId);
 
-        if ($finalData['finalQuantity'] > 0) {
-            if ($finalData['paymentStatus'] == "unpaid") {
-                $pdf = Pdf::loadView('admin.events.transactions.invoices.unpaid', $finalData);
-            } else {
-                $pdf = Pdf::loadView('admin.events.transactions.invoices.paid', $finalData);
-            }
-            return $pdf->stream('invoice.pdf');
-        } else {
-            abort(404, 'The URL is incorrect');
-        }
-    }
+    //     if ($finalData['finalQuantity'] > 0) {
+    //         if ($finalData['paymentStatus'] == "unpaid") {
+    //             $pdf = Pdf::loadView('admin.events.transactions.invoices.unpaid', $finalData);
+    //         } else {
+    //             $pdf = Pdf::loadView('admin.events.transactions.invoices.paid', $finalData);
+    //         }
+    //         return $pdf->stream('invoice.pdf');
+    //     } else {
+    //         abort(404, 'The URL is incorrect');
+    //     }
+    // }
 
     public function generatePublicInvoice($eventCategory, $eventId, $registrantId)
     {
         $finalData = $this->getInvoice($eventCategory, $eventId, $registrantId);
 
         if ($finalData['finalQuantity'] > 0) {
-            if ($finalData['paymentStatus'] == "unpaid") {
-                $pdf = Pdf::loadView('admin.events.transactions.invoices.unpaid', $finalData);
+            if ($eventCategory == "RCCA") {
+                if ($finalData['paymentStatus'] == "unpaid") {
+                    $pdf = Pdf::loadView('admin.events.transactions.invoices.rcca.unpaid', $finalData);
+                } else {
+                    $pdf = Pdf::loadView('admin.events.transactions.invoices.rcca.paid', $finalData);
+                }
             } else {
-                $pdf = Pdf::loadView('admin.events.transactions.invoices.paid', $finalData);
+                if ($finalData['paymentStatus'] == "unpaid") {
+                    $pdf = Pdf::loadView('admin.events.transactions.invoices.unpaid', $finalData);
+                } else {
+                    $pdf = Pdf::loadView('admin.events.transactions.invoices.paid', $finalData);
+                }
             }
             return $pdf->stream('invoice.pdf');
         } else {
@@ -2242,7 +2250,7 @@ class RegistrationController extends Controller
     }
 
 
-    
+
     public function registrationSuccessViewEvents($eventCategory, $eventId, $mainDelegateId)
     {
         $mainDelegate = MainDelegate::where('id', $mainDelegateId)->first();
@@ -2729,7 +2737,7 @@ class RegistrationController extends Controller
                                 'totalNetAmount' =>  $mainParticipant->unit_price,
                                 'promoCodeDiscount' => 0,
                             ]);
-                        } 
+                        }
                     }
                 }
             }

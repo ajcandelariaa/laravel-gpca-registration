@@ -270,15 +270,16 @@ class RccAwardsRegistrationForm extends Component
 
     public function submitStep3()
     {
-        if ($this->checkEmailIfExistsInDatabase($this->emailAddress)) {
-            $this->emailMainExistingError = "Email is already registered, please use another email!";
-        } else {
-            $this->emailMainExistingError = null;
-            $this->checkUnitPrice();
-            $this->calculateAmount();
-            $this->paymentMethod = null;
-            $this->currentStep += 1;
-        }
+        // if ($this->checkEmailIfExistsInDatabase($this->emailAddress)) {
+        //     $this->emailMainExistingError = "Email is already registered, please use another email!";
+        // } else {
+        // }
+
+        $this->emailMainExistingError = null;
+        $this->checkUnitPrice();
+        $this->calculateAmount();
+        $this->paymentMethod = null;
+        $this->currentStep += 1;
 
         $this->dispatchBrowserEvent('swal:remove-registration-loading-screen');
     }
@@ -382,6 +383,13 @@ class RccAwardsRegistrationForm extends Component
         if ($this->currentStep == 2) {
             $this->members = Members::where('active', true)->orderBy('name', 'ASC')->get();
         }
+
+        if($this->currentStep == 3){
+            $this->entryForm = null;
+            $this->supportingDocuments = [];
+            $this->supportingDocumentsError = [];
+        }
+        
         $this->resetCalculations();
         $this->currentStep -= 1;
     }

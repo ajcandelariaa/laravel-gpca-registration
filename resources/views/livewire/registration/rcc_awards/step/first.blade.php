@@ -86,6 +86,20 @@
     <div class="grid grid-cols-2 gap-5 mt-10">
 
         <div class="col-span-2 lg:col-span-1">
+
+            <div class="bg-gray-200 py-4 px-2">
+                <h1 class="text-2xl text-registrationPrimaryColor font-bold text-center">DO YOU WISH TO BECOME A MEMBER?
+                </h1>
+                <div class="bg-white mx-1 mt-5 p-5 space-y-5">
+                    <p>Do you wish to become a member and avail preferred rates and other benefit?</p>
+                    <p>If <strong>YES</strong>, please contact our sales team: members@gpca.org.ae</p>
+                    <p>If <strong>NO</strong>, please proceed with the registration</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-span-2 lg:col-span-1 flex flex-col gap-5">
+
             <div class="bg-gray-200 py-4 px-2">
                 <h1 class="text-2xl text-registrationPrimaryColor font-bold text-center">SELECT CATEGORY:</h1>
                 <div class="bg-white mx-1 mt-5 p-5">
@@ -131,9 +145,6 @@
                     @endif
                 </div>
             </div>
-        </div>
-
-        <div class="col-span-2 lg:col-span-1 flex flex-col gap-5">
             @if ($category != null)
                 <div class="bg-gray-200 py-4 px-2">
                     <h1 class="text-2xl text-registrationPrimaryColor font-bold text-center">PARTICIPANT PASS TYPE</h1>
@@ -221,16 +232,6 @@
                     </div>
                 </div>
             @endif
-
-            <div class="bg-gray-200 py-4 px-2">
-                <h1 class="text-2xl text-registrationPrimaryColor font-bold text-center">DO YOU WISH TO BECOME A MEMBER?
-                </h1>
-                <div class="bg-white mx-1 mt-5 p-5 space-y-5">
-                    <p>Do you wish to become a member and avail preferred rates and other benefit?</p>
-                    <p>If <strong>YES</strong>, please contact our sales team: members@gpca.org.ae</p>
-                    <p>If <strong>NO</strong>, please proceed with the registration</p>
-                </div>
-            </div>
         </div>
     </div>
 </div>

@@ -59,22 +59,8 @@
         </div>
 
         <ul class="list-decimal ml-8 mt-5">
-            <li>For any cancellation, please notify us within 7 days from the receipt of the invoice. Any
-                cancellation made after 7 days shall not be accepted hence the invoice has to be settled. </li>
-            <li class="mt-4">If any delegate is unable to attend, we will accept a substitute delegate at no extra
-                cost. Please
-                notify us in writing an email to: forumregistration@gpca.org.ae with the name, job title, email
-                address and telephone number of both the registered and substitute delegate. </li>
-            <li class="mt-4">Refund Policy
-                <ul class="list-disc ml-4">
-                    <li>If delegate/s cancelled their registration 31 days before the event, they will get a refund
-                        of 75%
-                        on the amount paid for the registration fee.</li>
-                    <li>If delegate/s cancelled their registration less than 31 days before the event, NO refund
-                        will be
-                        given.</li>
-                </ul>
-            </li>
+            <li>Pay the submission fee on or before the submission deadline, 15th July, to qualify your entries.</li>
+            <li>Payment is non-refundable</li>
         </ul>
     </div>
 </div>
