@@ -62,7 +62,7 @@
             <tr>
                 <td class="text-black w-1/2">
                     <div class="bg-white py-4 font-bold mb-1 ml-1 ">
-                        Non-Member <span class="text-xs italic text-red-600">(Responsible partner only)</span>
+                        Non-Member <span class="text-xs italic text-red-600">(Responsible partner category only)</span>
                     </div>
                 </td>
                 @if ($finalEbEndDate != null)

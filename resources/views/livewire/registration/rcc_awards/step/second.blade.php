@@ -263,7 +263,7 @@
 
                 <div class="col-span-2 sm:col-span-1">
                     <div class="text-registrationPrimaryColor">
-                        Supporting documents <span class="italic text-xs text-red-600">(You can choose up to 4 file in PDF or word format only)</span>
+                        Supporting documents <span class="italic text-xs text-red-600">(You can choose up to 4 files in PDF or word format only)</span>
                     </div>
                     <div>
                         <input type="file" wire:model.lazy="supportingDocuments" multiple
