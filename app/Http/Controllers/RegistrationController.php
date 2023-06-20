@@ -1521,6 +1521,7 @@ class RegistrationController extends Controller
                         'name' => $mainDelegate->salutation . " " . $mainDelegate->first_name . " " . $mainDelegate->middle_name . " " . $mainDelegate->last_name,
                         'eventLink' => $event->link,
                         'eventName' => $event->name,
+                        'eventCategory' => $event->category,
 
                         'invoiceAmount' => $mainDelegate->total_amount,
                         'amountPaid' => $mainDelegate->total_amount,
@@ -1563,6 +1564,7 @@ class RegistrationController extends Controller
                                 'name' => $additionalDelegate->salutation . " " . $additionalDelegate->first_name . " " . $additionalDelegate->middle_name . " " . $additionalDelegate->last_name,
                                 'eventLink' => $event->link,
                                 'eventName' => $event->name,
+                                'eventCategory' => $event->category,
 
                                 'invoiceAmount' => $mainDelegate->total_amount,
                                 'amountPaid' => $mainDelegate->total_amount,
@@ -1776,6 +1778,7 @@ class RegistrationController extends Controller
                         'name' => $mainSpouse->salutation . " " . $mainSpouse->first_name . " " . $mainSpouse->middle_name . " " . $mainSpouse->last_name,
                         'eventLink' => $event->link,
                         'eventName' => $event->name,
+                        'eventCategory' => $event->category,
 
                         'invoiceAmount' => $mainSpouse->total_amount,
                         'amountPaid' => $mainSpouse->total_amount,
@@ -1815,6 +1818,7 @@ class RegistrationController extends Controller
                                 'name' => $additionalSpouse->salutation . " " . $additionalSpouse->first_name . " " . $additionalSpouse->middle_name . " " . $additionalSpouse->last_name,
                                 'eventLink' => $event->link,
                                 'eventName' => $event->name,
+                                'eventCategory' => $event->category,
 
                                 'invoiceAmount' => $mainSpouse->total_amount,
                                 'amountPaid' => $mainSpouse->total_amount,
@@ -2044,6 +2048,7 @@ class RegistrationController extends Controller
                         'name' => $mainParticipant->salutation . " " . $mainParticipant->first_name . " " . $mainParticipant->middle_name . " " . $mainParticipant->last_name,
                         'eventLink' => $event->link,
                         'eventName' => $event->name,
+                        'eventCategory' => $event->category,
 
                         'invoiceAmount' => $mainParticipant->total_amount,
                         'amountPaid' => $mainParticipant->total_amount,
