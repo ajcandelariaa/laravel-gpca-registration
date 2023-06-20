@@ -1090,333 +1090,17 @@ class RegistrationController extends Controller
         }
     }
 
-    public function eventRegistrantsExportData($eventCategory, $eventId)
+    public function registrantsExportData($eventCategory, $eventId)
     {
         if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {
-            $finalExcelData = array();
-            $event = Event::where('id', $eventId)->where('category', $eventCategory)->first();
-
-            $mainDelegates = MainDelegate::where('event_id', $eventId)->get();
-            if (!$mainDelegates->isEmpty()) {
-                foreach ($mainDelegates as $mainDelegate) {
-                    $mainTransactionId = Transaction::where('delegate_id', $mainDelegate->id)->where('delegate_type', "main")->value('id');
-
-                    $tempYear = Carbon::parse($mainDelegate->registered_date_time)->format('y');
-                    $lastDigit = 1000 + intval($mainTransactionId);
-
-                    foreach (config('app.eventCategories') as $eventCategoryC => $code) {
-                        if ($event->category == $eventCategoryC) {
-                            $getEventcode = $code;
-                        }
-                    }
-
-                    $tempInvoiceNumber = "$event->category" . "$tempYear" . "/" . "$lastDigit";
-                    $tempBookReference = "$event->year" . "$getEventcode" . "$lastDigit";
-
-                    $promoCodeDiscount = null;
-                    $discountPrice = 0.0;
-                    $netAMount = 0.0;
-
-                    $promoCodeDiscount = PromoCode::where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $mainDelegate->pcode_used)->value('discount');
-
-                    if ($promoCodeDiscount  != null) {
-                        $discountPrice = $mainDelegate->unit_price * ($promoCodeDiscount / 100);
-                        $netAMount = $mainDelegate->unit_price - $discountPrice;
-                    } else {
-                        $discountPrice = 0.0;
-                        $netAMount = $mainDelegate->unit_price;
-                    }
-
-                    array_push($finalExcelData, [
-                        'transaction_id' => $tempBookReference,
-                        'id' => $mainDelegate->id,
-                        'delegateType' => 'Main',
-                        'event' => $eventCategory,
-                        'pass_type' => $mainDelegate->pass_type,
-                        'rate_type' => ($netAMount == 0) ? 'Complementary' : $mainDelegate->rate_type,
-
-                        'company_name' => $mainDelegate->company_name,
-                        'company_sector' => $mainDelegate->company_sector,
-                        'company_address' => $mainDelegate->company_address,
-                        'company_city' => $mainDelegate->company_city,
-                        'company_country' => $mainDelegate->company_country,
-                        'company_telephone_number' => $mainDelegate->company_telephone_number,
-                        'company_mobile_number' => $mainDelegate->company_mobile_number,
-                        'assistant_email_address' => $mainDelegate->assistant_email_address,
-
-                        'salutation' => $mainDelegate->salutation,
-                        'first_name' => $mainDelegate->first_name,
-                        'middle_name' => $mainDelegate->middle_name,
-                        'last_name' => $mainDelegate->last_name,
-                        'email_address' => $mainDelegate->email_address,
-                        'mobile_number' => $mainDelegate->mobile_number,
-                        'job_title' => $mainDelegate->job_title,
-                        'nationality' => $mainDelegate->nationality,
-                        'badge_type' => $mainDelegate->badge_type,
-                        'pcode_used' => $mainDelegate->pcode_used,
-
-                        'unit_price' => $mainDelegate->unit_price,
-                        'discount_price' => $discountPrice,
-                        'net_amount' => $netAMount,
-                        'printed_badge_date' => null,
-
-                        // PLEASE CONTINUE HERE
-                        'total_amount' => $mainDelegate->total_amount,
-                        'payment_status' => $mainDelegate->payment_status,
-                        'registration_status' => $mainDelegate->registration_status,
-                        'mode_of_payment' => $mainDelegate->mode_of_payment,
-                        'invoice_number' => $tempInvoiceNumber,
-                        'reference_number' => $tempBookReference,
-                        'registration_date_time' => $mainDelegate->registered_date_time,
-                        'paid_date_time' => $mainDelegate->paid_date_time,
-
-                        // NEW june 6 2023
-                        'registration_method' => $mainDelegate->registration_method,
-                        'transaction_remarks' => $mainDelegate->transaction_remarks,
-
-                        'delegate_cancelled' => $mainDelegate->delegate_cancelled,
-                        'delegate_replaced' => $mainDelegate->delegate_replaced,
-                        'delegate_refunded' => $mainDelegate->delegate_refunded,
-
-                        'delegate_replaced_type' => null,
-                        'delegate_original_from_id' => null,
-                        'delegate_replaced_from_id' => null,
-                        'delegate_replaced_by_id' => $mainDelegate->delegate_replaced_by_id,
-
-                        'delegate_cancelled_datetime' => $mainDelegate->delegate_cancelled_datetime,
-                        'delegate_refunded_datetime' => $mainDelegate->delegate_refunded_datetime,
-                        'delegate_replaced_datetime' => $mainDelegate->delegate_replaced_datetime,
-                    ]);
-
-                    $subDelegates = AdditionalDelegate::where('main_delegate_id', $mainDelegate->id)->get();
-
-                    if (!$subDelegates->isEmpty()) {
-                        foreach ($subDelegates as $subDelegate) {
-                            $subTransactionId = Transaction::where('delegate_id', $subDelegate->id)->where('delegate_type', "sub")->value('id');
-
-                            $promoCodeDiscount = null;
-                            $discountPrice = 0.0;
-                            $netAMount = 0.0;
-
-                            $promoCodeDiscount = PromoCode::where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $subDelegate->pcode_used)->value('discount');
-
-                            if ($promoCodeDiscount  != null) {
-                                $discountPrice = $mainDelegate->unit_price * ($promoCodeDiscount / 100);
-                                $netAMount = $mainDelegate->unit_price - $discountPrice;
-                            } else {
-                                $discountPrice = 0.0;
-                                $netAMount = $mainDelegate->unit_price;
-                            }
-
-                            $lastDigit = 1000 + intval($subTransactionId);
-                            $tempBookReferenceSub = "$event->year" . "$getEventcode" . "$lastDigit";
-
-                            array_push($finalExcelData, [
-                                'transaction_id' => $tempBookReferenceSub,
-                                'id' => $subDelegate->id,
-                                'delegateType' => 'Sub',
-                                'event' => $eventCategory,
-                                'pass_type' => $mainDelegate->pass_type,
-                                'rate_type' => $mainDelegate->rate_type,
-
-                                'company_name' => $mainDelegate->company_name,
-                                'company_sector' => $mainDelegate->company_sector,
-                                'company_address' => $mainDelegate->company_address,
-                                'company_city' => $mainDelegate->company_city,
-                                'company_country' => $mainDelegate->company_country,
-                                'company_telephone_number' => $mainDelegate->company_telephone_number,
-                                'company_mobile_number' => $mainDelegate->company_mobile_number,
-                                'assistant_email_address' => $mainDelegate->assistant_email_address,
-
-                                'salutation' => $subDelegate->salutation,
-                                'first_name' => $subDelegate->first_name,
-                                'middle_name' => $subDelegate->middle_name,
-                                'last_name' => $subDelegate->last_name,
-                                'email_address' => $subDelegate->email_address,
-                                'mobile_number' => $subDelegate->mobile_number,
-                                'job_title' => $subDelegate->job_title,
-                                'nationality' => $subDelegate->nationality,
-                                'badge_type' => $subDelegate->badge_type,
-                                'pcode_used' => $subDelegate->pcode_used,
-
-                                'unit_price' => $mainDelegate->unit_price,
-                                'discount_price' => $discountPrice,
-                                'net_amount' => $netAMount,
-                                'printed_badge_date' => null,
-
-                                // PLEASE CONTINUE HERE
-                                'total_amount' => $mainDelegate->total_amount,
-                                'payment_status' => $mainDelegate->payment_status,
-                                'registration_status' => $mainDelegate->registration_status,
-                                'mode_of_payment' => $mainDelegate->mode_of_payment,
-                                'invoice_number' => $tempInvoiceNumber,
-                                'reference_number' => $tempBookReference,
-                                'registration_date_time' => $mainDelegate->registered_date_time,
-                                'paid_date_time' => $mainDelegate->paid_date_time,
-
-                                // NEW june 6 2023
-                                'registration_method' => $mainDelegate->registration_method,
-                                'transaction_remarks' => $mainDelegate->transaction_remarks,
-
-                                'delegate_cancelled' => $subDelegate->delegate_cancelled,
-                                'delegate_replaced' => $subDelegate->delegate_replaced,
-                                'delegate_refunded' => $subDelegate->delegate_refunded,
-
-                                'delegate_replaced_type' => $subDelegate->delegate_replaced_type,
-                                'delegate_original_from_id' => $subDelegate->delegate_original_from_id,
-                                'delegate_replaced_from_id' => $subDelegate->delegate_replaced_from_id,
-                                'delegate_replaced_by_id' => $subDelegate->delegate_replaced_by_id,
-
-                                'delegate_cancelled_datetime' => $subDelegate->delegate_cancelled_datetime,
-                                'delegate_refunded_datetime' => $subDelegate->delegate_refunded_datetime,
-                                'delegate_replaced_datetime' => $subDelegate->delegate_replaced_datetime,
-                            ]);
-                        }
-                    }
-                }
+            if ($eventCategory == "AFS") {
+                $finalData = $this->spouseRegistrantsExportData($eventCategory, $eventId);
+            } else if ($eventCategory == "RCCA") {
+                $finalData = $this->rccAwardsRegistrantsExportData($eventCategory, $eventId);
+            } else {
+                $finalData = $this->eventRegistrantsExportData($eventCategory, $eventId);
             }
-
-            $fileName = 'transactions.csv';
-            $headers = array(
-                "Content-type"        => "text/csv",
-                "Content-Disposition" => "attachment; filename=$fileName",
-                "Pragma"              => "no-cache",
-                "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
-                "Expires"             => "0"
-            );
-
-            $columns = array(
-                'Transaction Id',
-                'ID',
-                'Delegate Type',
-                'Event',
-                'Pass Type',
-                'Rate Type',
-
-                'Promo Code used',
-                'Badge Type',
-                'Salutation',
-                'First Name',
-                'Last Name',
-                'Email Address',
-                'Mobile Number 1',
-                'Job Title',
-                'Nationality',
-
-                'Company Name',
-                'Company Address',
-                'City',
-                'Country',
-                'Telephone Number',
-                'Mobile Number 2',
-                'Assistant Email Address',
-
-                'Middle Name',
-
-                'Unit Price',
-                'Discount Price',
-                'Total Amount',
-                'Payment Status',
-                'Registration Status',
-                'Payment method',
-                'Invoice Number',
-                'Reference Number',
-                'Registered Date & Time',
-                'Paid Date & Time',
-                'Printed badge',
-
-                'Company Sector',
-
-                'Registration Method',
-                'Transaction Remarks',
-
-                'Delegate Cancelled',
-                'Delegate Replaced',
-                'Delegate Refunded',
-
-                'Delegate Replaced Type',
-                'Delegate Original From Id',
-                'Delegate Replaced From Id',
-                'Delegate Replaced By Id',
-
-                'Delegate Cancelled Date & Time',
-                'Delegate Refunded Date & Time',
-                'Delegate Replaced Date & Time',
-
-            );
-
-            $callback = function () use ($finalExcelData, $columns) {
-                $file = fopen('php://output', 'w');
-                fputcsv($file, $columns);
-
-                foreach ($finalExcelData as $data) {
-                    fputcsv(
-                        $file,
-                        array(
-                            $data['transaction_id'],
-                            $data['id'],
-                            $data['delegateType'],
-                            $data['event'],
-                            $data['pass_type'],
-                            $data['rate_type'],
-
-                            $data['pcode_used'],
-                            $data['badge_type'],
-
-                            $data['salutation'],
-                            $data['first_name'],
-                            $data['last_name'],
-                            $data['email_address'],
-                            $data['mobile_number'],
-                            $data['job_title'],
-                            $data['nationality'],
-
-                            $data['company_name'],
-                            $data['company_address'],
-                            $data['company_city'],
-                            $data['company_country'],
-                            $data['company_telephone_number'],
-                            $data['company_mobile_number'],
-                            $data['assistant_email_address'],
-
-                            $data['middle_name'],
-
-                            $data['unit_price'],
-                            $data['discount_price'],
-                            $data['net_amount'],
-                            $data['payment_status'],
-                            $data['registration_status'],
-                            $data['mode_of_payment'],
-                            $data['invoice_number'],
-                            $data['reference_number'],
-                            $data['registration_date_time'],
-                            $data['paid_date_time'],
-                            $data['printed_badge_date'],
-
-                            $data['company_sector'],
-
-                            $data['registration_method'],
-                            $data['transaction_remarks'],
-
-                            $data['delegate_cancelled'],
-                            $data['delegate_replaced'],
-                            $data['delegate_refunded'],
-
-                            $data['delegate_replaced_type'],
-                            $data['delegate_original_from_id'],
-                            $data['delegate_replaced_from_id'],
-                            $data['delegate_replaced_by_id'],
-
-                            $data['delegate_cancelled_datetime'],
-                            $data['delegate_refunded_datetime'],
-                            $data['delegate_replaced_datetime'],
-
-                        )
-                    );
-                }
-                fclose($file);
-            };
-            return response()->stream($callback, 200, $headers);
+            return response()->stream($finalData['callback'], 200, $finalData['headers']);
         } else {
             abort(404, 'The URL is incorrect');
         }
@@ -2808,5 +2492,926 @@ class RegistrationController extends Controller
         } else {
             abort(404, 'The URL is incorrect');
         }
+    }
+
+
+
+    public function eventRegistrantsExportData($eventCategory, $eventId)
+    {
+        $finalExcelData = array();
+        $event = Event::where('id', $eventId)->where('category', $eventCategory)->first();
+
+        $mainDelegates = MainDelegate::where('event_id', $eventId)->get();
+        if (!$mainDelegates->isEmpty()) {
+            foreach ($mainDelegates as $mainDelegate) {
+                $mainTransactionId = Transaction::where('delegate_id', $mainDelegate->id)->where('delegate_type', "main")->value('id');
+
+                $tempYear = Carbon::parse($mainDelegate->registered_date_time)->format('y');
+                $lastDigit = 1000 + intval($mainTransactionId);
+
+                foreach (config('app.eventCategories') as $eventCategoryC => $code) {
+                    if ($event->category == $eventCategoryC) {
+                        $getEventcode = $code;
+                    }
+                }
+
+                $tempInvoiceNumber = "$event->category" . "$tempYear" . "/" . "$lastDigit";
+                $tempBookReference = "$event->year" . "$getEventcode" . "$lastDigit";
+
+                $promoCodeDiscount = null;
+                $discountPrice = 0.0;
+                $netAMount = 0.0;
+
+                $promoCodeDiscount = PromoCode::where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $mainDelegate->pcode_used)->value('discount');
+
+                if ($promoCodeDiscount  != null) {
+                    $discountPrice = $mainDelegate->unit_price * ($promoCodeDiscount / 100);
+                    $netAMount = $mainDelegate->unit_price - $discountPrice;
+                } else {
+                    $discountPrice = 0.0;
+                    $netAMount = $mainDelegate->unit_price;
+                }
+
+                array_push($finalExcelData, [
+                    'transaction_id' => $tempBookReference,
+                    'id' => $mainDelegate->id,
+                    'delegateType' => 'Main',
+                    'event' => $eventCategory,
+                    'pass_type' => $mainDelegate->pass_type,
+                    'rate_type' => ($netAMount == 0) ? 'Complementary' : $mainDelegate->rate_type,
+
+                    'company_name' => $mainDelegate->company_name,
+                    'company_sector' => $mainDelegate->company_sector,
+                    'company_address' => $mainDelegate->company_address,
+                    'company_city' => $mainDelegate->company_city,
+                    'company_country' => $mainDelegate->company_country,
+                    'company_telephone_number' => $mainDelegate->company_telephone_number,
+                    'company_mobile_number' => $mainDelegate->company_mobile_number,
+                    'assistant_email_address' => $mainDelegate->assistant_email_address,
+
+                    'salutation' => $mainDelegate->salutation,
+                    'first_name' => $mainDelegate->first_name,
+                    'middle_name' => $mainDelegate->middle_name,
+                    'last_name' => $mainDelegate->last_name,
+                    'email_address' => $mainDelegate->email_address,
+                    'mobile_number' => $mainDelegate->mobile_number,
+                    'job_title' => $mainDelegate->job_title,
+                    'nationality' => $mainDelegate->nationality,
+                    'badge_type' => $mainDelegate->badge_type,
+                    'pcode_used' => $mainDelegate->pcode_used,
+
+                    'unit_price' => $mainDelegate->unit_price,
+                    'discount_price' => $discountPrice,
+                    'net_amount' => $netAMount,
+                    'printed_badge_date' => null,
+
+                    // PLEASE CONTINUE HERE
+                    'total_amount' => $mainDelegate->total_amount,
+                    'payment_status' => $mainDelegate->payment_status,
+                    'registration_status' => $mainDelegate->registration_status,
+                    'mode_of_payment' => $mainDelegate->mode_of_payment,
+                    'invoice_number' => $tempInvoiceNumber,
+                    'reference_number' => $tempBookReference,
+                    'registration_date_time' => $mainDelegate->registered_date_time,
+                    'paid_date_time' => $mainDelegate->paid_date_time,
+
+                    // NEW june 6 2023
+                    'registration_method' => $mainDelegate->registration_method,
+                    'transaction_remarks' => $mainDelegate->transaction_remarks,
+
+                    'delegate_cancelled' => $mainDelegate->delegate_cancelled,
+                    'delegate_replaced' => $mainDelegate->delegate_replaced,
+                    'delegate_refunded' => $mainDelegate->delegate_refunded,
+
+                    'delegate_replaced_type' => null,
+                    'delegate_original_from_id' => null,
+                    'delegate_replaced_from_id' => null,
+                    'delegate_replaced_by_id' => $mainDelegate->delegate_replaced_by_id,
+
+                    'delegate_cancelled_datetime' => $mainDelegate->delegate_cancelled_datetime,
+                    'delegate_refunded_datetime' => $mainDelegate->delegate_refunded_datetime,
+                    'delegate_replaced_datetime' => $mainDelegate->delegate_replaced_datetime,
+                ]);
+
+                $subDelegates = AdditionalDelegate::where('main_delegate_id', $mainDelegate->id)->get();
+
+                if (!$subDelegates->isEmpty()) {
+                    foreach ($subDelegates as $subDelegate) {
+                        $subTransactionId = Transaction::where('delegate_id', $subDelegate->id)->where('delegate_type', "sub")->value('id');
+
+                        $promoCodeDiscount = null;
+                        $discountPrice = 0.0;
+                        $netAMount = 0.0;
+
+                        $promoCodeDiscount = PromoCode::where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $subDelegate->pcode_used)->value('discount');
+
+                        if ($promoCodeDiscount  != null) {
+                            $discountPrice = $mainDelegate->unit_price * ($promoCodeDiscount / 100);
+                            $netAMount = $mainDelegate->unit_price - $discountPrice;
+                        } else {
+                            $discountPrice = 0.0;
+                            $netAMount = $mainDelegate->unit_price;
+                        }
+
+                        $lastDigit = 1000 + intval($subTransactionId);
+                        $tempBookReferenceSub = "$event->year" . "$getEventcode" . "$lastDigit";
+
+                        array_push($finalExcelData, [
+                            'transaction_id' => $tempBookReferenceSub,
+                            'id' => $subDelegate->id,
+                            'delegateType' => 'Sub',
+                            'event' => $eventCategory,
+                            'pass_type' => $mainDelegate->pass_type,
+                            'rate_type' => $mainDelegate->rate_type,
+
+                            'company_name' => $mainDelegate->company_name,
+                            'company_sector' => $mainDelegate->company_sector,
+                            'company_address' => $mainDelegate->company_address,
+                            'company_city' => $mainDelegate->company_city,
+                            'company_country' => $mainDelegate->company_country,
+                            'company_telephone_number' => $mainDelegate->company_telephone_number,
+                            'company_mobile_number' => $mainDelegate->company_mobile_number,
+                            'assistant_email_address' => $mainDelegate->assistant_email_address,
+
+                            'salutation' => $subDelegate->salutation,
+                            'first_name' => $subDelegate->first_name,
+                            'middle_name' => $subDelegate->middle_name,
+                            'last_name' => $subDelegate->last_name,
+                            'email_address' => $subDelegate->email_address,
+                            'mobile_number' => $subDelegate->mobile_number,
+                            'job_title' => $subDelegate->job_title,
+                            'nationality' => $subDelegate->nationality,
+                            'badge_type' => $subDelegate->badge_type,
+                            'pcode_used' => $subDelegate->pcode_used,
+
+                            'unit_price' => $mainDelegate->unit_price,
+                            'discount_price' => $discountPrice,
+                            'net_amount' => $netAMount,
+                            'printed_badge_date' => null,
+
+                            // PLEASE CONTINUE HERE
+                            'total_amount' => $mainDelegate->total_amount,
+                            'payment_status' => $mainDelegate->payment_status,
+                            'registration_status' => $mainDelegate->registration_status,
+                            'mode_of_payment' => $mainDelegate->mode_of_payment,
+                            'invoice_number' => $tempInvoiceNumber,
+                            'reference_number' => $tempBookReference,
+                            'registration_date_time' => $mainDelegate->registered_date_time,
+                            'paid_date_time' => $mainDelegate->paid_date_time,
+
+                            // NEW june 6 2023
+                            'registration_method' => $mainDelegate->registration_method,
+                            'transaction_remarks' => $mainDelegate->transaction_remarks,
+
+                            'delegate_cancelled' => $subDelegate->delegate_cancelled,
+                            'delegate_replaced' => $subDelegate->delegate_replaced,
+                            'delegate_refunded' => $subDelegate->delegate_refunded,
+
+                            'delegate_replaced_type' => $subDelegate->delegate_replaced_type,
+                            'delegate_original_from_id' => $subDelegate->delegate_original_from_id,
+                            'delegate_replaced_from_id' => $subDelegate->delegate_replaced_from_id,
+                            'delegate_replaced_by_id' => $subDelegate->delegate_replaced_by_id,
+
+                            'delegate_cancelled_datetime' => $subDelegate->delegate_cancelled_datetime,
+                            'delegate_refunded_datetime' => $subDelegate->delegate_refunded_datetime,
+                            'delegate_replaced_datetime' => $subDelegate->delegate_replaced_datetime,
+                        ]);
+                    }
+                }
+            }
+        }
+
+        $fileName = 'Event Transactions.csv';
+        $headers = array(
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=$fileName",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        );
+
+        $columns = array(
+            'Transaction Id',
+            'ID',
+            'Delegate Type',
+            'Event',
+            'Pass Type',
+            'Rate Type',
+
+            'Promo Code used',
+            'Badge Type',
+            'Salutation',
+            'First Name',
+            'Last Name',
+            'Email Address',
+            'Mobile Number 1',
+            'Job Title',
+            'Nationality',
+
+            'Company Name',
+            'Company Address',
+            'City',
+            'Country',
+            'Telephone Number',
+            'Mobile Number 2',
+            'Assistant Email Address',
+
+            'Middle Name',
+
+            'Unit Price',
+            'Discount Price',
+            'Total Amount',
+            'Payment Status',
+            'Registration Status',
+            'Payment method',
+            'Invoice Number',
+            'Reference Number',
+            'Registered Date & Time',
+            'Paid Date & Time',
+            'Printed badge',
+
+            'Company Sector',
+
+            'Registration Method',
+            'Transaction Remarks',
+
+            'Delegate Cancelled',
+            'Delegate Replaced',
+            'Delegate Refunded',
+
+            'Delegate Replaced Type',
+            'Delegate Original From Id',
+            'Delegate Replaced From Id',
+            'Delegate Replaced By Id',
+
+            'Delegate Cancelled Date & Time',
+            'Delegate Refunded Date & Time',
+            'Delegate Replaced Date & Time',
+
+        );
+
+        $callback = function () use ($finalExcelData, $columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+
+            foreach ($finalExcelData as $data) {
+                fputcsv(
+                    $file,
+                    array(
+                        $data['transaction_id'],
+                        $data['id'],
+                        $data['delegateType'],
+                        $data['event'],
+                        $data['pass_type'],
+                        $data['rate_type'],
+
+                        $data['pcode_used'],
+                        $data['badge_type'],
+
+                        $data['salutation'],
+                        $data['first_name'],
+                        $data['last_name'],
+                        $data['email_address'],
+                        $data['mobile_number'],
+                        $data['job_title'],
+                        $data['nationality'],
+
+                        $data['company_name'],
+                        $data['company_address'],
+                        $data['company_city'],
+                        $data['company_country'],
+                        $data['company_telephone_number'],
+                        $data['company_mobile_number'],
+                        $data['assistant_email_address'],
+
+                        $data['middle_name'],
+
+                        $data['unit_price'],
+                        $data['discount_price'],
+                        $data['net_amount'],
+                        $data['payment_status'],
+                        $data['registration_status'],
+                        $data['mode_of_payment'],
+                        $data['invoice_number'],
+                        $data['reference_number'],
+                        $data['registration_date_time'],
+                        $data['paid_date_time'],
+                        $data['printed_badge_date'],
+
+                        $data['company_sector'],
+
+                        $data['registration_method'],
+                        $data['transaction_remarks'],
+
+                        $data['delegate_cancelled'],
+                        $data['delegate_replaced'],
+                        $data['delegate_refunded'],
+
+                        $data['delegate_replaced_type'],
+                        $data['delegate_original_from_id'],
+                        $data['delegate_replaced_from_id'],
+                        $data['delegate_replaced_by_id'],
+
+                        $data['delegate_cancelled_datetime'],
+                        $data['delegate_refunded_datetime'],
+                        $data['delegate_replaced_datetime'],
+
+                    )
+                );
+            }
+            fclose($file);
+        };
+        return [
+            'callback' => $callback,
+            'headers' => $headers,
+        ];
+    }
+    
+    public function spouseRegistrantsExportData($eventCategory, $eventId)
+    {
+        $finalExcelData = array();
+        $event = Event::where('id', $eventId)->where('category', $eventCategory)->first();
+
+        $mainSpouses = MainSpouse::where('event_id', $eventId)->get();
+        if (!$mainSpouses->isEmpty()) {
+            foreach ($mainSpouses as $mainSpouse) {
+                $mainTransactionId = SpouseTransaction::where('spouse_id', $mainSpouse->id)->where('spouse_type', "main")->value('id');
+
+                $tempYear = Carbon::parse($mainSpouse->registered_date_time)->format('y');
+                $lastDigit = 1000 + intval($mainTransactionId);
+
+                foreach (config('app.eventCategories') as $eventCategoryC => $code) {
+                    if ($event->category == $eventCategoryC) {
+                        $getEventcode = $code;
+                    }
+                }
+
+                $tempInvoiceNumber = "$event->category" . "$tempYear" . "/" . "$lastDigit";
+                $tempBookReference = "$event->year" . "$getEventcode" . "$lastDigit";
+
+                $discountPrice = 0.0;
+                $netAMount = $mainSpouse->unit_price;
+
+                array_push($finalExcelData, [
+                    'transaction_id' => $tempBookReference,
+                    'id' => $mainSpouse->id,
+                    'spouseType' => 'Main',
+                    'event' => $eventCategory,
+                    'pass_type' => $mainSpouse->pass_type,
+                    'rate_type' => $mainSpouse->rate_type,
+
+                    'reference_delegate_name' => $mainSpouse->reference_delegate_name,
+
+                    'salutation' => $mainSpouse->salutation,
+                    'first_name' => $mainSpouse->first_name,
+                    'middle_name' => $mainSpouse->middle_name,
+                    'last_name' => $mainSpouse->last_name,
+                    'email_address' => $mainSpouse->email_address,
+                    'mobile_number' => $mainSpouse->mobile_number,
+                    'nationality' => $mainSpouse->nationality,
+                    'country' => $mainSpouse->country,
+                    'city' => $mainSpouse->city,
+
+                    'unit_price' => $mainSpouse->unit_price,
+                    'discount_price' => $discountPrice,
+                    'net_amount' => $netAMount,
+                    'printed_badge_date' => null,
+
+                    // PLEASE CONTINUE HERE
+                    'total_amount' => $mainSpouse->total_amount,
+                    'payment_status' => $mainSpouse->payment_status,
+                    'registration_status' => $mainSpouse->registration_status,
+                    'mode_of_payment' => $mainSpouse->mode_of_payment,
+                    'invoice_number' => $tempInvoiceNumber,
+                    'reference_number' => $tempBookReference,
+                    'registration_date_time' => $mainSpouse->registered_date_time,
+                    'paid_date_time' => $mainSpouse->paid_date_time,
+
+                    // NEW june 6 2023
+                    'registration_method' => $mainSpouse->registration_method,
+                    'transaction_remarks' => $mainSpouse->transaction_remarks,
+
+                    'spouse_cancelled' => $mainSpouse->spouse_cancelled,
+                    'spouse_replaced' => $mainSpouse->spouse_replaced,
+                    'spouse_refunded' => $mainSpouse->spouse_refunded,
+
+                    'spouse_replaced_type' => null,
+                    'spouse_original_from_id' => null,
+                    'spouse_replaced_from_id' => null,
+                    'spouse_replaced_by_id' => $mainSpouse->spouse_replaced_by_id,
+
+                    'spouse_cancelled_datetime' => $mainSpouse->spouse_cancelled_datetime,
+                    'spouse_refunded_datetime' => $mainSpouse->spouse_refunded_datetime,
+                    'spouse_replaced_datetime' => $mainSpouse->spouse_replaced_datetime,
+                ]);
+
+                $subSpouses = AdditionalSpouse::where('main_spouse_id', $mainSpouse->id)->get();
+
+                if (!$subSpouses->isEmpty()) {
+                    foreach ($subSpouses as $subSpouse) {
+                        $subTransactionId = SpouseTransaction::where('spouse_id', $subSpouse->id)->where('spouse_type', "sub")->value('id');
+
+                        $discountPrice = 0.0;
+                        $netAMount = $mainSpouse->unit_price;
+
+                        $lastDigit = 1000 + intval($subTransactionId);
+                        $tempBookReferenceSub = "$event->year" . "$getEventcode" . "$lastDigit";
+
+                        array_push($finalExcelData, [
+                            'transaction_id' => $tempBookReferenceSub,
+                            'id' => $subSpouse->id,
+                            'spouseType' => 'Sub',
+                            'event' => $eventCategory,
+                            'pass_type' => $mainSpouse->pass_type,
+                            'rate_type' => $mainSpouse->rate_type,
+
+                            'reference_delegate_name' => $mainSpouse->reference_delegate_name,
+
+                            'salutation' => $subSpouse->salutation,
+                            'first_name' => $subSpouse->first_name,
+                            'middle_name' => $subSpouse->middle_name,
+                            'last_name' => $subSpouse->last_name,
+                            'email_address' => $subSpouse->email_address,
+                            'mobile_number' => $subSpouse->mobile_number,
+                            'nationality' => $subSpouse->nationality,
+                            'country' => $subSpouse->country,
+                            'city' => $subSpouse->city,
+
+                            'unit_price' => $mainSpouse->unit_price,
+                            'discount_price' => $discountPrice,
+                            'net_amount' => $netAMount,
+                            'printed_badge_date' => null,
+
+                            // PLEASE CONTINUE HERE
+                            'total_amount' => $mainSpouse->total_amount,
+                            'payment_status' => $mainSpouse->payment_status,
+                            'registration_status' => $mainSpouse->registration_status,
+                            'mode_of_payment' => $mainSpouse->mode_of_payment,
+                            'invoice_number' => $tempInvoiceNumber,
+                            'reference_number' => $tempBookReference,
+                            'registration_date_time' => $mainSpouse->registered_date_time,
+                            'paid_date_time' => $mainSpouse->paid_date_time,
+
+                            // NEW june 6 2023
+                            'registration_method' => $mainSpouse->registration_method,
+                            'transaction_remarks' => $mainSpouse->transaction_remarks,
+
+                            'spouse_cancelled' => $subSpouse->spouse_cancelled,
+                            'spouse_replaced' => $subSpouse->spouse_replaced,
+                            'spouse_refunded' => $subSpouse->spouse_refunded,
+
+                            'spouse_replaced_type' => $subSpouse->spouse_replaced_type,
+                            'spouse_original_from_id' => $subSpouse->spouse_original_from_id,
+                            'spouse_replaced_from_id' => $subSpouse->spouse_replaced_from_id,
+                            'spouse_replaced_by_id' => $subSpouse->spouse_replaced_by_id,
+
+                            'spouse_cancelled_datetime' => $subSpouse->spouse_cancelled_datetime,
+                            'spouse_refunded_datetime' => $subSpouse->spouse_refunded_datetime,
+                            'spouse_replaced_datetime' => $subSpouse->spouse_replaced_datetime,
+                        ]);
+                    }
+                }
+            }
+        }
+
+        $fileName = 'Spouse Transactions.csv';
+        $headers = array(
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=$fileName",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        );
+
+        $columns = array(
+            'Transaction Id',
+            'ID',
+            'Spouse Type',
+            'Event',
+            'Rate Type',
+
+            'Reference Delegate Full Name',
+
+            'Salutation',
+            'First Name',
+            'Middle Name',
+            'Last Name',
+            'Email Address',
+            'Mobile Number',
+            'Nationality',
+            'Country',
+            'City',
+
+            'Unit Price',
+            'Discount Price',
+            'Total Amount',
+            'Payment Status',
+            'Registration Status',
+            'Payment method',
+            'Invoice Number',
+            'Reference Number',
+            'Registered Date & Time',
+            'Paid Date & Time',
+            'Printed badge',
+
+            'Registration Method',
+            'Transaction Remarks',
+
+            'Spouse Cancelled',
+            'Spouse Replaced',
+            'Spouse Refunded',
+
+            'Spouse Replaced Type',
+            'Spouse Original From Id',
+            'Spouse Replaced From Id',
+            'Spouse Replaced By Id',
+
+            'Spouse Cancelled Date & Time',
+            'Spouse Refunded Date & Time',
+            'Spouse Replaced Date & Time',
+
+        );
+
+        $callback = function () use ($finalExcelData, $columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+
+            foreach ($finalExcelData as $data) {
+                fputcsv(
+                    $file,
+                    array(
+                        $data['transaction_id'],
+                        $data['id'],
+                        $data['spouseType'],
+                        $data['event'],
+                        $data['rate_type'],
+
+                        $data['reference_delegate_name'],
+
+                        $data['salutation'],
+                        $data['first_name'],
+                        $data['middle_name'],
+                        $data['last_name'],
+                        $data['email_address'],
+                        $data['mobile_number'],
+                        $data['nationality'],
+                        $data['country'],
+                        $data['city'],
+
+                        $data['unit_price'],
+                        $data['discount_price'],
+                        $data['net_amount'],
+                        $data['payment_status'],
+                        $data['registration_status'],
+                        $data['mode_of_payment'],
+                        $data['invoice_number'],
+                        $data['reference_number'],
+                        $data['registration_date_time'],
+                        $data['paid_date_time'],
+                        $data['printed_badge_date'],
+
+                        $data['registration_method'],
+                        $data['transaction_remarks'],
+
+                        $data['spouse_cancelled'],
+                        $data['spouse_replaced'],
+                        $data['spouse_refunded'],
+
+                        $data['spouse_replaced_type'],
+                        $data['spouse_original_from_id'],
+                        $data['spouse_replaced_from_id'],
+                        $data['spouse_replaced_by_id'],
+
+                        $data['spouse_cancelled_datetime'],
+                        $data['spouse_refunded_datetime'],
+                        $data['spouse_replaced_datetime'],
+
+                    )
+                );
+            }
+            fclose($file);
+        };
+        return [
+            'callback' => $callback,
+            'headers' => $headers,
+        ];
+    }
+
+    public function rccAwardsRegistrantsExportData($eventCategory, $eventId)
+    {
+        $finalExcelData = array();
+        $event = Event::where('id', $eventId)->where('category', $eventCategory)->first();
+
+        $mainParticipants = RccAwardsMainParticipant::where('event_id', $eventId)->get();
+        if (!$mainParticipants->isEmpty()) {
+            foreach ($mainParticipants as $mainParticipant) {
+                $mainTransactionId = RccAwardsParticipantTransaction::where('participant_id', $mainParticipant->id)->where('participant_type', "main")->value('id');
+
+                $tempYear = Carbon::parse($mainParticipant->registered_date_time)->format('y');
+                $lastDigit = 1000 + intval($mainTransactionId);
+
+                foreach (config('app.eventCategories') as $eventCategoryC => $code) {
+                    if ($event->category == $eventCategoryC) {
+                        $getEventcode = $code;
+                    }
+                }
+
+                $tempInvoiceNumber = "$event->category" . "$tempYear" . "/" . "$lastDigit";
+                $tempBookReference = "$event->year" . "$getEventcode" . "$lastDigit";
+
+                $discountPrice = 0.0;
+                $netAMount = $mainParticipant->unit_price;
+
+                $entryFormId = RccAwardsDocument::where('event_id', $eventId)->where('participant_id', $mainParticipant->id)->where('document_type', 'entryForm')->value('id');
+
+
+                $getSupportingDocumentFiles = RccAwardsDocument::where('event_id', $eventId)->where('participant_id', $mainParticipant->id)->where('document_type', 'supportingDocument')->get();
+
+                $supportingDocumentLinks = [];
+
+                if ($getSupportingDocumentFiles->isNotEmpty()) {
+                    foreach ($getSupportingDocumentFiles as $supportingDocument) {
+                        $supportingDocumentLink = env('APP_URL') . '/download-file/' .$supportingDocument->id;
+                        $supportingDocumentLinks[] = $supportingDocumentLink;
+                    }
+                }
+
+                $entryFormDownloadLink = env('APP_URL') . '/download-file/' . $entryFormId;
+
+                array_push($finalExcelData, [
+                    'transaction_id' => $tempBookReference,
+                    'id' => $mainParticipant->id,
+                    'participantType' => 'Main',
+                    'event' => $eventCategory,
+                    'pass_type' => $mainParticipant->pass_type,
+                    'rate_type' => $mainParticipant->rate_type,
+
+                    'category' => $mainParticipant->category,
+                    'sub_category' => ($mainParticipant->sub_category == null) ? 'N/A' : $mainParticipant->sub_category,
+                    'company_name' => $mainParticipant->company_name,
+
+                    'salutation' => $mainParticipant->salutation,
+                    'first_name' => $mainParticipant->first_name,
+                    'middle_name' => $mainParticipant->middle_name,
+                    'last_name' => $mainParticipant->last_name,
+                    'email_address' => $mainParticipant->email_address,
+                    'mobile_number' => $mainParticipant->mobile_number,
+                    'address' => $mainParticipant->address,
+                    'country' => $mainParticipant->country,
+                    'city' => $mainParticipant->city,
+                    'job_title' => $mainParticipant->job_title,
+                    
+                    'entryFormDownloadLink' => $entryFormDownloadLink,
+                    'supportingDocumentLinks' => $supportingDocumentLinks,
+
+                    'unit_price' => $mainParticipant->unit_price,
+                    'discount_price' => $discountPrice,
+                    'net_amount' => $netAMount,
+                    'printed_badge_date' => null,
+
+                    // PLEASE CONTINUE HERE
+                    'total_amount' => $mainParticipant->total_amount,
+                    'payment_status' => $mainParticipant->payment_status,
+                    'registration_status' => $mainParticipant->registration_status,
+                    'mode_of_payment' => $mainParticipant->mode_of_payment,
+                    'invoice_number' => $tempInvoiceNumber,
+                    'reference_number' => $tempBookReference,
+                    'registration_date_time' => $mainParticipant->registered_date_time,
+                    'paid_date_time' => $mainParticipant->paid_date_time,
+
+                    // NEW june 6 2023
+                    'registration_method' => $mainParticipant->registration_method,
+                    'transaction_remarks' => $mainParticipant->transaction_remarks,
+
+                    'participant_cancelled' => $mainParticipant->participant_cancelled,
+                    'participant_replaced' => $mainParticipant->participant_replaced,
+                    'participant_refunded' => $mainParticipant->participant_refunded,
+
+                    'participant_replaced_type' => null,
+                    'participant_original_from_id' => null,
+                    'participant_replaced_from_id' => null,
+                    'participant_replaced_by_id' => $mainParticipant->participant_replaced_by_id,
+
+                    'participant_cancelled_datetime' => $mainParticipant->participant_cancelled_datetime,
+                    'participant_refunded_datetime' => $mainParticipant->participant_refunded_datetime,
+                    'participant_replaced_datetime' => $mainParticipant->participant_replaced_datetime,
+                ]);
+
+                $subParticipants = RccAwardsAdditionalParticipant::where('main_participant_id', $mainParticipant->id)->get();
+
+                if (!$subParticipants->isEmpty()) {
+                    foreach ($subParticipants as $subParticipant) {
+                        $subTransactionId = RccAwardsParticipantTransaction::where('participant_id', $subParticipant->id)->where('participant_type', "sub")->value('id');
+
+                        $discountPrice = 0.0;
+                        $netAMount = $mainParticipant->unit_price;
+
+                        $lastDigit = 1000 + intval($subTransactionId);
+                        $tempBookReferenceSub = "$event->year" . "$getEventcode" . "$lastDigit";
+
+                        array_push($finalExcelData, [
+                            'transaction_id' => $tempBookReferenceSub,
+                            'id' => $subParticipant->id,
+                            'participantType' => 'Sub',
+                            'event' => $eventCategory,
+                            'pass_type' => $mainParticipant->pass_type,
+                            'rate_type' => $mainParticipant->rate_type,
+        
+                            'category' => $mainParticipant->category,
+                            'sub_category' => ($mainParticipant->sub_category == null) ? 'N/A' : $mainParticipant->sub_category,
+                            'company_name' => $mainParticipant->company_name,
+        
+                            'salutation' => $subParticipant->salutation,
+                            'first_name' => $subParticipant->first_name,
+                            'middle_name' => $subParticipant->middle_name,
+                            'last_name' => $subParticipant->last_name,
+                            'email_address' => $subParticipant->email_address,
+                            'mobile_number' => $subParticipant->mobile_number,
+                            'address' => $subParticipant->address,
+                            'country' => $subParticipant->country,
+                            'city' => $subParticipant->city,
+                            'job_title' => $subParticipant->job_title,
+
+                            'entryFormDownloadLink' => $entryFormDownloadLink,
+                            'supportingDocumentLinks' => $supportingDocumentLinks,
+        
+                            'unit_price' => $mainParticipant->unit_price,
+                            'discount_price' => $discountPrice,
+                            'net_amount' => $netAMount,
+                            'printed_badge_date' => null,
+        
+                            // PLEASE CONTINUE HERE
+                            'total_amount' => $mainParticipant->total_amount,
+                            'payment_status' => $mainParticipant->payment_status,
+                            'registration_status' => $mainParticipant->registration_status,
+                            'mode_of_payment' => $mainParticipant->mode_of_payment,
+                            'invoice_number' => $tempInvoiceNumber,
+                            'reference_number' => $tempBookReference,
+                            'registration_date_time' => $mainParticipant->registered_date_time,
+                            'paid_date_time' => $mainParticipant->paid_date_time,
+        
+                            // NEW june 6 2023
+                            'registration_method' => $mainParticipant->registration_method,
+                            'transaction_remarks' => $mainParticipant->transaction_remarks,
+        
+                            'participant_cancelled' => $subParticipant->participant_cancelled,
+                            'participant_replaced' => $subParticipant->participant_replaced,
+                            'participant_refunded' => $subParticipant->participant_refunded,
+                       
+                            'participant_replaced_type' => $subParticipant->participant_replaced_type,
+                            'participant_original_from_id' => $subParticipant->participant_original_from_id,
+                            'participant_replaced_from_id' => $subParticipant->participant_replaced_from_id,
+                            'participant_replaced_by_id' => $subParticipant->participant_replaced_by_id,
+
+                            'participant_cancelled_datetime' => $subParticipant->participant_cancelled_datetime,
+                            'participant_refunded_datetime' => $subParticipant->participant_refunded_datetime,
+                            'participant_replaced_datetime' => $subParticipant->participant_replaced_datetime,
+                        ]);
+                    }
+                }
+            }
+        }
+
+        $fileName = 'RCC Awards Transactions.csv';
+        $headers = array(
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=$fileName",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        );
+
+        $columns = array(
+            'Transaction Id',
+            'ID',
+            'Participant Type',
+            'Event',
+            'Pass Type',
+            'Rate Type',
+
+            'Category',
+            'Sub Category',
+            'Company Name',
+
+            'Salutation',
+            'First Name',
+            'Middle Name',
+            'Last Name',
+            'Email Address',
+            'Mobile Number',
+            'Address',
+            'Country',
+            'City',
+            'Job Title',
+
+            'Entry Form',
+            'Supporting Document 1',
+            'Supporting Document 2',
+            'Supporting Document 3',
+            'Supporting Document 4',
+
+            'Unit Price',
+            'Discount Price',
+            'Total Amount',
+            'Payment Status',
+            'Registration Status',
+            'Payment method',
+            'Invoice Number',
+            'Reference Number',
+            'Registered Date & Time',
+            'Paid Date & Time',
+            'Printed badge',
+
+            'Registration Method',
+            'Transaction Remarks',
+
+            'Participant Cancelled',
+            'Participant Replaced',
+            'Participant Refunded',
+
+            'Participant Replaced Type',
+            'Participant Original From Id',
+            'Participant Replaced From Id',
+            'Participant Replaced By Id',
+
+            'Participant Cancelled Date & Time',
+            'Participant Refunded Date & Time',
+            'Participant Replaced Date & Time',
+
+        );
+
+        $callback = function () use ($finalExcelData, $columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+
+            foreach ($finalExcelData as $data) {
+                fputcsv(
+                    $file,
+                    array(
+                        $data['transaction_id'],
+                        $data['id'],
+                        $data['participantType'],
+                        $data['event'],
+                        $data['pass_type'],
+                        $data['rate_type'],
+
+                        $data['category'],
+                        $data['sub_category'],
+                        $data['company_name'],
+
+                        $data['salutation'],
+                        $data['first_name'],
+                        $data['middle_name'],
+                        $data['last_name'],
+                        $data['email_address'],
+                        $data['mobile_number'],
+                        $data['address'],
+                        $data['country'],
+                        $data['city'],
+                        $data['job_title'],
+
+                        $data['entryFormDownloadLink'],
+                        $data['supportingDocumentLinks'][0] ?? 'N/A',
+                        $data['supportingDocumentLinks'][1] ?? 'N/A',
+                        $data['supportingDocumentLinks'][2] ?? 'N/A',
+                        $data['supportingDocumentLinks'][3] ?? 'N/A',
+
+                        $data['unit_price'],
+                        $data['discount_price'],
+                        $data['net_amount'],
+                        $data['payment_status'],
+                        $data['registration_status'],
+                        $data['mode_of_payment'],
+                        $data['invoice_number'],
+                        $data['reference_number'],
+                        $data['registration_date_time'],
+                        $data['paid_date_time'],
+                        $data['printed_badge_date'],
+
+                        $data['registration_method'],
+                        $data['transaction_remarks'],
+
+                        $data['participant_cancelled'],
+                        $data['participant_replaced'],
+                        $data['participant_refunded'],
+
+                        $data['participant_replaced_type'],
+                        $data['participant_original_from_id'],
+                        $data['participant_replaced_from_id'],
+                        $data['participant_replaced_by_id'],
+
+                        $data['participant_cancelled_datetime'],
+                        $data['participant_refunded_datetime'],
+                        $data['participant_replaced_datetime'],
+                    )
+                );
+            }
+            fclose($file);
+        };
+
+        return [
+            'callback' => $callback,
+            'headers' => $headers,
+        ];
     }
 }

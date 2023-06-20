@@ -8,6 +8,8 @@ use App\Models\Event;
 use App\Models\EventRegistrationType;
 use App\Models\MainDelegate;
 use App\Models\MainSpouse;
+use App\Models\RccAwardsAdditionalParticipant;
+use App\Models\RccAwardsMainParticipant;
 use App\Models\Transaction;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -78,6 +80,15 @@ class EventController extends Controller
             if ($eventCategory == "AFS") {
                 $finalData = $this->eventDasbhoardSpouseData($eventId);
                 return view('admin.events.dashboard.spouse.dashboard', [
+                    "pageTitle" => "Event Dashboard",
+                    "eventCategory" => $eventCategory,
+                    "eventId" => $eventId,
+                    "event" => $event,
+                    "finalData" => $finalData,
+                ]);
+            } else if ($eventCategory == "RCCA") {
+                $finalData = $this->eventDasbhoardRccAwardsData($eventId);
+                return view('admin.events.dashboard.rcca.dashboard', [
                     "pageTitle" => "Event Dashboard",
                     "eventCategory" => $eventCategory,
                     "eventId" => $eventId,
@@ -587,6 +598,217 @@ class EventController extends Controller
         $finalData = [
             'totalConfirmedSpouses' => $totalConfirmedSpouses,
             'totalSpouses' => $totalSpouses,
+            'totalRegisteredToday' => $totalRegisteredToday,
+            'totalPaidToday' => $totalPaidToday,
+            'totalAmountPaidToday' => $totalAmountPaidToday,
+            'totalAmountPaid' => $totalAmountPaid,
+
+            'paymentStatus' => [$totalPaid, $totalFree, $totalUnpaid, $totalRefunded],
+            'registrationStatus' => [$totalConfirmed, $totalPending, $totalDroppedOut, $totalCancelled],
+            'registrationMethod' => [$totalOnline, $totalImported, $totalOnsite],
+            'paymentMethod' => [$totalCreditCard, $totalBankTransfer],
+
+            'arrayCountryTotal' => $arrayCountryTotal,
+        ];
+
+        return $finalData;
+    }
+
+
+    public function eventDasbhoardRccAwardsData($eventId)
+    {
+        $totalConfirmedParticipants = 0;
+        $totalParticipants = 0;
+        $totalRegisteredToday = 0;
+        $totalPaidToday = 0;
+        $totalAmountPaidToday = 0;
+        $totalAmountPaid = 0;
+        $totalBankTransfer = 0;
+        $totalCreditCard = 0;
+        $totalPaid = 0;
+        $totalFree = 0;
+        $totalUnpaid = 0;
+        $totalRefunded = 0;
+        $totalOnline = 0;
+        $totalImported = 0;
+        $totalOnsite = 0;
+        $totalConfirmed = 0;
+        $totalPending = 0;
+        $totalDroppedOut = 0;
+        $totalCancelled = 0;
+        $arrayCountryTotal = array();
+
+        $dateToday = Carbon::now();
+        $noRefund = 0;
+
+        $mainParticipants = RccAwardsMainParticipant::where('event_id', $eventId)->get();
+
+        if ($mainParticipants->isNotEmpty()) {
+            foreach ($mainParticipants as $mainParticipant) {
+
+                $participantRegisteredDate = Carbon::parse($mainParticipant->registered_date_time);
+                if ($dateToday->isSameDay($participantRegisteredDate)) {
+                    $totalRegisteredToday++;
+                }
+
+                if ($mainParticipant->participant_replaced_by_id == null && (!$mainParticipant->participant_refunded)) {
+                    if ($mainParticipant->registration_status == "confirmed") {
+                        $totalConfirmedParticipants++;
+                    }
+
+                    $totalParticipants++;
+
+                    if ($mainParticipant->mode_of_payment == "creditCard") {
+                        $totalCreditCard++;
+                    } else {
+                        $totalBankTransfer++;
+                    }
+
+                    if ($mainParticipant->payment_status == "paid") {
+                        $participantPaidDate = Carbon::parse($mainParticipant->paid_date_time);
+                        if ($dateToday->isSameDay($participantPaidDate)) {
+                            $totalPaidToday++;
+                        }
+
+                        $noRefund++;
+                        $totalPaid++;
+                    } else if ($mainParticipant->payment_status == "free") {
+                        $totalFree++;
+                    } else if ($mainParticipant->payment_status == "unpaid") {
+                        $totalUnpaid++;
+                    } else {
+                    }
+
+
+                    if ($mainParticipant->registration_method == "online") {
+                        $totalOnline++;
+                    } else if ($mainParticipant->registration_method == "imported") {
+                        $totalImported++;
+                    } else {
+                        $totalOnsite++;
+                    }
+
+
+                    if ($mainParticipant->registration_status == "confirmed") {
+                        $totalConfirmed++;
+                    } else if ($mainParticipant->registration_status == "pending") {
+                        $totalPending++;
+                    } else if ($mainParticipant->registration_status == "droppedOut") {
+                        $totalDroppedOut++;
+                    }
+
+                    if ($this->checkIfCountryExist($mainParticipant->country, $arrayCountryTotal)) {
+                        foreach ($arrayCountryTotal as $index => $country) {
+                            if ($country['name'] == $mainParticipant->country) {
+                                $arrayCountryTotal[$index]['total'] = $country['total'] + 1;
+                            }
+                        }
+                    } else {
+                        array_push($arrayCountryTotal, [
+                            'name' => $mainParticipant->country,
+                            'total' => 1,
+                        ]);
+                    }
+                } else {
+                    if ($mainParticipant->participant_refunded) {
+                        $totalRefunded++;
+                    }
+
+                    if ($mainParticipant->participant_cancelled) {
+                        $totalCancelled++;
+                    }
+                }
+
+                $additionalParticipants = RccAwardsAdditionalParticipant::where('main_participant_id', $mainParticipant->id)->get();
+                if ($additionalParticipants->isNotEmpty()) {
+                    foreach ($additionalParticipants as $additionalParticipant) {
+                        if ($additionalParticipant->participant_replaced_by_id == null && (!$additionalParticipant->participant_refunded)) {
+                            if ($mainParticipant->registration_status == "confirmed") {
+                                $totalConfirmedParticipants++;
+                            }
+
+                            $totalParticipants++;
+
+                            if ($mainParticipant->mode_of_payment == "creditCard") {
+                                $totalCreditCard++;
+                            } else {
+                                $totalBankTransfer++;
+                            }
+
+
+                            if ($mainParticipant->payment_status == "paid") {
+                                $spousePaidDate = Carbon::parse($mainParticipant->paid_date_time);
+                                if ($dateToday->isSameDay($spousePaidDate)) {
+                                    $totalPaidToday++;
+                                }
+
+                                $noRefund++;
+                                $totalPaid++;
+                            } else if ($mainParticipant->payment_status == "free") {
+                                $totalFree++;
+                            } else if ($mainParticipant->payment_status == "unpaid") {
+                                $totalUnpaid++;
+                            } else {
+                            }
+
+                            if ($mainParticipant->registration_method == "online") {
+                                $totalOnline++;
+                            } else if ($mainParticipant->registration_method == "imported") {
+                                $totalImported++;
+                            } else {
+                                $totalOnsite++;
+                            }
+
+
+                            if ($mainParticipant->registration_status == "confirmed") {
+                                $totalConfirmed++;
+                            } else if ($mainParticipant->registration_status == "pending") {
+                                $totalPending++;
+                            } else if ($mainParticipant->registration_status == "droppedOut") {
+                                $totalDroppedOut++;
+                            }
+
+
+
+
+                            if ($this->checkIfCountryExist($additionalParticipant->country, $arrayCountryTotal)) {
+                                foreach ($arrayCountryTotal as $index => $country) {
+                                    if ($country['name'] == $additionalParticipant->country) {
+                                        $arrayCountryTotal[$index]['total'] = $country['total'] + 1;
+                                    }
+                                }
+                            } else {
+                                array_push($arrayCountryTotal, [
+                                    'name' => $additionalParticipant->country,
+                                    'total' => 1,
+                                ]);
+                            }
+                        } else {
+                            if ($additionalParticipants->participant_refunded) {
+                                $totalRefunded++;
+                            }
+
+                            if ($additionalParticipants->participant_cancelled) {
+                                $totalCancelled++;
+                            }
+                        }
+                    }
+                }
+
+                if ($noRefund > 0 && $mainParticipant->payment_status == "paid") {
+                    $totalAmountPaid += $mainParticipant->total_amount;
+
+                    $participantPaidDate = Carbon::parse($mainParticipant->paid_date_time);
+                    if ($dateToday->isSameDay($participantPaidDate)) {
+                        $totalAmountPaidToday += $mainParticipant->total_amount;
+                    }
+                }
+            }
+        }
+
+        $finalData = [
+            'totalConfirmedParticipants' => $totalConfirmedParticipants,
+            'totalParticipants' => $totalParticipants,
             'totalRegisteredToday' => $totalRegisteredToday,
             'totalPaidToday' => $totalPaidToday,
             'totalAmountPaidToday' => $totalAmountPaidToday,

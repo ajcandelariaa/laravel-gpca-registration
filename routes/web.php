@@ -41,7 +41,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('/promo-code', [EventController::class, 'eventPromoCodeView'])->name('admin.event.promo-codes.view');
                 Route::prefix('registrant')->group(function (){
                     Route::get('/', [RegistrationController::class, 'eventRegistrantsView'])->name('admin.event.registrants.view');
-                    Route::get('/export', [RegistrationController::class, 'eventRegistrantsExportData'])->name('admin.event.registrants.exportData');
+                    Route::get('/export', [RegistrationController::class, 'registrantsExportData'])->name('admin.event.registrants.exportData');
                     Route::get('/{registrantId}', [RegistrationController::class, 'registrantDetailView'])->name('admin.event.registrants.detail.view');
                     Route::get('/{registrantId}/view-invoice', [RegistrationController::class, 'generatePublicInvoice'])->name('admin.event.registrants.view.invoice');
                 });

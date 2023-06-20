@@ -5,10 +5,10 @@
     <div class="mx-10 my-10">
         <div class="flex justify-between">
             <div>
-                {{-- <a href="{{ route('admin.event.registrants.exportData', ['eventCategory' => $eventCategory, 'eventId' => $eventId]) }}"
+                <a href="{{ route('admin.event.registrants.exportData', ['eventCategory' => $eventCategory, 'eventId' => $eventId]) }}"
                     target="_blank"
                     class="bg-green-600 hover:bg-green-700 text-white py-2 px-5 rounded-md text-lg text-center">Export
-                    Data to Excel</a> --}}
+                    Data to Excel</a>
             </div>
             <div class="flex items-center gap-2">
                 <div class="relative">
