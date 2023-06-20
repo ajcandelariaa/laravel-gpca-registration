@@ -475,6 +475,7 @@ class RccAwardsRegistrationForm extends Component
             'name' => $this->salutation . " " . $this->firstName . " " . $this->middleName . " " . $this->lastName,
             'eventLink' => $this->event->link,
             'eventName' => $this->event->name,
+            'eventCategory' => $this->event->category,
 
             'invoiceAmount' => $this->finalTotal,
             'amountPaid' => 0,

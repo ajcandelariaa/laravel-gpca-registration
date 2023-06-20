@@ -428,6 +428,7 @@ class SpouseRegistrationForm extends Component
             'name' => $this->salutation . " " . $this->firstName . " " . $this->middleName . " " . $this->lastName,
             'eventLink' => $this->event->link,
             'eventName' => $this->event->name,
+            'eventCategory' => $this->event->category,
 
             'invoiceAmount' => $this->finalTotal,
             'amountPaid' => 0,
@@ -470,6 +471,7 @@ class SpouseRegistrationForm extends Component
                     'name' => $additionalSpouse->salutation . " " . $additionalSpouse->first_name . " " . $additionalSpouse->middle_name . " " . $additionalSpouse->last_name,
                     'eventLink' => $this->event->link,
                     'eventName' => $this->event->name,
+                    'eventCategory' => $this->event->category,
 
                     'invoiceAmount' => $this->finalTotal,
                     'amountPaid' => 0,

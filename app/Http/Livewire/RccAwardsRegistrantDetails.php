@@ -367,6 +367,7 @@ class RccAwardsRegistrantDetails extends Component
                         'name' => $innerParticipant['name'],
                         'eventLink' => $this->event->link,
                         'eventName' => $this->event->name,
+                        'eventCategory' => $this->event->category,
 
                         'invoiceAmount' => $this->finalData['invoiceData']['total_amount'],
                         'amountPaid' => $this->finalData['invoiceData']['total_amount'],

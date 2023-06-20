@@ -549,6 +549,7 @@ class RegistrationForm extends Component
             'name' => $this->salutation . " " . $this->firstName . " " . $this->middleName . " " . $this->lastName,
             'eventLink' => $this->event->link,
             'eventName' => $this->event->name,
+            'eventCategory' => $this->event->category,
 
             'invoiceAmount' => $this->finalTotal,
             'amountPaid' => 0,
@@ -601,6 +602,7 @@ class RegistrationForm extends Component
                     'name' => $additionalDelegate->salutation . " " . $additionalDelegate->first_name . " " . $additionalDelegate->middle_name . " " . $additionalDelegate->last_name,
                     'eventLink' => $this->event->link,
                     'eventName' => $this->event->name,
+                    'eventCategory' => $this->event->category,
 
                     'invoiceAmount' => $this->finalTotal,
                     'amountPaid' => 0,
