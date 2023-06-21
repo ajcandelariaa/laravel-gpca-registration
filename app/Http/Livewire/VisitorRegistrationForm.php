@@ -5,9 +5,9 @@ namespace App\Http\Livewire;
 use App\Mail\RegistrationPaid;
 use App\Mail\RegistrationPaymentConfirmation;
 use App\Mail\RegistrationUnpaid;
-use App\Models\SpouseTransaction as SpouseTransactions;
-use App\Models\MainSpouse as MainSpouses;
-use App\Models\AdditionalSpouse as AdditionalSpouses;
+use App\Models\VisitorTransaction as VisitorTransactions;
+use App\Models\MainVisitor as MainVisitors;
+use App\Models\AdditionalVisitor as AdditionalVisitors;
 use Carbon\Carbon;
 use Livewire\Component;
 use Illuminate\Support\Facades\Mail;
@@ -15,33 +15,33 @@ use Illuminate\Support\Str;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Session;
 
-class SpouseRegistrationForm extends Component
+class VisitorRegistrationForm extends Component
 {
     public $countries, $salutations;
     public $event;
     public $finalEbEndDate, $finalStdStartDate;
     public $currentStep = 1;
-    public $showAddSpouseModal = false;
-    public $showEditSpouseModal = false;
-    public $additionalSpouses = [];
+    public $showAddVisitorModal = false;
+    public $showEditVisitorModal = false;
+    public $additionalVisitors = [];
 
-    // DELEGATE PASS TYPE
-    public $spousePassType, $rateType, $rateTypeString;
+    // VISITOR PASS TYPE
+    public $visitorPassType, $rateType, $rateTypeString;
 
-    // MAIN DELEGATE
-    public $salutation, $firstName, $middleName, $lastName, $nationality, $country, $city, $emailAddress, $mobileNumber, $heardWhere, $referenceDelegateName;
+    // MAIN VISITOR
+    public $salutation, $firstName, $middleName, $lastName, $emailAddress, $mobileNumber, $nationality, $country, $city, $companyName, $jobTitle, $heardWhere;
 
-    // SUB DELEGATE
-    public $subSalutation, $subFirstName, $subMiddleName, $subLastName, $subNationality, $subCountry, $subCity, $subEmailAddress, $subMobileNumber;
+    // SUB VISITOR
+    public $subSalutation, $subFirstName, $subMiddleName, $subLastName, $subEmailAddress, $subMobileNumber, $subNationality, $subCountry, $subCity, $subCompanyName, $subJobTitle;
 
-    // SUB DELEGATE EDIT
-    public $subIdEdit, $subSalutationEdit, $subFirstNameEdit, $subMiddleNameEdit, $subLastNameEdit, $subNationalityEdit, $subCountryEdit, $subCityEdit, $subEmailAddressEdit, $subMobileNumberEdit;
+    // SUB VISITOR EDIT
+    public $subIdEdit, $subSalutationEdit, $subFirstNameEdit, $subMiddleNameEdit, $subLastNameEdit, $subEmailAddressEdit, $subMobileNumberEdit, $subNationalityEdit, $subCountryEdit, $subCityEdit, $subCompanyNameEdit, $subJobTitleEdit;
 
     // 3RD PAGE
     public $paymentMethod, $finalEventStartDate, $finalEventEndDate, $finalQuantity, $finalUnitPrice, $finalNetAmount, $finalDiscount, $finalVat, $finalTotal;
 
-    public $spouseInvoiceDetails = array();
-    public $currentMainSpouseId;
+    public $visitorInvoiceDetails = array();
+    public $currentMainVisitorId;
 
     // 4TH PAGE
     public $sessionId, $cardDetails, $orderId, $transactionId, $htmlCodeOTP;
@@ -88,15 +88,17 @@ class SpouseRegistrationForm extends Component
         $this->finalStdStartDate = Carbon::parse($this->event->std_start_date)->format('d M Y');
         $this->finalEventStartDate = Carbon::parse($this->event->event_start_date)->format('d M Y');
         $this->finalEventEndDate = Carbon::parse($this->event->event_end_date)->format('d M Y');
-        $this->spousePassType = "nonMember";
+        $this->visitorPassType = "nonMember";
 
         $this->eventFormattedDate = Carbon::parse($this->event->event_start_date)->format('d') . '-' . Carbon::parse($this->event->event_end_date)->format('d M Y');
     }
 
     public function render()
     {
-        return view('livewire.registration.spouse.spouse-registration-form');
+        return view('livewire.registration.visitor.visitor-registration-form');
     }
+
+    
 
     public function checkUnitPrice()
     {
@@ -105,10 +107,10 @@ class SpouseRegistrationForm extends Component
         // CHECK UNIT PRICE
         if ($this->event->eb_end_date != null && $this->event->eb_member_rate != null && $this->event->eb_nmember_rate != null) {
             if ($today->lte(Carbon::parse($this->event->eb_end_date))) {
-                if ($this->spousePassType == "fullMember") {
+                if ($this->visitorPassType == "fullMember") {
                     $this->rateTypeString = "Full member early bird rate";
                     $this->finalUnitPrice = $this->event->eb_full_member_rate;
-                } else if ($this->spousePassType == "member") {
+                } else if ($this->visitorPassType == "member") {
                     $this->rateTypeString = "Member early bird rate";
                     $this->finalUnitPrice = $this->event->eb_member_rate;
                 } else {
@@ -117,10 +119,10 @@ class SpouseRegistrationForm extends Component
                 }
                 $this->rateType = "Early Bird";
             } else {
-                if ($this->spousePassType == "fullMember") {
+                if ($this->visitorPassType == "fullMember") {
                     $this->rateTypeString = "Full member standard rate";
                     $this->finalUnitPrice = $this->event->std_full_member_rate;
-                } else if ($this->spousePassType == "member") {
+                } else if ($this->visitorPassType == "member") {
                     $this->rateTypeString = "Member standard rate";
                     $this->finalUnitPrice = $this->event->std_full_member_rate;
                 } else {
@@ -130,10 +132,10 @@ class SpouseRegistrationForm extends Component
                 $this->rateType = "Standard";
             }
         } else {
-            if ($this->spousePassType == "fullMember") {
+            if ($this->visitorPassType == "fullMember") {
                 $this->rateTypeString = "Full member standard rate";
                 $this->finalUnitPrice = $this->event->std_full_member_rate;
-            } else if ($this->spousePassType == "member") {
+            } else if ($this->visitorPassType == "member") {
                 $this->rateTypeString = "Member standard rate";
                 $this->finalUnitPrice = $this->event->std_member_rate;
             } else {
@@ -144,13 +146,12 @@ class SpouseRegistrationForm extends Component
         }
     }
 
-
-
+    
     public function calculateAmount()
     {
-        array_push($this->spouseInvoiceDetails, [
-            'spouseDescription' => "Spouse Registration Fee",
-            'spouseNames' => [
+        array_push($this->visitorInvoiceDetails, [
+            'visitorDescription' => "Visitor Registration Fee",
+            'visitorNames' => [
                 $this->firstName . " " . $this->middleName . " " . $this->lastName,
             ],
             'quantity' => 1,
@@ -159,37 +160,38 @@ class SpouseRegistrationForm extends Component
         ]);
 
 
-        if (count($this->additionalSpouses) > 0) {
-            for ($i = 0; $i < count($this->additionalSpouses); $i++) {
+        if (count($this->additionalVisitors) > 0) {
+            for ($i = 0; $i < count($this->additionalVisitors); $i++) {
                 $existingIndex = 0;
 
                 array_push(
-                    $this->spouseInvoiceDetails[$existingIndex]['spouseNames'],
-                    $this->additionalSpouses[$i]['subFirstName'] . " " . $this->additionalSpouses[$i]['subMiddleName'] . " " . $this->additionalSpouses[$i]['subLastName']
+                    $this->visitorInvoiceDetails[$existingIndex]['visitorNames'],
+                    $this->additionalVisitors[$i]['subFirstName'] . " " . $this->additionalVisitors[$i]['subMiddleName'] . " " . $this->additionalVisitors[$i]['subLastName']
                 );
 
-                $quantityTemp = $this->spouseInvoiceDetails[$existingIndex]['quantity'] + 1;
+                $quantityTemp = $this->visitorInvoiceDetails[$existingIndex]['quantity'] + 1;
                 $totalDiscountTemp = 0;
                 $totalNetAmountTemp = ($this->finalUnitPrice * $quantityTemp) - $totalDiscountTemp;
 
-                $this->spouseInvoiceDetails[$existingIndex]['quantity'] = $quantityTemp;
-                $this->spouseInvoiceDetails[$existingIndex]['totalDiscount'] = $totalDiscountTemp;
-                $this->spouseInvoiceDetails[$existingIndex]['totalNetAmount'] = $totalNetAmountTemp;
+                $this->visitorInvoiceDetails[$existingIndex]['quantity'] = $quantityTemp;
+                $this->visitorInvoiceDetails[$existingIndex]['totalDiscount'] = $totalDiscountTemp;
+                $this->visitorInvoiceDetails[$existingIndex]['totalNetAmount'] = $totalNetAmountTemp;
             }
         }
 
-        foreach ($this->spouseInvoiceDetails as $spouseInvoiceDetail) {
-            $this->finalQuantity += $spouseInvoiceDetail['quantity'];
-            $this->finalDiscount += $spouseInvoiceDetail['totalDiscount'];
-            $this->finalNetAmount += $spouseInvoiceDetail['totalNetAmount'];
+        foreach ($this->visitorInvoiceDetails as $visitorInvoiceDetail) {
+            $this->finalQuantity += $visitorInvoiceDetail['quantity'];
+            $this->finalDiscount += $visitorInvoiceDetail['totalDiscount'];
+            $this->finalNetAmount += $visitorInvoiceDetail['totalNetAmount'];
         }
         $this->finalVat = $this->finalNetAmount * ($this->event->event_vat / 100);
         $this->finalTotal = $this->finalNetAmount + $this->finalVat;
     }
+    
 
     public function resetCalculations()
     {
-        $this->spouseInvoiceDetails = array();
+        $this->visitorInvoiceDetails = array();
         $this->finalQuantity = 0;
         $this->finalDiscount = 0;
         $this->finalNetAmount = 0;
@@ -197,6 +199,7 @@ class SpouseRegistrationForm extends Component
         $this->finalTotal = 0;
     }
 
+    
     public function increaseStep()
     {
         if ($this->currentStep == 1) {
@@ -207,7 +210,6 @@ class SpouseRegistrationForm extends Component
 
             $this->validate(
                 [
-                    'referenceDelegateName' => 'required',
                     'firstName' => 'required',
                     'lastName' => 'required',
                     'nationality' => 'required',
@@ -217,7 +219,6 @@ class SpouseRegistrationForm extends Component
                     'mobileNumber' => 'required',
                 ],
                 [
-                    'referenceDelegateName.required' => "Full name of Annual GPCA Forum registered attendee is required",
                     'firstName.required' => "First name is required",
                     'lastName.required' => "Last name is required",
                     'nationality.required' => "Nationality is required",
@@ -251,7 +252,7 @@ class SpouseRegistrationForm extends Component
         }
     }
 
-
+    
     public function submitStep3()
     {
         if ($this->checkEmailIfUsedAlreadyMain($this->emailAddress)) {
@@ -268,12 +269,10 @@ class SpouseRegistrationForm extends Component
                 $this->currentStep += 1;
             }
         }
-
         $this->dispatchBrowserEvent('swal:remove-registration-loading-screen');
     }
 
-
-
+    
     public function addtoDatabase()
     {
         if ($this->finalTotal == 0) {
@@ -282,7 +281,7 @@ class SpouseRegistrationForm extends Component
             $paymentStatus = "unpaid";
         }
 
-        $newRegistrant = MainSpouses::create([
+        $newRegistrant = MainVisitors::create([
             'event_id' => $this->event->id,
             'pass_type' => "nonMember",
             'rate_type' => $this->rateType,
@@ -292,13 +291,14 @@ class SpouseRegistrationForm extends Component
             'first_name' => $this->firstName,
             'middle_name' => $this->middleName,
             'last_name' => $this->lastName,
+            'email_address' => $this->emailAddress,
+            'mobile_number' => $this->mobileNumber,
             'nationality' => $this->nationality,
             'country' => $this->country,
             'city' => $this->city,
-            'email_address' => $this->emailAddress,
-            'mobile_number' => $this->mobileNumber,
+            'company_name' => $this->companyName,
+            'job_title' => $this->jobTitle,
 
-            'reference_delegate_name' => $this->referenceDelegateName,
             'heard_where' => $this->heardWhere,
 
             'quantity' => $this->finalQuantity,
@@ -315,39 +315,41 @@ class SpouseRegistrationForm extends Component
             'paid_date_time' => null,
         ]);
 
-        $transaction = SpouseTransactions::create([
+        $transaction = VisitorTransactions::create([
             'event_id' => $this->event->id,
             'event_category' => $this->event->category,
-            'spouse_id' => $newRegistrant->id,
-            'spouse_type' => "main",
+            'visitor_id' => $newRegistrant->id,
+            'visitor_type' => "main",
         ]);
 
         $tempYear = substr(Carbon::now()->year, -2);
         $lastDigit = 1000 + intval($transaction->id);
         $tempOrderId = $this->event->category . "$tempYear" . "$lastDigit";
 
-        $this->currentMainSpouseId = $newRegistrant->id;
+        $this->currentMainVisitorId = $newRegistrant->id;
 
-        if (!empty($this->additionalSpouses)) {
-            foreach ($this->additionalSpouses as $additionalSpouse) {
-                $newAdditionSpouse = AdditionalSpouses::create([
-                    'main_spouse_id' => $newRegistrant->id,
-                    'salutation' => $additionalSpouse['subSalutation'],
-                    'first_name' => $additionalSpouse['subFirstName'],
-                    'middle_name' => $additionalSpouse['subMiddleName'],
-                    'last_name' => $additionalSpouse['subLastName'],
-                    'nationality' => $additionalSpouse['subNationality'],
-                    'country' => $additionalSpouse['subCountry'],
-                    'city' => $additionalSpouse['subCity'],
-                    'email_address' => $additionalSpouse['subEmailAddress'],
-                    'mobile_number' => $additionalSpouse['subMobileNumber'],
+        if (!empty($this->additionalVisitors)) {
+            foreach ($this->additionalVisitors as $additionalVisitor) {
+                $newAdditionVisitor = AdditionalVisitors::create([
+                    'main_visitor_id' => $newRegistrant->id,
+                    'salutation' => $additionalVisitor['subSalutation'],
+                    'first_name' => $additionalVisitor['subFirstName'],
+                    'middle_name' => $additionalVisitor['subMiddleName'],
+                    'last_name' => $additionalVisitor['subLastName'],
+                    'email_address' => $additionalVisitor['subEmailAddress'],
+                    'mobile_number' => $additionalVisitor['subMobileNumber'],
+                    'nationality' => $additionalVisitor['subNationality'],
+                    'country' => $additionalVisitor['subCountry'],
+                    'city' => $additionalVisitor['subCity'],
+                    'company_name' => $additionalVisitor['subCompanyName'],
+                    'job_title' => $additionalVisitor['subJobTitle'],
                 ]);
 
-                SpouseTransactions::create([
+                VisitorTransactions::create([
                     'event_id' => $this->event->id,
                     'event_category' => $this->event->category,
-                    'spouse_id' => $newAdditionSpouse->id,
-                    'spouse_type' => "sub",
+                    'visitor_id' => $newAdditionVisitor->id,
+                    'visitor_type' => "sub",
                 ]);
             }
         }
@@ -361,8 +363,7 @@ class SpouseRegistrationForm extends Component
 
         $this->currentStep += 1;
     }
-
-
+    
     public function decreaseStep()
     {
         $this->resetCalculations();
@@ -375,7 +376,6 @@ class SpouseRegistrationForm extends Component
             $this->dispatchBrowserEvent('swal:add-registration-loading-screen');
         }
     }
-
     
     public function submitBankTransfer()
     {
@@ -388,13 +388,13 @@ class SpouseRegistrationForm extends Component
             $registrationStatus = "pending";
         }
 
-        MainSpouses::find($this->currentMainSpouseId)->fill([
+        MainVisitors::find($this->currentMainVisitorId)->fill([
             'registration_status' => $registrationStatus,
             'payment_status' => $paymentStatus,
             'paid_date_time' => null,
         ])->save();
 
-        $transaction = SpouseTransactions::where('spouse_id', $this->currentMainSpouseId)->where('spouse_type', "main")->first();
+        $transaction = VisitorTransactions::where('visitor_id', $this->currentMainVisitorId)->where('visitor_type', "main")->first();
 
         $eventFormattedData = Carbon::parse($this->event->event_start_date)->format('d') . '-' . Carbon::parse($this->event->event_end_date)->format('d M Y');
         $lastDigit = 1000 + intval($transaction->id);
@@ -406,7 +406,7 @@ class SpouseRegistrationForm extends Component
         }
 
         $tempTransactionId = $this->event->year . "$getEventcode" . "$lastDigit";
-        $invoiceLink = env('APP_URL') . '/' . $this->event->category . '/' . $this->event->id . '/view-invoice/' . $this->currentMainSpouseId;
+        $invoiceLink = env('APP_URL') . '/' . $this->event->category . '/' . $this->event->id . '/view-invoice/' . $this->currentMainVisitorId;
 
         $details1 = [
             'name' => $this->salutation . " " . $this->firstName . " " . $this->middleName . " " . $this->lastName,
@@ -443,32 +443,32 @@ class SpouseRegistrationForm extends Component
             Mail::to($this->emailAddress)->cc(config('app.ccEmailNotif'))->queue(new RegistrationUnpaid($details1));
         }
 
-        $additionalSpouses = AdditionalSpouses::where('main_spouse_id', $this->currentMainSpouseId)->get();
-        if (!empty($additionalSpouses)) {
-            foreach ($additionalSpouses as $additionalSpouse) {
+        $additionalVisitors = AdditionalVisitors::where('main_visitor_id', $this->currentMainVisitorId)->get();
+        if (!empty($additionalVisitors)) {
+            foreach ($additionalVisitors as $additionalVisitor) {
 
-                $transaction = SpouseTransactions::where('spouse_id', $additionalSpouse->id)->where('spouse_type', "sub")->first();
+                $transaction = VisitorTransactions::where('visitor_id', $additionalVisitor->id)->where('visitor_type', "sub")->first();
                 $lastDigit = 1000 + intval($transaction->id);
                 $tempTransactionId = $this->event->year . "$getEventcode" . "$lastDigit";
 
                 $details1 = [
-                    'name' => $additionalSpouse->salutation . " " . $additionalSpouse->first_name . " " . $additionalSpouse->middle_name . " " . $additionalSpouse->last_name,
+                    'name' => $additionalVisitor->salutation . " " . $additionalVisitor->first_name . " " . $additionalVisitor->middle_name . " " . $additionalVisitor->last_name,
                     'eventLink' => $this->event->link,
                     'eventName' => $this->event->name,
                     'eventDates' => $eventFormattedData,
                     'eventLocation' => $this->event->location,
                     'eventCategory' => $this->event->category,
 
-                    'nationality' => $additionalSpouse->nationality,
-                    'country' => $additionalSpouse->country,
-                    'city' => $additionalSpouse->city,
+                    'nationality' => $additionalVisitor->nationality,
+                    'country' => $additionalVisitor->country,
+                    'city' => $additionalVisitor->city,
                     'amountPaid' => 0,
                     'transactionId' => $tempTransactionId,
                     'invoiceLink' => $invoiceLink,
                 ];
 
                 $details2 = [
-                    'name' => $additionalSpouse->salutation . " " . $additionalSpouse->first_name . " " . $additionalSpouse->middle_name . " " . $additionalSpouse->last_name,
+                    'name' => $additionalVisitor->salutation . " " . $additionalVisitor->first_name . " " . $additionalVisitor->middle_name . " " . $additionalVisitor->last_name,
                     'eventLink' => $this->event->link,
                     'eventName' => $this->event->name,
                     'eventCategory' => $this->event->category,
@@ -480,16 +480,17 @@ class SpouseRegistrationForm extends Component
                 ];
 
                 if ($paymentStatus == "free") {
-                    Mail::to($additionalSpouse->email_address)->queue(new RegistrationPaid($details1));
-                    Mail::to($additionalSpouse->email_address)->queue(new RegistrationPaymentConfirmation($details2));
+                    Mail::to($additionalVisitor->email_address)->queue(new RegistrationPaid($details1));
+                    Mail::to($additionalVisitor->email_address)->queue(new RegistrationPaymentConfirmation($details2));
                 } else {
-                    Mail::to($additionalSpouse->email_address)->queue(new RegistrationUnpaid($details1));
+                    Mail::to($additionalVisitor->email_address)->queue(new RegistrationUnpaid($details1));
                 }
             }
         }
-        return redirect()->route('register.success.view', ['eventCategory' => $this->event->category, 'eventId' => $this->event->id, 'eventYear' => $this->event->year, 'mainDelegateId' => $this->currentMainSpouseId]);
+        return redirect()->route('register.success.view', ['eventCategory' => $this->event->category, 'eventId' => $this->event->id, 'eventYear' => $this->event->year, 'mainDelegateId' => $this->currentMainVisitorId]);
     }
 
+    
     public function btClicked()
     {
         $this->paymentMethodError = null;
@@ -514,6 +515,7 @@ class SpouseRegistrationForm extends Component
         }
     }
 
+    
     public function setSessionCC()
     {
         $apiEndpoint = env('MERCHANT_API_URL');
@@ -624,7 +626,7 @@ class SpouseRegistrationForm extends Component
                         'id' => $this->sessionId,
                     ],
                     "authentication" => [
-                        "redirectResponseUrl" => "$appUrl/capturePayment?sessionId=$this->sessionId&mainDelegateId=$this->currentMainSpouseId&registrationFormType=spouse",
+                        "redirectResponseUrl" => "$appUrl/capturePayment?sessionId=$this->sessionId&mainDelegateId=$this->currentMainVisitorId&registrationFormType=visitor",
                     ],
                     "correlationId" => "test",
                     "device" =>  [
@@ -678,56 +680,59 @@ class SpouseRegistrationForm extends Component
         }
     }
 
+    
     public function openAddModal()
     {
-        $this->showAddSpouseModal = true;
+        $this->showAddVisitorModal = true;
     }
 
+    
     public function resetAddModalFields()
     {
         $this->subSalutation = null;
         $this->subFirstName = null;
         $this->subMiddleName = null;
         $this->subLastName = null;
+        $this->subEmailAddress = null;
+        $this->subMobileNumber = null;
         $this->subNationality = null;
         $this->subCountry = null;
         $this->subCity = null;
-        $this->subEmailAddress = null;
-        $this->subMobileNumber = null;
+        $this->subCompanyName = null;
+        $this->subJobTitle = null;
 
         $this->emailSubExistingError = null;
         $this->emailSubAlreadyUsedError = null;
     }
 
-
     public function closeAddModal()
     {
-        $this->showAddSpouseModal = false;
+        $this->showAddVisitorModal = false;
         $this->resetAddModalFields();
     }
 
-
-
-    public function openEditModal($subSpouseId)
+    
+    public function openEditModal($subVisitorId)
     {
-        $this->showEditSpouseModal = true;
-        foreach ($this->additionalSpouses as $additionalSpouse) {
-            if ($additionalSpouse['subSpouseId'] == $subSpouseId) {
-                $this->subIdEdit = $additionalSpouse['subSpouseId'];
-                $this->subSalutationEdit = $additionalSpouse['subSalutation'];
-                $this->subFirstNameEdit = $additionalSpouse['subFirstName'];
-                $this->subMiddleNameEdit = $additionalSpouse['subMiddleName'];
-                $this->subLastNameEdit = $additionalSpouse['subLastName'];
-                $this->subNationalityEdit = $additionalSpouse['subNationality'];
-                $this->subCountryEdit = $additionalSpouse['subCountry'];
-                $this->subCityEdit = $additionalSpouse['subCity'];
-                $this->subEmailAddressEdit = $additionalSpouse['subEmailAddress'];
-                $this->subMobileNumberEdit = $additionalSpouse['subMobileNumber'];
+        $this->showEditVisitorModal = true;
+        foreach ($this->additionalVisitors as $additionalVisitor) {
+            if ($additionalVisitor['subVisitorId'] == $subVisitorId) {
+                $this->subIdEdit = $additionalVisitor['subVisitorId'];
+                $this->subSalutationEdit = $additionalVisitor['subSalutation'];
+                $this->subFirstNameEdit = $additionalVisitor['subFirstName'];
+                $this->subMiddleNameEdit = $additionalVisitor['subMiddleName'];
+                $this->subLastNameEdit = $additionalVisitor['subLastName'];
+                $this->subEmailAddressEdit = $additionalVisitor['subEmailAddress'];
+                $this->subMobileNumberEdit = $additionalVisitor['subMobileNumber'];
+                $this->subNationalityEdit = $additionalVisitor['subNationality'];
+                $this->subCountryEdit = $additionalVisitor['subCountry'];
+                $this->subCityEdit = $additionalVisitor['subCity'];
+                $this->subCompanyNameEdit = $additionalVisitor['subCompanyName'];
+                $this->subJobTitleEdit = $additionalVisitor['subJobTitle'];
             }
         }
     }
-
-
+    
     public function resetEditModalFields()
     {
         $this->subIdEdit = null;
@@ -735,26 +740,25 @@ class SpouseRegistrationForm extends Component
         $this->subFirstNameEdit = null;
         $this->subMiddleNameEdit = null;
         $this->subLastNameEdit = null;
+        $this->subEmailAddressEdit = null;
+        $this->subMobileNumberEdit = null;
         $this->subNationalityEdit = null;
         $this->subCountryEdit = null;
         $this->subCityEdit = null;
-        $this->subEmailAddressEdit = null;
-        $this->subMobileNumberEdit = null;
+        $this->subCompanyNameEdit = null;
+        $this->subJobTitleEdit = null;
 
         $this->emailSubExistingError = null;
         $this->emailSubAlreadyUsedError = null;
     }
 
-
     public function closeEditModal()
     {
-        $this->showEditSpouseModal = false;
+        $this->showEditVisitorModal = false;
         $this->resetEditModalFields();
     }
 
-
-
-    public function saveAdditionalSpouse()
+    public function saveAdditionalVisitor()
     {
         $this->emailSubAlreadyUsedError = null;
         $this->emailSubExistingError = null;
@@ -792,40 +796,41 @@ class SpouseRegistrationForm extends Component
                 $this->emailSubExistingError = null;
 
                 $uuid = Str::uuid();
-                array_push($this->additionalSpouses, [
-                    'subSpouseId' => $uuid->toString(),
+                array_push($this->additionalVisitors, [
+                    'subVisitorId' => $uuid->toString(),
                     'subSalutation' => $this->subSalutation,
                     'subFirstName' => $this->subFirstName,
                     'subMiddleName' => $this->subMiddleName,
                     'subLastName' => $this->subLastName,
                     'subNationality' => $this->subNationality,
-                    'subCountry' => $this->subCountry,
-                    'subCity' => $this->subCity,
                     'subEmailAddress' => $this->subEmailAddress,
                     'subMobileNumber' => $this->subMobileNumber,
+                    'subCountry' => $this->subCountry,
+                    'subCity' => $this->subCity,
+                    'subCompanyName' => $this->subCompanyName,
+                    'subJobTitle' => $this->subJobTitle,
                 ]);
 
                 $this->resetAddModalFields();
-                $this->showAddSpouseModal = false;
+                $this->showAddVisitorModal = false;
             }
         }
     }
-
-
-    public function removeAdditionalSpouse($subSpouseId)
+    
+    public function removeAdditionalVisitor($subVisitorId)
     {
-        $arrayTemp = array_filter($this->additionalSpouses, function ($item) use ($subSpouseId) {
-            return $item['subSpouseId'] != $subSpouseId;
+        $arrayTemp = array_filter($this->additionalVisitors, function ($item) use ($subVisitorId) {
+            return $item['subVisitorId'] != $subVisitorId;
         });
 
-        $this->additionalSpouses = [];
+        $this->additionalVisitors = [];
 
-        foreach ($arrayTemp as $spouse) {
-            array_push($this->additionalSpouses, $spouse);
+        foreach ($arrayTemp as $visitor) {
+            array_push($this->additionalVisitors, $visitor);
         }
     }
 
-    public function editAdditionalSpouse($subSpouseId)
+    public function editAdditionalVisitor($subVisitorId)
     {
         $this->emailSubAlreadyUsedError = null;
         $this->emailSubExistingError = null;
@@ -857,9 +862,9 @@ class SpouseRegistrationForm extends Component
         if ($this->subEmailAddressEdit == $this->emailAddress) {
             $tempCheckEmail = true;
         } else {
-            foreach ($this->additionalSpouses as $additionalSpouse) {
-                if ($additionalSpouse['subSpouseId'] != $subSpouseId) {
-                    if ($additionalSpouse['subEmailAddress'] == $this->subEmailAddressEdit) {
+            foreach ($this->additionalVisitors as $additionalVisitor) {
+                if ($additionalVisitor['subVisitorId'] != $subVisitorId) {
+                    if ($additionalVisitor['subEmailAddress'] == $this->subEmailAddressEdit) {
                         $tempCheckEmail = true;
                     }
                 }
@@ -876,69 +881,69 @@ class SpouseRegistrationForm extends Component
                 $this->emailSubAlreadyUsedError = null;
                 $this->emailSubExistingError = null;
 
-                for ($i = 0; $i < count($this->additionalSpouses); $i++) {
-                    if ($this->additionalSpouses[$i]['subSpouseId'] == $subSpouseId) {
-                        $this->additionalSpouses[$i]['subSalutation'] = $this->subSalutationEdit;
-                        $this->additionalSpouses[$i]['subFirstName'] = $this->subFirstNameEdit;
-                        $this->additionalSpouses[$i]['subMiddleName'] = $this->subMiddleNameEdit;
-                        $this->additionalSpouses[$i]['subLastName'] = $this->subLastNameEdit;
-                        $this->additionalSpouses[$i]['subNationality'] = $this->subNationalityEdit;
-                        $this->additionalSpouses[$i]['subCountry'] = $this->subCountryEdit;
-                        $this->additionalSpouses[$i]['subCity'] = $this->subCityEdit;
-                        $this->additionalSpouses[$i]['subEmailAddress'] = $this->subEmailAddressEdit;
-                        $this->additionalSpouses[$i]['subMobileNumber'] = $this->subMobileNumberEdit;
+                for ($i = 0; $i < count($this->additionalVisitors); $i++) {
+                    if ($this->additionalVisitors[$i]['subVisitorId'] == $subVisitorId) {
+                        $this->additionalVisitors[$i]['subSalutation'] = $this->subSalutationEdit;
+                        $this->additionalVisitors[$i]['subFirstName'] = $this->subFirstNameEdit;
+                        $this->additionalVisitors[$i]['subMiddleName'] = $this->subMiddleNameEdit;
+                        $this->additionalVisitors[$i]['subLastName'] = $this->subLastNameEdit;
+                        $this->additionalVisitors[$i]['subNationality'] = $this->subNationalityEdit;
+                        $this->additionalVisitors[$i]['subEmailAddress'] = $this->subEmailAddressEdit;
+                        $this->additionalVisitors[$i]['subMobileNumber'] = $this->subMobileNumberEdit;
+                        $this->additionalVisitors[$i]['subCountry'] = $this->subCountryEdit;
+                        $this->additionalVisitors[$i]['subCity'] = $this->subCityEdit;
+                        $this->additionalVisitors[$i]['subCompanyName'] = $this->subCompanyNameEdit;
+                        $this->additionalVisitors[$i]['subJobTitle'] = $this->subJobTitleEdit;
 
                         $this->resetEditModalFields();
-                        $this->showEditSpouseModal = false;
+                        $this->showEditVisitorModal = false;
                     }
                 }
             }
         }
     }
 
-
-
     public function checkEmailIfExistsInDatabase($emailAddress)
     {
-        $allSpouses = SpouseTransactions::where('event_id', $this->event->id)->where('event_category', $this->event->category)->get();
+        $allVisitors = VisitorTransactions::where('event_id', $this->event->id)->where('event_category', $this->event->category)->get();
 
-        $countMainSpouse = 0;
-        $countSubSpouse = 0;
+        $countMainVisitor = 0;
+        $countSubVisitor = 0;
 
-        if (!$allSpouses->isEmpty()) {
-            foreach ($allSpouses as $spouse) {
-                if ($spouse->spouse_type == "main") {
-                    $mainSpouse = MainSpouses::where('id', $spouse->spouse_id)->where('email_address', $emailAddress)->where('registration_status', '!=', 'droppedOut')->first();
-                    if ($mainSpouse != null) {
-                        $countMainSpouse++;
+        if (!$allVisitors->isEmpty()) {
+            foreach ($allVisitors as $visitor) {
+                if ($visitor->visitor_type == "main") {
+                    $mainVisitor = MainVisitors::where('id', $visitor->visitor_id)->where('email_address', $emailAddress)->where('registration_status', '!=', 'droppedOut')->first();
+                    if ($mainVisitor != null) {
+                        $countMainVisitor++;
                     }
                 } else {
-                    $subSpouse = AdditionalSpouses::where('id', $spouse->spouse_id)->where('email_address', $emailAddress)->first();
-                    if ($subSpouse != null) {
-                        $registrationStatsMain = MainSpouses::where('id', $subSpouse->main_spouse_id)->value('registration_status');
+                    $subVisitor = AdditionalVisitors::where('id', $visitor->visitor_id)->where('email_address', $emailAddress)->first();
+                    if ($subVisitor != null) {
+                        $registrationStatsMain = MainVisitors::where('id', $subVisitor->main_visitor_id)->value('registration_status');
                         if ($registrationStatsMain != "droppedOut") {
-                            $countSubSpouse++;
+                            $countSubVisitor++;
                         }
                     }
                 }
             }
         }
 
-        if ($countMainSpouse == 0 && $countSubSpouse == 0) {
+        if ($countMainVisitor == 0 && $countSubVisitor == 0) {
             return false;
         } else {
             return true;
         }
     }
 
-
+    
     public function checkEmailIfUsedAlreadyMain($emailAddress)
     {
-        if (count($this->additionalSpouses) == 0) {
+        if (count($this->additionalVisitors) == 0) {
             return false;
         } else {
-            foreach ($this->additionalSpouses as $additionalSpouse) {
-                if ($emailAddress == $additionalSpouse['subEmailAddress']) {
+            foreach ($this->additionalVisitors as $additionalVisitor) {
+                if ($emailAddress == $additionalVisitor['subEmailAddress']) {
                     return true;
                     break;
                 }
@@ -946,16 +951,17 @@ class SpouseRegistrationForm extends Component
         }
     }
 
+    
     public function checkEmailIfUsedAlreadySub($emailAddress)
     {
         if ($this->emailAddress == $emailAddress) {
             return true;
         } else {
-            if (count($this->additionalSpouses) == 0) {
+            if (count($this->additionalVisitors) == 0) {
                 return false;
             } else {
-                foreach ($this->additionalSpouses as $additionalSpouse) {
-                    if ($emailAddress == $additionalSpouse['subEmailAddress']) {
+                foreach ($this->additionalVisitors as $additionalVisitor) {
+                    if ($emailAddress == $additionalVisitor['subEmailAddress']) {
                         return true;
                         break;
                     }

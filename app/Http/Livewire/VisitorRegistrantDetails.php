@@ -6,15 +6,15 @@ use App\Mail\RegistrationPaid;
 use App\Mail\RegistrationPaymentConfirmation;
 use App\Mail\RegistrationPaymentReminder;
 use Livewire\Component;
-use App\Models\MainSpouse as MainSpouses;
+use App\Models\MainVisitor as MainVisitors;
 use App\Models\Event as Events;
-use App\Models\AdditionalSpouse as AdditionalSpouses;
-use App\Models\SpouseTransaction as SpouseTransactions;
+use App\Models\AdditionalVisitor as AdditionalVisitors;
+use App\Models\VisitorTransaction as VisitorTransactions;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
 use NumberFormatter;
 
-class SpouseRegistrantDetails extends Component
+class VisitorRegistrantDetails extends Component
 {
     public $countries, $salutations;
 
@@ -22,25 +22,22 @@ class SpouseRegistrantDetails extends Component
 
     public $finalUnitPrice;
 
-    // ADDITIONAL DETAILS
-    public $referenceDelegateName;
-
     // DELEGATE DETAILS
-    public $mainSpouseId, $spouseId, $salutation, $firstName, $middleName, $lastName, $emailAddress, $mobileNumber, $nationality, $country, $city, $type, $spouseIndex, $spouseInnerIndex;
+    public $mainVisitorId, $visitorId, $salutation, $firstName, $middleName, $lastName, $emailAddress, $mobileNumber, $nationality, $country, $city, $companyName, $jobTitle, $type, $visitorIndex, $visitorInnerIndex;
 
-    public $transactionRemarks, $spouseCancellationStep = 1, $replaceSpouse, $spouseRefund;
+    public $transactionRemarks, $visitorCancellationStep = 1, $replaceVisitor, $visitorRefund;
 
-    public $replaceSpouseIndex, $replaceSpouseInnerIndex, $replaceSalutation, $replaceFirstName, $replaceMiddleName, $replaceLastName, $replaceEmailAddress, $replaceMobileNumber, $replaceNationality, $replaceCountry, $replaceCity, $replaceEmailAlreadyUsedError;
+    public $replaceVisitorIndex, $replaceVisitorInnerIndex, $replaceSalutation, $replaceFirstName, $replaceMiddleName, $replaceLastName, $replaceEmailAddress, $replaceMobileNumber, $replaceNationality, $replaceCountry, $replaceCity, $replaceCompanyName, $replaceJobTitle, $replaceEmailAlreadyUsedError;
 
     public $mapPaymentMethod;
 
     // MODALS
-    public $showSpouseModal = false, $showAdditionalDetailsModal = false;
+    public $showVisitorModal = false, $showAdditionalDetailsModal = false;
     public $showTransactionRemarksModal = false;
-    public $showSpouseCancellationModal = false;
+    public $showVisitorCancellationModal = false;
     public $showMarkAsPaidModal = false;
 
-    protected $listeners = ['paymentReminderConfirmed' => 'sendEmailReminder', 'cancelRefundDelegateConfirmed' => 'cancelOrRefundSpouse', 'cancelReplaceDelegateConfirmed' => 'addReplaceSpouse', 'markAsPaidConfirmed' => 'markAsPaid'];
+    protected $listeners = ['paymentReminderConfirmed' => 'sendEmailReminder', 'cancelRefundDelegateConfirmed' => 'cancelOrRefundVisitor', 'cancelReplaceDelegateConfirmed' => 'addReplaceVisitor', 'markAsPaidConfirmed' => 'markAsPaid'];
 
     public function mount($eventCategory, $eventId, $registrantId, $finalData)
     {
@@ -55,10 +52,10 @@ class SpouseRegistrantDetails extends Component
 
     public function render()
     {
-        return view('livewire.admin.events.transactions.spouse.spouse-registrant-details');
+        return view('livewire.admin.events.transactions.visitor.visitor-registrant-details');
     }
 
-    public function updateSpouse()
+    public function updateVisitor()
     {
         $this->validate(
             [
@@ -83,7 +80,7 @@ class SpouseRegistrantDetails extends Component
         );
 
         if ($this->type == "main") {
-            MainSpouses::find($this->spouseId)->fill([
+            MainVisitors::find($this->visitorId)->fill([
                 'salutation' => $this->salutation,
                 'first_name' => $this->firstName,
                 'middle_name' => $this->middleName,
@@ -93,9 +90,11 @@ class SpouseRegistrantDetails extends Component
                 'nationality' => $this->nationality,
                 'country' => $this->country,
                 'city' => $this->city,
+                'company_name' => $this->companyName,
+                'job_title' => $this->jobTitle,
             ])->save();
         } else {
-            AdditionalSpouses::find($this->spouseId)->fill([
+            AdditionalVisitors::find($this->visitorId)->fill([
                 'salutation' => $this->salutation,
                 'first_name' => $this->firstName,
                 'middle_name' => $this->middleName,
@@ -105,58 +104,64 @@ class SpouseRegistrantDetails extends Component
                 'nationality' => $this->nationality,
                 'country' => $this->country,
                 'city' => $this->city,
+                'company_name' => $this->companyName,
+                'job_title' => $this->jobTitle,
             ])->save();
         }
 
-        $this->finalData['allSpouses'][$this->spouseIndex][$this->spouseInnerIndex]['salutation'] = $this->salutation;
-        $this->finalData['allSpouses'][$this->spouseIndex][$this->spouseInnerIndex]['first_name'] = $this->firstName;
-        $this->finalData['allSpouses'][$this->spouseIndex][$this->spouseInnerIndex]['middle_name'] = $this->salutation;
-        $this->finalData['allSpouses'][$this->spouseIndex][$this->spouseInnerIndex]['last_name'] = $this->lastName;
-        $this->finalData['allSpouses'][$this->spouseIndex][$this->spouseInnerIndex]['name'] = $this->salutation . " " . $this->firstName . " " . $this->middleName . " " . $this->lastName;
-        $this->finalData['allSpouses'][$this->spouseIndex][$this->spouseInnerIndex]['email_address'] = $this->emailAddress;
-        $this->finalData['allSpouses'][$this->spouseIndex][$this->spouseInnerIndex]['mobile_number'] = $this->mobileNumber;
-        $this->finalData['allSpouses'][$this->spouseIndex][$this->spouseInnerIndex]['nationality'] = $this->nationality;
-        $this->finalData['allSpouses'][$this->spouseIndex][$this->spouseInnerIndex]['country'] = $this->country;
-        $this->finalData['allSpouses'][$this->spouseIndex][$this->spouseInnerIndex]['city'] = $this->city;
+        $this->finalData['allVisitors'][$this->visitorIndex][$this->visitorInnerIndex]['salutation'] = $this->salutation;
+        $this->finalData['allVisitors'][$this->visitorIndex][$this->visitorInnerIndex]['first_name'] = $this->firstName;
+        $this->finalData['allVisitors'][$this->visitorIndex][$this->visitorInnerIndex]['middle_name'] = $this->salutation;
+        $this->finalData['allVisitors'][$this->visitorIndex][$this->visitorInnerIndex]['last_name'] = $this->lastName;
+        $this->finalData['allVisitors'][$this->visitorIndex][$this->visitorInnerIndex]['name'] = $this->salutation . " " . $this->firstName . " " . $this->middleName . " " . $this->lastName;
+        $this->finalData['allVisitors'][$this->visitorIndex][$this->visitorInnerIndex]['email_address'] = $this->emailAddress;
+        $this->finalData['allVisitors'][$this->visitorIndex][$this->visitorInnerIndex]['mobile_number'] = $this->mobileNumber;
+        $this->finalData['allVisitors'][$this->visitorIndex][$this->visitorInnerIndex]['nationality'] = $this->nationality;
+        $this->finalData['allVisitors'][$this->visitorIndex][$this->visitorInnerIndex]['country'] = $this->country;
+        $this->finalData['allVisitors'][$this->visitorIndex][$this->visitorInnerIndex]['city'] = $this->city;
+        $this->finalData['allVisitors'][$this->visitorIndex][$this->visitorInnerIndex]['company_name'] = $this->companyName;
+        $this->finalData['allVisitors'][$this->visitorIndex][$this->visitorInnerIndex]['job_title'] = $this->jobTitle;
 
         $this->calculateTotal();
 
-        $this->showSpouseModal = false;
+        $this->showVisitorModal = false;
         $this->resetEditModalFields();
     }
 
-
-    public function openEditSpouseModal($index, $innerIndex)
+    
+    public function openEditVisitorModal($index, $innerIndex)
     {
-        $this->spouseIndex = $index;
-        $this->spouseInnerIndex = $innerIndex;
-        $this->mainSpouseId = $this->finalData['allSpouses'][$index][$innerIndex]['mainSpouseId'];
-        $this->spouseId = $this->finalData['allSpouses'][$index][$innerIndex]['spouseId'];
-        $this->salutation = $this->finalData['allSpouses'][$index][$innerIndex]['salutation'];
-        $this->firstName = $this->finalData['allSpouses'][$index][$innerIndex]['first_name'];
-        $this->middleName = $this->finalData['allSpouses'][$index][$innerIndex]['middle_name'];
-        $this->lastName = $this->finalData['allSpouses'][$index][$innerIndex]['last_name'];
-        $this->emailAddress = $this->finalData['allSpouses'][$index][$innerIndex]['email_address'];
-        $this->mobileNumber = $this->finalData['allSpouses'][$index][$innerIndex]['mobile_number'];
-        $this->nationality = $this->finalData['allSpouses'][$index][$innerIndex]['nationality'];
-        $this->country = $this->finalData['allSpouses'][$index][$innerIndex]['country'];
-        $this->city = $this->finalData['allSpouses'][$index][$innerIndex]['city'];
-        $this->type = $this->finalData['allSpouses'][$index][$innerIndex]['spouseType'];
-        $this->showSpouseModal = true;
+        $this->visitorIndex = $index;
+        $this->visitorInnerIndex = $innerIndex;
+        $this->mainVisitorId = $this->finalData['allVisitors'][$index][$innerIndex]['mainVisitorId'];
+        $this->visitorId = $this->finalData['allVisitors'][$index][$innerIndex]['visitorId'];
+        $this->salutation = $this->finalData['allVisitors'][$index][$innerIndex]['salutation'];
+        $this->firstName = $this->finalData['allVisitors'][$index][$innerIndex]['first_name'];
+        $this->middleName = $this->finalData['allVisitors'][$index][$innerIndex]['middle_name'];
+        $this->lastName = $this->finalData['allVisitors'][$index][$innerIndex]['last_name'];
+        $this->emailAddress = $this->finalData['allVisitors'][$index][$innerIndex]['email_address'];
+        $this->mobileNumber = $this->finalData['allVisitors'][$index][$innerIndex]['mobile_number'];
+        $this->nationality = $this->finalData['allVisitors'][$index][$innerIndex]['nationality'];
+        $this->country = $this->finalData['allVisitors'][$index][$innerIndex]['country'];
+        $this->city = $this->finalData['allVisitors'][$index][$innerIndex]['city'];
+        $this->companyName = $this->finalData['allVisitors'][$index][$innerIndex]['company_name'];
+        $this->jobTitle = $this->finalData['allVisitors'][$index][$innerIndex]['job_title'];
+        $this->type = $this->finalData['allVisitors'][$index][$innerIndex]['visitorType'];
+        $this->showVisitorModal = true;
     }
 
-    public function closeEditSpouseModal()
+    public function closeEditVisitorModal()
     {
-        $this->showSpouseModal = false;
+        $this->showVisitorModal = false;
         $this->resetEditModalFields();
     }
 
     public function resetEditModalFields()
     {
-        $this->spouseIndex = null;
-        $this->spouseInnerIndex = null;
-        $this->mainSpouseId = null;
-        $this->spouseId = null;
+        $this->visitorIndex = null;
+        $this->visitorInnerIndex = null;
+        $this->mainVisitorId = null;
+        $this->visitorId = null;
         $this->salutation = null;
         $this->firstName = null;
         $this->middleName = null;
@@ -166,41 +171,11 @@ class SpouseRegistrantDetails extends Component
         $this->nationality = null;
         $this->country = null;
         $this->city = null;
+        $this->companyName = null;
+        $this->jobTitle = null;
         $this->type = null;
     }
-
-    public function updateAdditionalDetails()
-    {
-        $this->validate([
-            'referenceDelegateName' => 'required',
-        ]);
-
-        MainSpouses::find($this->finalData['mainSpouseId'])->fill([
-            'reference_delegate_name' => $this->referenceDelegateName,
-        ])->save();
-
-        $this->finalData['reference_delegate_name'] = $this->referenceDelegateName;
-
-        $this->resetEditAdditionalDetailsModalFields();
-        $this->showAdditionalDetailsModal = false;
-    }
-
-    public function openEditAdditionalDetailsModal()
-    {
-        $this->referenceDelegateName = $this->finalData['reference_delegate_name'];
-        $this->showAdditionalDetailsModal = true;
-    }
-
-    public function closeEditAdditionalDetailsModal()
-    {
-        $this->resetEditAdditionalDetailsModalFields();
-        $this->showAdditionalDetailsModal = false;
-    }
-
-    public function resetEditAdditionalDetailsModalFields()
-    {
-        $this->referenceDelegateName = null;
-    }
+    
 
     public function openMarkAsPaidModal()
     {
@@ -212,8 +187,6 @@ class SpouseRegistrantDetails extends Component
         $this->showMarkAsPaidModal = false;
         $this->mapPaymentMethod = null;
     }
-
-
 
     public function markAsPaidConfirmation()
     {
@@ -231,7 +204,7 @@ class SpouseRegistrantDetails extends Component
     }
 
 
-
+    
     public function markAsPaid()
     {
         if ($this->finalData['invoiceData']['total_amount'] == 0) {
@@ -240,7 +213,7 @@ class SpouseRegistrantDetails extends Component
             $paymentStatus = "paid";
         }
 
-        MainSpouses::find($this->finalData['mainSpouseId'])->fill([
+        MainVisitors::find($this->finalData['mainVisitorId'])->fill([
             'registration_status' => "confirmed",
             'payment_status' => $paymentStatus,
             'mode_of_payment' => $this->mapPaymentMethod,
@@ -248,29 +221,29 @@ class SpouseRegistrantDetails extends Component
         ])->save();
 
         $eventFormattedData = Carbon::parse($this->event->event_start_date)->format('d') . '-' . Carbon::parse($this->event->event_end_date)->format('d M Y');
-        $invoiceLink = env('APP_URL') . '/' . $this->event->category . '/' . $this->event->id . '/view-invoice/' . $this->finalData['mainSpouseId'];
+        $invoiceLink = env('APP_URL') . '/' . $this->event->category . '/' . $this->event->id . '/view-invoice/' . $this->finalData['mainVisitorId'];
 
-        foreach ($this->finalData['allSpouses'] as $spouses) {
-            foreach ($spouses as $innerSpouse) {
-                if (end($spouses) == $innerSpouse) {
+        foreach ($this->finalData['allVisitors'] as $visitors) {
+            foreach ($visitors as $innerVisitor) {
+                if (end($visitors) == $innerVisitor) {
                     $details1 = [
-                        'name' => $innerSpouse['name'],
+                        'name' => $innerVisitor['name'],
                         'eventLink' => $this->event->link,
                         'eventName' => $this->event->name,
                         'eventDates' => $eventFormattedData,
                         'eventLocation' => $this->event->location,
                         'eventCategory' => $this->event->category,
 
-                        'nationality' => $innerSpouse['nationality'],
-                        'country' => $innerSpouse['country'],
-                        'city' => $innerSpouse['city'],
+                        'nationality' => $innerVisitor['nationality'],
+                        'country' => $innerVisitor['country'],
+                        'city' => $innerVisitor['city'],
                         'amountPaid' => $this->finalData['invoiceData']['total_amount'],
-                        'transactionId' => $innerSpouse['transactionId'],
+                        'transactionId' => $innerVisitor['transactionId'],
                         'invoiceLink' => $invoiceLink,
                     ];
 
                     $details2 = [
-                        'name' => $innerSpouse['name'],
+                        'name' => $innerVisitor['name'],
                         'eventLink' => $this->event->link,
                         'eventName' => $this->event->name,
                         'eventCategory' => $this->event->category,
@@ -281,8 +254,8 @@ class SpouseRegistrantDetails extends Component
                         'invoiceLink' => $invoiceLink,
                     ];
 
-                    Mail::to($innerSpouse['email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaid($details1));
-                    Mail::to($innerSpouse['email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaymentConfirmation($details2));
+                    Mail::to($innerVisitor['email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaid($details1));
+                    Mail::to($innerVisitor['email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaymentConfirmation($details2));
                 }
             }
         }
@@ -306,32 +279,32 @@ class SpouseRegistrantDetails extends Component
         return $this->event->std_nmember_rate;
     }
 
-
+    
     public function calculateTotal()
     {
         $invoiceDetails = array();
         $countFinalQuantity = 0;
 
-        $mainSpouse = MainSpouses::where('id', $this->finalData['mainSpouseId'])->where('event_id', $this->eventId)->first();
+        $mainVisitor = MainVisitors::where('id', $this->finalData['mainVisitorId'])->where('event_id', $this->eventId)->first();
 
-        $addMainSpouse = true;
-        if ($mainSpouse->spouse_cancelled) {
-            if ($mainSpouse->spouse_refunded || $mainSpouse->spouse_replaced) {
-                $addMainSpouse = false;
+        $addMainVisitor = true;
+        if ($mainVisitor->visitor_cancelled) {
+            if ($mainVisitor->visitor_refunded || $mainVisitor->visitor_replaced) {
+                $addMainVisitor = false;
             }
         }
 
-        if ($mainSpouse->spouse_replaced_by_id == null & (!$mainSpouse->spouse_refunded)) {
+        if ($mainVisitor->visitor_replaced_by_id == null & (!$mainVisitor->visitor_refunded)) {
             $countFinalQuantity++;
         }
 
-        if ($addMainSpouse) {
-            $delegateDescription = "Spouse Registration Fee";
+        if ($addMainVisitor) {
+            $delegateDescription = "Visitor Registration Fee";
 
             array_push($invoiceDetails, [
                 'delegateDescription' => $delegateDescription,
                 'delegateNames' => [
-                    $mainSpouse->first_name . " " . $mainSpouse->middle_name . " " . $mainSpouse->last_name,
+                    $mainVisitor->first_name . " " . $mainVisitor->middle_name . " " . $mainVisitor->last_name,
                 ],
                 'badgeType' => null,
                 'quantity' => 1,
@@ -342,29 +315,29 @@ class SpouseRegistrantDetails extends Component
         }
     
 
-        $subSpouses = AdditionalSpouses::where('main_spouse_id', $this->finalData['mainSpouseId'])->get();
-        if (!$subSpouses->isEmpty()) {
-            foreach ($subSpouses as $subSpouse) {
+        $subVisitors = AdditionalVisitors::where('main_visitor_id', $this->finalData['mainVisitorId'])->get();
+        if (!$subVisitors->isEmpty()) {
+            foreach ($subVisitors as $subVisitor) {
 
-                if ($subSpouse->spouse_replaced_by_id == null & (!$subSpouse->spouse_refunded)) {
+                if ($subVisitor->visitor_replaced_by_id == null & (!$subVisitor->visitor_refunded)) {
                     $countFinalQuantity++;
                 }
 
-                $addSubSpouse = true;
-                if ($subSpouse->spouse_cancelled) {
-                    if ($subSpouse->spouse_refunded || $subSpouse->spouse_replaced) {
-                        $addSubSpouse = false;
+                $addSubVisitor = true;
+                if ($subVisitor->visitor_cancelled) {
+                    if ($subVisitor->visitor_refunded || $subVisitor->visitor_replaced) {
+                        $addSubVisitor = false;
                     }
                 }
 
 
-                if ($addSubSpouse) {
+                if ($addSubVisitor) {
                     $existingIndex = 0;
                     if (count($invoiceDetails) == 0) {
                         array_push($invoiceDetails, [
-                            'delegateDescription' => "Spouse Registration Fee",
+                            'delegateDescription' => "Visitor Registration Fee",
                             'delegateNames' => [
-                                $subSpouse->first_name . " " . $subSpouse->middle_name . " " . $subSpouse->last_name,
+                                $subVisitor->first_name . " " . $subVisitor->middle_name . " " . $subVisitor->last_name,
                             ],
                             'badgeType' => null,
                             'quantity' => 1,
@@ -375,7 +348,7 @@ class SpouseRegistrantDetails extends Component
                     } else {
                         array_push(
                             $invoiceDetails[$existingIndex]['delegateNames'],
-                            $subSpouse->first_name . " " . $subSpouse->middle_name . " " . $subSpouse->last_name
+                            $subVisitor->first_name . " " . $subVisitor->middle_name . " " . $subVisitor->last_name
                         );
     
                         $quantityTemp = $invoiceDetails[$existingIndex]['quantity'] + 1;
@@ -422,7 +395,7 @@ class SpouseRegistrantDetails extends Component
             //do nothing
         }
 
-        MainSpouses::find($this->finalData['mainSpouseId'])->fill([
+        MainVisitors::find($this->finalData['mainVisitorId'])->fill([
             'vat_price' => $totalVat,
             'net_amount' => $net_amount,
             'total_amount' => $totalAmount,
@@ -451,9 +424,9 @@ class SpouseRegistrantDetails extends Component
     {
         $invoiceLink = env('APP_URL') . '/' . $this->eventCategory . '/' . $this->eventId . '/view-invoice/' . $this->registrantId;
 
-        foreach ($this->finalData['allSpouses'] as $spouses) {
-            foreach ($spouses as $innerDelegate) {
-                if (end($spouses) == $innerDelegate) {
+        foreach ($this->finalData['allVisitors'] as $visitors) {
+            foreach ($visitors as $innerDelegate) {
+                if (end($visitors) == $innerDelegate) {
                     $details = [
                         'name' => $innerDelegate['name'],
                         'eventName' => $this->event->name,
@@ -474,39 +447,39 @@ class SpouseRegistrantDetails extends Component
     }
 
     
-
     public function checkEmailIfExistsInDatabase($emailAddress)
     {
-        $allSpouses = SpouseTransactions::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->get();
+        $allVisitors = VisitorTransactions::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->get();
 
-        $countMainSpouse = 0;
-        $countSubSpouse = 0;
+        $countMainVisitor = 0;
+        $countSubVisitor = 0;
 
-        if (!$allSpouses->isEmpty()) {
-            foreach ($allSpouses as $spouse) {
-                if ($spouse->spouse_type == "main") {
-                    $mainSpouse = MainSpouses::where('id', $spouse->spouse_id)->where('email_address', $emailAddress)->where('registration_status', '!=', 'droppedOut')->where('spouse_cancelled', '!=', true)->first();
-                    if ($mainSpouse != null) {
-                        $countMainSpouse++;
+        if (!$allVisitors->isEmpty()) {
+            foreach ($allVisitors as $visitor) {
+                if ($visitor->visitor_type == "main") {
+                    $mainVisitor = MainVisitors::where('id', $visitor->visitor_id)->where('email_address', $emailAddress)->where('registration_status', '!=', 'droppedOut')->where('visitor_cancelled', '!=', true)->first();
+                    if ($mainVisitor != null) {
+                        $countMainVisitor++;
                     }
                 } else {
-                    $subSpouse = AdditionalSpouses::where('id', $spouse->spouse_id)->where('email_address', $emailAddress)->where('spouse_cancelled', '!=', true)->first();
-                    if ($subSpouse != null) {
-                        $registrationStatsMain = MainSpouses::where('id', $subSpouse->main_spouse_id)->value('registration_status');
+                    $subVisitor = AdditionalVisitors::where('id', $visitor->visitor_id)->where('email_address', $emailAddress)->where('visitor_cancelled', '!=', true)->first();
+                    if ($subVisitor != null) {
+                        $registrationStatsMain = MainVisitors::where('id', $subVisitor->main_visitor_id)->value('registration_status');
                         if ($registrationStatsMain != "droppedOut") {
-                            $countSubSpouse++;
+                            $countSubVisitor++;
                         }
                     }
                 }
             }
         }
 
-        if ($countMainSpouse == 0 && $countSubSpouse == 0) {
+        if ($countMainVisitor == 0 && $countSubVisitor == 0) {
             return false;
         } else {
             return true;
         }
     }
+    
 
     public function openEditTransactionRemarksModal()
     {
@@ -520,9 +493,10 @@ class SpouseRegistrantDetails extends Component
         $this->showTransactionRemarksModal = false;
     }
 
+
     public function updateTransactionRemarks()
     {
-        MainSpouses::find($this->finalData['mainSpouseId'])->fill([
+        MainVisitors::find($this->finalData['mainVisitorId'])->fill([
             'transaction_remarks' => $this->transactionRemarks,
         ])->save();
 
@@ -531,46 +505,46 @@ class SpouseRegistrantDetails extends Component
         $this->showTransactionRemarksModal = false;
     }
 
-    public function openSpouseCancellationModal($index, $innerIndex)
+    public function openVisitorCancellationModal($index, $innerIndex)
     {
-        $this->replaceSpouseIndex = $index;
-        $this->replaceSpouseInnerIndex = $innerIndex;
-        $this->showSpouseCancellationModal = true;
+        $this->replaceVisitorIndex = $index;
+        $this->replaceVisitorInnerIndex = $innerIndex;
+        $this->showVisitorCancellationModal = true;
     }
 
-    public function closeSpouseCancellationModal()
+    public function closeVisitorCancellationModal()
     {
         $this->removeReplaceData();
-        $this->showSpouseCancellationModal = false;
+        $this->showVisitorCancellationModal = false;
     }
 
-    public function nextSpouseCancellation()
+    public function nextVisitorCancellation()
     {
-        $this->spouseCancellationStep++;
+        $this->visitorCancellationStep++;
     }
 
-    public function prevSpouseCancellation()
+    public function prevVisitorCancellation()
     {
-        $this->spouseCancellationStep--;
+        $this->visitorCancellationStep--;
     }
 
-    public function submitSpouseCancellation()
+    public function submitVisitorCancellation()
     {
-        if ($this->spouseCancellationStep == 2) {
-            if ($this->replaceSpouse == "No") {
+        if ($this->visitorCancellationStep == 2) {
+            if ($this->replaceVisitor == "No") {
                 $this->validate(
                     [
-                        'spouseRefund' => 'required',
+                        'visitorRefund' => 'required',
                     ],
                     [
-                        'spouseRefund.required' => "This needs to be fill up.",
+                        'visitorRefund.required' => "This needs to be fill up.",
                     ],
                 );
 
-                if ($this->spouseRefund == "Yes") {
-                    $message = "Are you sure want to cancel and refund this spouse?";
+                if ($this->visitorRefund == "Yes") {
+                    $message = "Are you sure want to cancel and refund this visitor?";
                 } else {
-                    $message = "Are you sure want to cancel and not refund this spouse?";
+                    $message = "Are you sure want to cancel and not refund this visitor?";
                 }
 
                 $this->dispatchBrowserEvent('swal:delegate-cancel-refund-confirmation', [
@@ -609,7 +583,7 @@ class SpouseRegistrantDetails extends Component
                     $this->replaceEmailAlreadyUsedError = null;
                     $this->dispatchBrowserEvent('swal:delegate-cancel-replace-confirmation', [
                         'type' => 'warning',
-                        'message' => 'Are you sure you want to cancel and replace this spouse?',
+                        'message' => 'Are you sure you want to cancel and replace this visitor?',
                         'text' => "",
                     ]);
                 }
@@ -617,33 +591,33 @@ class SpouseRegistrantDetails extends Component
         }
     }
 
-    public function cancelOrRefundSpouse()
+    public function cancelOrRefundVisitor()
     {
-        if ($this->spouseRefund == "Yes") {
+        if ($this->visitorRefund == "Yes") {
             // refunded
-            if ($this->finalData['allSpouses'][$this->replaceSpouseIndex][$this->replaceSpouseInnerIndex]['spouseType'] == "main") {
-                MainSpouses::find($this->finalData['allSpouses'][$this->replaceSpouseIndex][$this->replaceSpouseInnerIndex]['mainSpouseId'])->fill([
-                    'spouse_cancelled' => true,
-                    'spouse_refunded' => true,
-                    'spouse_cancelled_datetime' => Carbon::now(),
-                    'spouse_refunded_datetime' => Carbon::now(),
+            if ($this->finalData['allVisitors'][$this->replaceVisitorIndex][$this->replaceVisitorInnerIndex]['visitorType'] == "main") {
+                MainVisitors::find($this->finalData['allVisitors'][$this->replaceVisitorIndex][$this->replaceVisitorInnerIndex]['mainVisitorId'])->fill([
+                    'visitor_cancelled' => true,
+                    'visitor_refunded' => true,
+                    'visitor_cancelled_datetime' => Carbon::now(),
+                    'visitor_refunded_datetime' => Carbon::now(),
                 ])->save();
             } else {
-                AdditionalSpouses::find($this->finalData['allSpouses'][$this->replaceSpouseIndex][$this->replaceSpouseInnerIndex]['spouseId'])->fill([
-                    'spouse_cancelled' => true,
-                    'spouse_refunded' => true,
-                    'spouse_cancelled_datetime' => Carbon::now(),
-                    'spouse_refunded_datetime' => Carbon::now(),
+                AdditionalVisitors::find($this->finalData['allVisitors'][$this->replaceVisitorIndex][$this->replaceVisitorInnerIndex]['visitorId'])->fill([
+                    'visitor_cancelled' => true,
+                    'visitor_refunded' => true,
+                    'visitor_cancelled_datetime' => Carbon::now(),
+                    'visitor_refunded_datetime' => Carbon::now(),
                 ])->save();
             }
 
-            $this->finalData['allSpouses'][$this->replaceSpouseIndex][$this->replaceSpouseInnerIndex]['spouse_cancelled'] = true;
-            $this->finalData['allSpouses'][$this->replaceSpouseIndex][$this->replaceSpouseInnerIndex]['spouse_refunded'] = true;
-            $this->finalData['allSpouses'][$this->replaceSpouseIndex][$this->replaceSpouseInnerIndex]['spouse_cancelled_datetime'] = Carbon::parse(Carbon::now())->format('M j, Y g:i A');
-            $this->finalData['allSpouses'][$this->replaceSpouseIndex][$this->replaceSpouseInnerIndex]['spouse_refunded_datetime'] = Carbon::parse(Carbon::now())->format('M j, Y g:i A');
+            $this->finalData['allVisitors'][$this->replaceVisitorIndex][$this->replaceVisitorInnerIndex]['visitor_cancelled'] = true;
+            $this->finalData['allVisitors'][$this->replaceVisitorIndex][$this->replaceVisitorInnerIndex]['visitor_refunded'] = true;
+            $this->finalData['allVisitors'][$this->replaceVisitorIndex][$this->replaceVisitorInnerIndex]['visitor_cancelled_datetime'] = Carbon::parse(Carbon::now())->format('M j, Y g:i A');
+            $this->finalData['allVisitors'][$this->replaceVisitorIndex][$this->replaceVisitorInnerIndex]['visitor_refunded_datetime'] = Carbon::parse(Carbon::now())->format('M j, Y g:i A');
 
             if ($this->finalData['finalQuantity'] == 1) {
-                MainSpouses::find($this->finalData['allSpouses'][$this->replaceSpouseIndex][$this->replaceSpouseInnerIndex]['mainSpouseId'])->fill([
+                MainVisitors::find($this->finalData['allVisitors'][$this->replaceVisitorIndex][$this->replaceVisitorInnerIndex]['mainVisitorId'])->fill([
                     'registration_status' => "cancelled",
                     'payment_status' => "refunded",
                 ])->save();
@@ -655,28 +629,28 @@ class SpouseRegistrantDetails extends Component
 
             $this->dispatchBrowserEvent('swal:delegate-cancel-refund-success', [
                 'type' => 'success',
-                'message' => 'Spouse cancelled and refunded succesfully!',
+                'message' => 'Visitor cancelled and refunded succesfully!',
                 'text' => "",
             ]);
         } else {
             // not refunded
-            if ($this->finalData['allSpouses'][$this->replaceSpouseIndex][$this->replaceSpouseInnerIndex]['spouseType'] == "main") {
-                MainSpouses::find($this->finalData['allSpouses'][$this->replaceSpouseIndex][$this->replaceSpouseInnerIndex]['mainSpouseId'])->fill([
-                    'spouse_cancelled' => true,
-                    'spouse_cancelled_datetime' => Carbon::now(),
+            if ($this->finalData['allVisitors'][$this->replaceVisitorIndex][$this->replaceVisitorInnerIndex]['visitorType'] == "main") {
+                MainVisitors::find($this->finalData['allVisitors'][$this->replaceVisitorIndex][$this->replaceVisitorInnerIndex]['mainVisitorId'])->fill([
+                    'visitor_cancelled' => true,
+                    'visitor_cancelled_datetime' => Carbon::now(),
                 ])->save();
             } else {
-                AdditionalSpouses::find($this->finalData['allSpouses'][$this->replaceSpouseIndex][$this->replaceSpouseInnerIndex]['spouseId'])->fill([
-                    'spouse_cancelled' => true,
-                    'spouse_cancelled_datetime' => Carbon::now(),
+                AdditionalVisitors::find($this->finalData['allVisitors'][$this->replaceVisitorIndex][$this->replaceVisitorInnerIndex]['visitorId'])->fill([
+                    'visitor_cancelled' => true,
+                    'visitor_cancelled_datetime' => Carbon::now(),
                 ])->save();
             }
 
-            $this->finalData['allSpouses'][$this->replaceSpouseIndex][$this->replaceSpouseInnerIndex]['spouse_cancelled'] = true;
-            $this->finalData['allSpouses'][$this->replaceSpouseIndex][$this->replaceSpouseInnerIndex]['spouse_cancelled_datetime'] = Carbon::parse(Carbon::now())->format('M j, Y g:i A');
+            $this->finalData['allVisitors'][$this->replaceVisitorIndex][$this->replaceVisitorInnerIndex]['visitor_cancelled'] = true;
+            $this->finalData['allVisitors'][$this->replaceVisitorIndex][$this->replaceVisitorInnerIndex]['visitor_cancelled_datetime'] = Carbon::parse(Carbon::now())->format('M j, Y g:i A');
 
             if ($this->finalData['finalQuantity'] == 1) {
-                MainSpouses::find($this->finalData['allSpouses'][$this->replaceSpouseIndex][$this->replaceSpouseInnerIndex]['mainSpouseId'])->fill([
+                MainVisitors::find($this->finalData['allVisitors'][$this->replaceVisitorIndex][$this->replaceVisitorInnerIndex]['mainVisitorId'])->fill([
                     'registration_status' => "cancelled",
                 ])->save();
 
@@ -685,19 +659,19 @@ class SpouseRegistrantDetails extends Component
 
             $this->dispatchBrowserEvent('swal:delegate-cancel-refund-success', [
                 'type' => 'success',
-                'message' => 'Spouse cancelled but not refunded succesfully!',
+                'message' => 'Visitor cancelled but not refunded succesfully!',
                 'text' => "",
             ]);
         }
-        $this->showSpouseCancellationModal = false;
+        $this->showVisitorCancellationModal = false;
     }
 
     
 
-    public function addReplaceSpouse()
+    public function addReplaceVisitor()
     {
-        $replacedSpouse = AdditionalSpouses::create([
-            'main_spouse_id' => $this->finalData['allSpouses'][$this->replaceSpouseIndex][$this->replaceSpouseInnerIndex]['mainSpouseId'],
+        $replacedVisitor = AdditionalVisitors::create([
+            'main_visitor_id' => $this->finalData['allVisitors'][$this->replaceVisitorIndex][$this->replaceVisitorInnerIndex]['mainVisitorId'],
             'salutation' => $this->replaceSalutation,
             'first_name' => $this->replaceFirstName,
             'middle_name' => $this->replaceMiddleName,
@@ -707,18 +681,20 @@ class SpouseRegistrantDetails extends Component
             'nationality' => $this->replaceNationality,
             'country' => $this->replaceCountry,
             'city' => $this->replaceCity,
+            'company_name' => $this->replaceCompanyName,
+            'job_title' => $this->replaceJobTitle,
 
-            'spouse_replaced_type' => $this->finalData['allSpouses'][$this->replaceSpouseIndex][$this->replaceSpouseInnerIndex]['spouse_replaced_type'],
-            'spouse_replaced_from_id' => $this->finalData['allSpouses'][$this->replaceSpouseIndex][$this->replaceSpouseInnerIndex]['spouseId'],
-            'spouse_original_from_id' => $this->finalData['allSpouses'][$this->replaceSpouseIndex][$this->replaceSpouseInnerIndex]['spouse_original_from_id'],
+            'visitor_replaced_type' => $this->finalData['allVisitors'][$this->replaceVisitorIndex][$this->replaceVisitorInnerIndex]['visitor_replaced_type'],
+            'visitor_replaced_from_id' => $this->finalData['allVisitors'][$this->replaceVisitorIndex][$this->replaceVisitorInnerIndex]['visitorId'],
+            'visitor_original_from_id' => $this->finalData['allVisitors'][$this->replaceVisitorIndex][$this->replaceVisitorInnerIndex]['visitor_original_from_id'],
         ]);
 
 
-        $transaction = SpouseTransactions::create([
+        $transaction = VisitorTransactions::create([
             'event_id' => $this->eventId,
             'event_category' => $this->eventCategory,
-            'spouse_id' => $replacedSpouse->id,
-            'spouse_type' => "sub",
+            'visitor_id' => $replacedVisitor->id,
+            'visitor_type' => "sub",
         ]);
 
         foreach (config('app.eventCategories') as $eventCategoryC => $code) {
@@ -729,11 +705,11 @@ class SpouseRegistrantDetails extends Component
         $lastDigit = 1000 + intval($transaction->id);
         $finalTransactionId = $this->event->year . $eventCode . $lastDigit;
 
-        array_push($this->finalData['allSpouses'][$this->replaceSpouseIndex], [
+        array_push($this->finalData['allVisitors'][$this->replaceVisitorIndex], [
             'transactionId' => $finalTransactionId,
-            'mainSpouseId' => $this->finalData['allSpouses'][$this->replaceSpouseIndex][$this->replaceSpouseInnerIndex]['mainSpouseId'],
-            'spouseId' => $replacedSpouse->id,
-            'spouseType' => "sub",
+            'mainVisitorId' => $this->finalData['allVisitors'][$this->replaceVisitorIndex][$this->replaceVisitorInnerIndex]['mainVisitorId'],
+            'visitorId' => $replacedVisitor->id,
+            'visitorType' => "sub",
 
             'name' => $this->replaceSalutation . " " . $this->replaceFirstName . " " . $this->replaceMiddleName . " " . $this->replaceLastName,
             'salutation' => $this->replaceSalutation,
@@ -745,62 +721,66 @@ class SpouseRegistrantDetails extends Component
             'nationality' => $this->replaceNationality,
             'country' => $this->replaceCountry,
             'city' => $this->replaceCity,
+            'company_name' => $this->replaceCompanyName,
+            'job_title' => $this->replaceJobTitle,
 
             'is_replacement' => true,
-            'spouse_cancelled' => false,
-            'spouse_replaced' => false,
-            'spouse_refunded' => false,
+            'visitor_cancelled' => false,
+            'visitor_replaced' => false,
+            'visitor_refunded' => false,
 
-            'spouse_replaced_type' => "sub",
-            'spouse_original_from_id' => $this->finalData['allSpouses'][$this->replaceSpouseIndex][$this->replaceSpouseInnerIndex]['spouse_original_from_id'],
-            'spouse_replaced_from_id' => $this->finalData['allSpouses'][$this->replaceSpouseIndex][$this->replaceSpouseInnerIndex]['spouseId'],
-            'spouse_replaced_by_id' => null,
+            'visitor_replaced_type' => "sub",
+            'visitor_original_from_id' => $this->finalData['allVisitors'][$this->replaceVisitorIndex][$this->replaceVisitorInnerIndex]['visitor_original_from_id'],
+            'visitor_replaced_from_id' => $this->finalData['allVisitors'][$this->replaceVisitorIndex][$this->replaceVisitorInnerIndex]['visitorId'],
+            'visitor_replaced_by_id' => null,
 
-            'spouse_cancelled_datetime' => null,
-            'spouse_refunded_datetime' => null,
-            'spouse_replaced_datetime' => null,
+            'visitor_cancelled_datetime' => null,
+            'visitor_refunded_datetime' => null,
+            'visitor_replaced_datetime' => null,
         ]);
-        if ($this->finalData['allSpouses'][$this->replaceSpouseIndex][$this->replaceSpouseInnerIndex]['spouseType'] == "main") {
-            MainSpouses::find($this->finalData['allSpouses'][$this->replaceSpouseIndex][$this->replaceSpouseInnerIndex]['mainSpouseId'])->fill([
-                'spouse_cancelled' => true,
-                'spouse_cancelled_datetime' => Carbon::now(),
-                'spouse_replaced' => true,
-                'spouse_replaced_by_id' => $replacedSpouse->id,
-                'spouse_replaced_datetime' => Carbon::now(),
+        if ($this->finalData['allVisitors'][$this->replaceVisitorIndex][$this->replaceVisitorInnerIndex]['visitorType'] == "main") {
+            MainVisitors::find($this->finalData['allVisitors'][$this->replaceVisitorIndex][$this->replaceVisitorInnerIndex]['mainVisitorId'])->fill([
+                'visitor_cancelled' => true,
+                'visitor_cancelled_datetime' => Carbon::now(),
+                'visitor_replaced' => true,
+                'visitor_replaced_by_id' => $replacedVisitor->id,
+                'visitor_replaced_datetime' => Carbon::now(),
             ])->save();
         } else {
-            AdditionalSpouses::find($this->finalData['allSpouses'][$this->replaceSpouseIndex][$this->replaceSpouseInnerIndex]['spouseId'])->fill([
-                'spouse_cancelled' => true,
-                'spouse_cancelled_datetime' => Carbon::now(),
-                'spouse_replaced' => true,
-                'spouse_replaced_by_id' => $replacedSpouse->id,
-                'spouse_replaced_datetime' => Carbon::now(),
+            AdditionalVisitors::find($this->finalData['allVisitors'][$this->replaceVisitorIndex][$this->replaceVisitorInnerIndex]['visitorId'])->fill([
+                'visitor_cancelled' => true,
+                'visitor_cancelled_datetime' => Carbon::now(),
+                'visitor_replaced' => true,
+                'visitor_replaced_by_id' => $replacedVisitor->id,
+                'visitor_replaced_datetime' => Carbon::now(),
             ])->save();
         }
 
 
-        MainSpouses::where('id', $this->finalData['allSpouses'][$this->replaceSpouseIndex][$this->replaceSpouseInnerIndex]['mainSpouseId'])->increment('quantity');
+        MainVisitors::where('id', $this->finalData['allVisitors'][$this->replaceVisitorIndex][$this->replaceVisitorInnerIndex]['mainVisitorId'])->increment('quantity');
 
-        $this->finalData['allSpouses'][$this->replaceSpouseIndex][$this->replaceSpouseInnerIndex]['spouse_cancelled'] = true;
-        $this->finalData['allSpouses'][$this->replaceSpouseIndex][$this->replaceSpouseInnerIndex]['spouse_replaced'] = true;
-        $this->finalData['allSpouses'][$this->replaceSpouseIndex][$this->replaceSpouseInnerIndex]['spouse_cancelled_datetime'] = Carbon::parse(Carbon::now())->format('M j, Y g:i A');
-        $this->finalData['allSpouses'][$this->replaceSpouseIndex][$this->replaceSpouseInnerIndex]['spouse_replaced_datetime'] = Carbon::parse(Carbon::now())->format('M j, Y g:i A');
+        $this->finalData['allVisitors'][$this->replaceVisitorIndex][$this->replaceVisitorInnerIndex]['visitor_cancelled'] = true;
+        $this->finalData['allVisitors'][$this->replaceVisitorIndex][$this->replaceVisitorInnerIndex]['visitor_replaced'] = true;
+        $this->finalData['allVisitors'][$this->replaceVisitorIndex][$this->replaceVisitorInnerIndex]['visitor_cancelled_datetime'] = Carbon::parse(Carbon::now())->format('M j, Y g:i A');
+        $this->finalData['allVisitors'][$this->replaceVisitorIndex][$this->replaceVisitorInnerIndex]['visitor_replaced_datetime'] = Carbon::parse(Carbon::now())->format('M j, Y g:i A');
 
         $this->dispatchBrowserEvent('swal:delegate-cancel-replace-success', [
             'type' => 'success',
-            'message' => 'Spouse replaced succesfully!',
+            'message' => 'Visitor replaced succesfully!',
             'text' => "",
         ]);
         $this->calculateTotal();
         $this->removeReplaceData();
-        $this->showSpouseCancellationModal = false;
+        $this->showVisitorCancellationModal = false;
     }
+
+    
 
     public function removeReplaceData()
     {
-        $this->spouseCancellationStep = 1;
-        $this->replaceSpouseIndex = null;
-        $this->replaceSpouseInnerIndex = null;
+        $this->visitorCancellationStep = 1;
+        $this->replaceVisitorIndex = null;
+        $this->replaceVisitorInnerIndex = null;
 
         $this->replaceSalutation = null;
         $this->replaceFirstName = null;
@@ -811,6 +791,8 @@ class SpouseRegistrantDetails extends Component
         $this->replaceNationality = null;
         $this->replaceCountry = null;
         $this->replaceCity = null;
+        $this->replaceCompanyName = null;
+        $this->replaceJobTitle = null;
 
         $this->replaceEmailAlreadyUsedError = null;
     }

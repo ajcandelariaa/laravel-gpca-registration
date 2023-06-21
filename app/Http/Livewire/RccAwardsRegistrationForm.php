@@ -59,7 +59,7 @@ class RccAwardsRegistrationForm extends Component
         $this->salutations = config('app.salutations');
         $this->awardsCategories = config('app.rccAwardsCategories');
 
-        if ($data->category == "AF") {
+        if ($data->category == "AF" || $data->category == "AFS" || $data->category == "AFV") {
             $this->bankDetails = config('app.bankDetails.AF');
         } else {
             $this->bankDetails = config('app.bankDetails.DEFAULT');

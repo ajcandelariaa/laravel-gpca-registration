@@ -80,7 +80,7 @@ class RegistrationForm extends Component
         $this->companySectors = config('app.companySectors');
         $this->salutations = config('app.salutations');
 
-        if ($data->category == "AF") {
+        if ($data->category == "AF" || $data->category == "AFS" || $data->category == "AFV") {
             $this->bankDetails = config('app.bankDetails.AF');
         } else {
             $this->bankDetails = config('app.bankDetails.DEFAULT');

@@ -116,7 +116,7 @@
     @if ($event->category == 'AFS')
         @livewire('spouse-registration-form', ['data' => $event])
     @elseif ($event->category == 'AFV')
-
+        @livewire('visitor-registration-form', ['data' => $event])
     @elseif ($event->category == 'RCCA')
         @livewire('rcc-awards-registration-form', ['data' => $event])
     @else

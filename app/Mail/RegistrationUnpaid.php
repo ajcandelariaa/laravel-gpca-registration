@@ -57,6 +57,10 @@ class RegistrationUnpaid extends Mailable
             return new Content(
                 markdown: 'emails.spouse.registration-unpaid',
             );
+        } else if ($this->details['eventCategory'] == "AFV") {
+            return new Content(
+                markdown: 'emails.visitor.registration-unpaid',
+            );
         } else if ($this->details['eventCategory'] == "RCCA") {
             return new Content(
                 markdown: 'emails.rcca.registration-unpaid',

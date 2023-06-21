@@ -4,13 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\AdditionalDelegate;
 use App\Models\AdditionalSpouse;
+use App\Models\AdditionalVisitor;
 use App\Models\Event;
 use App\Models\EventRegistrationType;
 use App\Models\MainDelegate;
 use App\Models\MainSpouse;
+use App\Models\MainVisitor;
 use App\Models\RccAwardsAdditionalParticipant;
 use App\Models\RccAwardsMainParticipant;
-use App\Models\Transaction;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -80,6 +81,15 @@ class EventController extends Controller
             if ($eventCategory == "AFS") {
                 $finalData = $this->eventDasbhoardSpouseData($eventId);
                 return view('admin.events.dashboard.spouse.dashboard', [
+                    "pageTitle" => "Event Dashboard",
+                    "eventCategory" => $eventCategory,
+                    "eventId" => $eventId,
+                    "event" => $event,
+                    "finalData" => $finalData,
+                ]);
+            } else if ($eventCategory == "AFV") {
+                $finalData = $this->eventDasbhoardVisitorData($eventId);
+                return view('admin.events.dashboard.visitor.dashboard', [
                     "pageTitle" => "Event Dashboard",
                     "eventCategory" => $eventCategory,
                     "eventId" => $eventId,
@@ -614,6 +624,215 @@ class EventController extends Controller
         return $finalData;
     }
 
+    public function eventDasbhoardVisitorData($eventId)
+    {
+        $totalConfirmedVisitors = 0;
+        $totalVisitors = 0;
+        $totalRegisteredToday = 0;
+        $totalPaidToday = 0;
+        $totalAmountPaidToday = 0;
+        $totalAmountPaid = 0;
+        $totalBankTransfer = 0;
+        $totalCreditCard = 0;
+        $totalPaid = 0;
+        $totalFree = 0;
+        $totalUnpaid = 0;
+        $totalRefunded = 0;
+        $totalOnline = 0;
+        $totalImported = 0;
+        $totalOnsite = 0;
+        $totalConfirmed = 0;
+        $totalPending = 0;
+        $totalDroppedOut = 0;
+        $totalCancelled = 0;
+        $arrayCountryTotal = array();
+
+        $dateToday = Carbon::now();
+        $noRefund = 0;
+
+        $mainVisitors = MainVisitor::where('event_id', $eventId)->get();
+
+        if ($mainVisitors->isNotEmpty()) {
+            foreach ($mainVisitors as $mainVisitor) {
+
+                $visitorRegisteredDate = Carbon::parse($mainVisitor->registered_date_time);
+                if ($dateToday->isSameDay($visitorRegisteredDate)) {
+                    $totalRegisteredToday++;
+                }
+
+                if ($mainVisitor->visitor_replaced_by_id == null && (!$mainVisitor->visitor_refunded)) {
+                    if ($mainVisitor->registration_status == "confirmed") {
+                        $totalConfirmedVisitors++;
+                    }
+
+                    $totalVisitors++;
+
+                    if ($mainVisitor->mode_of_payment == "creditCard") {
+                        $totalCreditCard++;
+                    } else {
+                        $totalBankTransfer++;
+                    }
+
+                    if ($mainVisitor->payment_status == "paid") {
+                        $visitorPaidDate = Carbon::parse($mainVisitor->paid_date_time);
+                        if ($dateToday->isSameDay($visitorPaidDate)) {
+                            $totalPaidToday++;
+                        }
+
+                        $noRefund++;
+                        $totalPaid++;
+                    } else if ($mainVisitor->payment_status == "free") {
+                        $totalFree++;
+                    } else if ($mainVisitor->payment_status == "unpaid") {
+                        $totalUnpaid++;
+                    } else {
+                    }
+
+
+                    if ($mainVisitor->registration_method == "online") {
+                        $totalOnline++;
+                    } else if ($mainVisitor->registration_method == "imported") {
+                        $totalImported++;
+                    } else {
+                        $totalOnsite++;
+                    }
+
+
+                    if ($mainVisitor->registration_status == "confirmed") {
+                        $totalConfirmed++;
+                    } else if ($mainVisitor->registration_status == "pending") {
+                        $totalPending++;
+                    } else if ($mainVisitor->registration_status == "droppedOut") {
+                        $totalDroppedOut++;
+                    }
+
+                    if ($this->checkIfCountryExist($mainVisitor->country, $arrayCountryTotal)) {
+                        foreach ($arrayCountryTotal as $index => $country) {
+                            if ($country['name'] == $mainVisitor->country) {
+                                $arrayCountryTotal[$index]['total'] = $country['total'] + 1;
+                            }
+                        }
+                    } else {
+                        array_push($arrayCountryTotal, [
+                            'name' => $mainVisitor->country,
+                            'total' => 1,
+                        ]);
+                    }
+                } else {
+                    if ($mainVisitor->visitor_refunded) {
+                        $totalRefunded++;
+                    }
+
+                    if ($mainVisitor->visitor_cancelled) {
+                        $totalCancelled++;
+                    }
+                }
+
+                $additionalVisitors = AdditionalVisitor::where('main_visitor_id', $mainVisitor->id)->get();
+                if ($additionalVisitors->isNotEmpty()) {
+                    foreach ($additionalVisitors as $additionalVisitor) {
+                        if ($additionalVisitor->visitor_replaced_by_id == null && (!$additionalVisitor->visitor_refunded)) {
+                            if ($mainVisitor->registration_status == "confirmed") {
+                                $totalConfirmedVisitors++;
+                            }
+
+                            $totalVisitors++;
+
+                            if ($mainVisitor->mode_of_payment == "creditCard") {
+                                $totalCreditCard++;
+                            } else {
+                                $totalBankTransfer++;
+                            }
+
+
+                            if ($mainVisitor->payment_status == "paid") {
+                                $visitorPaidDate = Carbon::parse($mainVisitor->paid_date_time);
+                                if ($dateToday->isSameDay($visitorPaidDate)) {
+                                    $totalPaidToday++;
+                                }
+
+                                $noRefund++;
+                                $totalPaid++;
+                            } else if ($mainVisitor->payment_status == "free") {
+                                $totalFree++;
+                            } else if ($mainVisitor->payment_status == "unpaid") {
+                                $totalUnpaid++;
+                            } else {
+                            }
+
+                            if ($mainVisitor->registration_method == "online") {
+                                $totalOnline++;
+                            } else if ($mainVisitor->registration_method == "imported") {
+                                $totalImported++;
+                            } else {
+                                $totalOnsite++;
+                            }
+
+
+                            if ($mainVisitor->registration_status == "confirmed") {
+                                $totalConfirmed++;
+                            } else if ($mainVisitor->registration_status == "pending") {
+                                $totalPending++;
+                            } else if ($mainVisitor->registration_status == "droppedOut") {
+                                $totalDroppedOut++;
+                            }
+
+
+
+
+                            if ($this->checkIfCountryExist($mainVisitor->country, $arrayCountryTotal)) {
+                                foreach ($arrayCountryTotal as $index => $country) {
+                                    if ($country['name'] == $mainVisitor->country) {
+                                        $arrayCountryTotal[$index]['total'] = $country['total'] + 1;
+                                    }
+                                }
+                            } else {
+                                array_push($arrayCountryTotal, [
+                                    'name' => $mainVisitor->country,
+                                    'total' => 1,
+                                ]);
+                            }
+                        } else {
+                            if ($additionalVisitor->visitor_refunded) {
+                                $totalRefunded++;
+                            }
+
+                            if ($additionalVisitor->visitor_cancelled) {
+                                $totalCancelled++;
+                            }
+                        }
+                    }
+                }
+
+                if ($noRefund > 0 && $mainVisitor->payment_status == "paid") {
+                    $totalAmountPaid += $mainVisitor->total_amount;
+
+                    $visitorPaidDate = Carbon::parse($mainVisitor->paid_date_time);
+                    if ($dateToday->isSameDay($visitorPaidDate)) {
+                        $totalAmountPaidToday += $mainVisitor->total_amount;
+                    }
+                }
+            }
+        }
+
+        $finalData = [
+            'totalConfirmedVisitors' => $totalConfirmedVisitors,
+            'totalVisitors' => $totalVisitors,
+            'totalRegisteredToday' => $totalRegisteredToday,
+            'totalPaidToday' => $totalPaidToday,
+            'totalAmountPaidToday' => $totalAmountPaidToday,
+            'totalAmountPaid' => $totalAmountPaid,
+
+            'paymentStatus' => [$totalPaid, $totalFree, $totalUnpaid, $totalRefunded],
+            'registrationStatus' => [$totalConfirmed, $totalPending, $totalDroppedOut, $totalCancelled],
+            'registrationMethod' => [$totalOnline, $totalImported, $totalOnsite],
+            'paymentMethod' => [$totalCreditCard, $totalBankTransfer],
+
+            'arrayCountryTotal' => $arrayCountryTotal,
+        ];
+
+        return $finalData;
+    }
 
     public function eventDasbhoardRccAwardsData($eventId)
     {
@@ -865,7 +1084,7 @@ class EventController extends Controller
 
     public function eventRegistrationType($eventCategory, $eventId)
     {
-        if (Event::where('category', $eventCategory)->where('id', $eventId)->exists() && $eventCategory != 'AFS' && $eventCategory != 'RCCA') {
+        if (Event::where('category', $eventCategory)->where('id', $eventId)->exists() && $eventCategory != 'AFS' && $eventCategory != 'AFV' && $eventCategory != 'RCCA') {
             return view('admin.events.registration-type.registration_type', [
                 "pageTitle" => "Event Registration Type",
                 "eventCategory" => $eventCategory,
@@ -878,7 +1097,7 @@ class EventController extends Controller
 
     public function eventDelegateFeesView($eventCategory, $eventId)
     {
-        if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()  && $eventCategory != 'AFS' && $eventCategory != 'RCCA') {
+        if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()  && $eventCategory != 'AFS' && $eventCategory != 'AFV' && $eventCategory != 'RCCA') {
             return view('admin.events.delegate-fees.delegate_fees', [
                 "pageTitle" => "Event Delegate Fees",
                 "eventCategory" => $eventCategory,
@@ -891,7 +1110,7 @@ class EventController extends Controller
 
     public function eventPromoCodeView($eventCategory, $eventId)
     {
-        if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()  && $eventCategory != "AFS" && $eventCategory != 'RCCA') {
+        if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()  && $eventCategory != "AFS" && $eventCategory != "AFV" && $eventCategory != 'RCCA') {
             return view('admin.events.promo-codes.promo_codes', [
                 "pageTitle" => "Event Promo Codes",
                 "eventCategory" => $eventCategory,

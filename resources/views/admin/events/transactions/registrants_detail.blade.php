@@ -3,6 +3,8 @@
 @section('content')
     @if ($eventCategory == 'AFS')
         @livewire('spouse-registrant-details', ['eventCategory' => $eventCategory, 'eventId' => $eventId, 'registrantId' => $registrantId, 'finalData' => $finalData])
+    @elseif ($eventCategory == 'AFV')
+        @livewire('visitor-registrant-details', ['eventCategory' => $eventCategory, 'eventId' => $eventId, 'registrantId' => $registrantId, 'finalData' => $finalData])
     @elseif ($eventCategory == 'RCCA')
         @livewire('rcc-awards-registrant-details', ['eventCategory' => $eventCategory, 'eventId' => $eventId, 'registrantId' => $registrantId, 'finalData' => $finalData])
     @else
