@@ -66,9 +66,11 @@ Download invoice
 </ul>
 @endif --}}
 
-<h3>HOTEL AND ACCOMMODATION</h3>
+<h3>GENERAL INFORMATION</h3>
 
-<p>For hotel accommodation kindly contact my colleague <a href="mailto:abel@gpca.org.ae">abel@gpca.org.ae</a> or call +971 4 451 0666 ext. 102.</p>
+<p>Non – GPCC participants attending the <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a>, must process their own visa. Visa applications can be submitted online at <a href="https://www.evisa.gov.bh/">https://www.evisa.gov.bh/</a></p>
+
+<p>For the hotel accommodation, kindly <a href="http://gpcaresponsiblecare.com/wp-content/uploads/2023/07/The-Ritz-Carlton-Bahrain-Reservation-Form.pdf"><strong>click</strong></a> to download the form and submit your details to Prakash at <a href="mailto:Prakash.ramaiah@ritzcarlton.com">Prakash.ramaiah@ritzcarlton.com</a> or <a href="mailto:chahrazed.jassem@ritzcarlton.com">chahrazed.jassem@ritzcarlton.com</a>. You may also contact the following numbers for any additional inquiries: 973-66388039 or 973-39957141.</p>
 
 <p>For the latest updates on the event, please visit the event website at <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a>.</p>
 
