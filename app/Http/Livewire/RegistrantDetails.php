@@ -659,13 +659,13 @@ class RegistrantDetails extends Component
                         'invoiceLink' => $invoiceLink,
                         'earlyBirdValidityDate' => $earlyBirdValidityDate->format('jS F'),
                     ];
-                    Mail::to($innerDelegate['email_address'])->cc(config('app.ccEmailNotif'))->send(new RegistrationPaymentReminder($details));
+                    Mail::to($innerDelegate['email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaymentReminder($details));
                 }
             }
         }
 
         if ($this->finalData['assistant_email_address'] != null) {
-            Mail::to($this->finalData['assistant_email_address'])->send(new RegistrationPaymentReminder($details));
+            Mail::to($this->finalData['assistant_email_address'])->queue(new RegistrationPaymentReminder($details));
         }
 
         $this->dispatchBrowserEvent('swal:payment-reminder-success', [
