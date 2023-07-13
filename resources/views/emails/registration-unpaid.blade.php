@@ -74,11 +74,30 @@ Download invoice
 </ul>
 @endif --}}
 
+@if ($details['eventCategory'] == "RCC")
 <h3>GENERAL INFORMATION</h3>
 
 <p>Non – GPCC participants attending the <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a>, must process their own visa. Visa applications can be submitted online at <a href="https://www.evisa.gov.bh/">https://www.evisa.gov.bh/</a></p>
 
 <p>For the hotel accommodation, kindly <a href="http://gpcaresponsiblecare.com/wp-content/uploads/2023/07/The-Ritz-Carlton-Bahrain-Reservation-Form.pdf"><strong>click</strong></a> to download the form and submit your details to Prakash at <a href="mailto:Prakash.ramaiah@ritzcarlton.com">Prakash.ramaiah@ritzcarlton.com</a> or <a href="mailto:chahrazed.jassem@ritzcarlton.com">chahrazed.jassem@ritzcarlton.com</a>. You may also contact the following numbers for any additional inquiries: 973-66388039 or 973-39957141.</p>
+
+@elseif ($details['eventCategory'] == "ANC")
+<h3>GENERAL INFORMATION</h3>
+
+<h4><strong>Qatar Visa</strong></h4>
+<p>Please see the <a href="https://visitqatar.com/intl-en/practical-info/visas">link</a> for further information on how to obtain the visa. Kindly notify the GPCA office if you require any assistance.</p>
+
+<h4><strong>Hotel booking</strong></h4>
+<p>For the hotel accommodation, please click the <a href="https://www.marriott.com/event-reservations/reservation-link.mi?id=1688641689519&key=GRP&app=resvlink">hotel booking reservation</a> where we have special rates.</p>
+
+<ul>
+    <li>QAR 825 - QAR 2,000++ per night includes breakfast and internet.</li>
+    <li>Special rates are subject to availability.</li>
+    <li>All rates are valid till August 15, 2023.</li>
+</ul>
+
+@else
+@endif
 
 <p>For the latest updates on the event, please visit the event website at <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a>.</p>
 
