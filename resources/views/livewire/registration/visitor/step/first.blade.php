@@ -10,7 +10,7 @@
             <div class="grid grid-cols-2 gap-x-5">
                 <div class="col-span-2 sm:col-span-1">
                     <div class="text-registrationPrimaryColor">
-                        Company name
+                        Company name <span class="text-red-500">*</span>
                     </div>
                     <div>
                         <input placeholder="Company name" type="text" wire:model.lazy="companyName"
@@ -26,7 +26,7 @@
 
                 <div class="col-span-2 sm:col-span-1">
                     <div class="text-registrationPrimaryColor">
-                        Job title
+                        Job title <span class="text-red-500">*</span>
                     </div>
                     <div>
                         <input placeholder="Job title" type="text" wire:model.lazy="jobTitle"

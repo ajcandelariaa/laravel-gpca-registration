@@ -17,7 +17,7 @@
 
                         <div class="space-y-2">
                             <div class="text-registrationPrimaryColor">
-                                Company name
+                                Company name <span class="text-red-500">*</span>
                             </div>
                             <div>
                                 <input placeholder="Company name" type="text" wire:model.lazy="subCompanyNameEdit"
@@ -32,7 +32,7 @@
 
                         <div class="space-y-2">
                             <div class="text-registrationPrimaryColor">
-                                Job title
+                                Job title <span class="text-red-500">*</span>
                             </div>
                             <div>
                                 <input placeholder="Job title" type="text" wire:model.lazy="subJobTitleEdit"
