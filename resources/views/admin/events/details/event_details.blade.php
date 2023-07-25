@@ -25,13 +25,30 @@
                     class="text-registrationPrimaryColor rounded-full border border-registrationPrimaryColor px-4 font-bold text-sm">
                     {{ $event->category }}</p>
             </div>
-            <div>
+            <div class="flex items-center gap-4">
+                <div>
+                    <form
+                        action="{{ route('admin.event.update.status.post', ['eventCategory' => $event->category, 'eventId' => $event->id, 'eventStatus' => $event->active]) }}"
+                        method="POST">
+                        @csrf
 
-                <a href="{{ route('admin.event.edit.view', ['eventCategory' => $event->category, 'eventId' => $event->id]) }}"
-                    class="bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-2 px-5 rounded-md inline-flex items-center text-sm">
-                    <span class="mr-2"><i class="fa-solid fa-file-pen"></i></span>
-                    <span>Edit Event</span>
-                </a>
+                        @if ($event->active)
+                            <button type="submit"
+                                class="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-10 rounded inline-flex items-center text-sm cursor-pointer">Disable</button>
+                        @else
+                            <button type="submit"
+                                class="bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-10 rounded inline-flex items-center text-sm cursor-pointer">Enable</button>
+                        @endif
+                    </form>
+                </div>
+
+                <div>
+                    <a href="{{ route('admin.event.edit.view', ['eventCategory' => $event->category, 'eventId' => $event->id]) }}"
+                        class="bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-2 px-5 rounded-md inline-flex items-center text-sm">
+                        <span class="mr-2"><i class="fa-solid fa-file-pen"></i></span>
+                        <span>Edit Event</span>
+                    </a>
+                </div>
             </div>
         </div>
 
@@ -52,8 +69,7 @@
                 <span>View public registration form</span>
             </a>
 
-            
-            <a href="#" 
+            <a href="#"
                 class="bg-registrationPrimaryColor hover:bg-registrationPrimaryColorHover text-white font-medium py-2 px-5 rounded-md inline-flex items-center text-sm">
                 <span class="mr-2"><i class="fa-solid fa-file-pen"></i></span>
                 <span>View onsite registration form</span>

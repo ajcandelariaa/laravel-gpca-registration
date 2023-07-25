@@ -33,6 +33,8 @@ Route::prefix('admin')->group(function () {
             Route::prefix('{eventCategory}/{eventId}')->group(function (){
                 Route::get('/edit', [EventController::class, 'eventEditView'])->name('admin.event.edit.view');
                 Route::post('/edit', [EventController::class, 'updateEvent'])->name('admin.event.edit.post');
+                
+                Route::post('/update-status/{eventStatus}', [EventController::class, 'updateEventStatus'])->name('admin.event.update.status.post');
 
                 Route::get('/dashboard', [EventController::class, 'eventDashboardView'])->name('admin.event.dashboard.view');
                 Route::get('/detail', [EventController::class, 'eventDetailView'])->name('admin.event.detail.view');
@@ -50,6 +52,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('/{delegateType}/{delegateId}', [DelegateController::class, 'delegateDetailView'])->name('admin.event.delegates.detail.view');
                     Route::get('/{delegateType}/{delegateId}/print-badge', [DelegateController::class, 'delegateDetailPrintBadge'])->name('admin.event.delegates.detail.printBadge');
                 });
+                // Route::get('/onsite/register/', [RegistrationController::class, 'eventOnsiteRegistrationView'])->name('admin.event.onsite.register.view');
             });
         });
 

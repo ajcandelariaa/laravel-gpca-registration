@@ -40,7 +40,7 @@ class RegistrationController extends Controller
 
     public function homepageView()
     {
-        $events = Event::where('active', true)->orderBy('event_start_date', 'asc')->get();
+        $events = Event::orderBy('event_start_date', 'asc')->get();
         $finalUpcomingEvents = array();
         $finalPastEvents = array();
 
@@ -51,7 +51,7 @@ class RegistrationController extends Controller
 
                 $eventEndDate = Carbon::parse($event->event_end_date);
 
-                if (Carbon::now()->lt($eventEndDate->addDay())) {
+                if (Carbon::now()->lt($eventEndDate->addDay()) && $event->active) {
                     array_push($finalUpcomingEvents, [
                         'eventLogo' => $event->logo,
                         'eventName' => $event->name,
@@ -173,11 +173,15 @@ class RegistrationController extends Controller
 
             $eventEndDate = Carbon::parse($event->event_end_date);
 
-            if (Carbon::now()->lt($eventEndDate->addDay())) {
-                return view('registration.registration', [
-                    'pageTitle' => $event->name . " - Registration",
-                    'event' => $event,
-                ]);
+            if ($event->active) {
+                if (Carbon::now()->lt($eventEndDate->addDay())) {
+                    return view('registration.registration', [
+                        'pageTitle' => $event->name . " - Registration",
+                        'event' => $event,
+                    ]);
+                } else {
+                    abort(404, 'The URL is incorrect');
+                }
             } else {
                 abort(404, 'The URL is incorrect');
             }
@@ -185,6 +189,25 @@ class RegistrationController extends Controller
             abort(404, 'The URL is incorrect');
         }
     }
+
+    // public function eventOnsiteRegistrationView($eventCategory, $eventId){
+    //     if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {
+    //         $event = Event::where('category', $eventCategory)->where('id', $eventId)->first();
+
+    //         $eventEndDate = Carbon::parse($event->event_end_date);
+
+    //         if (Carbon::now()->lt($eventEndDate->addDay())) {
+    //             return view('registration.registration', [
+    //                 'pageTitle' => $event->name . " - Onsite Registration",
+    //                 'event' => $event,
+    //             ]);
+    //         } else {
+    //             abort(404, 'The URL is incorrect');
+    //         }
+    //     } else {
+    //         abort(404, 'The URL is incorrect');
+    //     }
+    // }
 
     public function eventRegistrantsView($eventCategory, $eventId)
     {
@@ -211,7 +234,7 @@ class RegistrationController extends Controller
             } else {
                 $finalData = $this->registrantDetailEventsView($eventCategory, $eventId, $registrantId);
             }
-            
+
             // dd($finalData);
             return view('admin.events.transactions.registrants_detail', [
                 "pageTitle" => "Transaction Details",
@@ -1375,7 +1398,7 @@ class RegistrationController extends Controller
             abort(404, 'The URL is incorrect');
         }
     }
-    
+
     public function getInvoice($eventCategory, $eventId, $registrantId)
     {
         if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {
@@ -1406,7 +1429,7 @@ class RegistrationController extends Controller
             } else {
                 $finalData = $this->eventRegistrantsExportData($eventCategory, $eventId);
             }
-            
+
             return response()->stream($finalData['callback'], 200, $finalData['headers']);
         } else {
             abort(404, 'The URL is incorrect');
@@ -4075,7 +4098,7 @@ class RegistrationController extends Controller
                         $data['nationality'],
                         $data['country'],
                         $data['city'],
-                        
+
                         $data['company_name'],
                         $data['job_title'],
 

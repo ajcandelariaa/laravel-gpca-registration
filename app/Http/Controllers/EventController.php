@@ -1439,6 +1439,20 @@ class EventController extends Controller
         }
     }
 
+    public function updateEventStatus(Request $request, $eventCategory, $eventId, $eventStatus){
+        if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {
+
+            Event::where('id', $eventId)->update([
+                'active'=> !$eventStatus,
+            ]);
+
+            return redirect()->route('admin.event.detail.view', ['eventCategory' => $eventCategory, 'eventId' => $eventId])->with('success', 'Event status updated successfully.');
+
+        } else {
+            abort(404, 'The URL is incorrect');
+        }
+    }
+
     public function checkIfCountryExist($countryTemp, $arrayCountries)
     {
         $checker = 0;
