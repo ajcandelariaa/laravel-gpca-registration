@@ -96,6 +96,21 @@ Download invoice
     <li>All rates are valid till August 15, 2023.</li>
 </ul>
 
+<h4><strong>Airlines</strong></h4>
+<p>For your flight bookings, please click the below link to avail the special rates.</p>
+<p>Preferred Airline – <a href="https://www.qatarairways.com/en/corporate-travel/qmice/qmice-attendees-book.html?promocode=GPCAGR23">Qatar Airways</a></p>
+
+<h4><strong>Offer Details:</strong></h4>
+<ul>
+    <li>Offer period: until 19 September 2023 (available for booking) </li>
+    <li>Travel period: <strong>from 7 to 29 September 2023</strong> </li>
+    <li>Offer only valid when using the promo code <strong>GPCAGR23</strong> and travelling to <strong>DOH</strong></li>
+</ul>
+
+<h4><strong>How to Book</strong></h4>
+<p><strong>Step 1</strong>: Select your origin airport to <strong>DOH</strong> and your travel dates between <strong>from 7 to 29 Sept 2023</strong></p>
+<p><strong>Step 2</strong>: Click show flights to book and choose your flights.</p>
+
 @else
 @endif
 
