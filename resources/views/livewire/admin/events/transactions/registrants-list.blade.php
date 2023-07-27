@@ -9,9 +9,9 @@
                     target="_blank"
                     class="bg-green-600 hover:bg-green-700 text-white py-2 px-5 rounded-md text-lg text-center">Export
                     Data to Excel</a>
-                {{-- <button type="button" wire:click="openImportModal" wire:key="openImportModal"
+                <button type="button" wire:click="openImportModal" wire:key="openImportModal"
                     class="bg-sky-600 hover:bg-sky-700 text-white py-2 px-5 rounded-md text-lg text-center">Import
-                    Data</button> --}}
+                    Transactions</button>
             </div>
             <div class="flex items-center gap-2">
                 <div class="relative">

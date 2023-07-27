@@ -9,6 +9,7 @@ use App\Models\Event as Events;
 use App\Models\Member as Members;
 use App\Models\PromoCode as PromoCodes;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -55,7 +56,7 @@ class RegistrantsList extends Component
         $this->eventId = $eventId;
         $this->eventCategory = $eventCategory;
 
-        $mainDelegates = MainDelegates::where('event_id', $this->eventId)->orderBy('registered_date_time', 'DESC')->get();
+        $mainDelegates = MainDelegates::where('event_id', $this->eventId)->orderBy('id', 'DESC')->get();
 
         foreach (config('app.eventCategories') as $eventCategoryC => $code) {
             if ($this->event->category == $eventCategoryC) {
@@ -76,9 +77,9 @@ class RegistrantsList extends Component
                 if ($mainDelegate->pass_type == 'member') {
                     $passType = "Member";
                 } else if ($mainDelegate->pass_type == 'nonMember') {
-                    $passType = "Non-Member"; 
+                    $passType = "Non-Member";
                 } else {
-                    $passType = "Full Member"; 
+                    $passType = "Full Member";
                 }
 
                 // get reg status
@@ -103,7 +104,7 @@ class RegistrantsList extends Component
                     $payStatus = "Refunded";
                 }
 
-                if($mainDelegate->mode_of_payment == "bankTransfer"){
+                if ($mainDelegate->mode_of_payment == "bankTransfer") {
                     $paymentMethod = "Bank Transfer";
                 } else {
                     $paymentMethod = "Credit Card";
@@ -145,7 +146,8 @@ class RegistrantsList extends Component
         return view('livewire.admin.events.transactions.registrants-list');
     }
 
-    public function clearFilter(){
+    public function clearFilter()
+    {
         $this->filterByPassType = null;
         $this->filterByRegStatus = null;
         $this->filterByPayStatus = null;
@@ -227,15 +229,7 @@ class RegistrantsList extends Component
         $this->promoCodeErrors = array();
 
         $this->validate([
-            'delegatePassType' => 'required',
-            'companyName' => 'required',
-            'companySector' => 'required',
-            'companyAddress' => 'required',
-            'companyCountry' => 'required',
-            'companyCity' => 'required',
-            'companyMobileNumber' => 'required',
-            'paid' => 'required',
-            'csvFile' => 'required',
+            'csvFile' => 'required|mimes:csv,txt',
         ]);
 
         $file = fopen($this->csvFile->getRealPath(), "r");
@@ -248,18 +242,28 @@ class RegistrantsList extends Component
         $checkIfCorrectFormat = true;
         for ($i = 0; $i < count($rows); $i++) {
             if ($i == 0) {
-                if (count($rows[$i]) == 10) {
+                if (count($rows[$i]) == 20) {
                     if (
-                        $rows[$i][0] != "Promo Code used" ||
-                        $rows[$i][1] != "Badge Type" ||
-                        $rows[$i][2] != "Salutation" ||
-                        $rows[$i][3] != "First Name" ||
-                        $rows[$i][4] != "Middle Name" ||
-                        $rows[$i][5] != "Last Name" ||
-                        $rows[$i][6] != "Email Address" ||
+                        $rows[$i][0] != "Rate type" ||
+                        $rows[$i][1] != "Company Name" ||
+                        $rows[$i][2] != "Company Sector" ||
+                        $rows[$i][3] != "Company Address" ||
+                        $rows[$i][4] != "Country" ||
+                        $rows[$i][5] != "City" ||
+                        $rows[$i][6] != "Landline Number" ||
                         $rows[$i][7] != "Mobile Number" ||
-                        $rows[$i][8] != "Nationality" ||
-                        $rows[$i][9] != "Job Title"
+                        $rows[$i][8] != "Assistants email address" ||
+                        $rows[$i][9] != "Payment status" ||
+                        $rows[$i][10] != "Promo Code used" ||
+                        $rows[$i][11] != "Badge Type" ||
+                        $rows[$i][12] != "Salutation" ||
+                        $rows[$i][13] != "First Name" ||
+                        $rows[$i][14] != "Middle Name" ||
+                        $rows[$i][15] != "Last Name" ||
+                        $rows[$i][16] != "Email Address" ||
+                        $rows[$i][17] != "Mobile Number" ||
+                        $rows[$i][18] != "Nationality" ||
+                        $rows[$i][19] != "Job Title"
                     ) {
                         $checkIfCorrectFormat = false;
                     }
@@ -278,13 +282,20 @@ class RegistrantsList extends Component
                     continue;
                 } else {
                     if (
+                        empty($rows[$i][0]) ||
                         empty($rows[$i][1]) ||
+                        empty($rows[$i][2]) ||
                         empty($rows[$i][3]) ||
+                        empty($rows[$i][4]) ||
                         empty($rows[$i][5]) ||
-                        empty($rows[$i][6]) ||
                         empty($rows[$i][7]) ||
-                        empty($rows[$i][8])  ||
-                        empty($rows[$i][9])
+                        empty($rows[$i][9]) ||
+                        empty($rows[$i][11]) ||
+                        empty($rows[$i][13]) ||
+                        empty($rows[$i][15]) ||
+                        empty($rows[$i][16]) ||
+                        empty($rows[$i][17]) ||
+                        empty($rows[$i][18])
                     ) {
                         $lineNumber = $i + 1;
                         array_push($this->incompleDetails, "Line $lineNumber have missing details!");
@@ -295,13 +306,14 @@ class RegistrantsList extends Component
             if (count($this->incompleDetails) == 0) {
                 $this->csvFileError = null;
                 $this->incompleDetails = array();
+
                 for ($i = 0; $i < count($rows); $i++) {
                     if ($i == 0) {
                         continue;
                     } else {
-                        $email = $rows[$i][6];
+                        $email = $rows[$i][16];
                         for ($j = $i + 1; $j < count($rows); $j++) {
-                            $tempEmail = $rows[$j][6];
+                            $tempEmail = $rows[$j][16];
                             if ($email === $tempEmail) {
                                 $lineNumber = $i + 1;
                                 array_push($this->emailYouAlreadyUsed, "Line $lineNumber email address is duplicated!");
@@ -315,25 +327,32 @@ class RegistrantsList extends Component
                     $this->csvFileError = null;
                     $this->incompleDetails = array();
                     $this->emailYouAlreadyUsed = array();
+
                     for ($i = 0; $i < count($rows); $i++) {
                         if ($i == 0) {
                             continue;
                         } else {
                             $allDelegates = Transactions::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->get();
-
                             $mainDelegate = null;
                             $subDelegate = null;
+
+                            $tempEmail = $rows[$i][16];
+                            $lineNumber = $i + 1;
+
                             foreach ($allDelegates as $delegate) {
                                 if ($delegate->delegate_type == "main") {
-                                    $mainDelegate = MainDelegates::where('id', $delegate->delegate_id)->where('email_address', $rows[$i][6])->first();
-                                } else {
-                                    $subDelegate = AdditionalDelegates::where('id', $delegate->delegate_id)->where('email_address', $rows[$i][6])->first();
-                                }
-                            }
+                                    $mainDelegate = MainDelegates::where('id', $delegate->delegate_id)->where('email_address', $tempEmail)->first();
 
-                            if ($mainDelegate != null || $subDelegate != null) {
-                                $lineNumber = $i + 1;
-                                array_push($this->emailAlreadyExisting, "Line $lineNumber email address is already registered!");
+                                    if ($mainDelegate) {
+                                        array_push($this->emailAlreadyExisting, "Line $lineNumber email address is already registered!");
+                                    }
+                                } else {
+                                    $subDelegate = AdditionalDelegates::where('id', $delegate->delegate_id)->where('email_address', $tempEmail)->first();
+
+                                    if ($subDelegate) {
+                                        array_push($this->emailAlreadyExisting, "Line $lineNumber email address is already registered!");
+                                    }
+                                }
                             }
                         }
                     }
@@ -349,12 +368,12 @@ class RegistrantsList extends Component
                                 continue;
                             } else {
                                 // check promo codes if valid
-                                $promoCodeUsed = $rows[$i][0];
-                                $delegateType = $rows[$i][1];
+                                $promoCodeUsed = $rows[$i][10];
+                                $badgeType = $rows[$i][11];
                                 $lineNumber = $i + 1;
 
                                 if ($promoCodeUsed != null) {
-                                    $promoCode = PromoCodes::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->where('active', true)->where('promo_code', $promoCodeUsed)->where('badge_type', $delegateType)->first();
+                                    $promoCode = PromoCodes::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->where('active', true)->where('promo_code', $promoCodeUsed)->where('badge_type', $badgeType)->first();
                                     if ($promoCode == null) {
                                         array_push($this->promoCodeErrors, "Line $lineNumber promo code is invalid");
                                     } else {
@@ -367,6 +386,10 @@ class RegistrantsList extends Component
                                         } else {
                                             array_push($this->promoCodeErrors, "Line $lineNumber promo code has reached its capacity");
                                         }
+                                    }
+                                } else {
+                                    if ($rows[$i][9] == "Free") {
+                                        array_push($this->promoCodeErrors, "Line $lineNumber promo code is required since the payment status is Free");
                                     }
                                 }
                             }
@@ -393,183 +416,8 @@ class RegistrantsList extends Component
         }
     }
 
-    public function submitImportRegistrants()
-    {
-
-        $file = fopen($this->csvFile->getRealPath(), "r");
-        $rows = [];
-        while (($row = fgetcsv($file, 0, ",")) !== FALSE) {
-            $rows[] = $row;
-        }
-        fclose($file);
-
-        $this->checkUnitPrice();
-
-        $quantity = count($rows) - 1;
-        $finalNetAmount = 0;
-        $finalVatPrice = 0;
-        $finalDiscountPrice = 0;
-        $totalAmount = 0;
-        $mainDelegateId = 0;
-
-        for ($i = 0; $i < count($rows); $i++) {
-            if ($i == 0) {
-                continue;
-            } else {
-                // calculate 
-                $promoCodeUsed = $rows[$i][0];
-                $delegateType = $rows[$i][1];
-
-                if ($promoCodeUsed != null) {
-                    $promoCode = PromoCodes::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->where('active', true)->where('promo_code', $promoCodeUsed)->where('badge_type', $delegateType)->first();
-
-                    $tempDiscount = $this->finalUnitPrice * ($promoCode->discount / 100);
-                    $tempNetAmount = $this->finalUnitPrice - $tempDiscount;
-
-                    $finalNetAmount +=  $tempNetAmount;
-                    $finalDiscountPrice +=  $tempDiscount;
-                } else {
-                    $finalNetAmount +=  $this->finalUnitPrice;
-                    $finalDiscountPrice +=  0;
-                }
-            }
-        }
-
-        $finalVatPrice = $finalNetAmount * ($this->event->event_vat / 100);
-        $totalAmount = $finalNetAmount + $finalVatPrice;
-
-        if ($totalAmount == 0) {
-            $paymentStatus = "free";
-            $registrationStatus = "confirmed";
-        } else {
-            $registrationStatus = "pending";
-            $paymentStatus = "unpaid";
-        }
-
-        for ($i = 0; $i < count($rows); $i++) {
-            if ($i == 0) {
-                continue;
-            } else if ($i == 1) {
-                // add main delegate
-                $newRegistrant = MainDelegates::create([
-                    'event_id' => $this->event->id,
-                    'pass_type' => $this->delegatePassType,
-                    'rate_type' => $this->rateType,
-                    'rate_type_string' => $this->rateTypeString,
-
-                    'company_name' => $this->companyName,
-                    'company_sector' => $this->companySector,
-                    'company_address' => $this->companyAddress,
-                    'company_country' => $this->companyCountry,
-                    'company_city' => $this->companyCity,
-                    'company_telephone_number' => $this->companyLandlineNumber,
-                    'company_mobile_number' => $this->companyMobileNumber,
-                    'assistant_email_address' => $this->assistantEmailAddress,
-
-                    'salutation' => $rows[$i][2],
-                    'first_name' => $rows[$i][3],
-                    'middle_name' => $rows[$i][4],
-                    'last_name' => $rows[$i][5],
-                    'email_address' => $rows[$i][6],
-                    'mobile_number' => $rows[$i][7],
-                    'nationality' => $rows[$i][8],
-                    'job_title' => $rows[$i][9],
-                    'badge_type' => $rows[$i][1],
-                    'pcode_used' => $rows[$i][0],
-
-                    'heard_where' => $this->heardWhere,
-                    'quantity' => $quantity,
-                    'unit_price' => $this->finalUnitPrice,
-                    'net_amount' => $finalNetAmount,
-                    'vat_price' => $finalVatPrice,
-                    'discount_price' => $finalDiscountPrice,
-                    'total_amount' => $totalAmount,
-                    'mode_of_payment' => "bankTransfer",
-                    'registration_status' => $registrationStatus,
-                    'payment_status' => $paymentStatus,
-                    'registered_date_time' => Carbon::now(),
-                    'paid_date_time' => null,
-                ]);
-
-                Transactions::create([
-                    'event_id' => $this->event->id,
-                    'event_category' => $this->event->category,
-                    'delegate_id' => $newRegistrant->id,
-                    'delegate_type' => "main",
-                ]);
-
-                $mainDelegateId = $newRegistrant->id;
-
-                // EMAIL NOTIFICATION HERE
-                $details = [
-                    'name' => $rows[$i][2] . " " . $rows[$i][3] . " " . $rows[$i][4] . " " . $rows[$i][5],
-                    'eventName' => $this->event->name,
-                    'startDate' => Carbon::createFromFormat('Y-m-d', $this->event->event_start_date)->format('l j F'),
-                    'endDate' => Carbon::createFromFormat('Y-m-d', $this->event->event_end_date)->format('l j F'),
-                    'year' => $this->event->year,
-                    'location' => $this->event->location,
-                    'badgeLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-badge" . "/" . "main" . "/" . $newRegistrant->id,
-                    'invoiceLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-invoice" . "/" . $newRegistrant->id,
-                ];
-
-                // Mail::to($rows[$i][6])->send(new RegistrationConfirmation($details));
-
-                // if ($this->assistantEmailAddress != null) {
-                //     Mail::to($this->assistantEmailAddress)->send(new RegistrationConfirmation($details));
-                // }
-            } else {
-                // add sub delegate
-                $newAdditionDelegate = AdditionalDelegates::create([
-                    'main_delegate_id' => $mainDelegateId,
-                    'salutation' => $rows[$i][2],
-                    'first_name' => $rows[$i][3],
-                    'middle_name' => $rows[$i][4],
-                    'last_name' => $rows[$i][5],
-                    'email_address' => $rows[$i][6],
-                    'mobile_number' => $rows[$i][7],
-                    'nationality' => $rows[$i][8],
-                    'job_title' => $rows[$i][9],
-                    'badge_type' => $rows[$i][1],
-                    'pcode_used' => $rows[$i][0],
-                ]);
-
-                Transactions::create([
-                    'event_id' => $this->event->id,
-                    'event_category' => $this->event->category,
-                    'delegate_id' => $newAdditionDelegate->id,
-                    'delegate_type' => "sub",
-                ]);
-
-
-                // EMAIL NOTIFICATION HERE
-                $details = [
-                    'name' => $rows[$i][2] . " " . $rows[$i][3] . " " . $rows[$i][4] . " " . $rows[$i][5],
-                    'eventName' => $this->event->name,
-                    'startDate' => Carbon::createFromFormat('Y-m-d', $this->event->event_start_date)->format('l j F'),
-                    'endDate' => Carbon::createFromFormat('Y-m-d', $this->event->event_end_date)->format('l j F'),
-                    'year' => $this->event->year,
-                    'location' => $this->event->location,
-                    'badgeLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-badge" . "/" . "main" . "/" . $newAdditionDelegate->id,
-                    'invoiceLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-invoice" . "/" . $mainDelegateId,
-                ];
-
-                // Mail::to($rows[$i][6])->send(new RegistrationConfirmation($details));
-            }
-        }
-
-        $this->resetImportFields();
-        $this->showImportModal = false;
-
-        $this->dispatchBrowserEvent('swal:import-delegate', [
-            'type' => 'success',
-            'message' => 'Delegate Imported Successfully!',
-            'text' => ''
-        ]);
-    }
-
     public function openImportModal()
     {
-        $this->members = Members::where('active', true)->get();
         $this->showImportModal = true;
     }
 
@@ -581,17 +429,7 @@ class RegistrantsList extends Component
 
     public function resetImportFields()
     {
-        $this->companyName = null;
-        $this->companySector = null;
-        $this->companyAddress = null;
-        $this->companyCountry = null;
-        $this->companyCity = null;
-        $this->companyLandlineNumber = null;
-        $this->assistantEmailAddress = null;
-        $this->companyMobileNumber = null;
-        $this->heardWhere = null;
         $this->csvFile = null;
-
         $this->csvFileError = null;
         $this->incompleDetails = array();
         $this->emailYouAlreadyUsed = array();
@@ -599,49 +437,307 @@ class RegistrantsList extends Component
         $this->promoCodeErrors = array();
     }
 
-    public function checkUnitPrice()
+    public function submitImportRegistrants()
     {
-        $today = Carbon::today();
+        $file = fopen($this->csvFile->getRealPath(), "r");
+        $rows = [];
+        while (($row = fgetcsv($file, 0, ",")) !== FALSE) {
+            $rows[] = $row;
+        }
+        fclose($file);
 
-        // CHECK UNIT PRICE
-        if ($this->event->eb_end_date != null && $this->event->eb_member_rate != null && $this->event->eb_nmember_rate != null) {
-            if ($today->lte(Carbon::parse($this->event->eb_end_date))) {
-                if ($this->delegatePassType == "fullMember") {
-                    $this->rateTypeString = "Early Bird Full Member Rate";
-                    $this->finalUnitPrice = $this->event->eb_full_member_rate;
-                } else if ($this->delegatePassType == "member") {
-                    $this->rateTypeString = "Early Bird Member Rate";
-                    $this->finalUnitPrice = $this->event->eb_member_rate;
-                } else {
-                    $this->rateTypeString = "Early Bird Non-Member Rate";
-                    $this->finalUnitPrice = $this->event->eb_nmember_rate;
-                }
-                $this->rateType = "Early Bird";
+        $earlyBirdUnpaid = array();
+        $earlyBirdPaidFree = array();
+        $standardUnpaid = array();
+        $standardPaidFree = array();
+        $finalData = array();
+
+        for ($i = 0; $i < count($rows); $i++) {
+            if ($i == 0) {
+                continue;
             } else {
-                if ($this->delegatePassType == "fullMember") {
-                    $this->rateTypeString = "Standard Full Member Rate";
-                    $this->finalUnitPrice = $this->event->std_full_member_rate;
-                } else if ($this->delegatePassType == "member") {
-                    $this->rateTypeString = "Standard Member Rate";
-                    $this->finalUnitPrice = $this->event->std_member_rate;
+                $rateType = $rows[$i][0];
+                $paymentStatus = $rows[$i][9];
+
+                if ($rateType == "Early Bird") {
+                    if ($paymentStatus == "Unpaid") {
+                        $earlyBirdUnpaid = $this->groupDelegatesByCompany($earlyBirdUnpaid, $rows, $i, 'earlyBird');
+                    } else {
+                        $earlyBirdPaidFree = $this->groupDelegatesByCompany($earlyBirdPaidFree, $rows, $i, 'earlyBird');
+                    }
                 } else {
-                    $this->rateTypeString = "Standard Non-Member Rate";
-                    $this->finalUnitPrice = $this->event->std_nmember_rate;
+                    if ($paymentStatus == "Unpaid") {
+                        $standardUnpaid = $this->groupDelegatesByCompany($standardUnpaid, $rows, $i, 'standard');
+                    } else {
+                        $standardPaidFree = $this->groupDelegatesByCompany($standardPaidFree, $rows, $i, 'standard');
+                    }
                 }
-                $this->rateType = "Standard";
+            }
+        }
+        $finalData = [$earlyBirdUnpaid, $earlyBirdPaidFree, $standardUnpaid, $standardPaidFree];
+
+        foreach ($finalData as $transactions) {
+            foreach ($transactions as $transaction) {
+
+                // dd($transaction);
+
+                $checkCompanyIfMember = Members::where('name', $transaction['company_name'])->first();
+
+                if ($checkCompanyIfMember) {
+                    if ($this->event->eb_full_member_rate != null && $this->event->std_full_member_rate != null) {
+                        $delegatePassType = 'fullMember';
+
+                        if ($transaction['rate_type'] == "earlyBird") {
+                            $rateTypeString = "Full member early bird rate";
+                            $finalUnitPrice = $this->event->eb_full_member_rate;
+                        } else {
+                            $rateTypeString = "Full member standard rate";
+                            $finalUnitPrice = $this->event->std_full_member_rate;
+                        }
+                    } else {
+                        $delegatePassType = 'member';
+
+                        if ($transaction['rate_type'] == "earlyBird") {
+                            $rateTypeString = "Member early bird rate";
+                            $finalUnitPrice = $this->event->eb_member_rate;
+                        } else {
+                            $rateTypeString = "Member standard rate";
+                            $finalUnitPrice = $this->event->std_member_rate;
+                        }
+                    }
+                } else {
+                    $delegatePassType = 'nonMember';
+
+                    if ($transaction['rate_type'] == "earlyBird") {
+                        $rateTypeString = "Non-Member early bird rate";
+                        $finalUnitPrice = $this->event->eb_nmember_rate;
+                    } else {
+                        $rateTypeString = "Non-Member standard rate";
+                        $finalUnitPrice = $this->event->std_nmember_rate;
+                    }
+                }
+
+                if ($transaction['delegates'][0]['payment_status'] == "Unpaid") {
+                    $registrationStatus = "pending";
+                } else {
+                    $registrationStatus = "confirmed";
+                }
+
+                $finalNetAmount = 0;
+                $finalDiscount = 0;
+
+                foreach ($transaction['delegates'] as $delegate) {
+                    if($delegate['pcode_used'] != null){
+                        $promoCodeDiscount = PromoCodes::where('event_id', $this->event->id)->where('event_category', $this->event->category)->where('badge_type', $delegate['badge_type'])->where('promo_code', $delegate['pcode_used'])->value('discount');
+
+                        if($promoCodeDiscount != null){
+                            PromoCodes::where('event_id', $this->event->id)->where('event_category', $this->event->category)->where('badge_type', $delegate['badge_type'])->where('promo_code', $delegate['pcode_used'])->increment('total_usage');
+
+                            $finalDiscount += $finalUnitPrice * ($promoCodeDiscount / 100);
+                            $finalNetAmount += $finalUnitPrice - ($finalUnitPrice * ($promoCodeDiscount / 100));
+                        }
+                    } else {
+                        $finalNetAmount += $finalUnitPrice;
+                    }
+                }
+
+                $finalVat = $finalNetAmount * ($this->event->event_vat / 100);
+                $finalTotal = $finalNetAmount + $finalVat;
+
+                if($finalTotal == 0){
+                    $paymentStatus = "free";
+                    $paidDateTime = Carbon::now();
+                } else {
+                    if($transaction['delegates'][0]['payment_status'] == "Unpaid"){
+                        $paymentStatus = "unpaid";
+                        $paidDateTime = null;
+                    } else {
+                        $paymentStatus = "paid";
+                        $paidDateTime = Carbon::now();
+                    }
+                }
+
+                $newTransaction = MainDelegates::create([
+                    'event_id' => $this->event->id,
+                    'pass_type' => $delegatePassType,
+                    'rate_type' => $transaction['rate_type'],
+                    'rate_type_string' => $rateTypeString,
+
+                    'company_name' => $transaction['company_name'],
+                    'company_sector' => $transaction['company_sector'],
+                    'company_address' => $transaction['company_address'],
+                    'company_country' => $transaction['company_country'],
+                    'company_city' => $transaction['company_city'],
+                    'company_telephone_number' => $transaction['company_telephone_number'],
+                    'company_mobile_number' => $transaction['company_mobile_number'],
+                    'assistant_email_address' => $transaction['assistant_email_address'],
+
+                    'salutation' => $transaction['delegates'][0]['salutation'],
+                    'first_name' => $transaction['delegates'][0]['first_name'],
+                    'middle_name' => $transaction['delegates'][0]['middle_name'],
+                    'last_name' => $transaction['delegates'][0]['last_name'],
+                    'email_address' => $transaction['delegates'][0]['email_address'],
+                    'mobile_number' => $transaction['delegates'][0]['mobile_number'],
+                    'nationality' => $transaction['delegates'][0]['nationality'],
+                    'job_title' => $transaction['delegates'][0]['job_title'],
+                    'badge_type' => $transaction['delegates'][0]['badge_type'],
+                    'pcode_used' => $transaction['delegates'][0]['pcode_used'],
+
+                    'heard_where' => null,
+                    'quantity' => count($transaction['delegates']),
+                    'unit_price' => $finalUnitPrice,
+                    'net_amount' => $finalNetAmount,
+                    'vat_price' => $finalVat,
+                    'discount_price' => $finalDiscount,
+                    'total_amount' => $finalTotal,
+                    'mode_of_payment' => "bankTransfer",
+                    'registration_status' => $registrationStatus,
+                    'payment_status' => $paymentStatus,
+                    'registered_date_time' => Carbon::now(),
+                    'paid_date_time' => $paidDateTime,
+
+                    'registration_method' => 'imported',
+                ]);
+
+                Transactions::create([
+                    'event_id' => $this->event->id,
+                    'event_category' => $this->event->category,
+                    'delegate_id' => $newTransaction->id,
+                    'delegate_type' => "main",
+                ]);
+
+                if(count($transaction['delegates']) > 1){
+                    for($x = 0; $x < count($transaction['delegates']); $x++){
+                        if($x == 0){
+                            continue;
+                        } else {
+                            $addtionalDelegate = AdditionalDelegates::create([
+                                'main_delegate_id' => $newTransaction->id,
+                                'salutation' => $transaction['delegates'][$x]['salutation'],
+                                'first_name' => $transaction['delegates'][$x]['first_name'],
+                                'middle_name' => $transaction['delegates'][$x]['middle_name'],
+                                'last_name' => $transaction['delegates'][$x]['last_name'],
+                                'email_address' => $transaction['delegates'][$x]['email_address'],
+                                'mobile_number' => $transaction['delegates'][$x]['mobile_number'],
+                                'nationality' => $transaction['delegates'][$x]['nationality'],
+                                'job_title' => $transaction['delegates'][$x]['job_title'],
+                                'badge_type' => $transaction['delegates'][$x]['badge_type'],
+                                'pcode_used' => $transaction['delegates'][$x]['pcode_used'],
+                            ]);
+            
+                            Transactions::create([
+                                'event_id' => $this->event->id,
+                                'event_category' => $this->event->category,
+                                'delegate_id' => $addtionalDelegate->id,
+                                'delegate_type' => "sub",
+                            ]);
+                        }
+                    }
+                }
+            }
+        }
+
+
+
+        $this->resetImportFields();
+        $this->showImportModal = false;
+
+        $this->dispatchBrowserEvent('swal:import-delegate', [
+            'type' => 'success',
+            'message' => 'Delegate Imported Successfully!',
+            'text' => ''
+        ]);
+    }
+
+    public function groupDelegatesByCompany($arrayData, $rows, $i, $rateType)
+    {
+        if (count($arrayData) > 0) {
+            $checkIfMatch = 0;
+            $arrayDataIndex = 0;
+            foreach ($arrayData as $index => $data) {
+                if ($data['company_name'] == $rows[$i][1]) {
+                    $checkIfMatch++;
+                    $arrayDataIndex = $index;
+                    break;
+                }
+            }
+
+            if ($checkIfMatch > 0) {
+                $delegate = [
+                    'payment_status' => $rows[$i][9],
+                    'pcode_used' => $rows[$i][10],
+                    'badge_type' => $rows[$i][11],
+                    'salutation' => $rows[$i][12],
+                    'first_name' => $rows[$i][13],
+                    'middle_name' => $rows[$i][14],
+                    'last_name' => $rows[$i][15],
+                    'email_address' => $rows[$i][16],
+                    'mobile_number' => $rows[$i][17],
+                    'nationality' => $rows[$i][18],
+                    'job_title' => $rows[$i][19],
+                ];
+
+                array_push($arrayData[$arrayDataIndex]['delegates'], $delegate);
+            } else {
+                $delegate = [
+                    'payment_status' => $rows[$i][9],
+                    'pcode_used' => $rows[$i][10],
+                    'badge_type' => $rows[$i][11],
+                    'salutation' => $rows[$i][12],
+                    'first_name' => $rows[$i][13],
+                    'middle_name' => $rows[$i][14],
+                    'last_name' => $rows[$i][15],
+                    'email_address' => $rows[$i][16],
+                    'mobile_number' => $rows[$i][17],
+                    'nationality' => $rows[$i][18],
+                    'job_title' => $rows[$i][19],
+                ];
+
+                array_push($arrayData, [
+                    'rate_type' => $rateType,
+                    'company_name' => $rows[$i][1],
+                    'company_sector' => $rows[$i][2],
+                    'company_address' => $rows[$i][3],
+                    'company_country' => $rows[$i][4],
+                    'company_city' => $rows[$i][5],
+                    'company_telephone_number' => $rows[$i][6],
+                    'company_mobile_number' => $rows[$i][7],
+                    'assistant_email_address' => $rows[$i][8],
+                    'delegates' => [
+                        $delegate
+                    ],
+                ]);
             }
         } else {
-            if ($this->delegatePassType == "fullMember") {
-                $this->rateTypeString = "Standard Full Member Rate";
-                $this->finalUnitPrice = $this->event->std_full_member_rate;
-            } else if ($this->delegatePassType == "member") {
-                $this->rateTypeString = "Standard Member Rate";
-                $this->finalUnitPrice = $this->event->std_member_rate;
-            } else {
-                $this->rateTypeString = "Standard Non-Member Rate";
-                $this->finalUnitPrice = $this->event->std_nmember_rate;
-            }
-            $this->rateType = "Standard";
+            $delegate = [
+                'payment_status' => $rows[$i][9],
+                'pcode_used' => $rows[$i][10],
+                'badge_type' => $rows[$i][11],
+                'salutation' => $rows[$i][12],
+                'first_name' => $rows[$i][13],
+                'middle_name' => $rows[$i][14],
+                'last_name' => $rows[$i][15],
+                'email_address' => $rows[$i][16],
+                'mobile_number' => $rows[$i][17],
+                'nationality' => $rows[$i][18],
+                'job_title' => $rows[$i][19],
+            ];
+
+            array_push($arrayData, [
+                'rate_type' => $rateType,
+                'company_name' => $rows[$i][1],
+                'company_sector' => $rows[$i][2],
+                'company_address' => $rows[$i][3],
+                'company_country' => $rows[$i][4],
+                'company_city' => $rows[$i][5],
+                'company_telephone_number' => $rows[$i][6],
+                'company_mobile_number' => $rows[$i][7],
+                'assistant_email_address' => $rows[$i][8],
+                'delegates' => [
+                    $delegate
+                ],
+            ]);
         }
+        return $arrayData;
     }
 }
