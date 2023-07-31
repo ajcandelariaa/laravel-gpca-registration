@@ -1502,4 +1502,33 @@ class EventController extends Controller
             return false;
         }
     }
+
+
+    // =========================================================
+    //                       RENDER APIS
+    // =========================================================
+
+    public function getRegistrationTypes($eventCategory, $year){
+        if(Event::where('category', $eventCategory)->where('year', $year)->exists()){
+            $eventId = Event::where('category', $eventCategory)->where('year', $year)->value('id');
+            $registrationTypes = EventRegistrationType::where('event_id', $eventId)->where('active', true)->get();
+    
+            $finalRegistrationTypes = array();
+    
+            if($registrationTypes->isNotEmpty()){
+                foreach($registrationTypes as $registrationType){
+                    array_push($finalRegistrationTypes, $registrationType->registration_type);
+                }
+            }
+            return response()->json([
+                'status' => '200',
+                'data' => $finalRegistrationTypes,
+            ], 200);
+        } else {
+            return response()->json([
+                'status' => '404',
+                'message' => "Event not found",
+            ], 404);
+        }
+    }
 }
