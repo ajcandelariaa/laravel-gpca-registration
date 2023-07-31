@@ -104,6 +104,25 @@ Download invoice
 <p><strong>Step 2</strong>: Click show flights to book and choose your flights.</p>
 
 @else
+<h3>GENERAL INFORMATION</h3>
+
+<h4><strong>Qatar Visa</strong></h4>
+<p>Please see the <a href="https://visitqatar.com/intl-en/practical-info/visas">link</a> for further information on how to obtain the visa. Kindly notify the GPCA office if you require any assistance.</p>
+
+<h4><strong>HOTEL ACCOMODATION</strong></h4>
+<p>Experience a seamless and stress-free event journey with our expert travel partner. For more information on travel and accommodation please contact</p>
+
+<p>Uchita Mhatre</p>
+<p>+971553079469</p>
+<p>umhatre@cozmotravel.com</p>
+
+<p>Mohamed Reda Sabbah</p>
+<p>+971558236738</p>
+<p>r.sabbah@cozmotravel.com</p>
+
+<p>Aziz Tinwala</p>
+<p>+971547502008</p>
+<p>t.aziz@cozmotravel.com</p>
 @endif
 
 <p>For the latest updates on the event, please visit the event website at <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a>.</p>
