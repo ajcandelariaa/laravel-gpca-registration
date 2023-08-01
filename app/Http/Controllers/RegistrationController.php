@@ -1523,12 +1523,14 @@ class RegistrationController extends Controller
                         'eventDates' => $eventFormattedData,
                         'eventLocation' => $event->location,
                         'eventCategory' => $event->category,
+                        'eventYear' => $event->year,
 
                         'jobTitle' => $mainDelegate->job_title,
                         'companyName' => $mainDelegate->company_name,
                         'amountPaid' => $mainDelegate->total_amount,
                         'transactionId' => $tempTransactionId,
                         'invoiceLink' => $invoiceLink,
+                        'badgeLink' => env('APP_URL')."/".$event->category."/".$event->id."/view-badge"."/"."main"."/".$mainDelegateId,
                     ];
 
                     $details2 = [
@@ -1536,6 +1538,7 @@ class RegistrationController extends Controller
                         'eventLink' => $event->link,
                         'eventName' => $event->name,
                         'eventCategory' => $event->category,
+                        'eventYear' => $event->year,
 
                         'invoiceAmount' => $mainDelegate->total_amount,
                         'amountPaid' => $mainDelegate->total_amount,
@@ -1566,12 +1569,14 @@ class RegistrationController extends Controller
                                 'eventDates' => $eventFormattedData,
                                 'eventLocation' => $event->location,
                                 'eventCategory' => $event->category,
+                                'eventYear' => $event->year,
 
                                 'jobTitle' => $additionalDelegate->job_title,
                                 'companyName' => $mainDelegate->company_name,
                                 'amountPaid' => $mainDelegate->total_amount,
                                 'transactionId' => $tempTransactionId,
                                 'invoiceLink' => $invoiceLink,
+                                'badgeLink' => env('APP_URL')."/".$event->category."/".$event->id."/view-badge"."/"."sub"."/".$additionalDelegate->id,
                             ];
 
                             $details2 = [
@@ -1579,6 +1584,7 @@ class RegistrationController extends Controller
                                 'eventLink' => $event->link,
                                 'eventName' => $event->name,
                                 'eventCategory' => $event->category,
+                                'eventYear' => $event->year,
 
                                 'invoiceAmount' => $mainDelegate->total_amount,
                                 'amountPaid' => $mainDelegate->total_amount,
@@ -1618,6 +1624,7 @@ class RegistrationController extends Controller
                         'eventLocation' => $event->location,
                         'bankDetails' => $bankDetails,
                         'invoiceLink' => $invoiceLink,
+                        'eventYear' => $event->year,
                     ];
 
                     Mail::to($mainDelegate->email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationCardDeclined($details));
@@ -1639,6 +1646,7 @@ class RegistrationController extends Controller
                                 'eventLocation' => $event->location,
                                 'bankDetails' => $bankDetails,
                                 'invoiceLink' => $invoiceLink,
+                                'eventYear' => $event->year,
                             ];
                             Mail::to($additionalDelegate->email_address)->queue(new RegistrationCardDeclined($details));
                         }
@@ -1673,6 +1681,7 @@ class RegistrationController extends Controller
                     'eventLocation' => $event->location,
                     'bankDetails' => $bankDetails,
                     'invoiceLink' => $invoiceLink,
+                    'eventYear' => $event->year,
                 ];
 
                 Mail::to($mainDelegate->email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationCardDeclined($details));
@@ -1694,6 +1703,7 @@ class RegistrationController extends Controller
                             'eventLocation' => $event->location,
                             'bankDetails' => $bankDetails,
                             'invoiceLink' => $invoiceLink,
+                            'eventYear' => $event->year,
                         ];
                         Mail::to($additionalDelegate->email_address)->queue(new RegistrationCardDeclined($details));
                     }
@@ -1783,6 +1793,7 @@ class RegistrationController extends Controller
                         'eventDates' => $eventFormattedData,
                         'eventLocation' => $event->location,
                         'eventCategory' => $event->category,
+                        'eventYear' => $event->year,
 
                         'nationality' => $mainSpouse->nationality,
                         'country' => $mainSpouse->country,
@@ -1790,6 +1801,7 @@ class RegistrationController extends Controller
                         'amountPaid' => $mainSpouse->total_amount,
                         'transactionId' => $tempTransactionId,
                         'invoiceLink' => $invoiceLink,
+                        'badgeLink' => env('APP_URL')."/".$event->category."/".$event->id."/view-badge"."/"."main"."/".$mainSpouse->id,
                     ];
 
                     $details2 = [
@@ -1797,6 +1809,7 @@ class RegistrationController extends Controller
                         'eventLink' => $event->link,
                         'eventName' => $event->name,
                         'eventCategory' => $event->category,
+                        'eventYear' => $event->year,
 
                         'invoiceAmount' => $mainSpouse->total_amount,
                         'amountPaid' => $mainSpouse->total_amount,
@@ -1823,6 +1836,7 @@ class RegistrationController extends Controller
                                 'eventDates' => $eventFormattedData,
                                 'eventLocation' => $event->location,
                                 'eventCategory' => $event->category,
+                                'eventYear' => $event->year,
 
                                 'nationality' => $additionalSpouse->nationality,
                                 'country' => $additionalSpouse->country,
@@ -1830,6 +1844,7 @@ class RegistrationController extends Controller
                                 'amountPaid' => $mainSpouse->total_amount,
                                 'transactionId' => $tempTransactionId,
                                 'invoiceLink' => $invoiceLink,
+                                'badgeLink' => env('APP_URL')."/".$event->category."/".$event->id."/view-badge"."/"."sub"."/".$additionalSpouse->id,
                             ];
 
                             $details2 = [
@@ -1837,6 +1852,7 @@ class RegistrationController extends Controller
                                 'eventLink' => $event->link,
                                 'eventName' => $event->name,
                                 'eventCategory' => $event->category,
+                                'eventYear' => $event->year,
 
                                 'invoiceAmount' => $mainSpouse->total_amount,
                                 'amountPaid' => $mainSpouse->total_amount,
@@ -1876,6 +1892,7 @@ class RegistrationController extends Controller
                         'eventLocation' => $event->location,
                         'bankDetails' => $bankDetails,
                         'invoiceLink' => $invoiceLink,
+                        'eventYear' => $event->year,
                     ];
 
                     Mail::to($mainSpouse->email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationCardDeclined($details));
@@ -1893,6 +1910,7 @@ class RegistrationController extends Controller
                                 'eventLocation' => $event->location,
                                 'bankDetails' => $bankDetails,
                                 'invoiceLink' => $invoiceLink,
+                                'eventYear' => $event->year,
                             ];
                             Mail::to($additionalSpouse->email_address)->queue(new RegistrationCardDeclined($details));
                         }
@@ -1927,6 +1945,7 @@ class RegistrationController extends Controller
                     'eventLocation' => $event->location,
                     'bankDetails' => $bankDetails,
                     'invoiceLink' => $invoiceLink,
+                    'eventYear' => $event->year,
                 ];
 
                 Mail::to($mainSpouse->email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationCardDeclined($details));
@@ -1944,6 +1963,7 @@ class RegistrationController extends Controller
                             'eventLocation' => $event->location,
                             'bankDetails' => $bankDetails,
                             'invoiceLink' => $invoiceLink,
+                            'eventYear' => $event->year,
                         ];
                         Mail::to($additionalSpouse->email_address)->queue(new RegistrationCardDeclined($details));
                     }
@@ -2033,6 +2053,7 @@ class RegistrationController extends Controller
                         'eventDates' => $eventFormattedData,
                         'eventLocation' => $event->location,
                         'eventCategory' => $event->category,
+                        'eventYear' => $event->year,
 
                         'nationality' => $mainVisitor->nationality,
                         'country' => $mainVisitor->country,
@@ -2040,6 +2061,7 @@ class RegistrationController extends Controller
                         'amountPaid' => $mainVisitor->total_amount,
                         'transactionId' => $tempTransactionId,
                         'invoiceLink' => $invoiceLink,
+                        'badgeLink' => env('APP_URL')."/".$event->category."/".$event->id."/view-badge"."/"."main"."/".$mainVisitor->id,
                     ];
 
                     $details2 = [
@@ -2047,6 +2069,7 @@ class RegistrationController extends Controller
                         'eventLink' => $event->link,
                         'eventName' => $event->name,
                         'eventCategory' => $event->category,
+                        'eventYear' => $event->year,
 
                         'invoiceAmount' => $mainVisitor->total_amount,
                         'amountPaid' => $mainVisitor->total_amount,
@@ -2073,6 +2096,7 @@ class RegistrationController extends Controller
                                 'eventDates' => $eventFormattedData,
                                 'eventLocation' => $event->location,
                                 'eventCategory' => $event->category,
+                                'eventYear' => $event->year,
 
                                 'nationality' => $additionalVisitor->nationality,
                                 'country' => $additionalVisitor->country,
@@ -2080,6 +2104,7 @@ class RegistrationController extends Controller
                                 'amountPaid' => $mainVisitor->total_amount,
                                 'transactionId' => $tempTransactionId,
                                 'invoiceLink' => $invoiceLink,
+                                'badgeLink' => env('APP_URL')."/".$event->category."/".$event->id."/view-badge"."/"."sub"."/".$additionalVisitor->id,
                             ];
 
                             $details2 = [
@@ -2087,6 +2112,7 @@ class RegistrationController extends Controller
                                 'eventLink' => $event->link,
                                 'eventName' => $event->name,
                                 'eventCategory' => $event->category,
+                                'eventYear' => $event->year,
 
                                 'invoiceAmount' => $mainVisitor->total_amount,
                                 'amountPaid' => $mainVisitor->total_amount,
@@ -2126,6 +2152,7 @@ class RegistrationController extends Controller
                         'eventLocation' => $event->location,
                         'bankDetails' => $bankDetails,
                         'invoiceLink' => $invoiceLink,
+                        'eventYear' => $event->year,
                     ];
 
                     Mail::to($mainVisitor->email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationCardDeclined($details));
@@ -2143,6 +2170,7 @@ class RegistrationController extends Controller
                                 'eventLocation' => $event->location,
                                 'bankDetails' => $bankDetails,
                                 'invoiceLink' => $invoiceLink,
+                                'eventYear' => $event->year,
                             ];
                             Mail::to($additionalVisitor->email_address)->queue(new RegistrationCardDeclined($details));
                         }
@@ -2177,6 +2205,7 @@ class RegistrationController extends Controller
                     'eventLocation' => $event->location,
                     'bankDetails' => $bankDetails,
                     'invoiceLink' => $invoiceLink,
+                    'eventYear' => $event->year,
                 ];
 
                 Mail::to($mainVisitor->email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationCardDeclined($details));
@@ -2194,6 +2223,7 @@ class RegistrationController extends Controller
                             'eventLocation' => $event->location,
                             'bankDetails' => $bankDetails,
                             'invoiceLink' => $invoiceLink,
+                            'eventYear' => $event->year,
                         ];
                         Mail::to($additionalVisitor->email_address)->queue(new RegistrationCardDeclined($details));
                     }
@@ -2298,6 +2328,7 @@ class RegistrationController extends Controller
                         'eventDates' => $eventFormattedData,
                         'eventLocation' => $event->location,
                         'eventCategory' => $event->category,
+                        'eventYear' => $event->year,
 
                         'jobTitle' => $mainParticipant->job_title,
                         'companyName' => $mainParticipant->company_name,
@@ -2314,6 +2345,7 @@ class RegistrationController extends Controller
                         'amountPaid' => $mainParticipant->total_amount,
                         'transactionId' => $tempTransactionId,
                         'invoiceLink' => $invoiceLink,
+                        'badgeLink' => env('APP_URL')."/".$event->category."/".$event->id."/view-badge"."/"."main"."/".$mainParticipant->id,
                     ];
 
                     $details2 = [
@@ -2321,6 +2353,7 @@ class RegistrationController extends Controller
                         'eventLink' => $event->link,
                         'eventName' => $event->name,
                         'eventCategory' => $event->category,
+                        'eventYear' => $event->year,
 
                         'invoiceAmount' => $mainParticipant->total_amount,
                         'amountPaid' => $mainParticipant->total_amount,
@@ -2361,6 +2394,7 @@ class RegistrationController extends Controller
                         'eventLocation' => $event->location,
                         'bankDetails' => $bankDetails,
                         'invoiceLink' => $invoiceLink,
+                        'eventYear' => $event->year,
                     ];
 
                     Mail::to($mainParticipant->email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationCardDeclined($details));
@@ -2395,6 +2429,7 @@ class RegistrationController extends Controller
                     'eventLocation' => $event->location,
                     'bankDetails' => $bankDetails,
                     'invoiceLink' => $invoiceLink,
+                    'eventYear' => $event->year,
                 ];
 
                 Mail::to($mainParticipant->email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationCardDeclined($details));

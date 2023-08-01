@@ -343,6 +343,7 @@ class RccAwardsRegistrantDetails extends Component
                         'eventDates' => $eventFormattedData,
                         'eventLocation' => $this->event->location,
                         'eventCategory' => $this->event->category,
+                        'eventYear' => $this->event->year,
 
                         'jobTitle' => $innerParticipant['job_title'],
                         'companyName' => $this->finalData['company_name'],
@@ -361,6 +362,8 @@ class RccAwardsRegistrantDetails extends Component
                         'amountPaid' => $this->finalData['invoiceData']['total_amount'],
                         'transactionId' => $innerParticipant['transactionId'],
                         'invoiceLink' => $invoiceLink,
+
+                        'badgeLink' => env('APP_URL')."/".$this->event->category."/".$this->event->id."/view-badge"."/".$innerParticipant['participantType']."/".$innerParticipant['participantId'],
                     ];
 
                     $details2 = [
@@ -368,6 +371,7 @@ class RccAwardsRegistrantDetails extends Component
                         'eventLink' => $this->event->link,
                         'eventName' => $this->event->name,
                         'eventCategory' => $this->event->category,
+                        'eventYear' => $this->event->year,
 
                         'invoiceAmount' => $this->finalData['invoiceData']['total_amount'],
                         'amountPaid' => $this->finalData['invoiceData']['total_amount'],
@@ -559,6 +563,7 @@ class RccAwardsRegistrantDetails extends Component
                         'eventLink' => $this->event->link,
                         'eventCategory' => $this->event->category,
                         'invoiceLink' => $invoiceLink,
+                        'eventYear' => $this->event->year,
                     ];
                     Mail::to($innerParticipant['email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaymentReminder($details));
                 }

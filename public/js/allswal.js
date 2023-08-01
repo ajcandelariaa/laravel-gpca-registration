@@ -179,6 +179,43 @@ window.addEventListener("swal:add-registration-type-confirmation", (event) => {
       });
 });
 
+// SEND EMAIL REGISTRATION CONFIRMATION
+window.addEventListener("swal:send-email-registration-confirmation-confirmation", (event) => {
+    swal({
+        title: event.detail.message,
+        text: event.detail.text,
+        icon: event.detail.type,
+        buttons: {
+            confirm: {
+                text: "Yes, send it!",
+                value: true,
+                visible: true,
+                closeModal: true,
+            },
+            cancel: {
+                text: "Cancel",
+                value: null,
+                visible: true,
+                closeModal: true,
+            },
+        }
+      }).then((result) => {
+        console.log(result);
+        if (result) {
+            Livewire.emit('sendEmailRegistrationConfirmationConfirmed')
+        }
+      });
+});
+
+// SEND EMAIL REGISTRATION CONFIRMATION SUCCESS
+window.addEventListener("swal:send-email-registration-success", (event) => {
+    swal({
+        title: event.detail.message,
+        text: event.detail.text,
+        icon: event.detail.type,
+    });
+});
+
 // PAYMENT REMINDER
 window.addEventListener("swal:payment-reminder-confirmation", (event) => {
     swal({

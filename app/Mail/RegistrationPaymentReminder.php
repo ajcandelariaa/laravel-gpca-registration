@@ -49,15 +49,15 @@ class RegistrationPaymentReminder extends Mailable
     {
         if ($this->details['eventCategory'] == "AFS") {
             return new Content(
-                markdown: 'emails.spouse.registration-payment-reminder',
+                markdown: 'emails.2023.spouse.registration-payment-reminder',
             );
         } else if ($this->details['eventCategory'] == "AFV") {
             return new Content(
-                markdown: 'emails.visitor.registration-payment-reminder',
+                markdown: 'emails.2023.visitor.registration-payment-reminder',
             );
         } else if ($this->details['eventCategory'] == "RCCA") {
             return new Content(
-                markdown: 'emails.rcca.registration-payment-reminder',
+                markdown: 'emails.2023.rcca.registration-payment-reminder',
             );
         } else {
             return new Content(

@@ -233,6 +233,7 @@ class VisitorRegistrantDetails extends Component
                         'eventDates' => $eventFormattedData,
                         'eventLocation' => $this->event->location,
                         'eventCategory' => $this->event->category,
+                        'eventYear' => $this->event->year,
 
                         'nationality' => $innerVisitor['nationality'],
                         'country' => $innerVisitor['country'],
@@ -240,6 +241,8 @@ class VisitorRegistrantDetails extends Component
                         'amountPaid' => $this->finalData['invoiceData']['total_amount'],
                         'transactionId' => $innerVisitor['transactionId'],
                         'invoiceLink' => $invoiceLink,
+                        
+                        'badgeLink' => env('APP_URL')."/".$this->event->category."/".$this->event->id."/view-badge"."/".$innerVisitor['visitorType']."/".$innerVisitor['visitorId'],
                     ];
 
                     $details2 = [
@@ -247,6 +250,7 @@ class VisitorRegistrantDetails extends Component
                         'eventLink' => $this->event->link,
                         'eventName' => $this->event->name,
                         'eventCategory' => $this->event->category,
+                        'eventYear' => $this->event->year,
 
                         'invoiceAmount' => $this->finalData['invoiceData']['total_amount'],
                         'amountPaid' => $this->finalData['invoiceData']['total_amount'],
@@ -433,6 +437,7 @@ class VisitorRegistrantDetails extends Component
                         'eventLink' => $this->event->link,
                         'eventCategory' => $this->event->category,
                         'invoiceLink' => $invoiceLink,
+                        'eventYear' => $this->event->year,
                     ];
                     Mail::to($innerDelegate['email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaymentReminder($details));
                 }

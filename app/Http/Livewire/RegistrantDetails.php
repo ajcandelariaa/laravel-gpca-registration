@@ -5,6 +5,7 @@ namespace App\Http\Livewire;
 use App\Mail\RegistrationPaid;
 use App\Mail\RegistrationPaymentConfirmation;
 use App\Mail\RegistrationPaymentReminder;
+use App\Mail\RegistrationUnpaid;
 use Livewire\Component;
 use App\Models\Member as Members;
 use App\Models\PromoCode as PromoCodes;
@@ -44,7 +45,7 @@ class RegistrantDetails extends Component
     public $showDelegateCancellationModal = false;
     public $showMarkAsPaidModal = false;
 
-    protected $listeners = ['paymentReminderConfirmed' => 'sendEmailReminder', 'cancelRefundDelegateConfirmed' => 'cancelOrRefundDelegate', 'cancelReplaceDelegateConfirmed' => 'addReplaceDelegate', 'markAsPaidConfirmed' => 'markAsPaid'];
+    protected $listeners = ['paymentReminderConfirmed' => 'sendEmailReminder', 'sendEmailRegistrationConfirmationConfirmed' => 'sendEmailRegistrationConfirmation', 'cancelRefundDelegateConfirmed' => 'cancelOrRefundDelegate', 'cancelReplaceDelegateConfirmed' => 'addReplaceDelegate', 'markAsPaidConfirmed' => 'markAsPaid'];
 
     public function mount($eventCategory, $eventId, $registrantId, $finalData)
     {
@@ -390,12 +391,14 @@ class RegistrantDetails extends Component
                         'eventDates' => $eventFormattedData,
                         'eventLocation' => $this->event->location,
                         'eventCategory' => $this->event->category,
+                        'eventYear' => $this->event->year,
 
                         'jobTitle' => $innerDelegate['job_title'],
                         'companyName' => $this->finalData['company_name'],
                         'amountPaid' => $this->finalData['invoiceData']['total_amount'],
                         'transactionId' => $innerDelegate['transactionId'],
                         'invoiceLink' => $invoiceLink,
+                        'badgeLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-badge" . "/" . $innerDelegate['delegateType'] . "/" . $innerDelegate['delegateId'],
                     ];
 
                     $details2 = [
@@ -403,6 +406,7 @@ class RegistrantDetails extends Component
                         'eventLink' => $this->event->link,
                         'eventName' => $this->event->name,
                         'eventCategory' => $this->event->category,
+                        'eventYear' => $this->event->year,
 
                         'invoiceAmount' => $this->finalData['invoiceData']['total_amount'],
                         'amountPaid' => $this->finalData['invoiceData']['total_amount'],
@@ -630,6 +634,87 @@ class RegistrantDetails extends Component
         return $formatter->format($number);
     }
 
+    public function sendEmailRegistrationConfirmationConfirmation()
+    {
+        $this->dispatchBrowserEvent('swal:send-email-registration-confirmation-confirmation', [
+            'type' => 'warning',
+            'message' => 'Are you sure?',
+            'text' => "",
+        ]);
+    }
+
+    public function sendEmailRegistrationConfirmation()
+    {
+        $eventFormattedData = Carbon::parse($this->event->event_start_date)->format('d') . '-' . Carbon::parse($this->event->event_end_date)->format('d M Y');
+        $invoiceLink = env('APP_URL') . '/' . $this->event->category . '/' . $this->event->id . '/view-invoice/' . $this->finalData['mainDelegateId'];
+
+        if($this->event->eb_end_date == null){
+            $earlyBirdValidityDate = Carbon::createFromFormat('Y-m-d', $this->event->std_start_date)->subDay();
+        } else {
+            $earlyBirdValidityDate = Carbon::createFromFormat('Y-m-d', $this->event->eb_end_date);
+        }
+
+        foreach ($this->finalData['allDelegates'] as $delegates) {
+            foreach ($delegates as $innerDelegate) {
+                if (end($delegates) == $innerDelegate) {
+                    $details1 = [
+                        'name' => $innerDelegate['name'],
+                        'eventLink' => $this->event->link,
+                        'eventName' => $this->event->name,
+                        'eventDates' => $eventFormattedData,
+                        'eventLocation' => $this->event->location,
+                        'eventCategory' => $this->event->category,
+                        'eventYear' => $this->event->year,
+
+                        'jobTitle' => $innerDelegate['job_title'],
+                        'companyName' => $this->finalData['company_name'],
+                        'amountPaid' => $this->finalData['invoiceData']['total_amount'],
+                        'transactionId' => $innerDelegate['transactionId'],
+                        'invoiceLink' => $invoiceLink,
+                        'earlyBirdValidityDate' => $earlyBirdValidityDate->format('jS F'),
+                        'badgeLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-badge" . "/" . $innerDelegate['delegateType'] . "/" . $innerDelegate['delegateId'],
+                    ];
+
+                    $details2 = [
+                        'name' => $innerDelegate['name'],
+                        'eventLink' => $this->event->link,
+                        'eventName' => $this->event->name,
+                        'eventCategory' => $this->event->category,
+                        'eventYear' => $this->event->year,
+
+                        'invoiceAmount' => $this->finalData['invoiceData']['total_amount'],
+                        'amountPaid' => $this->finalData['invoiceData']['total_amount'],
+                        'balance' => 0,
+                        'invoiceLink' => $invoiceLink,
+                    ];
+
+                    if($this->finalData['payment_status'] == "unpaid"){
+                        Mail::to($innerDelegate['email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationUnpaid($details1));
+                    } else {
+                        Mail::to($innerDelegate['email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaid($details1));
+                        Mail::to($innerDelegate['email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaymentConfirmation($details2));
+                    }
+                }
+            }
+        }
+
+        if ($this->finalData['assistant_email_address'] != null) {
+            if($this->finalData['payment_status'] == "unpaid"){
+                Mail::to($this->finalData['assistant_email_address'])->queue(new RegistrationUnpaid($details1));
+            } else {
+                Mail::to($this->finalData['assistant_email_address'])->queue(new RegistrationPaid($details1));
+                Mail::to($this->finalData['assistant_email_address'])->queue(new RegistrationPaymentConfirmation($details2));
+            }
+        }
+
+
+        $this->dispatchBrowserEvent('swal:send-email-registration-success', [
+            'type' => 'success',
+            'message' => 'Registration Confirmation sent!',
+            'text' => "",
+        ]);
+    }
+
     public function sendEmailReminderConfirmation()
     {
         $this->dispatchBrowserEvent('swal:payment-reminder-confirmation', [
@@ -658,6 +743,7 @@ class RegistrantDetails extends Component
                         'eventLink' => $this->event->link,
                         'invoiceLink' => $invoiceLink,
                         'earlyBirdValidityDate' => $earlyBirdValidityDate->format('jS F'),
+                        'eventYear' => $this->event->year,
                     ];
                     Mail::to($innerDelegate['email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaymentReminder($details));
                 }

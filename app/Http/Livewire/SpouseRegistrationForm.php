@@ -415,6 +415,7 @@ class SpouseRegistrationForm extends Component
             'eventDates' => $eventFormattedData,
             'eventLocation' => $this->event->location,
             'eventCategory' => $this->event->category,
+            'eventYear' => $this->event->year,
 
             'nationality' => $this->nationality,
             'country' => $this->country,
@@ -422,6 +423,8 @@ class SpouseRegistrationForm extends Component
             'amountPaid' => 0,
             'transactionId' => $tempTransactionId,
             'invoiceLink' => $invoiceLink,
+            
+            'badgeLink' => env('APP_URL')."/".$this->event->category."/".$this->event->id."/view-badge"."/"."main"."/".$this->currentMainSpouseId,
         ];
 
         $details2 = [
@@ -429,6 +432,7 @@ class SpouseRegistrationForm extends Component
             'eventLink' => $this->event->link,
             'eventName' => $this->event->name,
             'eventCategory' => $this->event->category,
+            'eventYear' => $this->event->year,
 
             'invoiceAmount' => $this->finalTotal,
             'amountPaid' => 0,
@@ -458,6 +462,7 @@ class SpouseRegistrationForm extends Component
                     'eventDates' => $eventFormattedData,
                     'eventLocation' => $this->event->location,
                     'eventCategory' => $this->event->category,
+                    'eventYear' => $this->event->year,
 
                     'nationality' => $additionalSpouse->nationality,
                     'country' => $additionalSpouse->country,
@@ -465,6 +470,8 @@ class SpouseRegistrationForm extends Component
                     'amountPaid' => 0,
                     'transactionId' => $tempTransactionId,
                     'invoiceLink' => $invoiceLink,
+            
+                    'badgeLink' => env('APP_URL')."/".$this->event->category."/".$this->event->id."/view-badge"."/"."sub"."/".$additionalSpouse->id,
                 ];
 
                 $details2 = [
@@ -472,6 +479,7 @@ class SpouseRegistrationForm extends Component
                     'eventLink' => $this->event->link,
                     'eventName' => $this->event->name,
                     'eventCategory' => $this->event->category,
+                    'eventYear' => $this->event->year,
 
                     'invoiceAmount' => $this->finalTotal,
                     'amountPaid' => 0,

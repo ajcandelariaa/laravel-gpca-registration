@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -53,18 +54,56 @@ class RegistrationUnpaid extends Mailable
      */
     public function content()
     {
-        if ($this->details['eventCategory'] == "AFS") {
-            return new Content(
-                markdown: 'emails.spouse.registration-unpaid',
-            );
-        } else if ($this->details['eventCategory'] == "AFV") {
-            return new Content(
-                markdown: 'emails.visitor.registration-unpaid',
-            );
-        } else if ($this->details['eventCategory'] == "RCCA") {
-            return new Content(
-                markdown: 'emails.rcca.registration-unpaid',
-            );
+        if($this->details['eventYear'] == '2023'){
+            if ($this->details['eventCategory'] == "AF") {
+                return new Content(
+                    markdown: 'emails.2023.af.registration-unpaid',
+                );
+            }
+            else if ($this->details['eventCategory'] == "AFS") {
+                return new Content(
+                    markdown: 'emails.2023.spouse.registration-unpaid',
+                );
+            }
+            else if ($this->details['eventCategory'] == "AFV") {
+                return new Content(
+                    markdown: 'emails.2023.visitor.registration-unpaid',
+                );
+            }
+            else if ($this->details['eventCategory'] == "ANC") {
+                return new Content(
+                    markdown: 'emails.2023.anc.registration-unpaid',
+                );
+            }
+            else if ($this->details['eventCategory'] == "IPAW") {
+                return new Content(
+                    markdown: 'emails.2023.ipaw.registration-unpaid',
+                );
+            }
+            else if ($this->details['eventCategory'] == "PC") {
+                return new Content(
+                    markdown: 'emails.2023.pc.registration-unpaid',
+                );
+            }
+            else if ($this->details['eventCategory'] == "RCC") {
+                return new Content(
+                    markdown: 'emails.2023.rcc.registration-unpaid',
+                );
+            }
+            else if ($this->details['eventCategory'] == "RCCA") {
+                return new Content(
+                    markdown: 'emails.2023.rcca.registration-unpaid',
+                );
+            }
+            else if ($this->details['eventCategory'] == "SCC") {
+                return new Content(
+                    markdown: 'emails.2023.scc.registration-unpaid',
+                );
+            } else {
+                return new Content(
+                    markdown: 'emails.registration-unpaid',
+                );
+            }
         } else {
             return new Content(
                 markdown: 'emails.registration-unpaid',

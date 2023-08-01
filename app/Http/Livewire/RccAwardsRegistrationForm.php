@@ -453,6 +453,7 @@ class RccAwardsRegistrationForm extends Component
             'eventDates' => $eventFormattedData,
             'eventLocation' => $this->event->location,
             'eventCategory' => $this->event->category,
+            'eventYear' => $this->event->year,
 
             'jobTitle' => $this->jobTitle,
             'companyName' => $this->companyName,
@@ -469,6 +470,7 @@ class RccAwardsRegistrationForm extends Component
             'amountPaid' => 0,
             'transactionId' => $tempTransactionId,
             'invoiceLink' => $invoiceLink,
+            'badgeLink' => env('APP_URL')."/".$this->event->category."/".$this->event->id."/view-badge"."/"."main"."/".$this->currentMainPartcipantId,
         ];
 
         $details2 = [
@@ -476,6 +478,7 @@ class RccAwardsRegistrationForm extends Component
             'eventLink' => $this->event->link,
             'eventName' => $this->event->name,
             'eventCategory' => $this->event->category,
+            'eventYear' => $this->event->year,
 
             'invoiceAmount' => $this->finalTotal,
             'amountPaid' => 0,

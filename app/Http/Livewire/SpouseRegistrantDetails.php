@@ -260,6 +260,7 @@ class SpouseRegistrantDetails extends Component
                         'eventDates' => $eventFormattedData,
                         'eventLocation' => $this->event->location,
                         'eventCategory' => $this->event->category,
+                        'eventYear' => $this->event->year,
 
                         'nationality' => $innerSpouse['nationality'],
                         'country' => $innerSpouse['country'],
@@ -267,6 +268,7 @@ class SpouseRegistrantDetails extends Component
                         'amountPaid' => $this->finalData['invoiceData']['total_amount'],
                         'transactionId' => $innerSpouse['transactionId'],
                         'invoiceLink' => $invoiceLink,
+                        'badgeLink' => env('APP_URL')."/".$this->event->category."/".$this->event->id."/view-badge"."/".$innerSpouse['spouseType']."/".$innerSpouse['spouseId'],
                     ];
 
                     $details2 = [
@@ -274,6 +276,7 @@ class SpouseRegistrantDetails extends Component
                         'eventLink' => $this->event->link,
                         'eventName' => $this->event->name,
                         'eventCategory' => $this->event->category,
+                        'eventYear' => $this->event->year,
 
                         'invoiceAmount' => $this->finalData['invoiceData']['total_amount'],
                         'amountPaid' => $this->finalData['invoiceData']['total_amount'],
@@ -460,6 +463,7 @@ class SpouseRegistrantDetails extends Component
                         'eventLink' => $this->event->link,
                         'eventCategory' => $this->event->category,
                         'invoiceLink' => $invoiceLink,
+                        'eventYear' => $this->event->year,
                     ];
                     Mail::to($innerDelegate['email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaymentReminder($details));
                 }
