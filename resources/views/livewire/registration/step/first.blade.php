@@ -5,7 +5,7 @@
                 <td class="py-4 font-bold text-lg">Pass category</td>
                 @if ($finalEbEndDate != null)
                     <td class="py-4 font-bold text-lg">
-                        <span>Early Bird Rate <br> <span class="font-normal text-base">(valid until
+                        <span>Early bird rate <br> <span class="font-normal text-base">(valid until
                                 {{ $finalEbEndDate }})</span></span>
                     </td>
                 @endif
@@ -20,7 +20,7 @@
                 <tr>
                     <td class="text-black">
                         <div class="bg-white py-4 font-bold ml-1">
-                            Full Member
+                            Full member
                         </div>
                     </td>
                     @if ($finalEbEndDate != null)
@@ -63,7 +63,7 @@
             <tr>
                 <td class="text-black">
                     <div class="bg-white py-4 font-bold mb-1 ml-1">
-                        Non-Member
+                        Non-member
                     </div>
                 </td>
                 @if ($finalEbEndDate != null)
@@ -119,12 +119,12 @@
                         @if ($event->eb_full_member_rate != null || $event->std_full_member_rate != null)
                             <button wire:click.prevent="fullMemberClicked"
                                 class="{{ $delegatePassType == 'fullMember' ? 'bg-registrationPrimaryColor text-white' : 'hover:bg-registrationPrimaryColor hover:text-white border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor' }} w-48 py-2 rounded-md">Full
-                                Member</button>
+                                member</button>
                         @endif
                         <button wire:click.prevent="memberClicked"
                             class="{{ $delegatePassType == 'member' ? 'bg-registrationPrimaryColor text-white' : 'hover:bg-registrationPrimaryColor hover:text-white border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor' }} w-48 py-2 rounded-md">Member</button>
                         <button wire:click.prevent="nonMemberClicked"
-                            class="{{ $delegatePassType == 'nonMember' ? 'bg-registrationPrimaryColor text-white' : 'hover:bg-registrationPrimaryColor hover:text-white border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor' }} w-48 py-2 rounded-md">Non-Member</button>
+                            class="{{ $delegatePassType == 'nonMember' ? 'bg-registrationPrimaryColor text-white' : 'hover:bg-registrationPrimaryColor hover:text-white border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor' }} w-48 py-2 rounded-md">Non-member</button>
                     </div>
 
                     @if ($delegatePassTypeError != null)
