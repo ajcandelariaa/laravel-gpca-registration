@@ -242,28 +242,29 @@ class RegistrantsList extends Component
         $checkIfCorrectFormat = true;
         for ($i = 0; $i < count($rows); $i++) {
             if ($i == 0) {
-                if (count($rows[$i]) == 20) {
+                if (count($rows[$i]) == 21) {
                     if (
                         $rows[$i][0] != "Rate type" ||
-                        $rows[$i][1] != "Company Name" ||
-                        $rows[$i][2] != "Company Sector" ||
-                        $rows[$i][3] != "Company Address" ||
-                        $rows[$i][4] != "Country" ||
-                        $rows[$i][5] != "City" ||
-                        $rows[$i][6] != "Landline Number" ||
-                        $rows[$i][7] != "Mobile Number" ||
-                        $rows[$i][8] != "Assistants email address" ||
-                        $rows[$i][9] != "Payment status" ||
-                        $rows[$i][10] != "Promo Code used" ||
-                        $rows[$i][11] != "Badge Type" ||
-                        $rows[$i][12] != "Salutation" ||
-                        $rows[$i][13] != "First Name" ||
-                        $rows[$i][14] != "Middle Name" ||
-                        $rows[$i][15] != "Last Name" ||
-                        $rows[$i][16] != "Email Address" ||
-                        $rows[$i][17] != "Mobile Number" ||
-                        $rows[$i][18] != "Nationality" ||
-                        $rows[$i][19] != "Job Title"
+                        $rows[$i][1] != "Pass type" ||
+                        $rows[$i][2] != "Company Name" ||
+                        $rows[$i][3] != "Company Sector" ||
+                        $rows[$i][4] != "Company Address" ||
+                        $rows[$i][5] != "Country" ||
+                        $rows[$i][6] != "City" ||
+                        $rows[$i][7] != "Landline Number" ||
+                        $rows[$i][8] != "Mobile Number" ||
+                        $rows[$i][9] != "Assistants email address" ||
+                        $rows[$i][10] != "Payment status" ||
+                        $rows[$i][11] != "Promo Code used" ||
+                        $rows[$i][12] != "Badge Type" ||
+                        $rows[$i][13] != "Salutation" ||
+                        $rows[$i][14] != "First Name" ||
+                        $rows[$i][15] != "Middle Name" ||
+                        $rows[$i][16] != "Last Name" ||
+                        $rows[$i][17] != "Email Address" ||
+                        $rows[$i][18] != "Mobile Number" ||
+                        $rows[$i][19] != "Nationality" ||
+                        $rows[$i][20] != "Job Title"
                     ) {
                         $checkIfCorrectFormat = false;
                     }
@@ -288,14 +289,16 @@ class RegistrantsList extends Component
                         empty($rows[$i][3]) ||
                         empty($rows[$i][4]) ||
                         empty($rows[$i][5]) ||
-                        empty($rows[$i][7]) ||
-                        empty($rows[$i][9]) ||
-                        empty($rows[$i][11]) ||
-                        empty($rows[$i][13]) ||
-                        empty($rows[$i][15]) ||
+                        empty($rows[$i][6]) ||
+                        empty($rows[$i][8]) ||
+                        empty($rows[$i][10]) ||
+                        empty($rows[$i][12]) ||
+                        empty($rows[$i][14]) ||
                         empty($rows[$i][16]) ||
                         empty($rows[$i][17]) ||
-                        empty($rows[$i][18])
+                        empty($rows[$i][18]) ||
+                        empty($rows[$i][19]) ||
+                        empty($rows[$i][20])
                     ) {
                         $lineNumber = $i + 1;
                         array_push($this->incompleDetails, "Line $lineNumber have missing details!");
@@ -311,9 +314,9 @@ class RegistrantsList extends Component
                     if ($i == 0) {
                         continue;
                     } else {
-                        $email = $rows[$i][16];
+                        $email = $rows[$i][17];
                         for ($j = $i + 1; $j < count($rows); $j++) {
-                            $tempEmail = $rows[$j][16];
+                            $tempEmail = $rows[$j][17];
                             if ($email === $tempEmail) {
                                 $lineNumber = $i + 1;
                                 array_push($this->emailYouAlreadyUsed, "Line $lineNumber email address is duplicated!");
@@ -336,7 +339,7 @@ class RegistrantsList extends Component
                             $mainDelegate = null;
                             $subDelegate = null;
 
-                            $tempEmail = $rows[$i][16];
+                            $tempEmail = $rows[$i][17];
                             $lineNumber = $i + 1;
 
                             foreach ($allDelegates as $delegate) {
@@ -368,8 +371,8 @@ class RegistrantsList extends Component
                                 continue;
                             } else {
                                 // check promo codes if valid
-                                $promoCodeUsed = $rows[$i][10];
-                                $badgeType = $rows[$i][11];
+                                $promoCodeUsed = $rows[$i][11];
+                                $badgeType = $rows[$i][12];
                                 $lineNumber = $i + 1;
 
                                 if ($promoCodeUsed != null) {
@@ -388,7 +391,7 @@ class RegistrantsList extends Component
                                         }
                                     }
                                 } else {
-                                    if ($rows[$i][9] == "Free") {
+                                    if ($rows[$i][10] == "Free") {
                                         array_push($this->promoCodeErrors, "Line $lineNumber promo code is required since the payment status is Free");
                                     }
                                 }
@@ -457,7 +460,7 @@ class RegistrantsList extends Component
                 continue;
             } else {
                 $rateType = $rows[$i][0];
-                $paymentStatus = $rows[$i][9];
+                $paymentStatus = $rows[$i][10];
 
                 if ($rateType == "Early Bird") {
                     if ($paymentStatus == "Unpaid") {
@@ -475,15 +478,15 @@ class RegistrantsList extends Component
             }
         }
         $finalData = [$earlyBirdUnpaid, $earlyBirdPaidFree, $standardUnpaid, $standardPaidFree];
-
+        // dd($finalData);
         foreach ($finalData as $transactions) {
             foreach ($transactions as $transaction) {
 
                 // dd($transaction);
 
-                $checkCompanyIfMember = Members::where('name', $transaction['company_name'])->first();
+                // $checkCompanyIfMember = Members::where('name', $transaction['company_name'])->first();
 
-                if ($checkCompanyIfMember) {
+                if ($transaction['pass_type'] != "Non-Member") {
                     if ($this->event->eb_full_member_rate != null && $this->event->std_full_member_rate != null) {
                         $delegatePassType = 'fullMember';
 
@@ -655,7 +658,7 @@ class RegistrantsList extends Component
             $checkIfMatch = 0;
             $arrayDataIndex = 0;
             foreach ($arrayData as $index => $data) {
-                if ($data['company_name'] == $rows[$i][1]) {
+                if ($data['company_name'] == $rows[$i][2]) {
                     $checkIfMatch++;
                     $arrayDataIndex = $index;
                     break;
@@ -664,45 +667,46 @@ class RegistrantsList extends Component
 
             if ($checkIfMatch > 0) {
                 $delegate = [
-                    'payment_status' => $rows[$i][9],
-                    'pcode_used' => $rows[$i][10],
-                    'badge_type' => $rows[$i][11],
-                    'salutation' => $rows[$i][12],
-                    'first_name' => $rows[$i][13],
-                    'middle_name' => $rows[$i][14],
-                    'last_name' => $rows[$i][15],
-                    'email_address' => $rows[$i][16],
-                    'mobile_number' => $rows[$i][17],
-                    'nationality' => $rows[$i][18],
-                    'job_title' => $rows[$i][19],
+                    'payment_status' => $rows[$i][10],
+                    'pcode_used' => $rows[$i][11],
+                    'badge_type' => $rows[$i][12],
+                    'salutation' => $rows[$i][13],
+                    'first_name' => $rows[$i][14],
+                    'middle_name' => $rows[$i][15],
+                    'last_name' => $rows[$i][16],
+                    'email_address' => $rows[$i][17],
+                    'mobile_number' => $rows[$i][18],
+                    'nationality' => $rows[$i][19],
+                    'job_title' => $rows[$i][20],
                 ];
 
                 array_push($arrayData[$arrayDataIndex]['delegates'], $delegate);
             } else {
                 $delegate = [
-                    'payment_status' => $rows[$i][9],
-                    'pcode_used' => $rows[$i][10],
-                    'badge_type' => $rows[$i][11],
-                    'salutation' => $rows[$i][12],
-                    'first_name' => $rows[$i][13],
-                    'middle_name' => $rows[$i][14],
-                    'last_name' => $rows[$i][15],
-                    'email_address' => $rows[$i][16],
-                    'mobile_number' => $rows[$i][17],
-                    'nationality' => $rows[$i][18],
-                    'job_title' => $rows[$i][19],
+                    'payment_status' => $rows[$i][10],
+                    'pcode_used' => $rows[$i][11],
+                    'badge_type' => $rows[$i][12],
+                    'salutation' => $rows[$i][13],
+                    'first_name' => $rows[$i][14],
+                    'middle_name' => $rows[$i][15],
+                    'last_name' => $rows[$i][16],
+                    'email_address' => $rows[$i][17],
+                    'mobile_number' => $rows[$i][18],
+                    'nationality' => $rows[$i][19],
+                    'job_title' => $rows[$i][20],
                 ];
 
                 array_push($arrayData, [
                     'rate_type' => $rateType,
-                    'company_name' => $rows[$i][1],
-                    'company_sector' => $rows[$i][2],
-                    'company_address' => $rows[$i][3],
-                    'company_country' => $rows[$i][4],
-                    'company_city' => $rows[$i][5],
-                    'company_telephone_number' => $rows[$i][6],
-                    'company_mobile_number' => $rows[$i][7],
-                    'assistant_email_address' => $rows[$i][8],
+                    'pass_type' => $rows[$i][1],
+                    'company_name' => $rows[$i][2],
+                    'company_sector' => $rows[$i][3],
+                    'company_address' => $rows[$i][4],
+                    'company_country' => $rows[$i][5],
+                    'company_city' => $rows[$i][6],
+                    'company_telephone_number' => $rows[$i][7],
+                    'company_mobile_number' => $rows[$i][8],
+                    'assistant_email_address' => $rows[$i][9],
                     'delegates' => [
                         $delegate
                     ],
@@ -710,29 +714,30 @@ class RegistrantsList extends Component
             }
         } else {
             $delegate = [
-                'payment_status' => $rows[$i][9],
-                'pcode_used' => $rows[$i][10],
-                'badge_type' => $rows[$i][11],
-                'salutation' => $rows[$i][12],
-                'first_name' => $rows[$i][13],
-                'middle_name' => $rows[$i][14],
-                'last_name' => $rows[$i][15],
-                'email_address' => $rows[$i][16],
-                'mobile_number' => $rows[$i][17],
-                'nationality' => $rows[$i][18],
-                'job_title' => $rows[$i][19],
+                'payment_status' => $rows[$i][10],
+                'pcode_used' => $rows[$i][11],
+                'badge_type' => $rows[$i][12],
+                'salutation' => $rows[$i][13],
+                'first_name' => $rows[$i][14],
+                'middle_name' => $rows[$i][15],
+                'last_name' => $rows[$i][16],
+                'email_address' => $rows[$i][17],
+                'mobile_number' => $rows[$i][18],
+                'nationality' => $rows[$i][19],
+                'job_title' => $rows[$i][20],
             ];
 
             array_push($arrayData, [
                 'rate_type' => $rateType,
-                'company_name' => $rows[$i][1],
-                'company_sector' => $rows[$i][2],
-                'company_address' => $rows[$i][3],
-                'company_country' => $rows[$i][4],
-                'company_city' => $rows[$i][5],
-                'company_telephone_number' => $rows[$i][6],
-                'company_mobile_number' => $rows[$i][7],
-                'assistant_email_address' => $rows[$i][8],
+                'pass_type' => $rows[$i][1],
+                'company_name' => $rows[$i][2],
+                'company_sector' => $rows[$i][3],
+                'company_address' => $rows[$i][4],
+                'company_country' => $rows[$i][5],
+                'company_city' => $rows[$i][6],
+                'company_telephone_number' => $rows[$i][7],
+                'company_mobile_number' => $rows[$i][8],
+                'assistant_email_address' => $rows[$i][9],
                 'delegates' => [
                     $delegate
                 ],
