@@ -3485,8 +3485,8 @@ class RegistrationController extends Controller
                 }
             }
         }
-
-        $fileName = 'Event Transactions.csv';
+        $currentDate = Carbon::now()->format('Y-m-d');
+        $fileName = $eventCategory. ' ' . $event->year. ' Transactions '.'['.$currentDate.'].csv';
         $headers = array(
             "Content-type"        => "text/csv",
             "Content-Disposition" => "attachment; filename=$fileName",
@@ -3779,7 +3779,8 @@ class RegistrationController extends Controller
             }
         }
 
-        $fileName = 'Spouse Transactions.csv';
+        $currentDate = Carbon::now()->format('Y-m-d');
+        $fileName = $eventCategory. ' ' . $event->year. ' Transactions '.'['.$currentDate.'].csv';
         $headers = array(
             "Content-type"        => "text/csv",
             "Content-Disposition" => "attachment; filename=$fileName",
@@ -4051,7 +4052,8 @@ class RegistrationController extends Controller
             }
         }
 
-        $fileName = 'Visitor Transactions.csv';
+        $currentDate = Carbon::now()->format('Y-m-d');
+        $fileName = $eventCategory. ' ' . $event->year. ' Transactions '.'['.$currentDate.'].csv';
         $headers = array(
             "Content-type"        => "text/csv",
             "Content-Disposition" => "attachment; filename=$fileName",
@@ -4351,7 +4353,8 @@ class RegistrationController extends Controller
             }
         }
 
-        $fileName = 'RCC Awards Transactions.csv';
+        $currentDate = Carbon::now()->format('Y-m-d');
+        $fileName = $eventCategory. ' ' . $event->year. ' Transactions '.'['.$currentDate.'].csv';
         $headers = array(
             "Content-type"        => "text/csv",
             "Content-Disposition" => "attachment; filename=$fileName",
