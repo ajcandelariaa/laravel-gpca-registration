@@ -3,13 +3,13 @@
 
 <p>Greetings from GPCA!</p>
 
-<p>Thank you for registering to attend the <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a> which will be held on {{ $details['eventDates'] }} at the {{ $details['eventLocation'] }}.</p>
+<p>Thank you for registering to attend the <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a> which will be held from {{ $details['eventDates'] }} at the {{ $details['eventLocation'] }}.</p>
 
 <p style="color: red;">
-    Please note that your registration is confirmed but admission to the forum will only be granted upon confirmation of payment receipt. Payment can be made via bank transfer.
+    Kindly note that your registration is not yet confirmed. Please settle your payment through bank transfer prior to the event to avoid any inconvenience onsite.
 </p>
 
-<p>To take advantage of the early bird discount, please ensure to settle your invoice on or before {{ $details['earlyBirdValidityDate'] }}. Standard rate will be applied after {{ $details['earlyBirdValidityDate'] }}.</p>
+<p>To take advantage of the early bird discount, please ensure to settle your invoice on or before {{ $details['earlyBirdValidityDate'] }}. Standard rate will be applied after this day.</p>
 
 <p>Your registration details as follows:</p>
 
@@ -30,7 +30,7 @@ Download invoice
 </x-mail::button>
 <span>&nbsp;</span>
 
-<p>To request changes, kindly respond to this email at the earliest, to rectify your badge.</p>
+<p>To request any changes, kindly respond to this email at the earliest to rectify your badge.</p>
 
 <h3>GENERAL INFORMATION</h3>
 
