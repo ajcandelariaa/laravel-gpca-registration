@@ -531,13 +531,25 @@ class RegistrantsList extends Component
 
                 foreach ($transaction['delegates'] as $delegate) {
                     if($delegate['pcode_used'] != null){
-                        $promoCodeDiscount = PromoCodes::where('event_id', $this->event->id)->where('event_category', $this->event->category)->where('badge_type', $delegate['badge_type'])->where('promo_code', $delegate['pcode_used'])->value('discount');
+                        $promoCode = PromoCodes::where('event_id', $this->event->id)->where('event_category', $this->event->category)->where('badge_type', $delegate['badge_type'])->where('promo_code', $delegate['pcode_used'])->first();
 
-                        if($promoCodeDiscount != null){
+                        if($promoCode != null){
                             PromoCodes::where('event_id', $this->event->id)->where('event_category', $this->event->category)->where('badge_type', $delegate['badge_type'])->where('promo_code', $delegate['pcode_used'])->increment('total_usage');
 
-                            $finalDiscount += $finalUnitPrice * ($promoCodeDiscount / 100);
-                            $finalNetAmount += $finalUnitPrice - ($finalUnitPrice * ($promoCodeDiscount / 100));
+                            $promoCodeDiscount = $promoCode->discount;
+                            $promoCodeDiscountType = $promoCode->discount_type;
+
+                            if($promoCodeDiscountType == "percentage"){
+                                $finalDiscount += $finalUnitPrice * ($promoCodeDiscount / 100);
+                                $finalNetAmount += $finalUnitPrice - ($finalUnitPrice * ($promoCodeDiscount / 100));
+                            } else {
+                                $finalDiscount += $promoCodeDiscount;
+                                $finalNetAmount += $finalUnitPrice - $promoCodeDiscount;
+                            }
+                            
+                        } else {
+                            $promoCodeDiscount = 0;
+                            $promoCodeDiscountType = null;
                         }
                     } else {
                         $finalNetAmount += $finalUnitPrice;

@@ -37,7 +37,13 @@
                         class="grid grid-cols-11 pt-2 pb-2 mb-1 place-items-center text-center {{ $count % 2 == 0 ? 'bg-registrationInputFieldsBGColor' : 'bg-registrationCardBGColor' }}">
                         <div class="col-span-1">{{ $promoCode->promo_code }}</div>
                         <div class="col-span-1">{{ $promoCode->badge_type }}</div>
-                        <div class="col-span-1">{{ $promoCode->discount }}%</div>
+                        <div class="col-span-1">
+                            @if ($promoCode->discount_type == "percentage")
+                                {{ $promoCode->discount }}%
+                            @else
+                                $ {{ number_format($promoCode->discount, 2, '.', ',') }}
+                            @endif
+                        </div>
                         <div class="col-span-2">{{ $promoCode->description }}</div>
                         <div class="col-span-1">{{ $promoCode->number_of_codes - $promoCode->total_usage }}</div>
                         <div class="col-span-1">{{ $promoCode->total_usage }}</div>

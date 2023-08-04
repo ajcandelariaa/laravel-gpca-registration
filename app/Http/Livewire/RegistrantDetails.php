@@ -30,11 +30,11 @@ class RegistrantDetails extends Component
     public $delegatePassType, $rateTypeString, $companyName, $companySector, $companyAddress, $companyCountry, $companyCity, $companyLandlineNumber, $assistantEmailAddress, $companyMobileNumber;
 
     // DELEGATE DETAILS
-    public $mainDelegateId, $delegateId, $salutation, $firstName, $middleName, $lastName, $emailAddress, $mobileNumber, $nationality, $jobTitle, $badgeType, $promoCode, $promoCodeDiscount, $promoCodeSuccess, $promoCodeFail, $type, $delegateIndex, $delegateInnerIndex;
+    public $mainDelegateId, $delegateId, $salutation, $firstName, $middleName, $lastName, $emailAddress, $mobileNumber, $nationality, $jobTitle, $badgeType, $promoCode, $promoCodeDiscount, $discountType, $promoCodeSuccess, $promoCodeFail, $type, $delegateIndex, $delegateInnerIndex;
 
     public $transactionRemarks, $delegateCancellationStep = 1, $replaceDelegate, $delegateRefund;
 
-    public $replaceDelegateIndex, $replaceDelegateInnerIndex, $replaceSalutation, $replaceFirstName, $replaceMiddleName, $replaceLastName, $replaceEmailAddress, $replaceMobileNumber, $replaceNationality, $replaceJobTitle, $replaceBadgeType, $replacePromoCode, $replacePromoCodeDiscount, $replacePromoCodeSuccess, $replacePromoCodeFail, $replaceEmailAlreadyUsedError;
+    public $replaceDelegateIndex, $replaceDelegateInnerIndex, $replaceSalutation, $replaceFirstName, $replaceMiddleName, $replaceLastName, $replaceEmailAddress, $replaceMobileNumber, $replaceNationality, $replaceJobTitle, $replaceBadgeType, $replacePromoCode, $replaceDiscountType, $replacePromoCodeDiscount, $replacePromoCodeSuccess, $replacePromoCodeFail, $replaceEmailAlreadyUsedError;
 
     public $mapPaymentMethod;
 
@@ -59,6 +59,8 @@ class RegistrantDetails extends Component
         $this->eventId = $eventId;
         $this->registrantId = $registrantId;
         $this->finalData = $finalData;
+
+        // dd($this->finalData);
     }
 
     public function render()
@@ -140,6 +142,7 @@ class RegistrantDetails extends Component
         $this->finalData['allDelegates'][$this->delegateIndex][$this->delegateInnerIndex]['badge_type'] = $this->badgeType;
         $this->finalData['allDelegates'][$this->delegateIndex][$this->delegateInnerIndex]['pcode_used'] = $this->promoCode;
         $this->finalData['allDelegates'][$this->delegateIndex][$this->delegateInnerIndex]['discount'] = $this->promoCodeDiscount;
+        $this->finalData['allDelegates'][$this->delegateIndex][$this->delegateInnerIndex]['discount_type'] = $this->discountType;
 
         $this->calculateTotal();
 
@@ -164,6 +167,7 @@ class RegistrantDetails extends Component
         $this->badgeType = $this->finalData['allDelegates'][$index][$innerIndex]['badge_type'];
         $this->promoCode = $this->finalData['allDelegates'][$index][$innerIndex]['pcode_used'];
         $this->promoCodeDiscount = $this->finalData['allDelegates'][$index][$innerIndex]['discount'];
+        $this->discountType = $this->finalData['allDelegates'][$index][$innerIndex]['discount_type'];
         $this->type = $this->finalData['allDelegates'][$index][$innerIndex]['delegateType'];
 
         if ($this->promoCode != null) {
@@ -190,6 +194,7 @@ class RegistrantDetails extends Component
         ]);
 
         $promoCode = PromoCodes::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->where('active', true)->where('promo_code', $this->promoCode)->where('badge_type', $this->badgeType)->first();
+
         if ($promoCode == null) {
             $this->promoCodeFail = "Invalid Code";
         } else {
@@ -198,7 +203,13 @@ class RegistrantDetails extends Component
                 if (Carbon::now()->lt($validityDateTime)) {
                     $this->promoCodeFail = null;
                     $this->promoCodeDiscount = $promoCode->discount;
-                    $this->promoCodeSuccess = "$promoCode->discount% discount";
+
+                    if($promoCode->discount_type == "percentage"){
+                        $this->discountType = $promoCode->discount_type;
+                        $this->promoCodeSuccess = "$promoCode->discount% discount";
+                    } else {
+                        $this->promoCodeSuccess = "$$promoCode->discount discount";
+                    }
                 } else {
                     $this->promoCodeFail = "Code is expired already";
                 }
@@ -212,6 +223,7 @@ class RegistrantDetails extends Component
     {
         $this->promoCode = null;
         $this->promoCodeDiscount = null;
+        $this->discountType = null;
         $this->promoCodeFail = null;
         $this->promoCodeSuccess = null;
     }
@@ -233,6 +245,7 @@ class RegistrantDetails extends Component
         $this->badgeType = null;
         $this->promoCode = null;
         $this->promoCodeDiscount = null;
+        $this->discountType = null;
         $this->promoCodeSuccess = null;
         $this->promoCodeFail = null;
         $this->type = null;
@@ -482,18 +495,36 @@ class RegistrantDetails extends Component
         }
 
         if ($addMainDelegate) {
-            $mainDiscount = PromoCodes::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->where('promo_code', $mainDelegate->pcode_used)->where('badge_type', $mainDelegate->badge_type)->value('discount');
+            $promoCode = PromoCodes::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->where('promo_code', $mainDelegate->pcode_used)->where('badge_type', $mainDelegate->badge_type)->first();
 
-            if ($mainDiscount != null) {
-                if ($mainDiscount == 100) {
-                    $delegateDescription = "Delegate Registration Fee - Complimentary";
-                } else if ($mainDiscount > 0 && $mainDiscount < 100) {
-                    $delegateDescription = "Delegate Registration Fee - " . $mainDelegate->rate_type_string . " (" . $mainDiscount . "% discount)";
+            if ($promoCode != null) {
+                $mainDiscount = $promoCode->discount;
+                $mainDiscountType = $promoCode->discount_type;
+
+                if($mainDiscountType == "percentage"){
+                    if ($mainDiscount == 100) {
+                        $delegateDescription = "Delegate Registration Fee - Complimentary";
+                    } else if ($mainDiscount > 0 && $mainDiscount < 100) {
+                        $delegateDescription = "Delegate Registration Fee - " . $mainDelegate->rate_type_string . " (" . $mainDiscount . "% discount)";
+                    } else {
+                        $delegateDescription = "Delegate Registration Fee - {$mainDelegate->rate_type_string}";
+                    }
                 } else {
                     $delegateDescription = "Delegate Registration Fee - {$mainDelegate->rate_type_string}";
                 }
             } else {
+                $mainDiscount = 0;
+                $mainDiscountType = null;
+
                 $delegateDescription = "Delegate Registration Fee - {$mainDelegate->rate_type_string}";
+            }
+
+            if($mainDiscountType == "percentage"){
+                $tempTotalDiscount = $this->checkUnitPrice() * ($mainDiscount / 100);
+                $tempTotalNetAmount = $this->checkUnitPrice() - ($this->checkUnitPrice() * ($mainDiscount / 100));
+            } else {
+                $tempTotalDiscount = $mainDiscount;
+                $tempTotalNetAmount = $this->checkUnitPrice() - $mainDiscount;
             }
 
             array_push($invoiceDetails, [
@@ -503,8 +534,8 @@ class RegistrantDetails extends Component
                 ],
                 'badgeType' => $mainDelegate->badge_type,
                 'quantity' => 1,
-                'totalDiscount' => $this->checkUnitPrice() * ($mainDiscount / 100),
-                'totalNetAmount' =>  $this->checkUnitPrice() - ($this->checkUnitPrice() * ($mainDiscount / 100)),
+                'totalDiscount' => $tempTotalDiscount,
+                'totalNetAmount' =>  $tempTotalNetAmount,
                 'promoCodeDiscount' => $mainDiscount,
             ]);
         }
@@ -527,10 +558,20 @@ class RegistrantDetails extends Component
 
 
                 if ($addSubDelegate) {
-                    $subDiscount = PromoCodes::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->where('promo_code', $subDelegate->pcode_used)->where('badge_type', $subDelegate->badge_type)->value('discount');
+                    $subPromoCode = PromoCodes::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->where('promo_code', $subDelegate->pcode_used)->where('badge_type', $subDelegate->badge_type)->first();
 
                     $checkIfExisting = false;
                     $existingIndex = 0;
+
+                    
+                    if($subPromoCode != null){
+                        $subDiscount = $subPromoCode->discount;
+                        $subDiscountType = $subPromoCode->discount_type;
+                    } else {
+                        $subDiscount = 0;
+                        $subDiscountType = null;
+                    }
+
 
                     for ($j = 0; $j < count($invoiceDetails); $j++) {
                         if ($subDelegate->badge_type == $invoiceDetails[$j]['badgeType'] && $subDiscount == $invoiceDetails[$j]['promoCodeDiscount']) {
@@ -547,8 +588,15 @@ class RegistrantDetails extends Component
                         );
 
                         $quantityTemp = $invoiceDetails[$existingIndex]['quantity'] + 1;
-                        $totalDiscountTemp = ($this->checkUnitPrice() * ($invoiceDetails[$existingIndex]['promoCodeDiscount'] / 100)) * $quantityTemp;
-                        $totalNetAmountTemp = ($this->checkUnitPrice() * $quantityTemp) - $totalDiscountTemp;
+
+                        if($subDiscountType == "percentage"){
+                            $totalDiscountTemp = ($this->checkUnitPrice() * ($invoiceDetails[$existingIndex]['promoCodeDiscount'] / 100)) * $quantityTemp;
+                            $totalNetAmountTemp = ($this->checkUnitPrice() * $quantityTemp) - $totalDiscountTemp;
+                        } else {
+                            $totalDiscountTemp = $invoiceDetails[$existingIndex]['promoCodeDiscount'] * $quantityTemp;
+                            $totalNetAmountTemp = ($this->checkUnitPrice() * $quantityTemp) - $totalDiscountTemp;
+                        }
+
 
                         $invoiceDetails[$existingIndex]['quantity'] = $quantityTemp;
                         $invoiceDetails[$existingIndex]['totalDiscount'] = $totalDiscountTemp;
@@ -556,15 +604,27 @@ class RegistrantDetails extends Component
                     } else {
 
                         if ($subDiscount != null) {
-                            if ($subDiscount == 100) {
-                                $subDelegateDescription = "Delegate Registration Fee - Complimentary";
-                            } else if ($subDiscount > 0 && $subDiscount < 100) {
-                                $subDelegateDescription = "Delegate Registration Fee - " . $mainDelegate->rate_type_string . " (" . $subDiscount . "% discount)";
+                            if($subDiscountType == "percentage"){
+                                if ($subDiscount == 100) {
+                                    $subDelegateDescription = "Delegate Registration Fee - Complimentary";
+                                } else if ($subDiscount > 0 && $subDiscount < 100) {
+                                    $subDelegateDescription = "Delegate Registration Fee - " . $mainDelegate->rate_type_string . " (" . $subDiscount . "% discount)";
+                                } else {
+                                    $subDelegateDescription = "Delegate Registration Fee - {$mainDelegate->rate_type_string}";
+                                }
                             } else {
                                 $subDelegateDescription = "Delegate Registration Fee - {$mainDelegate->rate_type_string}";
                             }
                         } else {
                             $subDelegateDescription = "Delegate Registration Fee - {$mainDelegate->rate_type_string}";
+                        }
+
+                        if($subDiscountType == "percentage"){
+                            $tempSubTotalDiscount = $this->checkUnitPrice() * ($subDiscount / 100);
+                            $tempSubTotalNetAmount = $this->checkUnitPrice() - ($this->checkUnitPrice() * ($subDiscount / 100));
+                        } else {
+                            $tempSubTotalDiscount = $subDiscount;
+                            $tempSubTotalNetAmount = $this->checkUnitPrice() - $subDiscount;
                         }
 
                         array_push($invoiceDetails, [
@@ -574,8 +634,8 @@ class RegistrantDetails extends Component
                             ],
                             'badgeType' => $subDelegate->badge_type,
                             'quantity' => 1,
-                            'totalDiscount' => $this->checkUnitPrice() * ($subDiscount / 100),
-                            'totalNetAmount' =>  $this->checkUnitPrice() - ($this->checkUnitPrice() * ($subDiscount / 100)),
+                            'totalDiscount' => $tempSubTotalDiscount,
+                            'totalNetAmount' =>  $tempSubTotalNetAmount,
                             'promoCodeDiscount' => $subDiscount,
                         ]);
                     }
@@ -983,7 +1043,15 @@ class RegistrantDetails extends Component
         if ($this->replacePromoCodeSuccess != null) {
             PromoCodes::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->where('active', true)->where('promo_code', $this->replacePromoCode)->where('badge_type', $this->replaceBadgeType)->increment('total_usage');
 
-            $subDiscount = PromoCodes::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->where('promo_code', $this->replacePromoCode)->where('badge_type', $this->replaceBadgeType)->value('discount');
+            $subPromoCode = PromoCodes::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->where('promo_code', $this->replacePromoCode)->where('badge_type', $this->replaceBadgeType)->first();
+
+            if($subPromoCode != null){
+                $subDiscount = $subPromoCode->discount;
+                $subDiscountType = $subPromoCode->discount_type;
+            } else {
+                $subDiscount = 0;
+                $subDiscountType = null;
+            }
         } else {
             $this->replacePromoCode = null;
             $subDiscount = null;
@@ -1041,6 +1109,7 @@ class RegistrantDetails extends Component
             'badge_type' => $this->replaceBadgeType,
             'pcode_used' => $this->replacePromoCode,
             'discount' => $subDiscount,
+            'discount_type' => $subDiscountType,
 
             'is_replacement' => true,
             'delegate_cancelled' => false,
@@ -1112,7 +1181,13 @@ class RegistrantDetails extends Component
                 if (Carbon::now()->lt($validityDateTime)) {
                     $this->replacePromoCodeFail = null;
                     $this->replacePromoCodeDiscount = $promoCode->discount;
-                    $this->replacePromoCodeSuccess = "$promoCode->discount% discount";
+
+                    if($promoCode->discount_type == "percentage"){
+                        $this->replaceDiscountType = $promoCode->discount_type;
+                        $this->replacePromoCodeSuccess = "$promoCode->discount% discount";
+                    } else {
+                        $this->replacePromoCodeSuccess = "$$promoCode->discount discount";
+                    }
                 } else {
                     $this->replacePromoCodeFail = "Code is expired already";
                 }
@@ -1126,6 +1201,7 @@ class RegistrantDetails extends Component
     {
         $this->replacePromoCode = null;
         $this->replacePromoCodeDiscount = null;
+        $this->replaceDiscountType = null;
         $this->replacePromoCodeFail = null;
         $this->replacePromoCodeSuccess = null;
     }
@@ -1148,6 +1224,7 @@ class RegistrantDetails extends Component
 
         $this->replacePromoCode = null;
         $this->replacePromoCodeDiscount = null;
+        $this->replaceDiscountType = null;
         $this->replacePromoCodeFail = null;
         $this->replacePromoCodeSuccess = null;
 

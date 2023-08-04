@@ -30,8 +30,7 @@
                         class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                         <option value=""></option>
                         @foreach ($registrationTypes as $registrationType)
-                            <option value="{{ $registrationType->registration_type }}" @if (old('badge_type') == $registrationType->registration_type) selected @endif>
-                                {{ $registrationType->registration_type }}</option>
+                            <option value="{{ $registrationType->registration_type }}">{{ $registrationType->registration_type }}</option>
                         @endforeach
                     </select>
 
@@ -45,14 +44,17 @@
 
             <div class="space-y-2 mt-5">
                 <div class="text-registrationPrimaryColor">
-                    Discount: <span class="text-red-500">*</span>
+                    Discount Type: <span class="text-red-500">*</span>
                 </div>
                 <div>
-                    <input type="number" wire:model="discount" step="1" min="0" placeholder="0%" max="100"
-                        value="{{ old('discount') }}"
+                    <select wire:model="discount_type"
                         class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                        <option value=""></option>
+                        <option value="percentage">Percentage</option>
+                        <option value="price">Price</option>
+                    </select>
 
-                    @error('discount')
+                    @error('discount_type')
                         <span class="mt-2 text-red-600 italic text-sm">
                             {{ $message }}
                         </span>
@@ -60,14 +62,34 @@
                 </div>
             </div>
 
+            @if ($discount_type != null)
+                <div class="space-y-2 mt-5">
+                    <div class="text-registrationPrimaryColor">
+                        Discount: <span class="text-red-500">*</span>
+                    </div>
+                    <div>
+                        @if ($discount_type == "percentage")
+                            <input type="number" wire:model="discount" step="1" min="0" placeholder="0%" max="100" class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                        @else
+                            <input type="number" wire:model="discount" step="1" min="0" placeholder="0" class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                        @endif
+
+                        @error('discount')
+                            <span class="mt-2 text-red-600 italic text-sm">
+                                {{ $message }}
+                            </span>
+                        @enderror
+                    </div>
+                </div>
+            @endif
+
             <div class="space-y-2 mt-5">
                 <div class="text-registrationPrimaryColor">
                     Number of Codes: <span class="text-red-500">*</span>
                 </div>
                 <div>
-                    <input type="number" wire:model="number_of_codes" step="1" min="1" placeholder="1" max="10000"
-                        value="{{ old('number_of_codes') }}"
-                        class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                    <input type="number" wire:model="number_of_codes" step="1" min="1" placeholder="1"
+                        max="10000" class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
 
                     @error('number_of_codes')
                         <span class="mt-2 text-red-600 italic text-sm">
@@ -82,9 +104,7 @@
                     Code Validity: <span class="text-red-500">*</span>
                 </div>
                 <div>
-                    <input type="datetime-local" wire:model="validity"
-                        value="{{ old('validity') }}"
-                        class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                    <input type="datetime-local" wire:model="validity" class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
 
                     @error('validity')
                         <span class="mt-2 text-red-600 italic text-sm">
@@ -96,7 +116,7 @@
 
             <div class="space-y-2 mt-5">
                 <div class="text-registrationPrimaryColor">
-                    Description: 
+                    Description:
                 </div>
                 <div>
                     <input type="text" wire:model="description"

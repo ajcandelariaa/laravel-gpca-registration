@@ -262,7 +262,16 @@ class RegistrationController extends Controller
 
             $eventYear = Event::where('id', $eventId)->value('year');
             $mainDelegate = MainDelegate::where('id', $registrantId)->where('event_id', $eventId)->first();
-            $mainDiscount = PromoCode::where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $mainDelegate->pcode_used)->where('badge_type', $mainDelegate->badge_type)->value('discount');
+
+            $promoCode = PromoCode::where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $mainDelegate->pcode_used)->where('badge_type', $mainDelegate->badge_type)->first();
+
+            if($promoCode != null){
+                $mainDiscount = $promoCode->discount;
+                $mainDiscountType = $promoCode->discount_type;
+            } else {
+                $mainDiscount = 0;
+                $mainDiscountType = null;
+            }
 
             foreach (config('app.eventCategories') as $eventCategoryC => $code) {
                 if ($eventCategory == $eventCategoryC) {
@@ -287,7 +296,22 @@ class RegistrationController extends Controller
                         $countFinalQuantity++;
                     }
 
-                    $subDiscount = PromoCode::where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $subDelegate->pcode_used)->where('badge_type', $subDelegate->badge_type)->value('discount');
+                    $subPromoCode = PromoCode::where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $subDelegate->pcode_used)->where('badge_type', $subDelegate->badge_type)->first();
+
+                    if($subPromoCode != null){
+                        $subDiscount = $subPromoCode->discount;
+                        $subDiscountType = $subPromoCode->discount_type;
+                    } else {
+                        $subDiscount = 0;
+                        $subDiscountType = null;
+                    }
+
+        
+                    foreach (config('app.eventCategories') as $eventCategoryC => $code) {
+                        if ($eventCategory == $eventCategoryC) {
+                            $eventCode = $code;
+                        }
+                    }
 
                     if ($subDelegate->delegate_replaced_from_id != null) {
                         array_push($subDelegatesReplacementArray, [
@@ -304,6 +328,7 @@ class RegistrationController extends Controller
                             'badge_type' => $subDelegate->badge_type,
                             'pcode_used' => $subDelegate->pcode_used,
                             'discount' => $subDiscount,
+                            'discount_type' => $subDiscountType,
 
                             'delegate_cancelled' => $subDelegate->delegate_cancelled,
                             'delegate_replaced' => $subDelegate->delegate_replaced,
@@ -333,6 +358,7 @@ class RegistrationController extends Controller
                             'badge_type' => $subDelegate->badge_type,
                             'pcode_used' => $subDelegate->pcode_used,
                             'discount' => $subDiscount,
+                            'discount_type' => $subDiscountType,
 
                             'delegate_cancelled' => $subDelegate->delegate_cancelled,
                             'delegate_replaced' => $subDelegate->delegate_replaced,
@@ -372,6 +398,7 @@ class RegistrationController extends Controller
                 'badge_type' => $mainDelegate->badge_type,
                 'pcode_used' => $mainDelegate->pcode_used,
                 'discount' => $mainDiscount,
+                'discount_type' => $mainDiscountType,
 
                 'is_replacement' => false,
                 'delegate_cancelled' => $mainDelegate->delegate_cancelled,
@@ -414,6 +441,7 @@ class RegistrationController extends Controller
                             'badge_type' => $subDelegateReplacement['badge_type'],
                             'pcode_used' => $subDelegateReplacement['pcode_used'],
                             'discount' => $subDelegateReplacement['discount'],
+                            'discount_type' => $subDelegateReplacement['discount_type'],
 
                             'is_replacement' => true,
                             'delegate_cancelled' => $subDelegateReplacement['delegate_cancelled'],
@@ -462,6 +490,7 @@ class RegistrationController extends Controller
                     'badge_type' => $subDelegate['badge_type'],
                     'pcode_used' => $subDelegate['pcode_used'],
                     'discount' => $subDelegate['discount'],
+                    'discount_type' => $subDelegate['discount_type'],
 
                     'is_replacement' => false,
                     'delegate_cancelled' => $subDelegate['delegate_cancelled'],
@@ -504,6 +533,7 @@ class RegistrationController extends Controller
                                 'badge_type' => $subDelegateReplacement['badge_type'],
                                 'pcode_used' => $subDelegateReplacement['pcode_used'],
                                 'discount' => $subDelegateReplacement['discount'],
+                                'discount_type' => $subDelegateReplacement['discount_type'],
 
                                 'is_replacement' => true,
                                 'delegate_cancelled' => $subDelegateReplacement['delegate_cancelled'],
@@ -2746,16 +2776,29 @@ class RegistrationController extends Controller
             }
 
             if ($addMainDelegate) {
-                $mainDiscount = PromoCode::where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $mainDelegate->pcode_used)->where('badge_type', $mainDelegate->badge_type)->value('discount');
+                $promoCode = PromoCode::where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $mainDelegate->pcode_used)->where('badge_type', $mainDelegate->badge_type)->first();
+
+                if($promoCode != null){
+                    $mainDiscount = $promoCode->discount;
+                    $mainDiscountType = $promoCode->discount_type;
+                } else {
+                    $mainDiscount = 0;
+                    $mainDiscountType = null;
+                }
+
 
                 if ($mainDelegate->badge_type == "Leaders of Tomorrow") {
                     $delegateDescription = "Delegate Registration Fee - Leaders of Tomorrow";
                 } else {
                     if ($mainDiscount != null) {
-                        if ($mainDiscount == 100) {
-                            $delegateDescription = "Delegate Registration Fee - Complimentary";
-                        } else if ($mainDiscount > 0 && $mainDiscount < 100) {
-                            $delegateDescription = "Delegate Registration Fee - " . $passType . " discounted rate";
+                        if($mainDiscountType == "percentage"){
+                            if ($mainDiscount == 100) {
+                                $delegateDescription = "Delegate Registration Fee - Complimentary";
+                            } else if ($mainDiscount > 0 && $mainDiscount < 100) {
+                                $delegateDescription = "Delegate Registration Fee - " . $passType . " discounted rate";
+                            } else {
+                                $delegateDescription = "Delegate Registration Fee - {$mainDelegate->rate_type_string}";
+                            }
                         } else {
                             $delegateDescription = "Delegate Registration Fee - {$mainDelegate->rate_type_string}";
                         }
@@ -2764,6 +2807,13 @@ class RegistrationController extends Controller
                     }
                 }
 
+                if($mainDiscountType == "percentage"){
+                    $tempTotalDiscount = $mainDelegate->unit_price * ($mainDiscount / 100);
+                    $tempTotalAmount = $mainDelegate->unit_price - ($mainDelegate->unit_price * ($mainDiscount / 100));
+                } else {
+                    $tempTotalDiscount = $mainDiscount;
+                    $tempTotalAmount = $mainDelegate->unit_price - $mainDiscount;
+                }
 
                 array_push($invoiceDetails, [
                     'delegateDescription' => $delegateDescription,
@@ -2772,8 +2822,8 @@ class RegistrationController extends Controller
                     ],
                     'badgeType' => $mainDelegate->badge_type,
                     'quantity' => 1,
-                    'totalDiscount' => $mainDelegate->unit_price * ($mainDiscount / 100),
-                    'totalNetAmount' =>  $mainDelegate->unit_price - ($mainDelegate->unit_price * ($mainDiscount / 100)),
+                    'totalDiscount' => $tempTotalDiscount,
+                    'totalNetAmount' =>  $tempTotalAmount,
                     'promoCodeDiscount' => $mainDiscount,
                 ]);
             }
@@ -2795,7 +2845,16 @@ class RegistrationController extends Controller
                     }
 
                     if ($addSubDelegate) {
-                        $subDiscount = PromoCode::where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $subDelegate->pcode_used)->where('badge_type', $subDelegate->badge_type)->value('discount');
+                        $subPromoCode = PromoCode::where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $subDelegate->pcode_used)->where('badge_type', $subDelegate->badge_type)->first();
+
+                        if($subPromoCode != null){
+                            $subDiscount = $subPromoCode->discount;
+                            $subDiscountType = $subPromoCode->discount_type;
+                        } else {
+                            $subDiscount = 0;
+                            $subDiscountType = null;
+                        }
+
 
                         $checkIfExisting = false;
                         $existingIndex = 0;
@@ -2815,8 +2874,14 @@ class RegistrationController extends Controller
                             );
 
                             $quantityTemp = $invoiceDetails[$existingIndex]['quantity'] + 1;
-                            $totalDiscountTemp = ($mainDelegate->unit_price * ($invoiceDetails[$existingIndex]['promoCodeDiscount'] / 100)) * $quantityTemp;
-                            $totalNetAmountTemp = ($mainDelegate->unit_price * $quantityTemp) - $totalDiscountTemp;
+
+                            if($subDiscountType == "percentage"){
+                                $totalDiscountTemp = ($mainDelegate->unit_price * ($invoiceDetails[$existingIndex]['promoCodeDiscount'] / 100)) * $quantityTemp;
+                                $totalNetAmountTemp = ($mainDelegate->unit_price * $quantityTemp) - $totalDiscountTemp;
+                            } else {
+                                $totalDiscountTemp = $invoiceDetails[$existingIndex]['promoCodeDiscount'] * $quantityTemp;
+                                $totalNetAmountTemp = ($mainDelegate->unit_price * $quantityTemp) - $totalDiscountTemp;
+                            }
 
                             $invoiceDetails[$existingIndex]['quantity'] = $quantityTemp;
                             $invoiceDetails[$existingIndex]['totalDiscount'] = $totalDiscountTemp;
@@ -2827,16 +2892,28 @@ class RegistrationController extends Controller
                                 $subDelegateDescription = "Delegate Registration Fee - Leaders of Tomorrow";
                             } else {
                                 if ($subDiscount != null) {
-                                    if ($subDiscount == 100) {
-                                        $subDelegateDescription = "Delegate Registration Fee - Complimentary";
-                                    } else if ($subDiscount > 0 && $subDiscount < 100) {
-                                        $subDelegateDescription = "Delegate Registration Fee - " . $passType . " discounted rate";
+                                    if($subDiscountType == "percentage"){
+                                        if ($subDiscount == 100) {
+                                            $subDelegateDescription = "Delegate Registration Fee - Complimentary";
+                                        } else if ($subDiscount > 0 && $subDiscount < 100) {
+                                            $subDelegateDescription = "Delegate Registration Fee - " . $passType . " discounted rate";
+                                        } else {
+                                            $subDelegateDescription = "Delegate Registration Fee - {$mainDelegate->rate_type_string}";
+                                        }
                                     } else {
                                         $subDelegateDescription = "Delegate Registration Fee - {$mainDelegate->rate_type_string}";
                                     }
                                 } else {
                                     $subDelegateDescription = "Delegate Registration Fee - {$mainDelegate->rate_type_string}";
                                 }
+                            }
+
+                            if($subDiscountType == "percentage"){
+                                $tempSubTotalDiscount = $mainDelegate->unit_price * ($subDiscount / 100);
+                                $tempSubTotalAmount = $mainDelegate->unit_price - ($mainDelegate->unit_price * ($subDiscount / 100));
+                            } else {
+                                $tempSubTotalDiscount = $subDiscount;
+                                $tempSubTotalAmount = $mainDelegate->unit_price - $subDiscount;
                             }
 
                             array_push($invoiceDetails, [
@@ -2846,8 +2923,8 @@ class RegistrationController extends Controller
                                 ],
                                 'badgeType' => $subDelegate->badge_type,
                                 'quantity' => 1,
-                                'totalDiscount' => $mainDelegate->unit_price * ($subDiscount / 100),
-                                'totalNetAmount' =>  $mainDelegate->unit_price - ($mainDelegate->unit_price * ($subDiscount / 100)),
+                                'totalDiscount' => $tempSubTotalDiscount,
+                                'totalNetAmount' =>  $tempSubTotalAmount,
                                 'promoCodeDiscount' => $subDiscount,
                             ]);
                         }

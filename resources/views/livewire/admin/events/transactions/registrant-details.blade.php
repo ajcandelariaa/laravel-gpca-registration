@@ -173,7 +173,10 @@
                         class="bg-orange-800 hover:bg-orange-900 text-white py-2 rounded-md text-lg text-center"
                         target="_blank">View Invoice</a>
 
-                    @if ($finalData['payment_status'] != 'paid' && $finalData['payment_status'] != 'refunded' && $finalData['paid_date_time'] == "N/A")
+                    @if (
+                        $finalData['payment_status'] != 'paid' &&
+                            $finalData['payment_status'] != 'refunded' &&
+                            $finalData['paid_date_time'] == 'N/A')
                         <button wire:click="openMarkAsPaidModal"
                             class="bg-green-600 hover:bg-green-700 text-white py-2 rounded-md text-lg text-center">Mark
                             as
@@ -185,7 +188,10 @@
                             Paid</button>
                     @endif
 
-                    @if ($finalData['payment_status'] != 'paid' && $finalData['payment_status'] != 'refunded' && $finalData['paid_date_time'] == "N/A")
+                    @if (
+                        $finalData['payment_status'] != 'paid' &&
+                            $finalData['payment_status'] != 'refunded' &&
+                            $finalData['paid_date_time'] == 'N/A')
                         <button wire:click="sendEmailReminderConfirmation"
                             class="col-span-1 bg-sky-600 hover:bg-sky-700 text-white py-2 rounded-md text-lg text-center">Send
                             Payment Reminder</button>
@@ -196,8 +202,8 @@
                     @endif
 
                     <button wire:click="sendEmailRegistrationConfirmationConfirmation"
-                    class="col-span-1 bg-yellow-600 hover:bg-yellow-700 text-white py-2 rounded-md text-lg text-center">Send
-                    Registration Confirmation</button>
+                        class="col-span-1 bg-yellow-600 hover:bg-yellow-700 text-white py-2 rounded-md text-lg text-center">Send
+                        Registration Confirmation</button>
                 </div>
             </div>
 
@@ -252,12 +258,20 @@
                                         @if ($innerDelegate['pcode_used'] == null)
                                             <p class="font-bold">N/A</p>
                                         @else
-                                            <p class="font-bold">{{ $innerDelegate['pcode_used'] }}
-                                                <span
-                                                    class="text-green-500 text-sm italic ml-2">{{ $innerDelegate['discount'] }}%
-                                                    discount
-                                                </span>
-                                            </p>
+                                            @if ($innerDelegate['discount_type'] == 'percentage')
+                                                <p class="font-bold">{{ $innerDelegate['pcode_used'] }}
+                                                    <span
+                                                        class="text-green-500 text-sm italic ml-2">{{ $innerDelegate['discount'] }}%
+                                                        discount
+                                                    </span>
+                                                </p>
+                                            @else
+                                                <p class="font-bold">{{ $innerDelegate['pcode_used'] }}
+                                                    <span class="text-green-500 text-sm italic ml-2">${{ $innerDelegate['discount'] }}
+                                                        discount
+                                                    </span>
+                                                </p>
+                                            @endif
                                         @endif
 
 

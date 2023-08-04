@@ -18,6 +18,7 @@ class PromoCode extends Component
     public $promo_code;
     public $description;
     public $badge_type;
+    public $discount_type;
     public $discount;
     public $number_of_codes;
     public $total_usage;
@@ -48,18 +49,19 @@ class PromoCode extends Component
             [
                 'promo_code' => 'required',
                 'badge_type' => 'required',
-                'discount' => 'required|numeric|min:0|max:100',
+                'discount_type' => 'required',
+                'discount' => 'required|numeric|min:0',
                 'number_of_codes' => 'required|numeric|min:1|max:10000',
                 'validity' => 'required',
             ],
             [
                 'promo_code.required' => 'Code is required',
                 'badge_type.required' => 'Badge Type is required',
+                'discount_type.required' => 'Discount Type is required',
 
                 'discount.required' => 'Discount is required',
                 'discount.numeric' => 'Discount must be a number.',
                 'discount.min' => 'Discount must be at least :min.',
-                'discount.max' => 'Discount may not be greater than :max.',
 
                 'number_of_codes.required' => 'Number of codes is required',
                 'number_of_codes.numeric' => 'Number of codes must be a number.',
@@ -86,6 +88,7 @@ class PromoCode extends Component
             'description' => $this->description,
             'badge_type' => $this->badge_type,
             'promo_code' => $this->promo_code,
+            'discount_type' => $this->discount_type,
             'discount' => $this->discount,
             'total_usage' => 0,
             'number_of_codes' => $this->number_of_codes,
@@ -95,6 +98,7 @@ class PromoCode extends Component
         $this->description = null;
         $this->badge_type = null;
         $this->promo_code = null;
+        $this->discount_type = null;
         $this->discount = null;
         $this->number_of_codes = null;
         $this->validity = null;
@@ -124,6 +128,7 @@ class PromoCode extends Component
         $this->promo_code = $promoCode->promo_code;
         $this->description = $promoCode->description;
         $this->badge_type = $promoCode->badge_type;
+        $this->discount_type = $promoCode->discount_type;
         $this->discount = $promoCode->discount;
         $this->number_of_codes = $promoCode->number_of_codes;
         $this->total_usage = $promoCode->total_usage;
@@ -138,6 +143,7 @@ class PromoCode extends Component
         $this->description = null;
         $this->badge_type = null;
         $this->promo_code = null;
+        $this->discount_type = null;
         $this->discount = null;
         $this->number_of_codes = null;
         $this->total_usage = null;
@@ -150,18 +156,19 @@ class PromoCode extends Component
             [
                 'promo_code' => 'required',
                 'badge_type' => 'required',
-                'discount' => 'required|numeric|min:0|max:100',
+                'discount_type' => 'required',
+                'discount' => 'required|numeric|min:0',
                 'number_of_codes' => 'required|numeric|min:'.$this->total_usage.'|max:10000',
                 'validity' => 'required',
             ],
             [
                 'promo_code.required' => 'Code is required',
                 'badge_type.required' => 'Badge Type is required',
+                'discount_type.required' => 'Discount Type is required',
 
                 'discount.required' => 'Discount is required',
                 'discount.numeric' => 'Discount must be a number.',
                 'discount.min' => 'Discount must be at least :min.',
-                'discount.max' => 'Discount may not be greater than :max.',
 
                 'number_of_codes.required' => 'Number of codes is required',
                 'number_of_codes.numeric' => 'Number of codes must be a number.',
@@ -186,6 +193,7 @@ class PromoCode extends Component
             'description' => $this->description,
             'badge_type' => $this->badge_type,
             'promo_code' => $this->promo_code,
+            'discount_type' => $this->discount_type,
             'discount' => $this->discount,
             'number_of_codes' => $this->number_of_codes,
             'validity' => $this->validity,
@@ -196,6 +204,7 @@ class PromoCode extends Component
         $this->description = null;
         $this->badge_type = null;
         $this->promo_code = null;
+        $this->discount_type = null;
         $this->discount = null;
         $this->number_of_codes = null;
         $this->total_usage = null;

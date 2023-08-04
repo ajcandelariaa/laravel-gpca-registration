@@ -16,6 +16,7 @@ class PromoCode extends Model
         'description',
         'badge_type',
         'promo_code',
+        'discount_type',
         'discount',
         'total_usage',
         'number_of_codes',
