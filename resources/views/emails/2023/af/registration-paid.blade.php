@@ -9,9 +9,9 @@
 
 <p>Upon your  arrival at the event, you can collect your badge from the fast-track delegate counter or from the main registration counter situated in exhibition hall 4 to 6 at concourse.</p>
 
-{{-- <p>Use the below QRCode to print your own badge onsite:</p> --}}
+<p>Use the below QRCode to print your own badge onsite:</p>
 
-{{-- <img src="data:image/png;base64, {!! base64_encode(QrCode::format('png')->size(200)->generate($details['badgeLink'])) !!}" /> --}}
+<img src="data:image/png;base64, {!! base64_encode(QrCode::format('png')->size(200)->generate($details['badgeLink'])) !!}" />
 
 <br><br>
 
