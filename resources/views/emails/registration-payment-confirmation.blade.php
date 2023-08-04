@@ -1,7 +1,7 @@
 <x-mail::message>
 <p>Dear {{ $details['name'] }},</p>
 
-<p>Thank you for your registering for the <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a>. We have successfully received your payment.</p>
+<p>Thank you for registering to the <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a>. We have successfully received your payment.</p>
 
 <p>Please find below a summary of your payment for your reference.</p>
 

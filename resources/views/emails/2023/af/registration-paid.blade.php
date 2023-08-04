@@ -11,7 +11,7 @@
 
 <p>Use the below QRCode to print your own badge onsite:</p>
 
-<img src="data:image/png;base64, {!! base64_encode(QrCode::format('png')->size(200)->generate($details['badgeLink'])) !!}" />
+{{-- <img src="data:image/png;base64, {!! base64_encode(QrCode::format('png')->size(200)->generate($details['badgeLink'])) !!}" /> --}}
 
 <br><br>
 
