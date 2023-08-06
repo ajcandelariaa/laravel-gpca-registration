@@ -174,6 +174,9 @@ class RegistrationForm extends Component
         if ($this->promoCodeDiscount == null) {
             $this->promoCode = null;
             $promoCodeMainDiscountString = "";
+
+            $tempTotalDiscount = 0;
+            $tempTotalNetAmount = $this->finalUnitPrice;
         } else {
 
             if($this->discountType == "percentage"){
