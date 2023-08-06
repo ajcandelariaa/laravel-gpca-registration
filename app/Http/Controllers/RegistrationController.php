@@ -3406,10 +3406,10 @@ class RegistrationController extends Controller
 
                 $promoCode = PromoCode::where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $mainDelegate->pcode_used)->first();
 
-                $promoCodeDiscount = $promoCode->discount;
-                $discountType = $promoCode->discount_type;
-
                 if ($promoCode  != null) {
+                    $promoCodeDiscount = $promoCode->discount;
+                    $discountType = $promoCode->discount_type;
+
                     if($discountType == "percentage"){
                         $discountPrice = $mainDelegate->unit_price * ($promoCodeDiscount / 100);
                         $netAMount = $mainDelegate->unit_price - $discountPrice;
@@ -3495,10 +3495,11 @@ class RegistrationController extends Controller
 
                         $subPromoCode = PromoCode::where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $subDelegate->pcode_used)->first();
 
-                        $promoCodeDiscount = $subPromoCode->discount;
-                        $discountType = $subPromoCode->discount_type;
 
-                        if ($promoCodeDiscount  != null) {
+                        if ($subPromoCode  != null) {
+                            $promoCodeDiscount = $subPromoCode->discount;
+                            $discountType = $subPromoCode->discount_type;
+
                             if($discountType == "percentage"){
                                 $discountPrice = $mainDelegate->unit_price * ($promoCodeDiscount / 100);
                                 $netAMount = $mainDelegate->unit_price - $discountPrice;
