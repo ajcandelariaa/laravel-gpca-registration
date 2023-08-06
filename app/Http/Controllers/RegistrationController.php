@@ -3404,11 +3404,19 @@ class RegistrationController extends Controller
                 $discountPrice = 0.0;
                 $netAMount = 0.0;
 
-                $promoCodeDiscount = PromoCode::where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $mainDelegate->pcode_used)->value('discount');
+                $promoCode = PromoCode::where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $mainDelegate->pcode_used)->first();
 
-                if ($promoCodeDiscount  != null) {
-                    $discountPrice = $mainDelegate->unit_price * ($promoCodeDiscount / 100);
-                    $netAMount = $mainDelegate->unit_price - $discountPrice;
+                $promoCodeDiscount = $promoCode->discount;
+                $discountType = $promoCode->discount_type;
+
+                if ($promoCode  != null) {
+                    if($discountType == "percentage"){
+                        $discountPrice = $mainDelegate->unit_price * ($promoCodeDiscount / 100);
+                        $netAMount = $mainDelegate->unit_price - $discountPrice;
+                    } else {
+                        $discountPrice = $promoCodeDiscount;
+                        $netAMount = $mainDelegate->unit_price - $discountPrice;
+                    }
                 } else {
                     $discountPrice = 0.0;
                     $netAMount = $mainDelegate->unit_price;
@@ -3485,11 +3493,19 @@ class RegistrationController extends Controller
                         $discountPrice = 0.0;
                         $netAMount = 0.0;
 
-                        $promoCodeDiscount = PromoCode::where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $subDelegate->pcode_used)->value('discount');
+                        $subPromoCode = PromoCode::where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $subDelegate->pcode_used)->first();
+
+                        $promoCodeDiscount = $subPromoCode->discount;
+                        $discountType = $subPromoCode->discount_type;
 
                         if ($promoCodeDiscount  != null) {
-                            $discountPrice = $mainDelegate->unit_price * ($promoCodeDiscount / 100);
-                            $netAMount = $mainDelegate->unit_price - $discountPrice;
+                            if($discountType == "percentage"){
+                                $discountPrice = $mainDelegate->unit_price * ($promoCodeDiscount / 100);
+                                $netAMount = $mainDelegate->unit_price - $discountPrice;
+                            } else {
+                                $discountPrice = $promoCodeDiscount;
+                                $netAMount = $mainDelegate->unit_price - $discountPrice;
+                            }
                         } else {
                             $discountPrice = 0.0;
                             $netAMount = $mainDelegate->unit_price;
