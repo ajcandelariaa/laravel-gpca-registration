@@ -36,7 +36,7 @@ class RegistrantDetails extends Component
 
     public $replaceDelegateIndex, $replaceDelegateInnerIndex, $replaceSalutation, $replaceFirstName, $replaceMiddleName, $replaceLastName, $replaceEmailAddress, $replaceMobileNumber, $replaceNationality, $replaceJobTitle, $replaceBadgeType, $replacePromoCode, $replaceDiscountType, $replacePromoCodeDiscount, $replacePromoCodeSuccess, $replacePromoCodeFail, $replaceEmailAlreadyUsedError;
 
-    public $mapPaymentMethod;
+    public $mapPaymentMethod, $sendInvoice;
 
     // MODALS
     public $showDelegateModal = false;
@@ -60,6 +60,11 @@ class RegistrantDetails extends Component
         $this->registrantId = $registrantId;
         $this->finalData = $finalData;
 
+        if($this->finalData['registration_method'] == "imported"){
+            $this->sendInvoice = false;
+        } else {
+            $this->sendInvoice = true;
+        }
         // dd($this->finalData);
     }
 
@@ -427,15 +432,15 @@ class RegistrantDetails extends Component
                         'invoiceLink' => $invoiceLink,
                     ];
 
-                    Mail::to($innerDelegate['email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaid($details1));
-                    Mail::to($innerDelegate['email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaymentConfirmation($details2));
+                    Mail::to($innerDelegate['email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaid($details1, $this->sendInvoice));
+                    Mail::to($innerDelegate['email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
                 }
             }
         }
 
         if ($this->finalData['assistant_email_address'] != null) {
-            Mail::to($this->finalData['assistant_email_address'])->queue(new RegistrationPaid($details1));
-            Mail::to($this->finalData['assistant_email_address'])->queue(new RegistrationPaymentConfirmation($details2));
+            Mail::to($this->finalData['assistant_email_address'])->queue(new RegistrationPaid($details1, $this->sendInvoice));
+            Mail::to($this->finalData['assistant_email_address'])->queue(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
         }
 
         $this->finalData['registration_status'] = "confirmed";
@@ -749,10 +754,10 @@ class RegistrantDetails extends Component
                     ];
 
                     if($this->finalData['payment_status'] == "unpaid"){
-                        Mail::to($innerDelegate['email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationUnpaid($details1));
+                        Mail::to($innerDelegate['email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationUnpaid($details1, $this->sendInvoice));
                     } else {
-                        Mail::to($innerDelegate['email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaid($details1));
-                        Mail::to($innerDelegate['email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaymentConfirmation($details2));
+                        Mail::to($innerDelegate['email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaid($details1, $this->sendInvoice));
+                        Mail::to($innerDelegate['email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
                     }
                 }
             }
@@ -760,10 +765,10 @@ class RegistrantDetails extends Component
 
         if ($this->finalData['assistant_email_address'] != null) {
             if($this->finalData['payment_status'] == "unpaid"){
-                Mail::to($this->finalData['assistant_email_address'])->queue(new RegistrationUnpaid($details1));
+                Mail::to($this->finalData['assistant_email_address'])->queue(new RegistrationUnpaid($details1, $this->sendInvoice));
             } else {
-                Mail::to($this->finalData['assistant_email_address'])->queue(new RegistrationPaid($details1));
-                Mail::to($this->finalData['assistant_email_address'])->queue(new RegistrationPaymentConfirmation($details2));
+                Mail::to($this->finalData['assistant_email_address'])->queue(new RegistrationPaid($details1, $this->sendInvoice));
+                Mail::to($this->finalData['assistant_email_address'])->queue(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
             }
         }
 
@@ -805,13 +810,13 @@ class RegistrantDetails extends Component
                         'earlyBirdValidityDate' => $earlyBirdValidityDate->format('jS F'),
                         'eventYear' => $this->event->year,
                     ];
-                    Mail::to($innerDelegate['email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaymentReminder($details));
+                    Mail::to($innerDelegate['email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaymentReminder($details, $this->sendInvoice));
                 }
             }
         }
 
         if ($this->finalData['assistant_email_address'] != null) {
-            Mail::to($this->finalData['assistant_email_address'])->queue(new RegistrationPaymentReminder($details));
+            Mail::to($this->finalData['assistant_email_address'])->queue(new RegistrationPaymentReminder($details, $this->sendInvoice));
         }
 
         $this->dispatchBrowserEvent('swal:payment-reminder-success', [

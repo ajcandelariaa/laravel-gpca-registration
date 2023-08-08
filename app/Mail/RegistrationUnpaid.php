@@ -16,15 +16,17 @@ class RegistrationUnpaid extends Mailable
     use Queueable, SerializesModels;
 
     public $details;
+    public $sendInvoice;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($details)
+    public function __construct($details, $sendInvoice = true)
     {
         $this->details = $details;
+        $this->sendInvoice = $sendInvoice;
     }
 
     /**

@@ -17,10 +17,14 @@
     <li style="mso-special-format:bullet;">Your card cannot be used for card-not-present transactions</li>
     <li style="mso-special-format:bullet;">There may be a problem with your bank’s authorization system.</li>
 </ul>
+@if ($sendInvoice)
 <x-mail::button :url="$details['invoiceLink']" color="registration">
 Download invoice
 </x-mail::button>
 <span>&nbsp;</span>
+@else
+<br><br>
+@endif
 
 <p>Please contact your bank for further information regarding the declined payment. Alternatively, you can reach out to Analee Candelaria at <a href="mailto:analee@gpca.org.ae">analee@gpca.org.ae</a> or +971 4 451 0666 ext. 116 to explore alternative payment options that may be available to you.</p>
 

@@ -26,11 +26,15 @@
     <br>
     Transaction ID: <strong>{{  $details['transactionId'] }}</strong>
 </span>
+@if ($sendInvoice)
 <br><br>
 <x-mail::button :url="$details['invoiceLink']" color="registration">
 Download invoice
 </x-mail::button>
 <span>&nbsp;</span>
+@else
+<br><br>
+@endif
 
 <h3>GENERAL INFORMATION</h3>
 

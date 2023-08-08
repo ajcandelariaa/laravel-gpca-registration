@@ -11,11 +11,13 @@
 
 <p>For further information on how to settle your payment, please contact Analee Candelaria at <a href="mailto:analee@gpca.org.ae">analee@gpca.org.ae</a> or call +971 4 451 0666 ext. 116.</p>
 
+@if ($sendInvoice)
 <x-mail::button :url="$details['invoiceLink']" color="registration">
 Download invoice
 </x-mail::button>
 
 <span>&nbsp;</span>
+@endif
 
 <p>Thank you and looking forward to welcoming you at the <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a>. </p>
 

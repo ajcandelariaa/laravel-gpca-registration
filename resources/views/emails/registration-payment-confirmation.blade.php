@@ -25,11 +25,12 @@
 </table>
 
 <br>
-
+@if ($sendInvoice)
 <x-mail::button :url="$details['invoiceLink']" color="registration">
 Download invoice
 </x-mail::button>
 <span>&nbsp;</span>
+@endif
 
 <p>For further information, you may contact the following:</p>
 

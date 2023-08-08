@@ -265,7 +265,7 @@ class RegistrationController extends Controller
 
             $promoCode = PromoCode::where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $mainDelegate->pcode_used)->where('badge_type', $mainDelegate->badge_type)->first();
 
-            if($promoCode != null){
+            if ($promoCode != null) {
                 $mainDiscount = $promoCode->discount;
                 $mainDiscountType = $promoCode->discount_type;
             } else {
@@ -298,7 +298,7 @@ class RegistrationController extends Controller
 
                     $subPromoCode = PromoCode::where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $subDelegate->pcode_used)->where('badge_type', $subDelegate->badge_type)->first();
 
-                    if($subPromoCode != null){
+                    if ($subPromoCode != null) {
                         $subDiscount = $subPromoCode->discount;
                         $subDiscountType = $subPromoCode->discount_type;
                     } else {
@@ -306,7 +306,7 @@ class RegistrationController extends Controller
                         $subDiscountType = null;
                     }
 
-        
+
                     foreach (config('app.eventCategories') as $eventCategoryC => $code) {
                         if ($eventCategory == $eventCategoryC) {
                             $eventCode = $code;
@@ -1405,10 +1405,9 @@ class RegistrationController extends Controller
         return $formatter->format($number);
     }
 
-    public function generatePublicInvoice($eventCategory, $eventId, $registrantId)
+    public function generateAdminInvoice($eventCategory, $eventId, $registrantId)
     {
         $finalData = $this->getInvoice($eventCategory, $eventId, $registrantId);
-
         if ($finalData['finalQuantity'] > 0) {
             if ($eventCategory == "RCCA") {
                 if ($finalData['paymentStatus'] == "unpaid") {
@@ -1424,6 +1423,33 @@ class RegistrationController extends Controller
                 }
             }
             return $pdf->stream('invoice.pdf');
+        } else {
+            abort(404, 'The URL is incorrect');
+        }
+    }
+
+    public function generatePublicInvoice($eventCategory, $eventId, $registrantId)
+    {
+        $finalData = $this->getInvoice($eventCategory, $eventId, $registrantId);
+        if ($finalData['finalQuantity'] > 0) {
+            if ($finalData['registrationMethod'] != "imported") {
+                if ($eventCategory == "RCCA") {
+                    if ($finalData['paymentStatus'] == "unpaid") {
+                        $pdf = Pdf::loadView('admin.events.transactions.invoices.rcca.unpaid', $finalData);
+                    } else {
+                        $pdf = Pdf::loadView('admin.events.transactions.invoices.rcca.paid', $finalData);
+                    }
+                } else {
+                    if ($finalData['paymentStatus'] == "unpaid") {
+                        $pdf = Pdf::loadView('admin.events.transactions.invoices.unpaid', $finalData);
+                    } else {
+                        $pdf = Pdf::loadView('admin.events.transactions.invoices.paid', $finalData);
+                    }
+                }
+                return $pdf->stream('invoice.pdf');
+            } else {
+                abort(404, 'The URL is incorrect');
+            }
         } else {
             abort(404, 'The URL is incorrect');
         }
@@ -1560,7 +1586,7 @@ class RegistrationController extends Controller
                         'amountPaid' => $mainDelegate->total_amount,
                         'transactionId' => $tempTransactionId,
                         'invoiceLink' => $invoiceLink,
-                        'badgeLink' => env('APP_URL')."/".$event->category."/".$event->id."/view-badge"."/"."main"."/".$mainDelegateId,
+                        'badgeLink' => env('APP_URL') . "/" . $event->category . "/" . $event->id . "/view-badge" . "/" . "main" . "/" . $mainDelegateId,
                     ];
 
                     $details2 = [
@@ -1606,7 +1632,7 @@ class RegistrationController extends Controller
                                 'amountPaid' => $mainDelegate->total_amount,
                                 'transactionId' => $tempTransactionId,
                                 'invoiceLink' => $invoiceLink,
-                                'badgeLink' => env('APP_URL')."/".$event->category."/".$event->id."/view-badge"."/"."sub"."/".$additionalDelegate->id,
+                                'badgeLink' => env('APP_URL') . "/" . $event->category . "/" . $event->id . "/view-badge" . "/" . "sub" . "/" . $additionalDelegate->id,
                             ];
 
                             $details2 = [
@@ -1831,7 +1857,7 @@ class RegistrationController extends Controller
                         'amountPaid' => $mainSpouse->total_amount,
                         'transactionId' => $tempTransactionId,
                         'invoiceLink' => $invoiceLink,
-                        'badgeLink' => env('APP_URL')."/".$event->category."/".$event->id."/view-badge"."/"."main"."/".$mainSpouse->id,
+                        'badgeLink' => env('APP_URL') . "/" . $event->category . "/" . $event->id . "/view-badge" . "/" . "main" . "/" . $mainSpouse->id,
                     ];
 
                     $details2 = [
@@ -1874,7 +1900,7 @@ class RegistrationController extends Controller
                                 'amountPaid' => $mainSpouse->total_amount,
                                 'transactionId' => $tempTransactionId,
                                 'invoiceLink' => $invoiceLink,
-                                'badgeLink' => env('APP_URL')."/".$event->category."/".$event->id."/view-badge"."/"."sub"."/".$additionalSpouse->id,
+                                'badgeLink' => env('APP_URL') . "/" . $event->category . "/" . $event->id . "/view-badge" . "/" . "sub" . "/" . $additionalSpouse->id,
                             ];
 
                             $details2 = [
@@ -2091,7 +2117,7 @@ class RegistrationController extends Controller
                         'amountPaid' => $mainVisitor->total_amount,
                         'transactionId' => $tempTransactionId,
                         'invoiceLink' => $invoiceLink,
-                        'badgeLink' => env('APP_URL')."/".$event->category."/".$event->id."/view-badge"."/"."main"."/".$mainVisitor->id,
+                        'badgeLink' => env('APP_URL') . "/" . $event->category . "/" . $event->id . "/view-badge" . "/" . "main" . "/" . $mainVisitor->id,
                     ];
 
                     $details2 = [
@@ -2134,7 +2160,7 @@ class RegistrationController extends Controller
                                 'amountPaid' => $mainVisitor->total_amount,
                                 'transactionId' => $tempTransactionId,
                                 'invoiceLink' => $invoiceLink,
-                                'badgeLink' => env('APP_URL')."/".$event->category."/".$event->id."/view-badge"."/"."sub"."/".$additionalVisitor->id,
+                                'badgeLink' => env('APP_URL') . "/" . $event->category . "/" . $event->id . "/view-badge" . "/" . "sub" . "/" . $additionalVisitor->id,
                             ];
 
                             $details2 = [
@@ -2375,7 +2401,7 @@ class RegistrationController extends Controller
                         'amountPaid' => $mainParticipant->total_amount,
                         'transactionId' => $tempTransactionId,
                         'invoiceLink' => $invoiceLink,
-                        'badgeLink' => env('APP_URL')."/".$event->category."/".$event->id."/view-badge"."/"."main"."/".$mainParticipant->id,
+                        'badgeLink' => env('APP_URL') . "/" . $event->category . "/" . $event->id . "/view-badge" . "/" . "main" . "/" . $mainParticipant->id,
                     ];
 
                     $details2 = [
@@ -2778,7 +2804,7 @@ class RegistrationController extends Controller
             if ($addMainDelegate) {
                 $promoCode = PromoCode::where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $mainDelegate->pcode_used)->where('badge_type', $mainDelegate->badge_type)->first();
 
-                if($promoCode != null){
+                if ($promoCode != null) {
                     $mainDiscount = $promoCode->discount;
                     $mainDiscountType = $promoCode->discount_type;
                 } else {
@@ -2791,7 +2817,7 @@ class RegistrationController extends Controller
                     $delegateDescription = "Delegate Registration Fee - Leaders of Tomorrow";
                 } else {
                     if ($mainDiscount != null) {
-                        if($mainDiscountType == "percentage"){
+                        if ($mainDiscountType == "percentage") {
                             if ($mainDiscount == 100) {
                                 $delegateDescription = "Delegate Registration Fee - Complimentary";
                             } else if ($mainDiscount > 0 && $mainDiscount < 100) {
@@ -2807,7 +2833,7 @@ class RegistrationController extends Controller
                     }
                 }
 
-                if($mainDiscountType == "percentage"){
+                if ($mainDiscountType == "percentage") {
                     $tempTotalDiscount = $mainDelegate->unit_price * ($mainDiscount / 100);
                     $tempTotalAmount = $mainDelegate->unit_price - ($mainDelegate->unit_price * ($mainDiscount / 100));
                 } else {
@@ -2847,7 +2873,7 @@ class RegistrationController extends Controller
                     if ($addSubDelegate) {
                         $subPromoCode = PromoCode::where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $subDelegate->pcode_used)->where('badge_type', $subDelegate->badge_type)->first();
 
-                        if($subPromoCode != null){
+                        if ($subPromoCode != null) {
                             $subDiscount = $subPromoCode->discount;
                             $subDiscountType = $subPromoCode->discount_type;
                         } else {
@@ -2875,7 +2901,7 @@ class RegistrationController extends Controller
 
                             $quantityTemp = $invoiceDetails[$existingIndex]['quantity'] + 1;
 
-                            if($subDiscountType == "percentage"){
+                            if ($subDiscountType == "percentage") {
                                 $totalDiscountTemp = ($mainDelegate->unit_price * ($invoiceDetails[$existingIndex]['promoCodeDiscount'] / 100)) * $quantityTemp;
                                 $totalNetAmountTemp = ($mainDelegate->unit_price * $quantityTemp) - $totalDiscountTemp;
                             } else {
@@ -2892,7 +2918,7 @@ class RegistrationController extends Controller
                                 $subDelegateDescription = "Delegate Registration Fee - Leaders of Tomorrow";
                             } else {
                                 if ($subDiscount != null) {
-                                    if($subDiscountType == "percentage"){
+                                    if ($subDiscountType == "percentage") {
                                         if ($subDiscount == 100) {
                                             $subDelegateDescription = "Delegate Registration Fee - Complimentary";
                                         } else if ($subDiscount > 0 && $subDiscount < 100) {
@@ -2908,7 +2934,7 @@ class RegistrationController extends Controller
                                 }
                             }
 
-                            if($subDiscountType == "percentage"){
+                            if ($subDiscountType == "percentage") {
                                 $tempSubTotalDiscount = $mainDelegate->unit_price * ($subDiscount / 100);
                                 $tempSubTotalAmount = $mainDelegate->unit_price - ($mainDelegate->unit_price * ($subDiscount / 100));
                             } else {
@@ -2967,6 +2993,7 @@ class RegistrationController extends Controller
                 "invoiceNumber" => $tempInvoiceNumber,
                 "bookRefNumber" => $tempBookReference,
                 "paymentStatus" => $mainDelegate->payment_status,
+                "registrationMethod" => $mainDelegate->registration_method,
                 "eventName" => $event->name,
                 "eventLocation" => $event->location,
                 "eventVat" => $event->event_vat,
@@ -3410,7 +3437,7 @@ class RegistrationController extends Controller
                     $promoCodeDiscount = $promoCode->discount;
                     $discountType = $promoCode->discount_type;
 
-                    if($discountType == "percentage"){
+                    if ($discountType == "percentage") {
                         $discountPrice = $mainDelegate->unit_price * ($promoCodeDiscount / 100);
                         $netAMount = $mainDelegate->unit_price - $discountPrice;
                     } else {
@@ -3500,7 +3527,7 @@ class RegistrationController extends Controller
                             $promoCodeDiscount = $subPromoCode->discount;
                             $discountType = $subPromoCode->discount_type;
 
-                            if($discountType == "percentage"){
+                            if ($discountType == "percentage") {
                                 $discountPrice = $mainDelegate->unit_price * ($promoCodeDiscount / 100);
                                 $netAMount = $mainDelegate->unit_price - $discountPrice;
                             } else {
@@ -3580,7 +3607,7 @@ class RegistrationController extends Controller
             }
         }
         $currentDate = Carbon::now()->format('Y-m-d');
-        $fileName = $eventCategory. ' ' . $event->year. ' Transactions '.'['.$currentDate.'].csv';
+        $fileName = $eventCategory . ' ' . $event->year . ' Transactions ' . '[' . $currentDate . '].csv';
         $headers = array(
             "Content-type"        => "text/csv",
             "Content-Disposition" => "attachment; filename=$fileName",
@@ -3874,7 +3901,7 @@ class RegistrationController extends Controller
         }
 
         $currentDate = Carbon::now()->format('Y-m-d');
-        $fileName = $eventCategory. ' ' . $event->year. ' Transactions '.'['.$currentDate.'].csv';
+        $fileName = $eventCategory . ' ' . $event->year . ' Transactions ' . '[' . $currentDate . '].csv';
         $headers = array(
             "Content-type"        => "text/csv",
             "Content-Disposition" => "attachment; filename=$fileName",
@@ -4147,7 +4174,7 @@ class RegistrationController extends Controller
         }
 
         $currentDate = Carbon::now()->format('Y-m-d');
-        $fileName = $eventCategory. ' ' . $event->year. ' Transactions '.'['.$currentDate.'].csv';
+        $fileName = $eventCategory . ' ' . $event->year . ' Transactions ' . '[' . $currentDate . '].csv';
         $headers = array(
             "Content-type"        => "text/csv",
             "Content-Disposition" => "attachment; filename=$fileName",
@@ -4448,7 +4475,7 @@ class RegistrationController extends Controller
         }
 
         $currentDate = Carbon::now()->format('Y-m-d');
-        $fileName = $eventCategory. ' ' . $event->year. ' Transactions '.'['.$currentDate.'].csv';
+        $fileName = $eventCategory . ' ' . $event->year . ' Transactions ' . '[' . $currentDate . '].csv';
         $headers = array(
             "Content-type"        => "text/csv",
             "Content-Disposition" => "attachment; filename=$fileName",
