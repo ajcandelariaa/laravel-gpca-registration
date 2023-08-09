@@ -232,13 +232,23 @@ class RegistrantsList extends Component
             'csvFile' => 'required|mimes:csv,txt',
         ]);
 
-        $file = fopen($this->csvFile->getRealPath(), "r");
+        $file = fopen($this->csvFile->getRealPath(), "r", 'UTF-8');
         $rows = [];
+
+        $rowCounter = 0;
         while (($row = fgetcsv($file, 0, ",")) !== FALSE) {
+            if($rowCounter > 0){ 
+                $tempRow = [];
+                foreach($row as $col){
+                    $tempRow[] = trim($col);
+                }
+                $row = $tempRow;
+            }
+
+            $rowCounter++;
             $rows[] = $row;
         }
         fclose($file);
-
         $checkIfCorrectFormat = true;
         for ($i = 0; $i < count($rows); $i++) {
             if ($i == 0) {
@@ -274,7 +284,6 @@ class RegistrantsList extends Component
                 break;
             }
         }
-
         if ($checkIfCorrectFormat) {
             $this->csvFileError = null;
 
@@ -481,11 +490,6 @@ class RegistrantsList extends Component
         // dd($finalData);
         foreach ($finalData as $transactions) {
             foreach ($transactions as $transaction) {
-
-                // dd($transaction);
-
-                // $checkCompanyIfMember = Members::where('name', $transaction['company_name'])->first();
-
                 if ($transaction['pass_type'] != "Non-Member") {
                     if ($this->event->eb_full_member_rate != null && $this->event->std_full_member_rate != null) {
                         $delegatePassType = 'fullMember';
@@ -548,11 +552,16 @@ class RegistrantsList extends Component
                             }
                             
                         } else {
+                            $finalDiscount += 0;
+                            $finalNetAmount += $finalUnitPrice;
                             $promoCodeDiscount = 0;
                             $promoCodeDiscountType = null;
                         }
                     } else {
+                        $finalDiscount += 0;
                         $finalNetAmount += $finalUnitPrice;
+                        $promoCodeDiscount = 0;
+                        $promoCodeDiscountType = null;
                     }
                 }
 
@@ -680,11 +689,11 @@ class RegistrantsList extends Component
             if ($checkIfMatch > 0) {
                 $delegate = [
                     'payment_status' => $rows[$i][10],
-                    'pcode_used' => $rows[$i][11],
+                    'pcode_used' => $rows[$i][11] == "" ? null : $rows[$i][11],
                     'badge_type' => $rows[$i][12],
-                    'salutation' => $rows[$i][13],
+                    'salutation' => $rows[$i][13] == "" ? null : $rows[$i][13],
                     'first_name' => $rows[$i][14],
-                    'middle_name' => $rows[$i][15],
+                    'middle_name' => $rows[$i][15] == "" ? null : $rows[$i][15],
                     'last_name' => $rows[$i][16],
                     'email_address' => $rows[$i][17],
                     'mobile_number' => $rows[$i][18],
@@ -696,11 +705,11 @@ class RegistrantsList extends Component
             } else {
                 $delegate = [
                     'payment_status' => $rows[$i][10],
-                    'pcode_used' => $rows[$i][11],
+                    'pcode_used' => $rows[$i][11] == "" ? null : $rows[$i][11],
                     'badge_type' => $rows[$i][12],
-                    'salutation' => $rows[$i][13],
+                    'salutation' => $rows[$i][13] == "" ? null : $rows[$i][13],
                     'first_name' => $rows[$i][14],
-                    'middle_name' => $rows[$i][15],
+                    'middle_name' => $rows[$i][15] == "" ? null : $rows[$i][15],
                     'last_name' => $rows[$i][16],
                     'email_address' => $rows[$i][17],
                     'mobile_number' => $rows[$i][18],
@@ -716,9 +725,9 @@ class RegistrantsList extends Component
                     'company_address' => $rows[$i][4],
                     'company_country' => $rows[$i][5],
                     'company_city' => $rows[$i][6],
-                    'company_telephone_number' => $rows[$i][7],
+                    'company_telephone_number' => $rows[$i][7] == "" ? null : $rows[$i][7],
                     'company_mobile_number' => $rows[$i][8],
-                    'assistant_email_address' => $rows[$i][9],
+                    'assistant_email_address' => $rows[$i][9] == "" ? null : $rows[$i][9],
                     'delegates' => [
                         $delegate
                     ],
@@ -727,11 +736,11 @@ class RegistrantsList extends Component
         } else {
             $delegate = [
                 'payment_status' => $rows[$i][10],
-                'pcode_used' => $rows[$i][11],
+                'pcode_used' => $rows[$i][11] == "" ? null : $rows[$i][11],
                 'badge_type' => $rows[$i][12],
-                'salutation' => $rows[$i][13],
+                'salutation' => $rows[$i][13] == "" ? null : $rows[$i][13],
                 'first_name' => $rows[$i][14],
-                'middle_name' => $rows[$i][15],
+                'middle_name' => $rows[$i][15] == "" ? null : $rows[$i][15],
                 'last_name' => $rows[$i][16],
                 'email_address' => $rows[$i][17],
                 'mobile_number' => $rows[$i][18],
@@ -747,9 +756,9 @@ class RegistrantsList extends Component
                 'company_address' => $rows[$i][4],
                 'company_country' => $rows[$i][5],
                 'company_city' => $rows[$i][6],
-                'company_telephone_number' => $rows[$i][7],
+                'company_telephone_number' => $rows[$i][7] == "" ? null : $rows[$i][7],
                 'company_mobile_number' => $rows[$i][8],
-                'assistant_email_address' => $rows[$i][9],
+                'assistant_email_address' => $rows[$i][9] == "" ? null : $rows[$i][9],
                 'delegates' => [
                     $delegate
                 ],
