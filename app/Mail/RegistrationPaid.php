@@ -53,50 +53,50 @@ class RegistrationPaid extends Mailable
      */
     public function content()
     {
-        if($this->details['eventYear'] == '2023'){
+        if ($this->details['eventYear'] == '2023') {
             if ($this->details['eventCategory'] == "AF") {
                 return new Content(
                     markdown: 'emails.2023.af.registration-paid',
                 );
-            }
-            else if ($this->details['eventCategory'] == "AFS") {
+            } else if ($this->details['eventCategory'] == "AFS") {
                 return new Content(
                     markdown: 'emails.2023.spouse.registration-paid',
                 );
-            }
-            else if ($this->details['eventCategory'] == "AFV") {
+            } else if ($this->details['eventCategory'] == "AFV") {
                 return new Content(
                     markdown: 'emails.2023.visitor.registration-paid',
                 );
-            }
-            else if ($this->details['eventCategory'] == "ANC") {
+            } else if ($this->details['eventCategory'] == "ANC") {
                 return new Content(
                     markdown: 'emails.2023.anc.registration-paid',
                 );
-            }
-            else if ($this->details['eventCategory'] == "IPAW") {
+            } else if ($this->details['eventCategory'] == "IPAW") {
                 return new Content(
                     markdown: 'emails.2023.ipaw.registration-paid',
                 );
-            }
-            else if ($this->details['eventCategory'] == "PC") {
+            } else if ($this->details['eventCategory'] == "PC") {
                 return new Content(
                     markdown: 'emails.2023.pc.registration-paid',
                 );
-            }
-            else if ($this->details['eventCategory'] == "RCC") {
+            } else if ($this->details['eventCategory'] == "RCC") {
                 return new Content(
                     markdown: 'emails.2023.rcc.registration-paid',
                 );
-            }
-            else if ($this->details['eventCategory'] == "RCCA") {
+            } else if ($this->details['eventCategory'] == "RCCA") {
                 return new Content(
                     markdown: 'emails.2023.rcca.registration-paid',
                 );
-            }
-            else if ($this->details['eventCategory'] == "SCC") {
+            } else if ($this->details['eventCategory'] == "SCC") {
                 return new Content(
                     markdown: 'emails.2023.scc.registration-paid',
+                );
+            } else if ($this->details['eventCategory'] == "PSW") {
+                return new Content(
+                    markdown: 'emails.2023.psw.registration-paid',
+                );
+            } else if ($this->details['eventCategory'] == "DAW") {
+                return new Content(
+                    markdown: 'emails.2023.daw.registration-paid',
                 );
             } else {
                 return new Content(

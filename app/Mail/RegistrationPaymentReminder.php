@@ -49,18 +49,32 @@ class RegistrationPaymentReminder extends Mailable
      */
     public function content()
     {
-        if ($this->details['eventCategory'] == "AFS") {
-            return new Content(
-                markdown: 'emails.2023.spouse.registration-payment-reminder',
-            );
-        } else if ($this->details['eventCategory'] == "AFV") {
-            return new Content(
-                markdown: 'emails.2023.visitor.registration-payment-reminder',
-            );
-        } else if ($this->details['eventCategory'] == "RCCA") {
-            return new Content(
-                markdown: 'emails.2023.rcca.registration-payment-reminder',
-            );
+        if ($this->details['eventYear'] == '2023') {
+            if ($this->details['eventCategory'] == "AFS") {
+                return new Content(
+                    markdown: 'emails.2023.spouse.registration-payment-reminder',
+                );
+            } else if ($this->details['eventCategory'] == "AFV") {
+                return new Content(
+                    markdown: 'emails.2023.visitor.registration-payment-reminder',
+                );
+            } else if ($this->details['eventCategory'] == "RCCA") {
+                return new Content(
+                    markdown: 'emails.2023.rcca.registration-payment-reminder',
+                );
+            } else if ($this->details['eventCategory'] == "PSW") {
+                return new Content(
+                    markdown: 'emails.2023.psw.registration-payment-reminder',
+                );
+            } else if ($this->details['eventCategory'] == "DAW") {
+                return new Content(
+                    markdown: 'emails.2023.daw.registration-payment-reminder',
+                );
+            } else {
+                return new Content(
+                    markdown: 'emails.registration-payment-reminder',
+                );
+            }
         } else {
             return new Content(
                 markdown: 'emails.registration-payment-reminder',
