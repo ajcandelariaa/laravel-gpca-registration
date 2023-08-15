@@ -604,10 +604,10 @@ class RegistrationForm extends Component
 
         if ($this->assistantEmailAddress != null) {
             if ($paymentStatus == "free") {
-                Mail::to($this->assistantEmailAddress)->queue(new RegistrationPaid($details1));
-                Mail::to($this->assistantEmailAddress)->queue(new RegistrationPaymentConfirmation($details2));
+                Mail::to($this->assistantEmailAddress)->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaid($details1));
+                Mail::to($this->assistantEmailAddress)->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaymentConfirmation($details2));
             } else {
-                Mail::to($this->assistantEmailAddress)->queue(new RegistrationUnpaid($details1));
+                Mail::to($this->assistantEmailAddress)->cc(config('app.ccEmailNotif'))->queue(new RegistrationUnpaid($details1));
             }
         }
 
@@ -652,10 +652,10 @@ class RegistrationForm extends Component
                 ];
 
                 if ($paymentStatus == "free") {
-                    Mail::to($additionalDelegate->email_address)->queue(new RegistrationPaid($details1));
-                    Mail::to($additionalDelegate->email_address)->queue(new RegistrationPaymentConfirmation($details2));
+                    Mail::to($additionalDelegate->email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaid($details1));
+                    Mail::to($additionalDelegate->email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaymentConfirmation($details2));
                 } else {
-                    Mail::to($additionalDelegate->email_address)->queue(new RegistrationUnpaid($details1));
+                    Mail::to($additionalDelegate->email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationUnpaid($details1));
                 }
             }
         }

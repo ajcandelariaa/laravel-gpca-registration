@@ -1606,8 +1606,8 @@ class RegistrationController extends Controller
                     Mail::to($mainDelegate->email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaymentConfirmation($details2));
 
                     if ($mainDelegate->assistant_email_address != null) {
-                        Mail::to($mainDelegate->assistant_email_address)->queue(new RegistrationPaid($details1));
-                        Mail::to($mainDelegate->assistant_email_address)->queue(new RegistrationPaymentConfirmation($details2));
+                        Mail::to($mainDelegate->assistant_email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaid($details1));
+                        Mail::to($mainDelegate->assistant_email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaymentConfirmation($details2));
                     }
 
                     $additionalDelegates = AdditionalDelegate::where('main_delegate_id', $mainDelegateId)->get();
@@ -1647,8 +1647,8 @@ class RegistrationController extends Controller
                                 'balance' => 0,
                                 'invoiceLink' => $invoiceLink,
                             ];
-                            Mail::to($additionalDelegate->email_address)->queue(new RegistrationPaid($details1));
-                            Mail::to($additionalDelegate->email_address)->queue(new RegistrationPaymentConfirmation($details2));
+                            Mail::to($additionalDelegate->email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaid($details1));
+                            Mail::to($additionalDelegate->email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaymentConfirmation($details2));
                         }
                     }
                     return redirect()->route('register.loading.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'eventYear' => $event->year, 'mainDelegateId' => $mainDelegateId, 'status' => "success"]);
@@ -1686,7 +1686,7 @@ class RegistrationController extends Controller
                     Mail::to($mainDelegate->email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationCardDeclined($details));
 
                     if ($mainDelegate->assistant_email_address != null) {
-                        Mail::to($mainDelegate->assistant_email_address)->queue(new RegistrationCardDeclined($details));
+                        Mail::to($mainDelegate->assistant_email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationCardDeclined($details));
                     }
 
                     $additionalDelegates = AdditionalDelegate::where('main_delegate_id', $mainDelegateId)->get();
@@ -1704,7 +1704,7 @@ class RegistrationController extends Controller
                                 'invoiceLink' => $invoiceLink,
                                 'eventYear' => $event->year,
                             ];
-                            Mail::to($additionalDelegate->email_address)->queue(new RegistrationCardDeclined($details));
+                            Mail::to($additionalDelegate->email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationCardDeclined($details));
                         }
                     }
                     return redirect()->route('register.loading.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'eventYear' => $event->year, 'mainDelegateId' => $mainDelegateId, 'status' => "failed"]);
@@ -1743,7 +1743,7 @@ class RegistrationController extends Controller
                 Mail::to($mainDelegate->email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationCardDeclined($details));
 
                 if ($mainDelegate->assistant_email_address != null) {
-                    Mail::to($mainDelegate->assistant_email_address)->queue(new RegistrationCardDeclined($details));
+                    Mail::to($mainDelegate->assistant_email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationCardDeclined($details));
                 }
 
                 $additionalDelegates = AdditionalDelegate::where('main_delegate_id', $mainDelegateId)->get();
@@ -1761,7 +1761,7 @@ class RegistrationController extends Controller
                             'invoiceLink' => $invoiceLink,
                             'eventYear' => $event->year,
                         ];
-                        Mail::to($additionalDelegate->email_address)->queue(new RegistrationCardDeclined($details));
+                        Mail::to($additionalDelegate->email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationCardDeclined($details));
                     }
                 }
                 return redirect()->route('register.loading.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'eventYear' => $event->year, 'mainDelegateId' => $mainDelegateId, 'status' => "failed"]);
@@ -1915,8 +1915,8 @@ class RegistrationController extends Controller
                                 'balance' => 0,
                                 'invoiceLink' => $invoiceLink,
                             ];
-                            Mail::to($additionalSpouse->email_address)->queue(new RegistrationPaid($details1));
-                            Mail::to($additionalSpouse->email_address)->queue(new RegistrationPaymentConfirmation($details2));
+                            Mail::to($additionalSpouse->email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaid($details1));
+                            Mail::to($additionalSpouse->email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaymentConfirmation($details2));
                         }
                     }
                     return redirect()->route('register.loading.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'eventYear' => $event->year, 'mainDelegateId' => $mainDelegateId, 'status' => "success"]);
@@ -1968,7 +1968,7 @@ class RegistrationController extends Controller
                                 'invoiceLink' => $invoiceLink,
                                 'eventYear' => $event->year,
                             ];
-                            Mail::to($additionalSpouse->email_address)->queue(new RegistrationCardDeclined($details));
+                            Mail::to($additionalSpouse->email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationCardDeclined($details));
                         }
                     }
                     return redirect()->route('register.loading.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'eventYear' => $event->year, 'mainDelegateId' => $mainDelegateId, 'status' => "failed"]);
@@ -2021,7 +2021,7 @@ class RegistrationController extends Controller
                             'invoiceLink' => $invoiceLink,
                             'eventYear' => $event->year,
                         ];
-                        Mail::to($additionalSpouse->email_address)->queue(new RegistrationCardDeclined($details));
+                        Mail::to($additionalSpouse->email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationCardDeclined($details));
                     }
                 }
                 return redirect()->route('register.loading.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'eventYear' => $event->year, 'mainDelegateId' => $mainDelegateId, 'status' => "failed"]);
@@ -2175,8 +2175,8 @@ class RegistrationController extends Controller
                                 'balance' => 0,
                                 'invoiceLink' => $invoiceLink,
                             ];
-                            Mail::to($additionalVisitor->email_address)->queue(new RegistrationPaid($details1));
-                            Mail::to($additionalVisitor->email_address)->queue(new RegistrationPaymentConfirmation($details2));
+                            Mail::to($additionalVisitor->email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaid($details1));
+                            Mail::to($additionalVisitor->email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaymentConfirmation($details2));
                         }
                     }
                     return redirect()->route('register.loading.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'eventYear' => $event->year, 'mainDelegateId' => $mainDelegateId, 'status' => "success"]);
@@ -2228,7 +2228,7 @@ class RegistrationController extends Controller
                                 'invoiceLink' => $invoiceLink,
                                 'eventYear' => $event->year,
                             ];
-                            Mail::to($additionalVisitor->email_address)->queue(new RegistrationCardDeclined($details));
+                            Mail::to($additionalVisitor->email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationCardDeclined($details));
                         }
                     }
                     return redirect()->route('register.loading.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'eventYear' => $event->year, 'mainDelegateId' => $mainDelegateId, 'status' => "failed"]);
@@ -2281,7 +2281,7 @@ class RegistrationController extends Controller
                             'invoiceLink' => $invoiceLink,
                             'eventYear' => $event->year,
                         ];
-                        Mail::to($additionalVisitor->email_address)->queue(new RegistrationCardDeclined($details));
+                        Mail::to($additionalVisitor->email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationCardDeclined($details));
                     }
                 }
                 return redirect()->route('register.loading.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'eventYear' => $event->year, 'mainDelegateId' => $mainDelegateId, 'status' => "failed"]);

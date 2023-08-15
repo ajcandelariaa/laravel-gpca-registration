@@ -439,8 +439,8 @@ class RegistrantDetails extends Component
         }
 
         if ($this->finalData['assistant_email_address'] != null) {
-            Mail::to($this->finalData['assistant_email_address'])->queue(new RegistrationPaid($details1, $this->sendInvoice));
-            Mail::to($this->finalData['assistant_email_address'])->queue(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+            Mail::to($this->finalData['assistant_email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaid($details1, $this->sendInvoice));
+            Mail::to($this->finalData['assistant_email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
         }
 
         $this->finalData['registration_status'] = "confirmed";
@@ -765,10 +765,10 @@ class RegistrantDetails extends Component
 
         if ($this->finalData['assistant_email_address'] != null) {
             if($this->finalData['payment_status'] == "unpaid"){
-                Mail::to($this->finalData['assistant_email_address'])->queue(new RegistrationUnpaid($details1, $this->sendInvoice));
+                Mail::to($this->finalData['assistant_email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationUnpaid($details1, $this->sendInvoice));
             } else {
-                Mail::to($this->finalData['assistant_email_address'])->queue(new RegistrationPaid($details1, $this->sendInvoice));
-                Mail::to($this->finalData['assistant_email_address'])->queue(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+                Mail::to($this->finalData['assistant_email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaid($details1, $this->sendInvoice));
+                Mail::to($this->finalData['assistant_email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
             }
         }
 
@@ -816,7 +816,7 @@ class RegistrantDetails extends Component
         }
 
         if ($this->finalData['assistant_email_address'] != null) {
-            Mail::to($this->finalData['assistant_email_address'])->queue(new RegistrationPaymentReminder($details, $this->sendInvoice));
+            Mail::to($this->finalData['assistant_email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaymentReminder($details, $this->sendInvoice));
         }
 
         $this->dispatchBrowserEvent('swal:payment-reminder-success', [

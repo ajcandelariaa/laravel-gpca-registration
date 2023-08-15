@@ -492,10 +492,10 @@ class VisitorRegistrationForm extends Component
                 ];
 
                 if ($paymentStatus == "free") {
-                    Mail::to($additionalVisitor->email_address)->queue(new RegistrationPaid($details1));
-                    Mail::to($additionalVisitor->email_address)->queue(new RegistrationPaymentConfirmation($details2));
+                    Mail::to($additionalVisitor->email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaid($details1));
+                    Mail::to($additionalVisitor->email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaymentConfirmation($details2));
                 } else {
-                    Mail::to($additionalVisitor->email_address)->queue(new RegistrationUnpaid($details1));
+                    Mail::to($additionalVisitor->email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationUnpaid($details1));
                 }
             }
         }
