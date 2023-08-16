@@ -10,8 +10,12 @@
                     </td>
                 @endif
                 <td class="py-4 font-bold text-lg">
-                    <span>Standard rate <br> <span class="font-normal text-base">(starting
-                            {{ $finalStdStartDate }})</span></span>
+                    @if ($finalEbEndDate != null)
+                        <span>Standard rate <br> <span class="font-normal text-base">(starting
+                                {{ $finalStdStartDate }})</span></span>
+                    @else
+                        <span>Standard rate</span>
+                    @endif
                 </td>
             </tr>
         </thead>

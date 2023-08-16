@@ -1606,8 +1606,8 @@ class RegistrationController extends Controller
                     Mail::to($mainDelegate->email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaymentConfirmation($details2));
 
                     if ($mainDelegate->assistant_email_address != null) {
-                        Mail::to($mainDelegate->assistant_email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaid($details1));
-                        Mail::to($mainDelegate->assistant_email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaymentConfirmation($details2));
+                        Mail::to($mainDelegate->assistant_email_address)->queue(new RegistrationPaid($details1));
+                        Mail::to($mainDelegate->assistant_email_address)->queue(new RegistrationPaymentConfirmation($details2));
                     }
 
                     $additionalDelegates = AdditionalDelegate::where('main_delegate_id', $mainDelegateId)->get();
@@ -1686,7 +1686,7 @@ class RegistrationController extends Controller
                     Mail::to($mainDelegate->email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationCardDeclined($details));
 
                     if ($mainDelegate->assistant_email_address != null) {
-                        Mail::to($mainDelegate->assistant_email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationCardDeclined($details));
+                        Mail::to($mainDelegate->assistant_email_address)->queue(new RegistrationCardDeclined($details));
                     }
 
                     $additionalDelegates = AdditionalDelegate::where('main_delegate_id', $mainDelegateId)->get();
@@ -1743,7 +1743,7 @@ class RegistrationController extends Controller
                 Mail::to($mainDelegate->email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationCardDeclined($details));
 
                 if ($mainDelegate->assistant_email_address != null) {
-                    Mail::to($mainDelegate->assistant_email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationCardDeclined($details));
+                    Mail::to($mainDelegate->assistant_email_address)->queue(new RegistrationCardDeclined($details));
                 }
 
                 $additionalDelegates = AdditionalDelegate::where('main_delegate_id', $mainDelegateId)->get();
