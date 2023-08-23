@@ -406,8 +406,8 @@ class RegistrantDetails extends Component
             'mode_of_payment' => $this->mapPaymentMethod,
             'paid_date_time' => Carbon::now(),
 
-            'registration_confirmation_sent_count' => $this->finalData['registration_confirmation_sent_count'] + 1,
-            'registration_confirmation_sent_datetime' => Carbon::now(),
+            // 'registration_confirmation_sent_count' => $this->finalData['registration_confirmation_sent_count'] + 1,
+            // 'registration_confirmation_sent_datetime' => Carbon::now(),
         ])->save();
 
         $eventFormattedData = Carbon::parse($this->event->event_start_date)->format('d') . '-' . Carbon::parse($this->event->event_end_date)->format('d M Y');
@@ -754,10 +754,10 @@ class RegistrantDetails extends Component
             $earlyBirdValidityDate = Carbon::createFromFormat('Y-m-d', $this->event->eb_end_date);
         }
 
-        MainDelegates::find($this->finalData['mainDelegateId'])->fill([
-            'registration_confirmation_sent_count' => $this->finalData['registration_confirmation_sent_count'] + 1,
-            'registration_confirmation_sent_datetime' => Carbon::now(),
-        ])->save();
+        // MainDelegates::find($this->finalData['mainDelegateId'])->fill([
+        //     'registration_confirmation_sent_count' => $this->finalData['registration_confirmation_sent_count'] + 1,
+        //     'registration_confirmation_sent_datetime' => Carbon::now(),
+        // ])->save();
 
         $assistantDetails1 = [];
         $assistantDetails2 = [];
