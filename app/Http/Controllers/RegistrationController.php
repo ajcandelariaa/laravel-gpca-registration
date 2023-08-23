@@ -1567,8 +1567,8 @@ class RegistrationController extends Controller
                         'payment_status' => "paid",
                         'paid_date_time' => Carbon::now(),
 
-                        'registration_confirmation_sent_count' => 1,
-                        'registration_confirmation_sent_datetime' => Carbon::now(),
+                        // 'registration_confirmation_sent_count' => 1,
+                        // 'registration_confirmation_sent_datetime' => Carbon::now(),
                     ])->save();
 
                     $mainDelegate = MainDelegate::where('id', $mainDelegateId)->first();
@@ -1876,8 +1876,8 @@ class RegistrationController extends Controller
                         'payment_status' => "paid",
                         'paid_date_time' => Carbon::now(),
 
-                        'registration_confirmation_sent_count' => 1,
-                        'registration_confirmation_sent_datetime' => Carbon::now(),
+                        // 'registration_confirmation_sent_count' => 1,
+                        // 'registration_confirmation_sent_datetime' => Carbon::now(),
                     ])->save();
 
                     $mainSpouse = MainSpouse::where('id', $mainDelegateId)->first();
@@ -2126,8 +2126,8 @@ class RegistrationController extends Controller
                         'payment_status' => "paid",
                         'paid_date_time' => Carbon::now(),
 
-                        'registration_confirmation_sent_count' => 1,
-                        'registration_confirmation_sent_datetime' => Carbon::now(),
+                        // 'registration_confirmation_sent_count' => 1,
+                        // 'registration_confirmation_sent_datetime' => Carbon::now(),
                     ])->save();
 
                     $mainVisitor = MainVisitor::where('id', $mainDelegateId)->first();
@@ -2376,8 +2376,8 @@ class RegistrationController extends Controller
                         'payment_status' => "paid",
                         'paid_date_time' => Carbon::now(),
 
-                        'registration_confirmation_sent_count' => 1,
-                        'registration_confirmation_sent_datetime' => Carbon::now(),
+                        // 'registration_confirmation_sent_count' => 1,
+                        // 'registration_confirmation_sent_datetime' => Carbon::now(),
                     ])->save();
 
                     $mainParticipant = RccAwardsMainParticipant::where('id', $mainDelegateId)->first();
