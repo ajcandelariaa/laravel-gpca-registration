@@ -2,8 +2,7 @@
 
 namespace App\Http\Livewire;
 
-use App\Mail\RegistrationPaid;
-use App\Mail\RegistrationPaymentConfirmation;
+use App\Mail\RegistrationFree;
 use App\Mail\RegistrationUnpaid;
 use Livewire\Component;
 use App\Models\Member as Members;
@@ -72,6 +71,8 @@ class RegistrationForm extends Component
 
     public $eventFormattedDate;
 
+    public $ccEmailNotif;
+
     protected $listeners = ['registrationConfirmed' => 'addtoDatabase', 'emitInitiateAuth' => 'initiateAuthenticationCC', 'emitSubmit' => 'submitBankTransfer', 'emitSubmitStep3' => 'submitStep3'];
 
     public function mount($data)
@@ -116,6 +117,14 @@ class RegistrationForm extends Component
         
 
         $this->eventFormattedDate = Carbon::parse($this->event->event_start_date)->format('j') . '-' . Carbon::parse($this->event->event_end_date)->format('j F Y');
+
+        // $this->ccEmailNotif = config('app.ccEmailNotif.test');
+
+        if($data->category == "DAW"){
+            $this->ccEmailNotif = config('app.ccEmailNotif.daw');
+        } else {
+            $this->ccEmailNotif = config('app.ccEmailNotif.default');
+        }
     }
 
     public function render()
@@ -531,7 +540,7 @@ class RegistrationForm extends Component
         // UPDATE DETAILS
         if ($this->finalTotal == 0) {
             $paymentStatus = "free";
-            $registrationStatus = "confirmed";
+            $registrationStatus = "pending";
         } else {
             $paymentStatus = "unpaid";
             $registrationStatus = "pending";
@@ -582,30 +591,15 @@ class RegistrationForm extends Component
 
         ];
 
-        $details2 = [
-            'name' => $this->salutation . " " . $this->firstName . " " . $this->middleName . " " . $this->lastName,
-            'eventLink' => $this->event->link,
-            'eventName' => $this->event->name,
-            'eventCategory' => $this->event->category,
-            'eventYear' => $this->event->year,
-
-            'invoiceAmount' => $this->finalTotal,
-            'amountPaid' => 0,
-            'balance' => 0,
-            'invoiceLink' => $invoiceLink,
-        ];
-
         if ($paymentStatus == "free") {
-            Mail::to($this->emailAddress)->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaid($details1));
-            Mail::to($this->emailAddress)->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaymentConfirmation($details2));
+            Mail::to($this->emailAddress)->cc($this->ccEmailNotif)->queue(new RegistrationFree($details1));
         } else {
-            Mail::to($this->emailAddress)->cc(config('app.ccEmailNotif'))->queue(new RegistrationUnpaid($details1));
+            Mail::to($this->emailAddress)->cc($this->ccEmailNotif)->queue(new RegistrationUnpaid($details1));
         }
 
         if ($this->assistantEmailAddress != null) {
             if ($paymentStatus == "free") {
-                Mail::to($this->assistantEmailAddress)->queue(new RegistrationPaid($details1));
-                Mail::to($this->assistantEmailAddress)->queue(new RegistrationPaymentConfirmation($details2));
+                Mail::to($this->emailAddress)->queue(new RegistrationFree($details1));
             } else {
                 Mail::to($this->assistantEmailAddress)->queue(new RegistrationUnpaid($details1));
             }
@@ -638,24 +632,10 @@ class RegistrationForm extends Component
                     'badgeLink' => env('APP_URL')."/".$this->event->category."/".$this->event->id."/view-badge"."/"."sub"."/".$additionalDelegate->id,
                 ];
 
-                $details2 = [
-                    'name' => $additionalDelegate->salutation . " " . $additionalDelegate->first_name . " " . $additionalDelegate->middle_name . " " . $additionalDelegate->last_name,
-                    'eventLink' => $this->event->link,
-                    'eventName' => $this->event->name,
-                    'eventCategory' => $this->event->category,
-                    'eventYear' => $this->event->year,
-
-                    'invoiceAmount' => $this->finalTotal,
-                    'amountPaid' => 0,
-                    'balance' => 0,
-                    'invoiceLink' => $invoiceLink,
-                ];
-
                 if ($paymentStatus == "free") {
-                    Mail::to($additionalDelegate->email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaid($details1));
-                    Mail::to($additionalDelegate->email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaymentConfirmation($details2));
+                    Mail::to($additionalDelegate->email_address)->cc($this->ccEmailNotif)->queue(new RegistrationFree($details1));
                 } else {
-                    Mail::to($additionalDelegate->email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationUnpaid($details1));
+                    Mail::to($additionalDelegate->email_address)->cc($this->ccEmailNotif)->queue(new RegistrationUnpaid($details1));
                 }
             }
         }

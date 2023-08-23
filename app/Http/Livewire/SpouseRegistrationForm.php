@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire;
 
+use App\Mail\RegistrationFree;
 use App\Mail\RegistrationPaid;
 use App\Mail\RegistrationPaymentConfirmation;
 use App\Mail\RegistrationUnpaid;
@@ -55,6 +56,8 @@ class SpouseRegistrationForm extends Component
 
     public $eventFormattedDate;
 
+    public $ccEmailNotif;
+
     protected $listeners = ['registrationConfirmed' => 'addtoDatabase', 'emitInitiateAuth' => 'initiateAuthenticationCC', 'emitSubmit' => 'submitBankTransfer', 'emitSubmitStep3' => 'submitStep3'];
 
     public function mount($data)
@@ -91,6 +94,8 @@ class SpouseRegistrationForm extends Component
         $this->spousePassType = "nonMember";
 
         $this->eventFormattedDate = Carbon::parse($this->event->event_start_date)->format('d') . '-' . Carbon::parse($this->event->event_end_date)->format('d M Y');
+
+        $this->ccEmailNotif = config('app.ccEmailNotif.default');
     }
 
     public function render()
@@ -382,7 +387,7 @@ class SpouseRegistrationForm extends Component
         // UPDATE DETAILS
         if ($this->finalTotal == 0) {
             $paymentStatus = "free";
-            $registrationStatus = "confirmed";
+            $registrationStatus = "pending";
         } else {
             $paymentStatus = "unpaid";
             $registrationStatus = "pending";
@@ -427,24 +432,10 @@ class SpouseRegistrationForm extends Component
             'badgeLink' => env('APP_URL')."/".$this->event->category."/".$this->event->id."/view-badge"."/"."main"."/".$this->currentMainSpouseId,
         ];
 
-        $details2 = [
-            'name' => $this->salutation . " " . $this->firstName . " " . $this->middleName . " " . $this->lastName,
-            'eventLink' => $this->event->link,
-            'eventName' => $this->event->name,
-            'eventCategory' => $this->event->category,
-            'eventYear' => $this->event->year,
-
-            'invoiceAmount' => $this->finalTotal,
-            'amountPaid' => 0,
-            'balance' => 0,
-            'invoiceLink' => $invoiceLink,
-        ];
-
         if ($paymentStatus == "free") {
-            Mail::to($this->emailAddress)->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaid($details1));
-            Mail::to($this->emailAddress)->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaymentConfirmation($details2));
+            Mail::to($this->emailAddress)->cc($this->ccEmailNotif)->queue(new RegistrationFree($details1));
         } else {
-            Mail::to($this->emailAddress)->cc(config('app.ccEmailNotif'))->queue(new RegistrationUnpaid($details1));
+            Mail::to($this->emailAddress)->cc($this->ccEmailNotif)->queue(new RegistrationUnpaid($details1));
         }
 
         $additionalSpouses = AdditionalSpouses::where('main_spouse_id', $this->currentMainSpouseId)->get();
@@ -474,24 +465,10 @@ class SpouseRegistrationForm extends Component
                     'badgeLink' => env('APP_URL')."/".$this->event->category."/".$this->event->id."/view-badge"."/"."sub"."/".$additionalSpouse->id,
                 ];
 
-                $details2 = [
-                    'name' => $additionalSpouse->salutation . " " . $additionalSpouse->first_name . " " . $additionalSpouse->middle_name . " " . $additionalSpouse->last_name,
-                    'eventLink' => $this->event->link,
-                    'eventName' => $this->event->name,
-                    'eventCategory' => $this->event->category,
-                    'eventYear' => $this->event->year,
-
-                    'invoiceAmount' => $this->finalTotal,
-                    'amountPaid' => 0,
-                    'balance' => 0,
-                    'invoiceLink' => $invoiceLink,
-                ];
-
                 if ($paymentStatus == "free") {
-                    Mail::to($additionalSpouse->email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaid($details1));
-                    Mail::to($additionalSpouse->email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaymentConfirmation($details2));
+                    Mail::to($additionalSpouse->email_address)->cc($this->ccEmailNotif)->queue(new RegistrationFree($details1));
                 } else {
-                    Mail::to($additionalSpouse->email_address)->cc(config('app.ccEmailNotif'))->queue(new RegistrationUnpaid($details1));
+                    Mail::to($additionalSpouse->email_address)->cc($this->ccEmailNotif)->queue(new RegistrationUnpaid($details1));
                 }
             }
         }

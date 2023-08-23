@@ -3,15 +3,9 @@
 
 <p>Greetings from GPCA!</p>
 
-<p>Thank you for registering to attend the <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a> which will be held on {{ $details['eventDates'] }} at the {{ $details['eventLocation'] }}.</p>
+<p>Thank you for registration on the <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a> which will take place on {{ $details['eventDates'] }} at the prestigious{{ $details['eventLocation'] }}.</p>
 
-<p style="color: red;">This is a kind reminder to process your registration invoice to complete your delegate registration.</p>
-
-{{-- <p>To take advantage of the early bird discount, please ensure to settle your invoice on or before {{ $details['earlyBirdValidityDate'] }}. Standard rate will be applied after {{ $details['earlyBirdValidityDate'] }}.</p> --}}
-
-{{-- <p>
-    Note: <strong><em>NO BADGE</em></strong> will be issued unless payment has been settled and confirmed. Onsite payment is available on a <strong><em>CASH BASIS</em></strong> only.
-</p> --}}
+<p style="color: red;">Kindly note that your registration is not yet confirmed. Please settle your payment through bank transfer prior to the event or contact analee@gpca.org.ae for other payment options.</p>
 
 <p>Your registration details as follows:</p>
 
@@ -21,8 +15,10 @@
     Job title: <strong>{{  $details['jobTitle'] }}</strong>
     <br>
     Company name: <strong>{{  $details['companyName'] }}</strong>
+    @if ($sendInvoice)
     <br>
     Amount paid: <strong>$ {{ number_format($details['amountPaid'], 2, '.', ',') }}</strong>
+    @endif
     <br>
     Transaction ID: <strong>{{  $details['transactionId'] }}</strong>
 </span>
@@ -36,9 +32,9 @@ Download invoice
 <br><br>
 @endif
 
-{{-- <p>To request changes, kindly respond to this email at the earliest, to rectify your badge.</p> --}}
+<p>For further information about the workshop agenda, speakers, and other related details, please feel free to reach out to Aastha at aastha@gpca.org.ae or contact us via phone at +971 4 451 0666 ext. 104.</p>
 
-<p>For the latest updates on the event, please visit the event website at <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a>.</p>
+<p>We look forward to welcoming you to the workshop.</p>
 
 Best regards,
 <br><br>

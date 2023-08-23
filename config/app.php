@@ -495,10 +495,16 @@ return [
     ],
 
     'ccEmailNotif' => [
-        'analee@gpca.org.ae', 'jovelyn@gpca.org.ae', 'forumregistration@gpca.org.ae',
+        'default' => ['analee@gpca.org.ae', 'jovelyn@gpca.org.ae', 'forumregistration@gpca.org.ae'],
+        'test' => ['aj@gpca.org.ae'],
+        'daw' => ['aastha@gpca.org.ae', 'analee@gpca.org.ae', 'jovelyn@gpca.org.ae', 'forumregistration@gpca.org.ae'],
     ],
 
-    // 'ccEmailNotif' => ['aj@gpca.org.ae'],
+    // 'ccEmailNotif' => [
+    //     'default' => ['aj@gpca.org.ae'],
+    //     'test' => ['aj@gpca.org.ae'],
+    //     'daw' => ['aj@gpca.org.ae'],
+    // ],
 
     'rccAwardsCategories' => [
         'Process Safety' => null,

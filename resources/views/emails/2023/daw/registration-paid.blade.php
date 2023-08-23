@@ -3,7 +3,7 @@
 
 <p>Greetings from GPCA!</p>
 
-<p>Thank you for registering to attend the <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a> taking place from {{ $details['eventDates'] }} at {{ $details['eventLocation'] }}.</p>
+<p>Thank you for registration on the <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a> which will take place on {{ $details['eventDates'] }} at the prestigious{{ $details['eventLocation'] }}.</p>
 
 <p>
     Your registration has been confirmed, and we are pleased to provide you with the booking confirmation below for your reference.
@@ -15,8 +15,10 @@
     Job title: <strong>{{  $details['jobTitle'] }}</strong>
     <br>
     Company name: <strong>{{  $details['companyName'] }}</strong>
+    @if ($sendInvoice)
     <br>
     Amount paid: <strong>$ {{ number_format($details['amountPaid'], 2, '.', ',') }}</strong>
+    @endif
     <br>
     Transaction ID: <strong>{{  $details['transactionId'] }}</strong>
 </span>
@@ -30,9 +32,9 @@ Download invoice
 <br><br>
 @endif
 
-{{-- <p>To collect your badge onsite, please present your business card as a reference to facilitate the verification process. To request changes, kindly respond to this email at the earliest, to rectify your badge. </p> --}}
+<p>For further information about the workshop agenda, speakers, and other related details, please feel free to reach out to Aastha at aastha@gpca.org.ae or contact us via phone at +971 4 451 0666 ext. 104.</p>
 
-<p>For the latest updates on the event, please visit the event website at <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a>.</p>
+<p>We look forward to welcoming you to the workshop.</p>
 
 Best regards,
 <br><br>

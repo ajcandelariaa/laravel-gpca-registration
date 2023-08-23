@@ -15,8 +15,10 @@
     Job title: <strong>{{  $details['jobTitle'] }}</strong>
     <br>
     Company name: <strong>{{  $details['companyName'] }}</strong>
+    @if ($sendInvoice)
     <br>
     Amount paid: <strong>$ {{ number_format($details['amountPaid'], 2, '.', ',') }}</strong>
+    @endif
     <br>
     Transaction ID: <strong>{{  $details['transactionId'] }}</strong>
 </span>

@@ -2,9 +2,11 @@
 
 namespace App\Http\Livewire;
 
+use App\Mail\RegistrationFree;
 use App\Mail\RegistrationPaid;
 use App\Mail\RegistrationPaymentConfirmation;
 use App\Mail\RegistrationPaymentReminder;
+use App\Mail\RegistrationUnpaid;
 use Livewire\Component;
 use App\Models\MainVisitor as MainVisitors;
 use App\Models\Event as Events;
@@ -29,7 +31,7 @@ class VisitorRegistrantDetails extends Component
 
     public $replaceVisitorIndex, $replaceVisitorInnerIndex, $replaceSalutation, $replaceFirstName, $replaceMiddleName, $replaceLastName, $replaceEmailAddress, $replaceMobileNumber, $replaceNationality, $replaceCountry, $replaceCity, $replaceCompanyName, $replaceJobTitle, $replaceEmailAlreadyUsedError;
 
-    public $mapPaymentMethod;
+    public $mapPaymentMethod, $sendInvoice;
 
     // MODALS
     public $showVisitorModal = false, $showAdditionalDetailsModal = false;
@@ -37,7 +39,9 @@ class VisitorRegistrantDetails extends Component
     public $showVisitorCancellationModal = false;
     public $showMarkAsPaidModal = false;
 
-    protected $listeners = ['paymentReminderConfirmed' => 'sendEmailReminder', 'cancelRefundDelegateConfirmed' => 'cancelOrRefundVisitor', 'cancelReplaceDelegateConfirmed' => 'addReplaceVisitor', 'markAsPaidConfirmed' => 'markAsPaid'];
+    public $ccEmailNotif;
+
+    protected $listeners = ['paymentReminderConfirmed' => 'sendEmailReminder', 'sendEmailRegistrationConfirmationConfirmed' => 'sendEmailRegistrationConfirmation', 'cancelRefundDelegateConfirmed' => 'cancelOrRefundVisitor', 'cancelReplaceDelegateConfirmed' => 'addReplaceVisitor', 'markAsPaidConfirmed' => 'markAsPaid'];
 
     public function mount($eventCategory, $eventId, $registrantId, $finalData)
     {
@@ -48,6 +52,14 @@ class VisitorRegistrantDetails extends Component
         $this->eventId = $eventId;
         $this->registrantId = $registrantId;
         $this->finalData = $finalData;
+
+        if ($this->finalData['registration_method'] == "imported") {
+            $this->sendInvoice = false;
+        } else {
+            $this->sendInvoice = true;
+        }
+
+        $this->ccEmailNotif = config('app.ccEmailNotif.default');
     }
 
     public function render()
@@ -128,7 +140,7 @@ class VisitorRegistrantDetails extends Component
         $this->resetEditModalFields();
     }
 
-    
+
     public function openEditVisitorModal($index, $innerIndex)
     {
         $this->visitorIndex = $index;
@@ -175,7 +187,7 @@ class VisitorRegistrantDetails extends Component
         $this->jobTitle = null;
         $this->type = null;
     }
-    
+
 
     public function openMarkAsPaidModal()
     {
@@ -204,7 +216,7 @@ class VisitorRegistrantDetails extends Component
     }
 
 
-    
+
     public function markAsPaid()
     {
         if ($this->finalData['invoiceData']['total_amount'] == 0) {
@@ -218,12 +230,15 @@ class VisitorRegistrantDetails extends Component
             'payment_status' => $paymentStatus,
             'mode_of_payment' => $this->mapPaymentMethod,
             'paid_date_time' => Carbon::now(),
+
+            'registration_confirmation_sent_count' => $this->finalData['registration_confirmation_sent_count'] + 1,
+            'registration_confirmation_sent_datetime' => Carbon::now(),
         ])->save();
 
         $eventFormattedData = Carbon::parse($this->event->event_start_date)->format('d') . '-' . Carbon::parse($this->event->event_end_date)->format('d M Y');
         $invoiceLink = env('APP_URL') . '/' . $this->event->category . '/' . $this->event->id . '/view-invoice/' . $this->finalData['mainVisitorId'];
 
-        foreach ($this->finalData['allVisitors'] as $visitors) {
+        foreach ($this->finalData['allVisitors'] as $visitorsIndex => $visitors) {
             foreach ($visitors as $innerVisitor) {
                 if (end($visitors) == $innerVisitor) {
                     $details1 = [
@@ -238,11 +253,11 @@ class VisitorRegistrantDetails extends Component
                         'nationality' => $innerVisitor['nationality'],
                         'country' => $innerVisitor['country'],
                         'city' => $innerVisitor['city'],
-                        'amountPaid' => $this->finalData['invoiceData']['total_amount'],
+                        'amountPaid' => $this->finalData['invoiceData']['unit_price'],
                         'transactionId' => $innerVisitor['transactionId'],
                         'invoiceLink' => $invoiceLink,
-                        
-                        'badgeLink' => env('APP_URL')."/".$this->event->category."/".$this->event->id."/view-badge"."/".$innerVisitor['visitorType']."/".$innerVisitor['visitorId'],
+
+                        'badgeLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-badge" . "/" . $innerVisitor['visitorType'] . "/" . $innerVisitor['visitorId'],
                     ];
 
                     $details2 = [
@@ -258,8 +273,13 @@ class VisitorRegistrantDetails extends Component
                         'invoiceLink' => $invoiceLink,
                     ];
 
-                    Mail::to($innerVisitor['email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaid($details1));
-                    Mail::to($innerVisitor['email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaymentConfirmation($details2));
+                    Mail::to($innerVisitor['email_address'])->cc($this->ccEmailNotif)->queue(new RegistrationPaid($details1));
+                    
+                    if ($this->sendInvoice) {
+                        if ($visitorsIndex == 0) {
+                            Mail::to($innerVisitor['email_address'])->cc($this->ccEmailNotif)->queue(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+                        }
+                    }
                 }
             }
         }
@@ -268,6 +288,9 @@ class VisitorRegistrantDetails extends Component
         $this->finalData['payment_status'] = $paymentStatus;
         $this->finalData['mode_of_payment'] = $this->mapPaymentMethod;
         $this->finalData['paid_date_time'] = Carbon::parse(Carbon::now())->format('M j, Y g:i A');
+
+        $this->finalData['registration_confirmation_sent_count'] = $this->finalData['registration_confirmation_sent_count'] + 1;
+        $this->finalData['registration_confirmation_sent_datetime'] = Carbon::parse(Carbon::now())->format('M j, Y g:i A');
 
         $this->showMarkAsPaidModal = false;
         $this->mapPaymentMethod = null;
@@ -283,7 +306,7 @@ class VisitorRegistrantDetails extends Component
         return $this->event->std_nmember_rate;
     }
 
-    
+
     public function calculateTotal()
     {
         $invoiceDetails = array();
@@ -317,7 +340,7 @@ class VisitorRegistrantDetails extends Component
                 'promoCodeDiscount' => 0,
             ]);
         }
-    
+
 
         $subVisitors = AdditionalVisitors::where('main_visitor_id', $this->finalData['mainVisitorId'])->get();
         if (!$subVisitors->isEmpty()) {
@@ -354,10 +377,10 @@ class VisitorRegistrantDetails extends Component
                             $invoiceDetails[$existingIndex]['delegateNames'],
                             $subVisitor->first_name . " " . $subVisitor->middle_name . " " . $subVisitor->last_name
                         );
-    
+
                         $quantityTemp = $invoiceDetails[$existingIndex]['quantity'] + 1;
                         $totalNetAmountTemp = $this->checkUnitPrice() * $quantityTemp;
-    
+
                         $invoiceDetails[$existingIndex]['quantity'] = $quantityTemp;
                         $invoiceDetails[$existingIndex]['totalNetAmount'] = $totalNetAmountTemp;
                     }
@@ -415,6 +438,94 @@ class VisitorRegistrantDetails extends Component
         return $formatter->format($number);
     }
 
+    public function sendEmailRegistrationConfirmationConfirmation()
+    {
+        $this->dispatchBrowserEvent('swal:send-email-registration-confirmation-confirmation', [
+            'type' => 'warning',
+            'message' => 'Are you sure?',
+            'text' => "",
+        ]);
+    }
+
+    public function sendEmailRegistrationConfirmation()
+    {
+        $eventFormattedData = Carbon::parse($this->event->event_start_date)->format('d') . '-' . Carbon::parse($this->event->event_end_date)->format('d M Y');
+        $invoiceLink = env('APP_URL') . '/' . $this->event->category . '/' . $this->event->id . '/view-invoice/' . $this->finalData['mainVisitorId'];
+
+        if ($this->event->eb_end_date == null) {
+            $earlyBirdValidityDate = Carbon::createFromFormat('Y-m-d', $this->event->std_start_date)->subDay();
+        } else {
+            $earlyBirdValidityDate = Carbon::createFromFormat('Y-m-d', $this->event->eb_end_date);
+        }
+
+        MainVisitors::find($this->finalData['mainVisitorId'])->fill([
+            'registration_confirmation_sent_count' => $this->finalData['registration_confirmation_sent_count'] + 1,
+            'registration_confirmation_sent_datetime' => Carbon::now(),
+        ])->save();
+
+        foreach ($this->finalData['allVisitors'] as $visitorsIndex => $visitors) {
+            foreach ($visitors as $innerVisitor) {
+                if (end($visitors) == $innerVisitor) {
+                    $details1 = [
+                        'name' => $innerVisitor['name'],
+                        'eventLink' => $this->event->link,
+                        'eventName' => $this->event->name,
+                        'eventDates' => $eventFormattedData,
+                        'eventLocation' => $this->event->location,
+                        'eventCategory' => $this->event->category,
+                        'eventYear' => $this->event->year,
+
+                        'nationality' => $innerVisitor['nationality'],
+                        'country' => $innerVisitor['country'],
+                        'city' => $innerVisitor['city'],
+                        'amountPaid' => $this->finalData['invoiceData']['unit_price'],
+                        'transactionId' => $innerVisitor['transactionId'],
+                        'invoiceLink' => $invoiceLink,
+                        'earlyBirdValidityDate' => $earlyBirdValidityDate->format('jS F'),
+
+                        'badgeLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-badge" . "/" . $innerVisitor['visitorType'] . "/" . $innerVisitor['visitorId'],
+                    ];
+
+                    $details2 = [
+                        'name' => $innerVisitor['name'],
+                        'eventLink' => $this->event->link,
+                        'eventName' => $this->event->name,
+                        'eventCategory' => $this->event->category,
+                        'eventYear' => $this->event->year,
+
+                        'invoiceAmount' => $this->finalData['invoiceData']['total_amount'],
+                        'amountPaid' => $this->finalData['invoiceData']['total_amount'],
+                        'balance' => 0,
+                        'invoiceLink' => $invoiceLink,
+                    ];
+
+                    if ($this->finalData['payment_status'] == "unpaid") {
+                        Mail::to($innerVisitor['email_address'])->cc($this->ccEmailNotif)->queue(new RegistrationUnpaid($details1, $this->sendInvoice));
+                    } else if ($this->finalData['payment_status'] == "free" && $this->finalData['registration_status'] == "pending") {
+                        Mail::to($innerVisitor['email_address'])->cc($this->ccEmailNotif)->queue(new RegistrationFree($details1, $this->sendInvoice));
+                    } else {
+                        Mail::to($innerVisitor['email_address'])->cc($this->ccEmailNotif)->queue(new RegistrationPaid($details1, $this->sendInvoice));
+                        if ($this->sendInvoice) {
+                            if ($visitorsIndex == 0) {
+                                Mail::to($innerVisitor['email_address'])->cc($this->ccEmailNotif)->queue(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+
+        $this->finalData['registration_confirmation_sent_count'] = $this->finalData['registration_confirmation_sent_count'] + 1;
+        $this->finalData['registration_confirmation_sent_datetime'] = Carbon::parse(Carbon::now())->format('M j, Y g:i A');
+
+        $this->dispatchBrowserEvent('swal:send-email-registration-success', [
+            'type' => 'success',
+            'message' => 'Registration Confirmation sent!',
+            'text' => "",
+        ]);
+    }
+
     public function sendEmailReminderConfirmation()
     {
         $this->dispatchBrowserEvent('swal:payment-reminder-confirmation', [
@@ -439,7 +550,7 @@ class VisitorRegistrantDetails extends Component
                         'invoiceLink' => $invoiceLink,
                         'eventYear' => $this->event->year,
                     ];
-                    Mail::to($innerDelegate['email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaymentReminder($details));
+                    Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->queue(new RegistrationPaymentReminder($details));
                 }
             }
         }
@@ -451,7 +562,7 @@ class VisitorRegistrantDetails extends Component
         ]);
     }
 
-    
+
     public function checkEmailIfExistsInDatabase($emailAddress)
     {
         $allVisitors = VisitorTransactions::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->get();
@@ -484,7 +595,7 @@ class VisitorRegistrantDetails extends Component
             return true;
         }
     }
-    
+
 
     public function openEditTransactionRemarksModal()
     {
@@ -671,7 +782,7 @@ class VisitorRegistrantDetails extends Component
         $this->showVisitorCancellationModal = false;
     }
 
-    
+
 
     public function addReplaceVisitor()
     {
@@ -779,7 +890,7 @@ class VisitorRegistrantDetails extends Component
         $this->showVisitorCancellationModal = false;
     }
 
-    
+
 
     public function removeReplaceData()
     {

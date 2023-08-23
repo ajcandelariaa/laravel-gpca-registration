@@ -2,9 +2,11 @@
 
 namespace App\Http\Livewire;
 
+use App\Mail\RegistrationFree;
 use App\Mail\RegistrationPaid;
 use App\Mail\RegistrationPaymentConfirmation;
 use App\Mail\RegistrationPaymentReminder;
+use App\Mail\RegistrationUnpaid;
 use Livewire\Component;
 use App\Models\MainSpouse as MainSpouses;
 use App\Models\Event as Events;
@@ -32,7 +34,7 @@ class SpouseRegistrantDetails extends Component
 
     public $replaceSpouseIndex, $replaceSpouseInnerIndex, $replaceSalutation, $replaceFirstName, $replaceMiddleName, $replaceLastName, $replaceEmailAddress, $replaceMobileNumber, $replaceNationality, $replaceCountry, $replaceCity, $replaceEmailAlreadyUsedError;
 
-    public $mapPaymentMethod;
+    public $mapPaymentMethod, $sendInvoice;
 
     // MODALS
     public $showSpouseModal = false, $showAdditionalDetailsModal = false;
@@ -40,7 +42,9 @@ class SpouseRegistrantDetails extends Component
     public $showSpouseCancellationModal = false;
     public $showMarkAsPaidModal = false;
 
-    protected $listeners = ['paymentReminderConfirmed' => 'sendEmailReminder', 'cancelRefundDelegateConfirmed' => 'cancelOrRefundSpouse', 'cancelReplaceDelegateConfirmed' => 'addReplaceSpouse', 'markAsPaidConfirmed' => 'markAsPaid'];
+    public $ccEmailNotif;
+
+    protected $listeners = ['paymentReminderConfirmed' => 'sendEmailReminder', 'sendEmailRegistrationConfirmationConfirmed' => 'sendEmailRegistrationConfirmation', 'cancelRefundDelegateConfirmed' => 'cancelOrRefundSpouse', 'cancelReplaceDelegateConfirmed' => 'addReplaceSpouse', 'markAsPaidConfirmed' => 'markAsPaid'];
 
     public function mount($eventCategory, $eventId, $registrantId, $finalData)
     {
@@ -51,6 +55,14 @@ class SpouseRegistrantDetails extends Component
         $this->eventId = $eventId;
         $this->registrantId = $registrantId;
         $this->finalData = $finalData;
+
+        if ($this->finalData['registration_method'] == "imported") {
+            $this->sendInvoice = false;
+        } else {
+            $this->sendInvoice = true;
+        }
+
+        $this->ccEmailNotif = config('app.ccEmailNotif.default');
     }
 
     public function render()
@@ -245,12 +257,15 @@ class SpouseRegistrantDetails extends Component
             'payment_status' => $paymentStatus,
             'mode_of_payment' => $this->mapPaymentMethod,
             'paid_date_time' => Carbon::now(),
+
+            'registration_confirmation_sent_count' => $this->finalData['registration_confirmation_sent_count'] + 1,
+            'registration_confirmation_sent_datetime' => Carbon::now(),
         ])->save();
 
         $eventFormattedData = Carbon::parse($this->event->event_start_date)->format('d') . '-' . Carbon::parse($this->event->event_end_date)->format('d M Y');
         $invoiceLink = env('APP_URL') . '/' . $this->event->category . '/' . $this->event->id . '/view-invoice/' . $this->finalData['mainSpouseId'];
 
-        foreach ($this->finalData['allSpouses'] as $spouses) {
+        foreach ($this->finalData['allSpouses'] as $spousesIndex => $spouses) {
             foreach ($spouses as $innerSpouse) {
                 if (end($spouses) == $innerSpouse) {
                     $details1 = [
@@ -265,10 +280,10 @@ class SpouseRegistrantDetails extends Component
                         'nationality' => $innerSpouse['nationality'],
                         'country' => $innerSpouse['country'],
                         'city' => $innerSpouse['city'],
-                        'amountPaid' => $this->finalData['invoiceData']['total_amount'],
+                        'amountPaid' => $this->finalData['invoiceData']['unit_price'],
                         'transactionId' => $innerSpouse['transactionId'],
                         'invoiceLink' => $invoiceLink,
-                        'badgeLink' => env('APP_URL')."/".$this->event->category."/".$this->event->id."/view-badge"."/".$innerSpouse['spouseType']."/".$innerSpouse['spouseId'],
+                        'badgeLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-badge" . "/" . $innerSpouse['spouseType'] . "/" . $innerSpouse['spouseId'],
                     ];
 
                     $details2 = [
@@ -284,8 +299,13 @@ class SpouseRegistrantDetails extends Component
                         'invoiceLink' => $invoiceLink,
                     ];
 
-                    Mail::to($innerSpouse['email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaid($details1));
-                    Mail::to($innerSpouse['email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaymentConfirmation($details2));
+                    Mail::to($innerSpouse['email_address'])->cc($this->ccEmailNotif)->queue(new RegistrationPaid($details1));
+                    
+                    if ($this->sendInvoice) {
+                        if ($spousesIndex == 0) {
+                            Mail::to($innerSpouse['email_address'])->cc($this->ccEmailNotif)->queue(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+                        }
+                    }
                 }
             }
         }
@@ -294,6 +314,9 @@ class SpouseRegistrantDetails extends Component
         $this->finalData['payment_status'] = $paymentStatus;
         $this->finalData['mode_of_payment'] = $this->mapPaymentMethod;
         $this->finalData['paid_date_time'] = Carbon::parse(Carbon::now())->format('M j, Y g:i A');
+
+        $this->finalData['registration_confirmation_sent_count'] = $this->finalData['registration_confirmation_sent_count'] + 1;
+        $this->finalData['registration_confirmation_sent_datetime'] = Carbon::parse(Carbon::now())->format('M j, Y g:i A');
 
         $this->showMarkAsPaidModal = false;
         $this->mapPaymentMethod = null;
@@ -343,7 +366,7 @@ class SpouseRegistrantDetails extends Component
                 'promoCodeDiscount' => 0,
             ]);
         }
-    
+
 
         $subSpouses = AdditionalSpouses::where('main_spouse_id', $this->finalData['mainSpouseId'])->get();
         if (!$subSpouses->isEmpty()) {
@@ -380,10 +403,10 @@ class SpouseRegistrantDetails extends Component
                             $invoiceDetails[$existingIndex]['delegateNames'],
                             $subSpouse->first_name . " " . $subSpouse->middle_name . " " . $subSpouse->last_name
                         );
-    
+
                         $quantityTemp = $invoiceDetails[$existingIndex]['quantity'] + 1;
                         $totalNetAmountTemp = $this->checkUnitPrice() * $quantityTemp;
-    
+
                         $invoiceDetails[$existingIndex]['quantity'] = $quantityTemp;
                         $invoiceDetails[$existingIndex]['totalNetAmount'] = $totalNetAmountTemp;
                     }
@@ -441,6 +464,94 @@ class SpouseRegistrantDetails extends Component
         return $formatter->format($number);
     }
 
+    public function sendEmailRegistrationConfirmationConfirmation()
+    {
+        $this->dispatchBrowserEvent('swal:send-email-registration-confirmation-confirmation', [
+            'type' => 'warning',
+            'message' => 'Are you sure?',
+            'text' => "",
+        ]);
+    }
+
+    public function sendEmailRegistrationConfirmation()
+    {
+        $eventFormattedData = Carbon::parse($this->event->event_start_date)->format('d') . '-' . Carbon::parse($this->event->event_end_date)->format('d M Y');
+        $invoiceLink = env('APP_URL') . '/' . $this->event->category . '/' . $this->event->id . '/view-invoice/' . $this->finalData['mainSpouseId'];
+
+        if ($this->event->eb_end_date == null) {
+            $earlyBirdValidityDate = Carbon::createFromFormat('Y-m-d', $this->event->std_start_date)->subDay();
+        } else {
+            $earlyBirdValidityDate = Carbon::createFromFormat('Y-m-d', $this->event->eb_end_date);
+        }
+
+        MainSpouses::find($this->finalData['mainSpouseId'])->fill([
+            'registration_confirmation_sent_count' => $this->finalData['registration_confirmation_sent_count'] + 1,
+            'registration_confirmation_sent_datetime' => Carbon::now(),
+        ])->save();
+
+        foreach ($this->finalData['allSpouses'] as $spousesIndex => $spouses) {
+            foreach ($spouses as $innerSpouse) {
+                if (end($spouses) == $innerSpouse) {
+                    $details1 = [
+                        'name' => $innerSpouse['name'],
+                        'eventLink' => $this->event->link,
+                        'eventName' => $this->event->name,
+                        'eventDates' => $eventFormattedData,
+                        'eventLocation' => $this->event->location,
+                        'eventCategory' => $this->event->category,
+                        'eventYear' => $this->event->year,
+
+                        'nationality' => $innerSpouse['nationality'],
+                        'country' => $innerSpouse['country'],
+                        'city' => $innerSpouse['city'],
+                        'amountPaid' => $this->finalData['invoiceData']['unit_price'],
+                        'transactionId' => $innerSpouse['transactionId'],
+                        'invoiceLink' => $invoiceLink,
+                        'earlyBirdValidityDate' => $earlyBirdValidityDate->format('jS F'),
+
+                        'badgeLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-badge" . "/" . $innerSpouse['spouseType'] . "/" . $innerSpouse['spouseId'],
+                    ];
+
+                    $details2 = [
+                        'name' => $innerSpouse['name'],
+                        'eventLink' => $this->event->link,
+                        'eventName' => $this->event->name,
+                        'eventCategory' => $this->event->category,
+                        'eventYear' => $this->event->year,
+
+                        'invoiceAmount' => $this->finalData['invoiceData']['total_amount'],
+                        'amountPaid' => $this->finalData['invoiceData']['total_amount'],
+                        'balance' => 0,
+                        'invoiceLink' => $invoiceLink,
+                    ];
+
+                    if ($this->finalData['payment_status'] == "unpaid") {
+                        Mail::to($innerSpouse['email_address'])->cc($this->ccEmailNotif)->queue(new RegistrationUnpaid($details1, $this->sendInvoice));
+                    } else if ($this->finalData['payment_status'] == "free" && $this->finalData['registration_status'] == "pending") {
+                        Mail::to($innerSpouse['email_address'])->cc($this->ccEmailNotif)->queue(new RegistrationFree($details1, $this->sendInvoice));
+                    } else {
+                        Mail::to($innerSpouse['email_address'])->cc($this->ccEmailNotif)->queue(new RegistrationPaid($details1, $this->sendInvoice));
+                        if ($this->sendInvoice) {
+                            if ($spousesIndex == 0) {
+                                Mail::to($innerSpouse['email_address'])->cc($this->ccEmailNotif)->queue(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+
+        $this->finalData['registration_confirmation_sent_count'] = $this->finalData['registration_confirmation_sent_count'] + 1;
+        $this->finalData['registration_confirmation_sent_datetime'] = Carbon::parse(Carbon::now())->format('M j, Y g:i A');
+
+        $this->dispatchBrowserEvent('swal:send-email-registration-success', [
+            'type' => 'success',
+            'message' => 'Registration Confirmation sent!',
+            'text' => "",
+        ]);
+    }
+
     public function sendEmailReminderConfirmation()
     {
         $this->dispatchBrowserEvent('swal:payment-reminder-confirmation', [
@@ -465,7 +576,7 @@ class SpouseRegistrantDetails extends Component
                         'invoiceLink' => $invoiceLink,
                         'eventYear' => $this->event->year,
                     ];
-                    Mail::to($innerDelegate['email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaymentReminder($details));
+                    Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->queue(new RegistrationPaymentReminder($details));
                 }
             }
         }
@@ -477,7 +588,7 @@ class SpouseRegistrantDetails extends Component
         ]);
     }
 
-    
+
 
     public function checkEmailIfExistsInDatabase($emailAddress)
     {
@@ -696,7 +807,7 @@ class SpouseRegistrantDetails extends Component
         $this->showSpouseCancellationModal = false;
     }
 
-    
+
 
     public function addReplaceSpouse()
     {

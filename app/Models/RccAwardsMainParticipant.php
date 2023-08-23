@@ -58,5 +58,8 @@ class RccAwardsMainParticipant extends Model
         'participant_cancelled_datetime',
         'participant_refunded_datetime',
         'participant_replaced_datetime',
+
+        'registration_confirmation_sent_count',
+        'registration_confirmation_sent_datetime',
     ];
 }

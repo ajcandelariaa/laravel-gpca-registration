@@ -249,6 +249,7 @@ class RegistrantsList extends Component
             $rows[] = $row;
         }
         fclose($file);
+        // dd($rows);
         $checkIfCorrectFormat = true;
         for ($i = 0; $i < count($rows); $i++) {
             if ($i == 0) {

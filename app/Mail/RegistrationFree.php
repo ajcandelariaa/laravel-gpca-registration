@@ -1,0 +1,107 @@
+<?php
+
+namespace App\Mail;
+
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Content;
+use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Mail\Mailables\Address;
+
+class RegistrationFree extends Mailable
+{
+    use Queueable, SerializesModels;
+
+    public $details;
+    public $sendInvoice;
+
+    /**
+     * Create a new message instance.
+     *
+     * @return void
+     */
+    public function __construct($details, $sendInvoice = true)
+    {
+        $this->details = $details;
+        $this->sendInvoice = $sendInvoice;
+    }
+
+    /**
+     * Get the message envelope.
+     *
+     * @return \Illuminate\Mail\Mailables\Envelope
+     */
+    public function envelope()
+    {
+        $subject = 'Registration confirmation for the ' . $this->details['eventName'];
+        
+        return new Envelope(
+            from: new Address('forumregistration@gpca.org.ae', 'GPCA Events Registration'),
+            subject: $subject,
+        );
+    }
+
+    /**
+     * Get the message content definition.
+     *
+     * @return \Illuminate\Mail\Mailables\Content
+     */
+    public function content()
+    {
+        if ($this->details['eventYear'] == '2023') {
+            if ($this->details['eventCategory'] == "AF") {
+                return new Content(
+                    markdown: 'emails.2023.af.registration-free',
+                );
+            } else if ($this->details['eventCategory'] == "ANC") {
+                return new Content(
+                    markdown: 'emails.2023.anc.registration-free',
+                );
+            } else if ($this->details['eventCategory'] == "IPAW") {
+                return new Content(
+                    markdown: 'emails.2023.ipaw.registration-free',
+                );
+            } else if ($this->details['eventCategory'] == "PC") {
+                return new Content(
+                    markdown: 'emails.2023.pc.registration-free',
+                );
+            } else if ($this->details['eventCategory'] == "RCC") {
+                return new Content(
+                    markdown: 'emails.2023.rcc.registration-free',
+                );
+            } else if ($this->details['eventCategory'] == "SCC") {
+                return new Content(
+                    markdown: 'emails.2023.scc.registration-free',
+                );
+            } else if ($this->details['eventCategory'] == "PSW") {
+                return new Content(
+                    markdown: 'emails.2023.psw.registration-free',
+                );
+            } else if ($this->details['eventCategory'] == "DAW") {
+                return new Content(
+                    markdown: 'emails.2023.daw.registration-free',
+                );
+            } else {
+                return new Content(
+                    markdown: 'emails.registration-free',
+                );
+            }
+        } else {
+            return new Content(
+                markdown: 'emails.registration-free',
+            );
+        }
+    }
+
+    /**
+     * Get the attachments for the message.
+     *
+     * @return array
+     */
+    public function attachments()
+    {
+        return [];
+    }
+}

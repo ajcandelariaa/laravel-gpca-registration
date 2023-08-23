@@ -196,6 +196,12 @@
                             class="col-span-1 bg-gray-400 cursor-not-allowed text-white py-2 rounded-md text-lg text-center">Send
                             Payment Reminder</button>
                     @endif
+
+                    @if ($finalData['registration_status'] == 'confirmed' || $finalData['registration_status'] == 'pending')
+                        <button wire:click="sendEmailRegistrationConfirmationConfirmation"
+                        class="col-span-1 {{ $finalData['registration_confirmation_sent_count'] > 0 ? 'bg-gray-400' : 'bg-yellow-600 hover:bg-yellow-700' }}  text-white py-2 rounded-md text-lg text-center">Send
+                        Registration Confirmation</button>
+                    @endif
                 </div>
             </div>
 

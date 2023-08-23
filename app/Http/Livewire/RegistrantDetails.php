@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire;
 
+use App\Mail\RegistrationFree;
 use App\Mail\RegistrationPaid;
 use App\Mail\RegistrationPaymentConfirmation;
 use App\Mail\RegistrationPaymentReminder;
@@ -45,6 +46,8 @@ class RegistrantDetails extends Component
     public $showDelegateCancellationModal = false;
     public $showMarkAsPaidModal = false;
 
+    public $ccEmailNotif;
+
     protected $listeners = ['paymentReminderConfirmed' => 'sendEmailReminder', 'sendEmailRegistrationConfirmationConfirmed' => 'sendEmailRegistrationConfirmation', 'cancelRefundDelegateConfirmed' => 'cancelOrRefundDelegate', 'cancelReplaceDelegateConfirmed' => 'addReplaceDelegate', 'markAsPaidConfirmed' => 'markAsPaid'];
 
     public function mount($eventCategory, $eventId, $registrantId, $finalData)
@@ -60,12 +63,20 @@ class RegistrantDetails extends Component
         $this->registrantId = $registrantId;
         $this->finalData = $finalData;
 
-        if($this->finalData['registration_method'] == "imported"){
+        if ($this->finalData['registration_method'] == "imported") {
             $this->sendInvoice = false;
         } else {
             $this->sendInvoice = true;
         }
         // dd($this->finalData);
+
+        // $this->ccEmailNotif = config('app.ccEmailNotif.test');
+        
+        if($eventCategory == "DAW"){
+            $this->ccEmailNotif = config('app.ccEmailNotif.daw');
+        } else {
+            $this->ccEmailNotif = config('app.ccEmailNotif.default');
+        }
     }
 
     public function render()
@@ -209,7 +220,7 @@ class RegistrantDetails extends Component
                     $this->promoCodeFail = null;
                     $this->promoCodeDiscount = $promoCode->discount;
 
-                    if($promoCode->discount_type == "percentage"){
+                    if ($promoCode->discount_type == "percentage") {
                         $this->discountType = $promoCode->discount_type;
                         $this->promoCodeSuccess = "$promoCode->discount% discount";
                     } else {
@@ -394,14 +405,21 @@ class RegistrantDetails extends Component
             'payment_status' => $paymentStatus,
             'mode_of_payment' => $this->mapPaymentMethod,
             'paid_date_time' => Carbon::now(),
+
+            'registration_confirmation_sent_count' => $this->finalData['registration_confirmation_sent_count'] + 1,
+            'registration_confirmation_sent_datetime' => Carbon::now(),
         ])->save();
 
         $eventFormattedData = Carbon::parse($this->event->event_start_date)->format('d') . '-' . Carbon::parse($this->event->event_end_date)->format('d M Y');
         $invoiceLink = env('APP_URL') . '/' . $this->event->category . '/' . $this->event->id . '/view-invoice/' . $this->finalData['mainDelegateId'];
 
-        foreach ($this->finalData['allDelegates'] as $delegates) {
+        $assistantDetails1 = [];
+        $assistantDetails2 = [];
+
+        foreach ($this->finalData['allDelegates'] as $delegatesIndex => $delegates) {
             foreach ($delegates as $innerDelegate) {
                 if (end($delegates) == $innerDelegate) {
+                    
                     $details1 = [
                         'name' => $innerDelegate['name'],
                         'eventLink' => $this->event->link,
@@ -413,11 +431,12 @@ class RegistrantDetails extends Component
 
                         'jobTitle' => $innerDelegate['job_title'],
                         'companyName' => $this->finalData['company_name'],
-                        'amountPaid' => $this->finalData['invoiceData']['total_amount'],
+                        'amountPaid' => $this->finalData['invoiceData']['unit_price'] - $innerDelegate['discount'],
                         'transactionId' => $innerDelegate['transactionId'],
                         'invoiceLink' => $invoiceLink,
                         'badgeLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-badge" . "/" . $innerDelegate['delegateType'] . "/" . $innerDelegate['delegateId'],
                     ];
+
 
                     $details2 = [
                         'name' => $innerDelegate['name'],
@@ -431,22 +450,38 @@ class RegistrantDetails extends Component
                         'balance' => 0,
                         'invoiceLink' => $invoiceLink,
                     ];
+                    
+                    if($delegatesIndex == 0){
+                        $assistantDetails1 = $details1;
+                        $assistantDetails2 = $details2;
+                    }
 
-                    Mail::to($innerDelegate['email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaid($details1, $this->sendInvoice));
-                    Mail::to($innerDelegate['email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+                    Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->queue(new RegistrationPaid($details1, $this->sendInvoice));
+                    if ($this->sendInvoice) {
+                        if ($delegatesIndex == 0) {
+                            Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->queue(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+                        }
+                    }
                 }
             }
         }
 
+        $assistantDetails1['amountPaid'] = $this->finalData['invoiceData']['total_amount'];
+
         if ($this->finalData['assistant_email_address'] != null) {
-            Mail::to($this->finalData['assistant_email_address'])->queue(new RegistrationPaid($details1, $this->sendInvoice));
-            Mail::to($this->finalData['assistant_email_address'])->queue(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+            Mail::to($this->finalData['assistant_email_address'])->queue(new RegistrationPaid($assistantDetails1, $this->sendInvoice));
+            if($this->sendInvoice){
+                Mail::to($this->finalData['assistant_email_address'])->queue(new RegistrationPaymentConfirmation($assistantDetails2, $this->sendInvoice));
+            }
         }
 
         $this->finalData['registration_status'] = "confirmed";
         $this->finalData['payment_status'] = $paymentStatus;
         $this->finalData['mode_of_payment'] = $this->mapPaymentMethod;
         $this->finalData['paid_date_time'] = Carbon::parse(Carbon::now())->format('M j, Y g:i A');
+
+        $this->finalData['registration_confirmation_sent_count'] = $this->finalData['registration_confirmation_sent_count'] + 1;
+        $this->finalData['registration_confirmation_sent_datetime'] = Carbon::parse(Carbon::now())->format('M j, Y g:i A');
 
         $this->showMarkAsPaidModal = false;
         $this->mapPaymentMethod = null;
@@ -506,7 +541,7 @@ class RegistrantDetails extends Component
                 $mainDiscount = $promoCode->discount;
                 $mainDiscountType = $promoCode->discount_type;
 
-                if($mainDiscountType == "percentage"){
+                if ($mainDiscountType == "percentage") {
                     if ($mainDiscount == 100) {
                         $delegateDescription = "Delegate Registration Fee - Complimentary";
                     } else if ($mainDiscount > 0 && $mainDiscount < 100) {
@@ -524,7 +559,7 @@ class RegistrantDetails extends Component
                 $delegateDescription = "Delegate Registration Fee - {$mainDelegate->rate_type_string}";
             }
 
-            if($mainDiscountType == "percentage"){
+            if ($mainDiscountType == "percentage") {
                 $tempTotalDiscount = $this->checkUnitPrice() * ($mainDiscount / 100);
                 $tempTotalNetAmount = $this->checkUnitPrice() - ($this->checkUnitPrice() * ($mainDiscount / 100));
             } else {
@@ -568,8 +603,8 @@ class RegistrantDetails extends Component
                     $checkIfExisting = false;
                     $existingIndex = 0;
 
-                    
-                    if($subPromoCode != null){
+
+                    if ($subPromoCode != null) {
                         $subDiscount = $subPromoCode->discount;
                         $subDiscountType = $subPromoCode->discount_type;
                     } else {
@@ -594,7 +629,7 @@ class RegistrantDetails extends Component
 
                         $quantityTemp = $invoiceDetails[$existingIndex]['quantity'] + 1;
 
-                        if($subDiscountType == "percentage"){
+                        if ($subDiscountType == "percentage") {
                             $totalDiscountTemp = ($this->checkUnitPrice() * ($invoiceDetails[$existingIndex]['promoCodeDiscount'] / 100)) * $quantityTemp;
                             $totalNetAmountTemp = ($this->checkUnitPrice() * $quantityTemp) - $totalDiscountTemp;
                         } else {
@@ -609,7 +644,7 @@ class RegistrantDetails extends Component
                     } else {
 
                         if ($subDiscount != null) {
-                            if($subDiscountType == "percentage"){
+                            if ($subDiscountType == "percentage") {
                                 if ($subDiscount == 100) {
                                     $subDelegateDescription = "Delegate Registration Fee - Complimentary";
                                 } else if ($subDiscount > 0 && $subDiscount < 100) {
@@ -624,7 +659,7 @@ class RegistrantDetails extends Component
                             $subDelegateDescription = "Delegate Registration Fee - {$mainDelegate->rate_type_string}";
                         }
 
-                        if($subDiscountType == "percentage"){
+                        if ($subDiscountType == "percentage") {
                             $tempSubTotalDiscount = $this->checkUnitPrice() * ($subDiscount / 100);
                             $tempSubTotalNetAmount = $this->checkUnitPrice() - ($this->checkUnitPrice() * ($subDiscount / 100));
                         } else {
@@ -713,15 +748,24 @@ class RegistrantDetails extends Component
         $eventFormattedData = Carbon::parse($this->event->event_start_date)->format('d') . '-' . Carbon::parse($this->event->event_end_date)->format('d M Y');
         $invoiceLink = env('APP_URL') . '/' . $this->event->category . '/' . $this->event->id . '/view-invoice/' . $this->finalData['mainDelegateId'];
 
-        if($this->event->eb_end_date == null){
+        if ($this->event->eb_end_date == null) {
             $earlyBirdValidityDate = Carbon::createFromFormat('Y-m-d', $this->event->std_start_date)->subDay();
         } else {
             $earlyBirdValidityDate = Carbon::createFromFormat('Y-m-d', $this->event->eb_end_date);
         }
 
-        foreach ($this->finalData['allDelegates'] as $delegates) {
+        MainDelegates::find($this->finalData['mainDelegateId'])->fill([
+            'registration_confirmation_sent_count' => $this->finalData['registration_confirmation_sent_count'] + 1,
+            'registration_confirmation_sent_datetime' => Carbon::now(),
+        ])->save();
+
+        $assistantDetails1 = [];
+        $assistantDetails2 = [];
+
+        foreach ($this->finalData['allDelegates'] as $delegatesIndex => $delegates) {
             foreach ($delegates as $innerDelegate) {
                 if (end($delegates) == $innerDelegate) {
+                    
                     $details1 = [
                         'name' => $innerDelegate['name'],
                         'eventLink' => $this->event->link,
@@ -733,7 +777,7 @@ class RegistrantDetails extends Component
 
                         'jobTitle' => $innerDelegate['job_title'],
                         'companyName' => $this->finalData['company_name'],
-                        'amountPaid' => $this->finalData['invoiceData']['total_amount'],
+                        'amountPaid' => $this->finalData['invoiceData']['unit_price'] - $innerDelegate['discount'],
                         'transactionId' => $innerDelegate['transactionId'],
                         'invoiceLink' => $invoiceLink,
                         'earlyBirdValidityDate' => $earlyBirdValidityDate->format('jS F'),
@@ -752,26 +796,47 @@ class RegistrantDetails extends Component
                         'balance' => 0,
                         'invoiceLink' => $invoiceLink,
                     ];
+                    
+                    if($delegatesIndex == 0){
+                        $assistantDetails1 = $details1;
+                        $assistantDetails2 = $details2;
+                    }
 
-                    if($this->finalData['payment_status'] == "unpaid"){
-                        Mail::to($innerDelegate['email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationUnpaid($details1, $this->sendInvoice));
+                    if ($this->finalData['payment_status'] == "unpaid") {
+                        Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->queue(new RegistrationUnpaid($details1, $this->sendInvoice));
+                    } else if ($this->finalData['payment_status'] == "free" && $this->finalData['registration_status'] == "pending") {
+                        Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->queue(new RegistrationFree($details1, $this->sendInvoice));
                     } else {
-                        Mail::to($innerDelegate['email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaid($details1, $this->sendInvoice));
-                        Mail::to($innerDelegate['email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+                        Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->queue(new RegistrationPaid($details1, $this->sendInvoice));
+                        if ($this->sendInvoice) {
+                            if ($delegatesIndex == 0) {
+                                Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->queue(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+                            }
+                        }
                     }
                 }
             }
         }
+        
+        $assistantDetails1['amountPaid'] = $this->finalData['invoiceData']['total_amount'];
 
         if ($this->finalData['assistant_email_address'] != null) {
-            if($this->finalData['payment_status'] == "unpaid"){
-                Mail::to($this->finalData['assistant_email_address'])->queue(new RegistrationUnpaid($details1, $this->sendInvoice));
+            if ($this->finalData['payment_status'] == "unpaid") {
+                Mail::to($this->finalData['assistant_email_address'])->queue(new RegistrationUnpaid($assistantDetails1, $this->sendInvoice));
+            } else if ($this->finalData['payment_status'] == "free" && $this->finalData['registration_status'] == "pending") {
+                Mail::to($this->finalData['assistant_email_address'])->queue(new RegistrationFree($assistantDetails1, $this->sendInvoice));
             } else {
-                Mail::to($this->finalData['assistant_email_address'])->queue(new RegistrationPaid($details1, $this->sendInvoice));
-                Mail::to($this->finalData['assistant_email_address'])->queue(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+                Mail::to($this->finalData['assistant_email_address'])->queue(new RegistrationPaid($assistantDetails1, $this->sendInvoice));
+                if($this->sendInvoice){
+                    Mail::to($this->finalData['assistant_email_address'])->queue(new RegistrationPaymentConfirmation($assistantDetails2, $this->sendInvoice));
+                }
+                
             }
         }
 
+
+        $this->finalData['registration_confirmation_sent_count'] = $this->finalData['registration_confirmation_sent_count'] + 1;
+        $this->finalData['registration_confirmation_sent_datetime'] = Carbon::parse(Carbon::now())->format('M j, Y g:i A');
 
         $this->dispatchBrowserEvent('swal:send-email-registration-success', [
             'type' => 'success',
@@ -810,7 +875,7 @@ class RegistrantDetails extends Component
                         'earlyBirdValidityDate' => $earlyBirdValidityDate->format('jS F'),
                         'eventYear' => $this->event->year,
                     ];
-                    Mail::to($innerDelegate['email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaymentReminder($details, $this->sendInvoice));
+                    Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->queue(new RegistrationPaymentReminder($details, $this->sendInvoice));
                 }
             }
         }
@@ -1050,7 +1115,7 @@ class RegistrantDetails extends Component
 
             $subPromoCode = PromoCodes::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->where('promo_code', $this->replacePromoCode)->where('badge_type', $this->replaceBadgeType)->first();
 
-            if($subPromoCode != null){
+            if ($subPromoCode != null) {
                 $subDiscount = $subPromoCode->discount;
                 $subDiscountType = $subPromoCode->discount_type;
             } else {
@@ -1187,7 +1252,7 @@ class RegistrantDetails extends Component
                     $this->replacePromoCodeFail = null;
                     $this->replacePromoCodeDiscount = $promoCode->discount;
 
-                    if($promoCode->discount_type == "percentage"){
+                    if ($promoCode->discount_type == "percentage") {
                         $this->replaceDiscountType = $promoCode->discount_type;
                         $this->replacePromoCodeSuccess = "$promoCode->discount% discount";
                     } else {

@@ -26,7 +26,7 @@ return new class extends Migration
     public function down()
     {
         Schema::table('promo_codes', function (Blueprint $table) {
-            //
+            $table->dropColumn('discount_type');
         });
     }
 };

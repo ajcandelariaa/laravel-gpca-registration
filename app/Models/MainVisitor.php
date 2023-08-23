@@ -55,5 +55,8 @@ class MainVisitor extends Model
         'visitor_cancelled_datetime',
         'visitor_refunded_datetime',
         'visitor_replaced_datetime',
+        
+        'registration_confirmation_sent_count',
+        'registration_confirmation_sent_datetime',
     ];
 }

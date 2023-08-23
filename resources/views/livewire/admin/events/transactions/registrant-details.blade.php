@@ -152,6 +152,9 @@
 
                     <p>Payment date & time:</p>
                     <p class="font-bold">{{ $finalData['paid_date_time'] }}</p>
+
+                    <p>Last registration confirmation sent:</p>
+                    <p class="font-bold">{{ $finalData['registration_confirmation_sent_datetime'] }}</p>
                 </div>
 
 
@@ -201,9 +204,11 @@
                             Payment Reminder</button>
                     @endif
 
-                    <button wire:click="sendEmailRegistrationConfirmationConfirmation"
-                        class="col-span-1 bg-yellow-600 hover:bg-yellow-700 text-white py-2 rounded-md text-lg text-center">Send
+                    @if ($finalData['registration_status'] == 'confirmed' || $finalData['registration_status'] == 'pending')
+                        <button wire:click="sendEmailRegistrationConfirmationConfirmation"
+                        class="col-span-1 {{ $finalData['registration_confirmation_sent_count'] > 0 ? 'bg-gray-400' : 'bg-yellow-600 hover:bg-yellow-700' }}  text-white py-2 rounded-md text-lg text-center">Send
                         Registration Confirmation</button>
+                    @endif
                 </div>
             </div>
 

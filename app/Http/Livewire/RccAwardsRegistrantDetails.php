@@ -2,9 +2,11 @@
 
 namespace App\Http\Livewire;
 
+use App\Mail\RegistrationFree;
 use App\Mail\RegistrationPaid;
 use App\Mail\RegistrationPaymentConfirmation;
 use App\Mail\RegistrationPaymentReminder;
+use App\Mail\RegistrationUnpaid;
 use Livewire\Component;
 use App\Models\Member as Members;
 use App\Models\Event as Events;
@@ -37,15 +39,17 @@ class RccAwardsRegistrantDetails extends Component
 
     public $replaceParticipantIndex, $replaceParticipantInnerIndex, $replaceSalutation, $replaceFirstName, $replaceMiddleName, $replaceLastName, $replaceEmailAddress, $replaceMobileNumber, $replaceAddress, $replaceCountry, $replaceCity, $replaceJobTitle, $replaceEmailAlreadyUsedError;
 
-    public $mapPaymentMethod;
+    public $mapPaymentMethod, $sendInvoice;
 
     // MODALS
     public $showParticipantModal = false, $showAdditionalDetailsModal = false;
     public $showTransactionRemarksModal = false;
     public $showParticipantCancellationModal = false;
     public $showMarkAsPaidModal = false;
+    
+    public $ccEmailNotif;
 
-    protected $listeners = ['paymentReminderConfirmed' => 'sendEmailReminder', 'cancelRefundDelegateConfirmed' => 'cancelOrRefundParticipant', 'cancelReplaceDelegateConfirmed' => 'addReplaceParticipant', 'markAsPaidConfirmed' => 'markAsPaid'];
+    protected $listeners = ['paymentReminderConfirmed' => 'sendEmailReminder', 'sendEmailRegistrationConfirmationConfirmed' => 'sendEmailRegistrationConfirmation', 'cancelRefundDelegateConfirmed' => 'cancelOrRefundParticipant', 'cancelReplaceDelegateConfirmed' => 'addReplaceParticipant', 'markAsPaidConfirmed' => 'markAsPaid'];
 
     public function mount($eventCategory, $eventId, $registrantId, $finalData)
     {
@@ -58,6 +62,13 @@ class RccAwardsRegistrantDetails extends Component
         $this->registrantId = $registrantId;
         $this->finalData = $finalData;
 
+        if ($this->finalData['registration_method'] == "imported") {
+            $this->sendInvoice = false;
+        } else {
+            $this->sendInvoice = true;
+        }
+        
+        $this->ccEmailNotif = config('app.ccEmailNotif.default');
     }
 
     public function render()
@@ -327,13 +338,16 @@ class RccAwardsRegistrantDetails extends Component
             'payment_status' => $paymentStatus,
             'mode_of_payment' => $this->mapPaymentMethod,
             'paid_date_time' => Carbon::now(),
+
+            'registration_confirmation_sent_count' => $this->finalData['registration_confirmation_sent_count'] + 1,
+            'registration_confirmation_sent_datetime' => Carbon::now(),
         ])->save();
 
         $eventFormattedData = Carbon::parse($this->event->event_start_date)->format('j F Y');
         $invoiceLink = env('APP_URL') . '/' . $this->event->category . '/' . $this->event->id . '/view-invoice/' . $this->finalData['mainParticipantId'];
         $downloadLink = env('APP_URL') . '/download-file/';
 
-        foreach ($this->finalData['allParticipants'] as $participants) {
+        foreach ($this->finalData['allParticipants'] as $participantsIndex => $participants) {
             foreach ($participants as $innerParticipant) {
                 if (end($participants) == $innerParticipant) {
                     $details1 = [
@@ -379,8 +393,14 @@ class RccAwardsRegistrantDetails extends Component
                         'invoiceLink' => $invoiceLink,
                     ];
 
-                    Mail::to($innerParticipant['email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaid($details1));
-                    Mail::to($innerParticipant['email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaymentConfirmation($details2));
+                    Mail::to($innerParticipant['email_address'])->cc($this->ccEmailNotif)->queue(new RegistrationPaid($details1));
+
+                    
+                    if ($this->sendInvoice) {
+                        if ($participantsIndex == 0) {
+                            Mail::to($innerParticipant['email_address'])->cc($this->ccEmailNotif)->queue(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+                        }
+                    }
                 }
             }
         }
@@ -389,6 +409,9 @@ class RccAwardsRegistrantDetails extends Component
         $this->finalData['payment_status'] = $paymentStatus;
         $this->finalData['mode_of_payment'] = $this->mapPaymentMethod;
         $this->finalData['paid_date_time'] = Carbon::parse(Carbon::now())->format('M j, Y g:i A');
+
+        $this->finalData['registration_confirmation_sent_count'] = $this->finalData['registration_confirmation_sent_count'] + 1;
+        $this->finalData['registration_confirmation_sent_datetime'] = Carbon::parse(Carbon::now())->format('M j, Y g:i A');
 
         $this->showMarkAsPaidModal = false;
         $this->mapPaymentMethod = null;
@@ -540,6 +563,98 @@ class RccAwardsRegistrantDetails extends Component
         $formatter = new NumberFormatter('en', NumberFormatter::SPELLOUT);
         return $formatter->format($number);
     }
+    public function sendEmailRegistrationConfirmationConfirmation()
+    {
+        $this->dispatchBrowserEvent('swal:send-email-registration-confirmation-confirmation', [
+            'type' => 'warning',
+            'message' => 'Are you sure?',
+            'text' => "",
+        ]);
+    }
+
+    public function sendEmailRegistrationConfirmation()
+    {
+        $eventFormattedData = Carbon::parse($this->event->event_start_date)->format('d') . '-' . Carbon::parse($this->event->event_end_date)->format('d M Y');
+        $invoiceLink = env('APP_URL') . '/' . $this->event->category . '/' . $this->event->id . '/view-invoice/' . $this->finalData['mainParticipantId'];
+        $downloadLink = env('APP_URL') . '/download-file/';
+
+        RccAwardsMainParticipants::find($this->finalData['mainParticipantId'])->fill([
+            'registration_confirmation_sent_count' => $this->finalData['registration_confirmation_sent_count'] + 1,
+            'registration_confirmation_sent_datetime' => Carbon::now(),
+        ])->save();
+
+        foreach ($this->finalData['allParticipants'] as $participantsIndex => $participants) {
+            foreach ($participants as $innerParticipant) {
+                if (end($participants) == $innerParticipant) {
+                    $details1 = [
+                        'name' => $innerParticipant['name'],
+                        'eventLink' => $this->event->link,
+                        'eventName' => $this->event->name,
+                        'eventDates' => $eventFormattedData,
+                        'eventLocation' => $this->event->location,
+                        'eventCategory' => $this->event->category,
+                        'eventYear' => $this->event->year,
+
+                        'jobTitle' => $innerParticipant['job_title'],
+                        'companyName' => $this->finalData['company_name'],
+                        'emailAddress' => $innerParticipant['email_address'],
+                        'mobileNumber' => $innerParticipant['mobile_number'],
+                        'city' => $innerParticipant['city'],
+                        'country' => $innerParticipant['country'],
+
+                        'category' => $this->finalData['category'],
+                        'subCategory' => ($this->finalData['sub_category'] != null) ? $this->finalData['sub_category'] : 'N/A',
+
+                        'entryFormId' => $this->finalData['entryFormId'],
+                        'supportingDocumentsDownloadId' => $this->finalData['supportingDocumentsDownloadId'],
+                        'downloadLink' => $downloadLink,
+
+                        'amountPaid' => $this->finalData['invoiceData']['total_amount'],
+                        'transactionId' => $innerParticipant['transactionId'],
+                        'invoiceLink' => $invoiceLink,
+
+                        'badgeLink' => env('APP_URL')."/".$this->event->category."/".$this->event->id."/view-badge"."/".$innerParticipant['participantType']."/".$innerParticipant['participantId'],
+                    ];
+
+                    $details2 = [
+                        'name' => $innerParticipant['name'],
+                        'eventLink' => $this->event->link,
+                        'eventName' => $this->event->name,
+                        'eventCategory' => $this->event->category,
+                        'eventYear' => $this->event->year,
+
+                        'invoiceAmount' => $this->finalData['invoiceData']['total_amount'],
+                        'amountPaid' => $this->finalData['invoiceData']['total_amount'],
+                        'balance' => 0,
+                        'invoiceLink' => $invoiceLink,
+                    ];
+
+                    if ($this->finalData['payment_status'] == "unpaid") {
+                        Mail::to($innerParticipant['email_address'])->cc($this->ccEmailNotif)->queue(new RegistrationUnpaid($details1, $this->sendInvoice));
+                    } else if ($this->finalData['payment_status'] == "free" && $this->finalData['registration_status'] == "pending") {
+                        Mail::to($innerParticipant['email_address'])->cc($this->ccEmailNotif)->queue(new RegistrationFree($details1, $this->sendInvoice));
+                    } else {
+                        Mail::to($innerParticipant['email_address'])->cc($this->ccEmailNotif)->queue(new RegistrationPaid($details1, $this->sendInvoice));
+                        if ($this->sendInvoice) {
+                            if ($participantsIndex == 0) {
+                                Mail::to($innerParticipant['email_address'])->cc($this->ccEmailNotif)->queue(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+
+        $this->finalData['registration_confirmation_sent_count'] = $this->finalData['registration_confirmation_sent_count'] + 1;
+        $this->finalData['registration_confirmation_sent_datetime'] = Carbon::parse(Carbon::now())->format('M j, Y g:i A');
+
+        $this->dispatchBrowserEvent('swal:send-email-registration-success', [
+            'type' => 'success',
+            'message' => 'Registration Confirmation sent!',
+            'text' => "",
+        ]);
+    }
 
     public function sendEmailReminderConfirmation()
     {
@@ -565,7 +680,7 @@ class RccAwardsRegistrantDetails extends Component
                         'invoiceLink' => $invoiceLink,
                         'eventYear' => $this->event->year,
                     ];
-                    Mail::to($innerParticipant['email_address'])->cc(config('app.ccEmailNotif'))->queue(new RegistrationPaymentReminder($details));
+                    Mail::to($innerParticipant['email_address'])->cc($this->ccEmailNotif)->queue(new RegistrationPaymentReminder($details));
                 }
             }
         }

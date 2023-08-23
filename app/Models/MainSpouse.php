@@ -55,5 +55,8 @@ class MainSpouse extends Model
         'spouse_cancelled_datetime',
         'spouse_refunded_datetime',
         'spouse_replaced_datetime',
+        
+        'registration_confirmation_sent_count',
+        'registration_confirmation_sent_datetime',
     ];
 }

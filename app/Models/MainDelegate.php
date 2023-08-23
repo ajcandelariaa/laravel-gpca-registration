@@ -66,5 +66,8 @@ class MainDelegate extends Model
         'delegate_cancelled_datetime',
         'delegate_refunded_datetime',
         'delegate_replaced_datetime',
+
+        'registration_confirmation_sent_count',
+        'registration_confirmation_sent_datetime',
     ];
 }
