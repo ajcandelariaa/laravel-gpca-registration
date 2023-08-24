@@ -875,10 +875,7 @@ class RegistrantDetails extends Component
                         'earlyBirdValidityDate' => $earlyBirdValidityDate->format('jS F'),
                         'eventYear' => $this->event->year,
                     ];
-                    // Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->queue(new RegistrationPaymentReminder($details, $this->sendInvoice));
-
-                    Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaymentReminder($details, $this->sendInvoice));
-
+                    Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->queue(new RegistrationPaymentReminder($details, $this->sendInvoice));
                 }
             }
         }
