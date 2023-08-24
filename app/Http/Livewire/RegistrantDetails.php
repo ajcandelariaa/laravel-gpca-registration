@@ -803,14 +803,14 @@ class RegistrantDetails extends Component
                     }
 
                     if ($this->finalData['payment_status'] == "unpaid") {
-                        Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationUnpaid($details1, $this->sendInvoice));
+                        Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->queue(new RegistrationUnpaid($details1, $this->sendInvoice));
                     } else if ($this->finalData['payment_status'] == "free" && $this->finalData['registration_status'] == "pending") {
-                        Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationFree($details1, $this->sendInvoice));
+                        Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->queue(new RegistrationFree($details1, $this->sendInvoice));
                     } else {
-                        Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaid($details1, $this->sendInvoice));
+                        Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->queue(new RegistrationPaid($details1, $this->sendInvoice));
                         if ($this->sendInvoice) {
                             if ($delegatesIndex == 0) {
-                                Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+                                Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->queue(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
                             }
                         }
                     }
