@@ -17,7 +17,9 @@
         <img src="{{ Storage::url($event->banner) }}" alt="" class="w-full object-fill object-center">
 
         <div class="my-10">
-            @if ($paymentStatus == 'unpaid')
+            @if ($paymentStatus == 'free')
+                @include('registration.success-messages.free_message')
+            @elseif ($paymentStatus == 'unpaid')
                 @include('registration.success-messages.unpaid_message')
             @else
                 @include('registration.success-messages.paid_message')
