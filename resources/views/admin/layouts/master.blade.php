@@ -88,6 +88,10 @@
 
     @yield('content')
 
+    <div>
+        @include('helpers.registration_loading_screen')
+    </div>
+
     @livewireScripts()
 
     @if (request()->is('admin/event/add'))

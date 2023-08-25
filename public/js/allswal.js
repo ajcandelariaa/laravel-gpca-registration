@@ -1,5 +1,7 @@
 //MARK AS PAID 
 window.addEventListener("swal:mark-as-paid-success", (event) => {
+    let registrationLloadingScreen = document.getElementById('registration-loading-screen');
+    registrationLloadingScreen.classList.add('hidden');
     swal({
         title: event.detail.message,
         text: event.detail.text,
@@ -29,6 +31,8 @@ window.addEventListener("swal:mark-as-paid-confirmation", (event) => {
       }).then((result) => {
         console.log(result);
         if (result) {
+            let registrationLloadingScreen = document.getElementById('registration-loading-screen');
+            registrationLloadingScreen.classList.remove('hidden');
             Livewire.emit('markAsPaidConfirmed')
         }
       });
@@ -202,6 +206,8 @@ window.addEventListener("swal:send-email-registration-confirmation-confirmation"
       }).then((result) => {
         console.log(result);
         if (result) {
+            let registrationLloadingScreen = document.getElementById('registration-loading-screen');
+            registrationLloadingScreen.classList.remove('hidden');
             Livewire.emit('sendEmailRegistrationConfirmationConfirmed')
         }
       });
@@ -209,6 +215,8 @@ window.addEventListener("swal:send-email-registration-confirmation-confirmation"
 
 // SEND EMAIL REGISTRATION CONFIRMATION SUCCESS
 window.addEventListener("swal:send-email-registration-success", (event) => {
+    let registrationLloadingScreen = document.getElementById('registration-loading-screen');
+    registrationLloadingScreen.classList.add('hidden');
     swal({
         title: event.detail.message,
         text: event.detail.text,
