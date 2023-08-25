@@ -406,8 +406,8 @@ class RegistrantDetails extends Component
             'mode_of_payment' => $this->mapPaymentMethod,
             'paid_date_time' => Carbon::now(),
 
-            // 'registration_confirmation_sent_count' => $this->finalData['registration_confirmation_sent_count'] + 1,
-            // 'registration_confirmation_sent_datetime' => Carbon::now(),
+            'registration_confirmation_sent_count' => $this->finalData['registration_confirmation_sent_count'] + 1,
+            'registration_confirmation_sent_datetime' => Carbon::now(),
         ])->save();
 
         $eventFormattedData = Carbon::parse($this->event->event_start_date)->format('d') . '-' . Carbon::parse($this->event->event_end_date)->format('d M Y');
@@ -456,10 +456,10 @@ class RegistrantDetails extends Component
                         $assistantDetails2 = $details2;
                     }
 
-                    Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->queue(new RegistrationPaid($details1, $this->sendInvoice));
+                    Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaid($details1, $this->sendInvoice));
                     if ($this->sendInvoice) {
                         if ($delegatesIndex == 0) {
-                            Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->queue(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+                            Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
                         }
                     }
                 }
@@ -469,9 +469,9 @@ class RegistrantDetails extends Component
         $assistantDetails1['amountPaid'] = $this->finalData['invoiceData']['total_amount'];
 
         if ($this->finalData['assistant_email_address'] != null) {
-            Mail::to($this->finalData['assistant_email_address'])->queue(new RegistrationPaid($assistantDetails1, $this->sendInvoice));
+            Mail::to($this->finalData['assistant_email_address'])->send(new RegistrationPaid($assistantDetails1, $this->sendInvoice));
             if($this->sendInvoice){
-                Mail::to($this->finalData['assistant_email_address'])->queue(new RegistrationPaymentConfirmation($assistantDetails2, $this->sendInvoice));
+                Mail::to($this->finalData['assistant_email_address'])->send(new RegistrationPaymentConfirmation($assistantDetails2, $this->sendInvoice));
             }
         }
 
@@ -754,10 +754,10 @@ class RegistrantDetails extends Component
             $earlyBirdValidityDate = Carbon::createFromFormat('Y-m-d', $this->event->eb_end_date);
         }
 
-        // MainDelegates::find($this->finalData['mainDelegateId'])->fill([
-        //     'registration_confirmation_sent_count' => $this->finalData['registration_confirmation_sent_count'] + 1,
-        //     'registration_confirmation_sent_datetime' => Carbon::now(),
-        // ])->save();
+        MainDelegates::find($this->finalData['mainDelegateId'])->fill([
+            'registration_confirmation_sent_count' => $this->finalData['registration_confirmation_sent_count'] + 1,
+            'registration_confirmation_sent_datetime' => Carbon::now(),
+        ])->save();
 
         $assistantDetails1 = [];
         $assistantDetails2 = [];
@@ -803,14 +803,14 @@ class RegistrantDetails extends Component
                     }
 
                     if ($this->finalData['payment_status'] == "unpaid") {
-                        Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->queue(new RegistrationUnpaid($details1, $this->sendInvoice));
+                        Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationUnpaid($details1, $this->sendInvoice));
                     } else if ($this->finalData['payment_status'] == "free" && $this->finalData['registration_status'] == "pending") {
-                        Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->queue(new RegistrationFree($details1, $this->sendInvoice));
+                        Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationFree($details1, $this->sendInvoice));
                     } else {
-                        Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->queue(new RegistrationPaid($details1, $this->sendInvoice));
+                        Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaid($details1, $this->sendInvoice));
                         if ($this->sendInvoice) {
                             if ($delegatesIndex == 0) {
-                                Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->queue(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+                                Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
                             }
                         }
                     }
@@ -822,13 +822,13 @@ class RegistrantDetails extends Component
 
         if ($this->finalData['assistant_email_address'] != null) {
             if ($this->finalData['payment_status'] == "unpaid") {
-                Mail::to($this->finalData['assistant_email_address'])->queue(new RegistrationUnpaid($assistantDetails1, $this->sendInvoice));
+                Mail::to($this->finalData['assistant_email_address'])->send(new RegistrationUnpaid($assistantDetails1, $this->sendInvoice));
             } else if ($this->finalData['payment_status'] == "free" && $this->finalData['registration_status'] == "pending") {
-                Mail::to($this->finalData['assistant_email_address'])->queue(new RegistrationFree($assistantDetails1, $this->sendInvoice));
+                Mail::to($this->finalData['assistant_email_address'])->send(new RegistrationFree($assistantDetails1, $this->sendInvoice));
             } else {
-                Mail::to($this->finalData['assistant_email_address'])->queue(new RegistrationPaid($assistantDetails1, $this->sendInvoice));
+                Mail::to($this->finalData['assistant_email_address'])->send(new RegistrationPaid($assistantDetails1, $this->sendInvoice));
                 if($this->sendInvoice){
-                    Mail::to($this->finalData['assistant_email_address'])->queue(new RegistrationPaymentConfirmation($assistantDetails2, $this->sendInvoice));
+                    Mail::to($this->finalData['assistant_email_address'])->send(new RegistrationPaymentConfirmation($assistantDetails2, $this->sendInvoice));
                 }
                 
             }
@@ -875,13 +875,13 @@ class RegistrantDetails extends Component
                         'earlyBirdValidityDate' => $earlyBirdValidityDate->format('jS F'),
                         'eventYear' => $this->event->year,
                     ];
-                    Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->queue(new RegistrationPaymentReminder($details, $this->sendInvoice));
+                    Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaymentReminder($details, $this->sendInvoice));
                 }
             }
         }
 
         if ($this->finalData['assistant_email_address'] != null) {
-            Mail::to($this->finalData['assistant_email_address'])->queue(new RegistrationPaymentReminder($details, $this->sendInvoice));
+            Mail::to($this->finalData['assistant_email_address'])->send(new RegistrationPaymentReminder($details, $this->sendInvoice));
         }
 
         $this->dispatchBrowserEvent('swal:payment-reminder-success', [

@@ -175,10 +175,45 @@ class RegistrationController extends Controller
 
             if ($event->active) {
                 if (Carbon::now()->lt($eventEndDate->addDay())) {
-                    return view('registration.registration', [
-                        'pageTitle' => $event->name . " - Registration",
-                        'event' => $event,
-                    ]);
+                    if ($event->category == "DAW") {
+                        $mainDelegates = MainDelegate::where('event_id', $eventId)->get();
+                        $totalConfirmedDelegates = 0;
+
+                        if ($mainDelegates->isNotEmpty()) {
+                            foreach ($mainDelegates as $mainDelegate) {
+                                if ($mainDelegate->delegate_replaced_by_id == null && (!$mainDelegate->delegate_refunded)) {
+                                    if ($mainDelegate->registration_status == "confirmed") {
+                                        $totalConfirmedDelegates++;
+                                    }
+                                }
+
+                                $additionalDelegates = AdditionalDelegate::where('main_delegate_id', $mainDelegate->id)->get();
+                                if ($additionalDelegates->isNotEmpty()) {
+                                    foreach ($additionalDelegates as $additionalDelegate) {
+                                        if ($additionalDelegate->delegate_replaced_by_id == null && (!$additionalDelegate->delegate_refunded)) {
+                                            if ($mainDelegate->registration_status == "confirmed") {
+                                                $totalConfirmedDelegates++;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        if ($totalConfirmedDelegates >= 50) {
+                            abort(404, 'The URL is incorrect');
+                        } else {
+                            return view('registration.registration', [
+                                'pageTitle' => $event->name . " - Registration",
+                                'event' => $event,
+                            ]);
+                        }
+                    } else {
+                        return view('registration.registration', [
+                            'pageTitle' => $event->name . " - Registration",
+                            'event' => $event,
+                        ]);
+                    }
                 } else {
                     abort(404, 'The URL is incorrect');
                 }
@@ -1567,8 +1602,8 @@ class RegistrationController extends Controller
                         'payment_status' => "paid",
                         'paid_date_time' => Carbon::now(),
 
-                        // 'registration_confirmation_sent_count' => 1,
-                        // 'registration_confirmation_sent_datetime' => Carbon::now(),
+                        'registration_confirmation_sent_count' => 1,
+                        'registration_confirmation_sent_datetime' => Carbon::now(),
                     ])->save();
 
                     $mainDelegate = MainDelegate::where('id', $mainDelegateId)->first();
@@ -1637,14 +1672,14 @@ class RegistrationController extends Controller
                         $ccEmailNotif = config('app.ccEmailNotif.default');
                     }
 
-                    Mail::to($mainDelegate->email_address)->cc($ccEmailNotif)->queue(new RegistrationPaid($details1));
-                    Mail::to($mainDelegate->email_address)->cc($ccEmailNotif)->queue(new RegistrationPaymentConfirmation($details2));
+                    Mail::to($mainDelegate->email_address)->cc($ccEmailNotif)->send(new RegistrationPaid($details1));
+                    Mail::to($mainDelegate->email_address)->cc($ccEmailNotif)->send(new RegistrationPaymentConfirmation($details2));
 
                     if ($mainDelegate->assistant_email_address != null) {
                         $details1['amountPaid'] = $mainDelegate->total_amount;
 
-                        Mail::to($mainDelegate->assistant_email_address)->queue(new RegistrationPaid($details1));
-                        Mail::to($mainDelegate->assistant_email_address)->queue(new RegistrationPaymentConfirmation($details2));
+                        Mail::to($mainDelegate->assistant_email_address)->send(new RegistrationPaid($details1));
+                        Mail::to($mainDelegate->assistant_email_address)->send(new RegistrationPaymentConfirmation($details2));
                     }
 
                     $additionalDelegates = AdditionalDelegate::where('main_delegate_id', $mainDelegateId)->get();
@@ -1686,7 +1721,7 @@ class RegistrationController extends Controller
                                 'badgeLink' => env('APP_URL') . "/" . $event->category . "/" . $event->id . "/view-badge" . "/" . "sub" . "/" . $additionalDelegate->id,
                             ];
 
-                            Mail::to($additionalDelegate->email_address)->cc($ccEmailNotif)->queue(new RegistrationPaid($details1));
+                            Mail::to($additionalDelegate->email_address)->cc($ccEmailNotif)->send(new RegistrationPaid($details1));
                         }
                     }
                     return redirect()->route('register.loading.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'eventYear' => $event->year, 'mainDelegateId' => $mainDelegateId, 'status' => "success"]);
@@ -1728,10 +1763,10 @@ class RegistrationController extends Controller
                         $ccEmailNotif = config('app.ccEmailNotif.default');
                     }
 
-                    Mail::to($mainDelegate->email_address)->cc($ccEmailNotif)->queue(new RegistrationCardDeclined($details));
+                    Mail::to($mainDelegate->email_address)->cc($ccEmailNotif)->send(new RegistrationCardDeclined($details));
 
                     if ($mainDelegate->assistant_email_address != null) {
-                        Mail::to($mainDelegate->assistant_email_address)->queue(new RegistrationCardDeclined($details));
+                        Mail::to($mainDelegate->assistant_email_address)->send(new RegistrationCardDeclined($details));
                     }
 
                     $additionalDelegates = AdditionalDelegate::where('main_delegate_id', $mainDelegateId)->get();
@@ -1749,7 +1784,7 @@ class RegistrationController extends Controller
                                 'invoiceLink' => $invoiceLink,
                                 'eventYear' => $event->year,
                             ];
-                            Mail::to($additionalDelegate->email_address)->cc($ccEmailNotif)->queue(new RegistrationCardDeclined($details));
+                            Mail::to($additionalDelegate->email_address)->cc($ccEmailNotif)->send(new RegistrationCardDeclined($details));
                         }
                     }
                     return redirect()->route('register.loading.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'eventYear' => $event->year, 'mainDelegateId' => $mainDelegateId, 'status' => "failed"]);
@@ -1791,10 +1826,10 @@ class RegistrationController extends Controller
                     $ccEmailNotif = config('app.ccEmailNotif.default');
                 }
 
-                Mail::to($mainDelegate->email_address)->cc($ccEmailNotif)->queue(new RegistrationCardDeclined($details));
+                Mail::to($mainDelegate->email_address)->cc($ccEmailNotif)->send(new RegistrationCardDeclined($details));
 
                 if ($mainDelegate->assistant_email_address != null) {
-                    Mail::to($mainDelegate->assistant_email_address)->queue(new RegistrationCardDeclined($details));
+                    Mail::to($mainDelegate->assistant_email_address)->send(new RegistrationCardDeclined($details));
                 }
 
                 $additionalDelegates = AdditionalDelegate::where('main_delegate_id', $mainDelegateId)->get();
@@ -1812,7 +1847,7 @@ class RegistrationController extends Controller
                             'invoiceLink' => $invoiceLink,
                             'eventYear' => $event->year,
                         ];
-                        Mail::to($additionalDelegate->email_address)->cc($ccEmailNotif)->queue(new RegistrationCardDeclined($details));
+                        Mail::to($additionalDelegate->email_address)->cc($ccEmailNotif)->send(new RegistrationCardDeclined($details));
                     }
                 }
                 return redirect()->route('register.loading.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'eventYear' => $event->year, 'mainDelegateId' => $mainDelegateId, 'status' => "failed"]);
@@ -1876,8 +1911,8 @@ class RegistrationController extends Controller
                         'payment_status' => "paid",
                         'paid_date_time' => Carbon::now(),
 
-                        // 'registration_confirmation_sent_count' => 1,
-                        // 'registration_confirmation_sent_datetime' => Carbon::now(),
+                        'registration_confirmation_sent_count' => 1,
+                        'registration_confirmation_sent_datetime' => Carbon::now(),
                     ])->save();
 
                     $mainSpouse = MainSpouse::where('id', $mainDelegateId)->first();
@@ -2126,8 +2161,8 @@ class RegistrationController extends Controller
                         'payment_status' => "paid",
                         'paid_date_time' => Carbon::now(),
 
-                        // 'registration_confirmation_sent_count' => 1,
-                        // 'registration_confirmation_sent_datetime' => Carbon::now(),
+                        'registration_confirmation_sent_count' => 1,
+                        'registration_confirmation_sent_datetime' => Carbon::now(),
                     ])->save();
 
                     $mainVisitor = MainVisitor::where('id', $mainDelegateId)->first();
@@ -2376,8 +2411,8 @@ class RegistrationController extends Controller
                         'payment_status' => "paid",
                         'paid_date_time' => Carbon::now(),
 
-                        // 'registration_confirmation_sent_count' => 1,
-                        // 'registration_confirmation_sent_datetime' => Carbon::now(),
+                        'registration_confirmation_sent_count' => 1,
+                        'registration_confirmation_sent_datetime' => Carbon::now(),
                     ])->save();
 
                     $mainParticipant = RccAwardsMainParticipant::where('id', $mainDelegateId)->first();

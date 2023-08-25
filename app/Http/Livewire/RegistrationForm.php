@@ -592,16 +592,16 @@ class RegistrationForm extends Component
         ];
 
         if ($paymentStatus == "free") {
-            Mail::to($this->emailAddress)->cc($this->ccEmailNotif)->queue(new RegistrationFree($details1));
+            Mail::to($this->emailAddress)->cc($this->ccEmailNotif)->send(new RegistrationFree($details1));
         } else {
-            Mail::to($this->emailAddress)->cc($this->ccEmailNotif)->queue(new RegistrationUnpaid($details1));
+            Mail::to($this->emailAddress)->cc($this->ccEmailNotif)->send(new RegistrationUnpaid($details1));
         }
 
         if ($this->assistantEmailAddress != null) {
             if ($paymentStatus == "free") {
-                Mail::to($this->emailAddress)->queue(new RegistrationFree($details1));
+                Mail::to($this->emailAddress)->send(new RegistrationFree($details1));
             } else {
-                Mail::to($this->assistantEmailAddress)->queue(new RegistrationUnpaid($details1));
+                Mail::to($this->assistantEmailAddress)->send(new RegistrationUnpaid($details1));
             }
         }
 
@@ -633,9 +633,9 @@ class RegistrationForm extends Component
                 ];
 
                 if ($paymentStatus == "free") {
-                    Mail::to($additionalDelegate->email_address)->cc($this->ccEmailNotif)->queue(new RegistrationFree($details1));
+                    Mail::to($additionalDelegate->email_address)->cc($this->ccEmailNotif)->send(new RegistrationFree($details1));
                 } else {
-                    Mail::to($additionalDelegate->email_address)->cc($this->ccEmailNotif)->queue(new RegistrationUnpaid($details1));
+                    Mail::to($additionalDelegate->email_address)->cc($this->ccEmailNotif)->send(new RegistrationUnpaid($details1));
                 }
             }
         }
