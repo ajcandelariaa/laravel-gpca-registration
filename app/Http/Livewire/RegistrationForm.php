@@ -599,7 +599,7 @@ class RegistrationForm extends Component
 
         if ($this->assistantEmailAddress != null) {
             if ($paymentStatus == "free") {
-                Mail::to($this->emailAddress)->send(new RegistrationFree($details1));
+                Mail::to($this->assistantEmailAddress)->send(new RegistrationFree($details1));
             } else {
                 Mail::to($this->assistantEmailAddress)->send(new RegistrationUnpaid($details1));
             }
