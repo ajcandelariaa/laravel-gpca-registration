@@ -245,6 +245,8 @@ class RegistrationForm extends Component
                     $this->delegatInvoiceDetails[$existingIndex]['totalDiscount'] = $totalDiscountTemp;
                     $this->delegatInvoiceDetails[$existingIndex]['totalNetAmount'] = $totalNetAmountTemp;
                 } else {
+                    $tempSubTotalDiscount = 0;
+                    $tempSubTotalNetAmount = $this->finalUnitPrice;
                     
                     if ($this->additionalDelegates[$i]['subPromoCodeDiscount'] == null) {
                         $this->additionalDelegates[$i]['subPromoCode'] = null;
