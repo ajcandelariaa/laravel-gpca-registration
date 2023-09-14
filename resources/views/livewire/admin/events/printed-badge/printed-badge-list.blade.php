@@ -18,15 +18,16 @@
         <div class="shadow-lg my-5 pt-5 bg-white rounded-md">
             <h1 class="text-center text-2xl bg-registrationPrimaryColor text-white py-4">Printed Badges</h1>
 
-            <div class="grid grid-cols-12 pt-4 pb-2 text-center items-center ">
-                <div class="col-span-1">No.</div>
-                <div class="col-span-1">Transaction ID</div>
-                <div class="col-span-1">Invoice</div>
-                <div class="col-span-2">Name</div>
-                <div class="col-span-2">Company</div>
-                <div class="col-span-2">Email Address</div>
-                <div class="col-span-1">Registration type</div>
-                <div class="col-span-2">Printed Date Time</div>
+            <div class="grid grid-cols-12 gap-5 p-4 px-4 text-center items-center bg-blue-600 text-white ">
+                <div class="col-span-1 break-words">No.</div>
+                <div class="col-span-1 break-words">Transaction ID</div>
+                <div class="col-span-1 break-words">Invoice</div>
+                <div class="col-span-2 break-words">Name</div>
+                <div class="col-span-1 break-words">Company</div>
+                <div class="col-span-2 break-words">Email Address</div>
+                <div class="col-span-1 break-words">Registration type</div>
+                <div class="col-span-1 break-words">Print Count</div>
+                <div class="col-span-2 break-words">Printed Date Time</div>
             </div>
 
             @if (empty($finalListsOfDelegates))
@@ -36,36 +37,40 @@
             @else
                 @foreach ($finalListsOfDelegates as $delegateIndex => $finalListsOfDelegate)
                     <div
-                        class="grid grid-cols-12 pt-2 pb-2 mb-1 text-center items-center  {{ $delegateIndex % 2 == 0 ? 'bg-registrationInputFieldsBGColor' : 'bg-registrationCardBGColor' }}">
-                        <div class="col-span-1">{{ $delegateIndex + 1 }}</div>
+                        class="grid grid-cols-12 gap-5 py-2 px-4 mb-1 text-center items-center  {{ $delegateIndex % 2 == 0 ? 'bg-registrationInputFieldsBGColor' : 'bg-registrationCardBGColor' }}">
+                        <div class="col-span-1 break-words">{{ $delegateIndex + 1 }}</div>
 
-                        <div class="col-span-1">
+                        <div class="col-span-1 break-words">
                             {{ $finalListsOfDelegate['delegateTransactionId'] }}
                         </div>
 
-                        <div class="col-span-1">
+                        <div class="col-span-1 break-words">
                             <a href="{{ route('admin.event.registrants.detail.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'registrantId' => $finalListsOfDelegate['mainDelegateId']]) }}" target="_blank" class="text-blue-700 font-semibold hover:underline">
                                 {{ $finalListsOfDelegate['delegateInvoiceNumber'] }}
                             </a>
                         </div>
 
-                        <div class="col-span-2">
+                        <div class="col-span-2 break-words">
                             {{ $finalListsOfDelegate['delegateName'] }}
                         </div>
 
-                        <div class="col-span-2">
+                        <div class="col-span-1 break-words">
                             {{ $finalListsOfDelegate['delegateCompany'] }}
                         </div>
 
-                        <div class="col-span-2">
+                        <div class="col-span-2 break-words">
                             {{ $finalListsOfDelegate['delegateEmailAddress'] }}
                         </div>
 
-                        <div class="col-span-1">
+                        <div class="col-span-1 break-words">
                             {{ $finalListsOfDelegate['delegateBadgeType'] }}
                         </div>
 
-                        <div class="col-span-2">
+                        <div class="col-span-1 break-words">
+                            {{ $finalListsOfDelegate['delegatePrintBadgeCount'] }}
+                        </div>
+
+                        <div class="col-span-2 break-words">
                             {{ $finalListsOfDelegate['delegatePrintedDateTime'] }}
                         </div>
                     </div>

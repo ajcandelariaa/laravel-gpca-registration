@@ -17,7 +17,7 @@
         <div class="shadow-lg my-5 pt-5 bg-white rounded-md">
             <h1 class="text-center text-2xl bg-registrationPrimaryColor text-white py-4">Confirmed Delegates</h1>
 
-            <div class="grid grid-cols-12 gap-5 pt-4 pb-4 text-center items-center bg-blue-600 text-white ">
+            <div class="grid grid-cols-12 gap-5 p-4 text-center items-center bg-blue-600 text-white ">
                 <div class="col-span-1 break-words">No.</div>
                 <div class="col-span-1 break-words">Transaction ID</div>
                 <div class="col-span-1 break-words">Invoice</div>
@@ -37,42 +37,42 @@
             @else
                 @foreach ($finalListsOfDelegates as $delegateIndex => $finalListsOfDelegate)
                     <div
-                        class="grid grid-cols-12 gap-5 pt-2 pb-2 mb-1 text-center items-center  {{ $delegateIndex % 2 == 0 ? 'bg-registrationInputFieldsBGColor' : 'bg-registrationCardBGColor' }}">
-                        <div class="col-span-1 break-words">{{ $delegateIndex + 1 }}</div>
+                        class="grid grid-cols-12 gap-5 py-2 px-4 mb-1 text-center items-center  {{ $delegateIndex % 2 == 0 ? 'bg-registrationInputFieldsBGColor' : 'bg-registrationCardBGColor' }}">
+                        <div class="col-span-1 break-words text-sm">{{ $delegateIndex + 1 }}</div>
 
-                        <div class="col-span-1 break-words">
+                        <div class="col-span-1 break-words text-sm">
                             <a href="{{ route('admin.event.delegates.detail.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'delegateType' => $finalListsOfDelegate['delegateType'], 'delegateId' => $finalListsOfDelegate['delegateId']]) }}" target="_blank" class="text-blue-700 font-semibold hover:underline">
                                 {{ $finalListsOfDelegate['delegateTransactionId'] }}
                             </a>
                         </div>
 
-                        <div class="col-span-1 break-words">
+                        <div class="col-span-1 break-words text-sm">
                             <a href="{{ route('admin.event.registrants.detail.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'registrantId' => $finalListsOfDelegate['mainDelegateId']]) }}" target="_blank" class="text-blue-700 font-semibold hover:underline">
                                 {{ $finalListsOfDelegate['delegateInvoiceNumber'] }}
                             </a>
                         </div>
 
-                        <div class="col-span-2 break-words">
+                        <div class="col-span-2 break-words text-sm">
                             {{ $finalListsOfDelegate['delegateSalutation'] }} {{ $finalListsOfDelegate['delegateFName'] }} {{ $finalListsOfDelegate['delegateMName'] }} {{ $finalListsOfDelegate['delegateLName'] }}
                         </div>
 
-                        <div class="col-span-1 break-words">
+                        <div class="col-span-1 break-words text-sm">
                             {{ $finalListsOfDelegate['delegateJobTitle'] }}
                         </div>
 
-                        <div class="col-span-1 break-words">
+                        <div class="col-span-1 break-words text-sm">
                             {{ $finalListsOfDelegate['delegateCompany'] }}
                         </div>
 
-                        <div class="col-span-1 break-words">
+                        <div class="col-span-1 break-words text-sm">
                             {{ $finalListsOfDelegate['delegateEmailAddress'] }}
                         </div>
 
-                        <div class="col-span-1 break-words">
+                        <div class="col-span-1 break-words text-sm">
                             {{ $finalListsOfDelegate['delegateBadgeType'] }}
                         </div>
 
-                        <div class="col-span-1 break-words font-bold">
+                        <div class="col-span-1 break-words text-sm font-bold">
                             @if ($finalListsOfDelegate['delegatePrinted'] == "Yes")
                                 <span class="text-green-600">
                                     {{ $finalListsOfDelegate['delegatePrinted'] }}
@@ -84,7 +84,7 @@
                             @endif
                         </div>
 
-                        <div class="col-span-2 break-words">
+                        <div class="col-span-2 break-words text-sm">
                             <button wire:click="previewBadge({{ $delegateIndex }})"
                                 class="cursor-pointer hover:text-gray-600 text-gray-500 mr-4 text-sm" target="_blank">
                                 <i class="fa-solid fa-eye"></i> Preview

@@ -14,17 +14,17 @@
 
         @if ($registrationTypes->isNotEmpty())
             <div class="shadow-lg my-5 pt-5 bg-white rounded-md" style="margin-left: 320px; ">
-                <h1 class="text-center text-2xl text-white bg-registrationPrimaryColor py-2">Registration Types</h1>
-                <div class="grid grid-cols-9 pt-4 pb-2 place-items-center text-center">
-                    <div class="col-span-1">Registration type</div>
-                    <div class="col-span-1">Badge footer <br> front name</div>
-                    <div class="col-span-1">Badge footer <br> front bg color</div>
-                    <div class="col-span-1">Badge footer <br> front text color</div>
-                    <div class="col-span-1">Badge footer <br> back name</div>
-                    <div class="col-span-1">Badge footer <br> back bg color</div>
-                    <div class="col-span-1">Badge footer <br> back text color</div>
-                    <div class="col-span-1">Status</div>
-                    <div class="col-span-1">Action</div>
+                <h1 class="text-center text-2xl bg-registrationPrimaryColor text-white py-4">Registration Types</h1>
+                <div class="grid grid-cols-9 gap-5 p-4 px-4 text-center items-center bg-blue-600 text-white ">
+                    <div class="col-span-1 break-words">Registration type</div>
+                    <div class="col-span-1 break-words">Badge footer <br> front name</div>
+                    <div class="col-span-1 break-words">Badge footer <br> front bg color</div>
+                    <div class="col-span-1 break-words">Badge footer <br> front text color</div>
+                    <div class="col-span-1 break-words">Badge footer <br> back name</div>
+                    <div class="col-span-1 break-words">Badge footer <br> back bg color</div>
+                    <div class="col-span-1 break-words">Badge footer <br> back text color</div>
+                    <div class="col-span-1 break-words">Status</div>
+                    <div class="col-span-1 break-words">Action</div>
                 </div>
 
                 @php
@@ -33,15 +33,15 @@
 
                 @foreach ($registrationTypes as $registrationType)
                     <div
-                        class="grid grid-cols-9 pt-2 pb-2 mb-1 place-items-center text-center {{ $count % 2 == 0 ? 'bg-registrationInputFieldsBGColor' : 'bg-registrationCardBGColor' }}">
-                        <div class="col-span-1">{{ $registrationType->registration_type }}</div>
-                        <div class="col-span-1">{{ $registrationType->badge_footer_front_name }}</div>
-                        <div class="col-span-1">{{ $registrationType->badge_footer_front_bg_color }}</div>
-                        <div class="col-span-1">{{ $registrationType->badge_footer_front_text_color }}</div>
-                        <div class="col-span-1">{{ $registrationType->badge_footer_back_name }}</div>
-                        <div class="col-span-1">{{ $registrationType->badge_footer_back_bg_color }}</div>
-                        <div class="col-span-1">{{ $registrationType->badge_footer_back_text_color }}</div>
-                        <div class="col-span-1">
+                        class="grid grid-cols-9 gap-5 py-2 px-4 mb-1 items-center text-center {{ $count % 2 == 0 ? 'bg-registrationInputFieldsBGColor' : 'bg-registrationCardBGColor' }}">
+                        <div class="col-span-1 break-words">{{ $registrationType->registration_type }}</div>
+                        <div class="col-span-1 break-words">{{ $registrationType->badge_footer_front_name }}</div>
+                        <div class="col-span-1 break-words">{{ $registrationType->badge_footer_front_bg_color }}</div>
+                        <div class="col-span-1 break-words">{{ $registrationType->badge_footer_front_text_color }}</div>
+                        <div class="col-span-1 break-words">{{ $registrationType->badge_footer_back_name }}</div>
+                        <div class="col-span-1 break-words">{{ $registrationType->badge_footer_back_bg_color }}</div>
+                        <div class="col-span-1 break-words">{{ $registrationType->badge_footer_back_text_color }}</div>
+                        <div class="col-span-1 break-words">
                             @if ($registrationType->active)
                                 <button wire:click="updateStatus({{ $registrationType->id }}, {{ $registrationType->active }})"
                                     class="text-gray-700 bg-green-300 hover:bg-green-500 hover:text-white py-1 px-2 text-sm rounded-md">Active</button>
@@ -50,7 +50,7 @@
                                     class="text-gray-700 bg-red-300 hover:bg-red-500 hover:text-white py-1 px-2 text-sm rounded-md">Inactive</button>
                             @endif
                         </div>
-                        <div class="col-span-1 flex flex-col text-left gap-1">
+                        <div class="col-span-1 break-words flex flex-col gap-1 justify-center ">
                             <div wire:click="showSampleBadge({{ $registrationType->id }})"
                                 class="cursor-pointer hover:text-gray-600 text-gray-500">
                                 <i class="fa-solid fa-eye"></i>

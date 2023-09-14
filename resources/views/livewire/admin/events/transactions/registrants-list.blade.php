@@ -73,19 +73,19 @@
         <div class="shadow-lg my-5 pt-5 bg-white rounded-md">
             <h1 class="text-center text-2xl bg-registrationPrimaryColor text-white py-4">Transactions</h1>
 
-            <div class="grid grid-cols-12 pt-4 pb-2 text-center items-center gap-10">
-                <div class="col-span-1">Invoice Number</div>
-                <div class="col-span-1">Company</div>
-                <div class="col-span-1">Country</div>
-                <div class="col-span-1">City</div>
-                <div class="col-span-1">Pass Type</div>
-                <div class="col-span-1">Quantity</div>
-                <div class="col-span-1">Total Amount</div>
-                <div class="col-span-1">Registered Date & Time</div>
-                <div class="col-span-1">Registration Status</div>
-                <div class="col-span-1">Payment Status</div>
-                <div class="col-span-1">Payment Method</div>
-                <div class="col-span-1">Action</div>
+            <div class="grid grid-cols-12 gap-5 p-4 text-center items-center bg-blue-600 text-white ">
+                <div class="col-span-1 break-words">Invoice Number</div>
+                <div class="col-span-1 break-words">Company</div>
+                <div class="col-span-1 break-words">Country</div>
+                <div class="col-span-1 break-words">City</div>
+                <div class="col-span-1 break-words">Pass Type</div>
+                <div class="col-span-1 break-words">Quantity</div>
+                <div class="col-span-1 break-words">Total Amount</div>
+                <div class="col-span-1 break-words">Registered Date & Time</div>
+                <div class="col-span-1 break-words">Registration Status</div>
+                <div class="col-span-1 break-words">Payment Status</div>
+                <div class="col-span-1 break-words">Payment Method</div>
+                <div class="col-span-1 break-words">Action</div>
             </div>
 
             @php
@@ -99,20 +99,20 @@
             @else
                 @foreach ($finalListOfRegistrants as $finalListOfRegistrant)
                     <div
-                        class="grid grid-cols-12 gap-10 pt-2 pb-2 mb-1 text-center items-center text-sm {{ $count % 2 == 0 ? 'bg-registrationInputFieldsBGColor' : 'bg-registrationCardBGColor' }}">
-                        <div class="col-span-1">{{ $finalListOfRegistrant['invoiceNumber'] }}</div>
-                        <div class="col-span-1">{{ $finalListOfRegistrant['companyName'] }}</div>
-                        <div class="col-span-1">{{ $finalListOfRegistrant['country'] }}</div>
-                        <div class="col-span-1">{{ $finalListOfRegistrant['city'] }}</div>
-                        <div class="col-span-1">{{ $finalListOfRegistrant['passType'] }}</div>
-                        <div class="col-span-1">{{ $finalListOfRegistrant['quantity'] }}</div>
-                        <div class="col-span-1">$
+                        class="grid grid-cols-12 gap-5 px-4 py-2 mb-1 text-center items-center text-sm {{ $count % 2 == 0 ? 'bg-registrationInputFieldsBGColor' : 'bg-registrationCardBGColor' }}">
+                        <div class="col-span-1 break-words">{{ $finalListOfRegistrant['invoiceNumber'] }}</div>
+                        <div class="col-span-1 break-words">{{ $finalListOfRegistrant['companyName'] }}</div>
+                        <div class="col-span-1 break-words">{{ $finalListOfRegistrant['country'] }}</div>
+                        <div class="col-span-1 break-words">{{ $finalListOfRegistrant['city'] }}</div>
+                        <div class="col-span-1 break-words">{{ $finalListOfRegistrant['passType'] }}</div>
+                        <div class="col-span-1 break-words">{{ $finalListOfRegistrant['quantity'] }}</div>
+                        <div class="col-span-1 break-words">$
                             {{ number_format($finalListOfRegistrant['totalAmount'], 2, '.', ',') }}</div>
-                        <div class="col-span-1">{{ $finalListOfRegistrant['regDateTime'] }}</div>
-                        <div class="col-span-1">{{ $finalListOfRegistrant['regStatus'] }}</div>
-                        <div class="col-span-1">{{ $finalListOfRegistrant['payStatus'] }}</div>
-                        <div class="col-span-1">{{ $finalListOfRegistrant['paymentMethod'] }}</div>
-                        <div class="col-span-1">
+                        <div class="col-span-1 break-words">{{ $finalListOfRegistrant['regDateTime'] }}</div>
+                        <div class="col-span-1 break-words">{{ $finalListOfRegistrant['regStatus'] }}</div>
+                        <div class="col-span-1 break-words">{{ $finalListOfRegistrant['payStatus'] }}</div>
+                        <div class="col-span-1 break-words">{{ $finalListOfRegistrant['paymentMethod'] }}</div>
+                        <div class="col-span-1 break-words">
                             <a href="{{ route('admin.event.registrants.detail.view', ['eventCategory' => $eventCategory, 'eventId' => $eventId, 'registrantId' => $finalListOfRegistrant['mainDelegateId']]) }}"
                                 class="cursor-pointer hover:text-gray-600 text-gray-500" target="_blank">
                                 <i class="fa-solid fa-eye"></i> View

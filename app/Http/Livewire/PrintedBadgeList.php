@@ -42,18 +42,26 @@ class PrintedBadgeList extends Component
                     $finalTransactionId = $this->event->year . $eventCode . $lastDigit;
                     $invoiceNumber = $eventCategory . $tempYear . "/" . $lastDigit;
 
-                    array_push($this->finalListsOfDelegatesTemp, [
-                        'mainDelegateId' => $mainDelegate->id,
-                        'delegateId' => $mainDelegate->id,
-                        'delegateTransactionId' => $finalTransactionId,
-                        'delegateInvoiceNumber' => $invoiceNumber,
-                        'delegateType' => "main",
-                        'delegateCompany' => $mainDelegate->company_name,
-                        'delegateName' => $mainDelegate->salutation . " " . $mainDelegate->first_name . " " . $mainDelegate->middle_name . " " . $mainDelegate->last_name,
-                        'delegateEmailAddress' => $mainDelegate->email_address,
-                        'delegateBadgeType' => $mainDelegate->badge_type,
-                        'delegatePrintedDateTime' => $printedBadge->printed_date_time,
-                    ]);
+                    $result = $this->checkIfBadgePrintedExist($finalTransactionId, $this->finalListsOfDelegatesTemp);
+                    if ($result[0]) {
+                        $this->finalListsOfDelegatesTemp[$result[1]]['delegatePrintBadgeCount'] += 1;
+                        $this->finalListsOfDelegatesTemp[$result[1]]['delegatePrintedDateTime'] = $printedBadge->printed_date_time;
+                    } else {
+                        array_push($this->finalListsOfDelegatesTemp, [
+                            'mainDelegateId' => $mainDelegate->id,
+                            'delegateId' => $mainDelegate->id,
+                            'delegateTransactionId' => $finalTransactionId,
+                            'delegateInvoiceNumber' => $invoiceNumber,
+                            'delegateType' => "main",
+                            'delegateCompany' => $mainDelegate->company_name,
+                            'delegateName' => $mainDelegate->salutation . " " . $mainDelegate->first_name . " " . $mainDelegate->middle_name . " " . $mainDelegate->last_name,
+                            'delegateEmailAddress' => $mainDelegate->email_address,
+                            'delegateBadgeType' => $mainDelegate->badge_type,
+                            'delegatePrintBadgeCount' => 1,
+                            'delegatePrintedDateTime' => $printedBadge->printed_date_time,
+                        ]);
+                    }
+
                 } else {
                     $additionalDelegate = AdditionalDelegates::where('id', $printedBadge->delegate_id)->first();
 
@@ -62,22 +70,32 @@ class PrintedBadgeList extends Component
                     $lastDigit = 1000 + intval($transactionId);
 
                     $finalTransactionId = $this->event->year . $eventCode . $lastDigit;
-                    $invoiceNumber = $eventCategory . $tempYear . "/" . $lastDigit;
+
+                    $transactionId2 = Transactions::where('event_id', $eventId)->where('delegate_id', $additionalDelegate->main_delegate_id)->where('delegate_type', "main")->value('id');
+                    $lastDigit2 = 1000 + intval($transactionId2);
+                    $invoiceNumber = $eventCategory . $tempYear . "/" . $lastDigit2;
 
                     $mainDelegateCompany = MainDelegates::where('id', $additionalDelegate->main_delegate_id)->value('company_name');
 
-                    array_push($this->finalListsOfDelegatesTemp, [
-                        'mainDelegateId' => $additionalDelegate->main_delegate_id,
-                        'delegateId' => $additionalDelegate->id,
-                        'delegateTransactionId' => $finalTransactionId,
-                        'delegateInvoiceNumber' => $invoiceNumber,
-                        'delegateType' => "sub",
-                        'delegateCompany' => $mainDelegateCompany,
-                        'delegateName' => $additionalDelegate->salutation . " " . $additionalDelegate->first_name . " " . $additionalDelegate->middle_name . " " . $additionalDelegate->last_name,
-                        'delegateEmailAddress' => $additionalDelegate->email_address,
-                        'delegateBadgeType' => $additionalDelegate->badge_type,
-                        'delegatePrintedDateTime' => $printedBadge->printed_date_time,
-                    ]);
+                    $result = $this->checkIfBadgePrintedExist($finalTransactionId, $this->finalListsOfDelegatesTemp);
+                    if ($result[0]) {
+                        $this->finalListsOfDelegatesTemp[$result[1]]['delegatePrintBadgeCount'] += 1;
+                        $this->finalListsOfDelegatesTemp[$result[1]]['delegatePrintedDateTime'] = $printedBadge->printed_date_time;
+                    } else {
+                        array_push($this->finalListsOfDelegatesTemp, [
+                            'mainDelegateId' => $additionalDelegate->main_delegate_id,
+                            'delegateId' => $additionalDelegate->id,
+                            'delegateTransactionId' => $finalTransactionId,
+                            'delegateInvoiceNumber' => $invoiceNumber,
+                            'delegateType' => "sub",
+                            'delegateCompany' => $mainDelegateCompany,
+                            'delegateName' => $additionalDelegate->salutation . " " . $additionalDelegate->first_name . " " . $additionalDelegate->middle_name . " " . $additionalDelegate->last_name,
+                            'delegateEmailAddress' => $additionalDelegate->email_address,
+                            'delegateBadgeType' => $additionalDelegate->badge_type,
+                            'delegatePrintBadgeCount' => 1,
+                            'delegatePrintedDateTime' => $printedBadge->printed_date_time,
+                        ]);
+                    }
                 }
             }
         }
@@ -100,5 +118,23 @@ class PrintedBadgeList extends Component
                 ->all();
         }
         return view('livewire.admin.events.printed-badge.printed-badge-list');
+    }
+
+    public function checkIfBadgePrintedExist($transactionId, $printedBadges)
+    {
+        $checker = 0;
+        $index = null;
+        foreach ($printedBadges as $printedBadgeIndex => $printedBadge) {
+            if ($printedBadge['delegateTransactionId'] == $transactionId) {
+                $checker++;
+                $index = $printedBadgeIndex;
+            }
+        }
+
+        if ($checker > 0) {
+            return [true, $index];
+        } else {
+            return [false, $index];
+        }
     }
 }

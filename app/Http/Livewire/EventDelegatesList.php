@@ -89,9 +89,7 @@ class EventDelegatesList extends Component
                                 $tempYear = Carbon::parse($subDelegate->registered_date_time)->format('y');
                                 $transactionId = Transactions::where('delegate_id', $subDelegate->id)->where('delegate_type', "sub")->value('id');
                                 $lastDigit = 1000 + intval($transactionId);
-
                                 $finalTransactionId = $this->event->year . $eventCode . $lastDigit;
-                                $invoiceNumber = $eventCategory . $tempYear . "/" . $lastDigit;
 
                                 $printedBadge = PrintedBadges::where('event_id', $eventId)->where('delegate_id', $subDelegate->id)->where('delegate_type', "sub")->first();
 
