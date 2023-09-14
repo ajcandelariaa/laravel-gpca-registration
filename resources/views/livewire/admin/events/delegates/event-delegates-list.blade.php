@@ -53,7 +53,7 @@
                         </div>
 
                         <div class="col-span-2 break-words">
-                            {{ $finalListsOfDelegate['delegateName'] }}
+                            {{ $finalListsOfDelegate['delegateSalutation'] }} {{ $finalListsOfDelegate['delegateFName'] }} {{ $finalListsOfDelegate['delegateMName'] }} {{ $finalListsOfDelegate['delegateLName'] }}
                         </div>
 
                         <div class="col-span-1 break-words">

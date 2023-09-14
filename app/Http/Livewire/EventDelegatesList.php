@@ -67,7 +67,10 @@ class EventDelegatesList extends Component
                             'delegateType' => "main",
                             'delegateCompany' => $mainDelegate->company_name,
                             'delegateJobTitle' => $mainDelegate->job_title,
-                            'delegateName' => $mainDelegate->salutation . " " . $mainDelegate->first_name . " " . $mainDelegate->middle_name . " " . $mainDelegate->last_name,
+                            'delegateSalutation' => $mainDelegate->salutation,
+                            'delegateFName' => $mainDelegate->first_name,
+                            'delegateMName' => $mainDelegate->middle_name,
+                            'delegateLName' => $mainDelegate->last_name,
                             'delegateEmailAddress' => $mainDelegate->email_address,
                             'delegateBadgeType' => $mainDelegate->badge_type,
                         ]);
@@ -107,7 +110,10 @@ class EventDelegatesList extends Component
                                     'delegateType' => "sub",
                                     'delegateCompany' => $mainDelegate->company_name,
                                     'delegateJobTitle' => $subDelegate->job_title,
-                                    'delegateName' => $subDelegate->salutation . " " . $subDelegate->first_name . " " . $subDelegate->middle_name . " " . $subDelegate->last_name,
+                                    'delegateSalutation' => $subDelegate->salutation,
+                                    'delegateFName' => $subDelegate->first_name,
+                                    'delegateMName' => $subDelegate->middle_name,
+                                    'delegateLName' => $subDelegate->last_name,
                                     'delegateEmailAddress' => $subDelegate->email_address,
                                     'delegateBadgeType' => $subDelegate->badge_type,
                                 ]);
@@ -128,7 +134,10 @@ class EventDelegatesList extends Component
             $this->finalListsOfDelegates = collect($this->finalListsOfDelegatesTemp)
                 ->filter(function ($item) {
                     return str_contains(strtolower($item['delegateCompany']), strtolower($this->searchTerm)) ||
-                        str_contains(strtolower($item['delegateName']), strtolower($this->searchTerm)) ||
+                        str_contains(strtolower($item['delegateSalutation']), strtolower($this->searchTerm)) ||
+                        str_contains(strtolower($item['delegateFName']), strtolower($this->searchTerm)) ||
+                        str_contains(strtolower($item['delegateMName']), strtolower($this->searchTerm)) ||
+                        str_contains(strtolower($item['delegateLName']), strtolower($this->searchTerm)) ||
                         str_contains(strtolower($item['delegateJobTitle']), strtolower($this->searchTerm)) ||
                         str_contains(strtolower($item['delegateEmailAddress']), strtolower($this->searchTerm)) ||
                         str_contains(strtolower($item['delegateTransactionId']), strtolower($this->searchTerm)) ||
@@ -181,7 +190,13 @@ class EventDelegatesList extends Component
     }
 
     public function previewBadge($delegateIndex){
-        $this->name = $this->finalListsOfDelegates[$delegateIndex]['delegateName'];
+        
+        if($this->finalListsOfDelegates[$delegateIndex]['delegateSalutation'] == "Dr." || $this->finalListsOfDelegates[$delegateIndex]['delegateSalutation'] == "Prof." ){
+            $this->name = $this->finalListsOfDelegates[$delegateIndex]['delegateSalutation'] . ' ' . $this->finalListsOfDelegates[$delegateIndex]['delegateFName'] . ' ' . $this->finalListsOfDelegates[$delegateIndex]['delegateMName'] . ' ' . $this->finalListsOfDelegates[$delegateIndex]['delegateLName'];
+        } else {
+            $this->name = $this->finalListsOfDelegates[$delegateIndex]['delegateFName'] . ' ' . $this->finalListsOfDelegates[$delegateIndex]['delegateMName'] . ' ' . $this->finalListsOfDelegates[$delegateIndex]['delegateLName'];
+        }
+
         $this->jobTitle = $this->finalListsOfDelegates[$delegateIndex]['delegateCompany'];
         $this->company = $this->finalListsOfDelegates[$delegateIndex]['delegateJobTitle'];
         $this->registrationType = $this->finalListsOfDelegates[$delegateIndex]['delegateBadgeType'];
