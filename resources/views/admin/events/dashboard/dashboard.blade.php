@@ -7,18 +7,25 @@
 
     <div class="container mx-auto my-10">
 
-        <div class="grid grid-cols-3 gap-4 text-center">
+        <div class="grid grid-cols-1 gap-4 text-center">
             <div class="bg-blue-500 p-4 rounded-lg shadow-lg">
                 <h3 class="text-lg font-semibold text-white">Confirmed delegates</h3>
                 <p class="text-4xl font-bold text-white">{{ $finalData['totalConfirmedDelegates'] }}</p>
             </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-4 text-center mt-10">
             <div class="bg-blue-500 p-4 rounded-lg shadow-lg">
-                <h3 class="text-lg font-semibold text-white">Total delegates</h3>
+                <h3 class="text-lg font-semibold text-white">Total registration</h3>
                 <p class="text-4xl font-bold text-white">{{ $finalData['totalDelegates'] }}</p>
             </div>
             <div class="bg-blue-500 p-4 rounded-lg shadow-lg">
                 <h3 class="text-lg font-semibold text-white">Registered today</h3>
                 <p class="text-4xl font-bold text-white">{{ $finalData['totalRegisteredToday'] }}</p>
+            </div>
+            <div class="bg-blue-500 p-4 rounded-lg shadow-lg">
+                <h3 class="text-lg font-semibold text-white">Printed badges</h3>
+                <p class="text-4xl font-bold text-white">{{ $finalData['totalPrintedBadges'] }}</p>
             </div>
         </div>
 

@@ -14,7 +14,7 @@
 
         @if ($promoCodes->isNotEmpty())
             <div class="shadow-lg my-5 pt-5 bg-white rounded-md" style="margin-left: 320px; ">
-                <h1 class="text-center text-2xl">Promo codes</h1>
+                <h1 class="text-center text-2xl text-white bg-registrationPrimaryColor py-2">Promo codes</h1>
                 <div class="grid grid-cols-11 pt-4 pb-2 place-items-center text-center">
                     <div class="col-span-1">Code</div>
                     <div class="col-span-1">Registration Type</div>

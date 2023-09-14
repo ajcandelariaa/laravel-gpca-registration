@@ -13,6 +13,7 @@ use App\Models\Event;
 use App\Models\MainDelegate;
 use App\Models\MainSpouse;
 use App\Models\MainVisitor;
+use App\Models\PrintedBadge;
 use App\Models\RccAwardsAdditionalParticipant;
 use App\Models\RccAwardsDocument;
 use App\Models\RccAwardsMainParticipant;
@@ -3518,6 +3519,18 @@ class RegistrationController extends Controller
                     $netAMount = $mainDelegate->unit_price;
                 }
 
+                $printedBadgeCount = 0;
+                $printedBadgeDateTime = null;
+
+                $printedBadges = PrintedBadge::where('event_id', $eventId)->where('delegate_id', $mainDelegate->id)->where('delegate_type', 'main')->get();
+
+                if($printedBadges->isNotEmpty()){
+                    foreach($printedBadges as $printedBadge){
+                        $printedBadgeCount++;
+                        $printedBadgeDateTime = $printedBadge->printed_date_time;
+                    }
+                }
+
                 array_push($finalExcelData, [
                     'transaction_id' => $tempBookReference,
                     'id' => $mainDelegate->id,
@@ -3549,7 +3562,8 @@ class RegistrationController extends Controller
                     'unit_price' => $mainDelegate->unit_price,
                     'discount_price' => $discountPrice,
                     'net_amount' => $netAMount,
-                    'printed_badge_date' => null,
+                    'printed_badge_count' => $printedBadgeCount,
+                    'printed_badge_date_time' => $printedBadgeDateTime,
 
                     // PLEASE CONTINUE HERE
                     'total_amount' => $mainDelegate->total_amount,
@@ -3610,6 +3624,18 @@ class RegistrationController extends Controller
 
                         $lastDigit = 1000 + intval($subTransactionId);
                         $tempBookReferenceSub = "$event->year" . "$getEventcode" . "$lastDigit";
+                        
+                        $printedBadgeCount = 0;
+                        $printedBadgeDateTime = null;
+
+                        $printedBadges = PrintedBadge::where('event_id', $eventId)->where('delegate_id', $subDelegate->id)->where('delegate_type', 'sub')->get();
+                        
+                        if($printedBadges->isNotEmpty()){
+                            foreach($printedBadges as $printedBadge){
+                                $printedBadgeCount++;
+                                $printedBadgeDateTime = $printedBadge->printed_date_time;
+                            }
+                        }
 
                         array_push($finalExcelData, [
                             'transaction_id' => $tempBookReferenceSub,
@@ -3642,7 +3668,8 @@ class RegistrationController extends Controller
                             'unit_price' => $mainDelegate->unit_price,
                             'discount_price' => $discountPrice,
                             'net_amount' => $netAMount,
-                            'printed_badge_date' => null,
+                            'printed_badge_count' => $printedBadgeCount,
+                            'printed_badge_date_time' => $printedBadgeDateTime,
 
                             // PLEASE CONTINUE HERE
                             'total_amount' => $mainDelegate->total_amount,
@@ -3723,7 +3750,8 @@ class RegistrationController extends Controller
             'Reference Number',
             'Registered Date & Time',
             'Paid Date & Time',
-            'Printed badge',
+            'Printed badge count',
+            'Printed badge date time',
 
             'Company Sector',
 
@@ -3791,7 +3819,8 @@ class RegistrationController extends Controller
                         $data['reference_number'],
                         $data['registration_date_time'],
                         $data['paid_date_time'],
-                        $data['printed_badge_date'],
+                        $data['printed_badge_count'],
+                        $data['printed_badge_date_time'],
 
                         $data['company_sector'],
 

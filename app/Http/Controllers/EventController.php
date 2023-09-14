@@ -10,6 +10,7 @@ use App\Models\EventRegistrationType;
 use App\Models\MainDelegate;
 use App\Models\MainSpouse;
 use App\Models\MainVisitor;
+use App\Models\PrintedBadge;
 use App\Models\RccAwardsAdditionalParticipant;
 use App\Models\RccAwardsMainParticipant;
 use Carbon\Carbon;
@@ -125,6 +126,7 @@ class EventController extends Controller
         $totalConfirmedDelegates = 0;
         $totalDelegates = 0;
         $totalRegisteredToday = 0;
+        $totalPrintedBadges = 0;
         $totalPaidToday = 0;
         $totalAmountPaidToday = 0;
         $totalAmountPaid = 0;
@@ -391,10 +393,13 @@ class EventController extends Controller
             }
         }
 
+        $totalPrintedBadges = PrintedBadge::where('event_id', $eventId)->count();
+
         $finalData = [
             'totalConfirmedDelegates' => $totalConfirmedDelegates,
             'totalDelegates' => $totalDelegates,
             'totalRegisteredToday' => $totalRegisteredToday,
+            'totalPrintedBadges' => $totalPrintedBadges,
             'totalPaidToday' => $totalPaidToday,
             'totalAmountPaidToday' => $totalAmountPaidToday,
             'totalAmountPaid' => $totalAmountPaid,

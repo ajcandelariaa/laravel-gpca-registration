@@ -2,6 +2,7 @@
     <div>
         <img src="{{ Storage::url($event->banner) }}" alt="" class="w-full object-cover">
     </div>
+
     <div class="mx-10 my-10">
         <form>
             <div class="relative">
@@ -15,7 +16,7 @@
         </form>
 
         <div class="shadow-lg my-5 pt-5 bg-white rounded-md">
-            <h1 class="text-center text-2xl bg-registrationPrimaryColor text-white py-4">Confirmed Delegates</h1>
+            <h1 class="text-center text-2xl bg-registrationPrimaryColor text-white py-4">Printed Badges</h1>
 
             <div class="grid grid-cols-12 pt-4 pb-2 text-center items-center ">
                 <div class="col-span-1">No.</div>
@@ -23,15 +24,14 @@
                 <div class="col-span-1">Invoice</div>
                 <div class="col-span-2">Name</div>
                 <div class="col-span-2">Company</div>
-                <div class="col-span-1">Email Address</div>
-                <div class="col-span-1">Registration Type</div>
-                <div class="col-span-1">Printed</div>
-                <div class="col-span-2">Action</div>
+                <div class="col-span-2">Email Address</div>
+                <div class="col-span-1">Registration type</div>
+                <div class="col-span-2">Printed Date Time</div>
             </div>
 
             @if (empty($finalListsOfDelegates))
                 <div class="bg-red-400 text-white text-center py-3 mt-5 rounded-md">
-                    There are no registrants yet.
+                    There are no printed badges yet.
                 </div>
             @else
                 @foreach ($finalListsOfDelegates as $delegateIndex => $finalListsOfDelegate)
@@ -57,7 +57,7 @@
                             {{ $finalListsOfDelegate['delegateCompany'] }}
                         </div>
 
-                        <div class="col-span-1">
+                        <div class="col-span-2">
                             {{ $finalListsOfDelegate['delegateEmailAddress'] }}
                         </div>
 
@@ -65,27 +65,8 @@
                             {{ $finalListsOfDelegate['delegateBadgeType'] }}
                         </div>
 
-                        <div class="col-span-1 font-bold">
-                            @if ($finalListsOfDelegate['delegatePrinted'] == "Yes")
-                                <span class="text-green-600">
-                                    {{ $finalListsOfDelegate['delegatePrinted'] }}
-                                </span>
-                            @else 
-                            <span class="text-red-600">
-                                    {{ $finalListsOfDelegate['delegatePrinted'] }}
-                                </span>
-                            @endif
-                        </div>
-
                         <div class="col-span-2">
-                            <a href="{{ route('admin.event.delegates.detail.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'delegateType' => $finalListsOfDelegate['delegateType'], 'delegateId' => $finalListsOfDelegate['delegateId']]) }}"
-                                class="cursor-pointer hover:text-gray-600 text-gray-500 mr-2" target="_blank">
-                                <i class="fa-solid fa-eye"></i> View
-                            </a>
-
-                            <button type="button" wire:click="printBadgeClicked('{{ $finalListsOfDelegate['delegateType'] }}', {{ $finalListsOfDelegate['delegateId'] }}, {{ $delegateIndex }})" class="bg-green-800 hover:bg-green-900 text-white py-1 px-2 rounded-md text-xs text-center">
-                                Print Badge
-                            </button>
+                            {{ $finalListsOfDelegate['delegatePrintedDateTime'] }}
                         </div>
                     </div>
                 @endforeach

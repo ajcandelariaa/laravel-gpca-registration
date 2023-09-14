@@ -61,14 +61,14 @@
                     <img src="{{ asset('assets/images/logo2.jpg') }}" class="max-h-16" alt="logo">
                 </div>
                 <div class="text-white font-semibold flex items-center gap-10">
-                    <a href="{{ route('admin.dashboard.view') }}"
-                        class="{{ request()->is('admin/dashboard*') ? 'text-dashboardNavItemHoverColor' : 'hover:underline' }}">Dashboard</a>
+                    {{-- <a href="{{ route('admin.dashboard.view') }}"
+                        class="{{ request()->is('admin/dashboard*') ? 'text-dashboardNavItemHoverColor' : 'hover:underline' }}">Dashboard</a> --}}
                     <a href="{{ route('admin.event.view') }}"
                         class="{{ request()->is('admin/event*') ? 'text-dashboardNavItemHoverColor' : 'hover:underline' }}">Events</a>
                     <a href="{{ route('admin.member.view') }}"
                         class="{{ request()->is('admin/member*') ? 'text-dashboardNavItemHoverColor' : 'hover:underline' }}">Members</a>
-                    <a href="{{ route('admin.delegate.view') }}"
-                        class="{{ request()->is('admin/delegate*') ? 'text-dashboardNavItemHoverColor' : 'hover:underline' }}">Delegates</a>
+                    {{-- <a href="{{ route('admin.delegate.view') }}"
+                        class="{{ request()->is('admin/delegate*') ? 'text-dashboardNavItemHoverColor' : 'hover:underline' }}">Delegates</a> --}}
                     <a href="{{ route('admin.logout') }}" class="hover:underline">Logout</a>
                     <br><br>
                 </div>
@@ -82,7 +82,9 @@
             request()->is('admin/event/*/*/delegate-fees*') ||
             request()->is('admin/event/*/*/promo-code*') ||
             request()->is('admin/event/*/*/registrant*') ||
-            request()->is('admin/event/*/*/delegate*'))
+            request()->is('admin/event/*/*/delegate*') ||
+            request()->is('admin/event/*/*/printed-badge*') ||
+            request()->is('admin/event/*/*/scanned-delegate*')) 
         @include('admin.layouts.event_navigations')
     @endif
 

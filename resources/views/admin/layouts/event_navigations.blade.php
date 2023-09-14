@@ -35,6 +35,12 @@
                 @if ($eventCategory != 'AFS' && $eventCategory != 'AFV' && $eventCategory != 'RCCA')
                     <a href="{{ route('admin.event.delegates.view', ['eventCategory' => $eventCategory, 'eventId' => $eventId]) }}"
                         class="{{ request()->is('admin/event/*/*/delegate*') ? 'underline' : 'hover:underline' }} text-registrationPrimaryColor">Delegates</a>
+
+                    <a href="{{ route('admin.printed.badge.list.view', ['eventCategory' => $eventCategory, 'eventId' => $eventId]) }}"
+                        class="{{ request()->is('admin/event/*/*/printed-badge*') ? 'underline' : 'hover:underline' }} text-registrationPrimaryColor">Printed</a>
+
+                    <a href="{{ route('admin.scanned.delegate.list.view', ['eventCategory' => $eventCategory, 'eventId' => $eventId]) }}"
+                        class="{{ request()->is('admin/event/*/*/scanned-delegate*') ? 'underline' : 'hover:underline' }} text-registrationPrimaryColor">Scanned</a>
                 @endif
             </div>
         </div>

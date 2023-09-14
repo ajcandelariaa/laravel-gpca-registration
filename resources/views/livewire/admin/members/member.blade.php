@@ -26,7 +26,7 @@
             </form>
         </div>
 
-        <h1 class="text-center text-2xl mt-4">List of members</h1>
+        <h1 class="text-center text-2xl text-white bg-registrationPrimaryColor py-2 mt-5">Members</h1>
         <div class="grid grid-cols-12 pt-4 pb-2 place-items-center text-center">
             <div class="col-span-1">No.</div>
             <div class="col-span-1">Type</div>

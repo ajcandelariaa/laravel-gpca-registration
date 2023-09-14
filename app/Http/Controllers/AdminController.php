@@ -23,9 +23,10 @@ class AdminController extends Controller
     }
 
     public function dashboardView(){
-        return view('admin.dashboard.dashboard', [
-            "pageTitle" => "Dashboard"
-        ]);
+        return redirect()->route('admin.event.view');
+        // return view('admin.dashboard.dashboard', [
+        //     "pageTitle" => "Dashboard"
+        // ]);
     }
 
 

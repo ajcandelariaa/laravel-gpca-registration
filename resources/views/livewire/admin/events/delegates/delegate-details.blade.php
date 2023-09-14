@@ -173,7 +173,8 @@
                 </div>
             </div>
 
-            <div class="col-span-12 mb-20">
+
+            {{-- <div class="col-span-12 mb-20">
                 <div class="text-registrationPrimaryColor italic font-bold text-xl">
                     Delegate Badge
                 </div>
@@ -240,15 +241,19 @@
                             {!! QrCode::size(300)->generate(Request::url() . '/print-badge') !!}
                         </div>
 
-                        {{-- <div class="flex mt-10 justify-center">
+                        <div class="flex mt-10 justify-center">
                             <img src="data:image/png;base64, {!! base64_encode(QrCode::format('png')->size(300)->generate(Request::url().'/print-badge')) !!}" />
-                        </div> --}}
+                        </div>
                     </div>
                 </div>
+            </div> --}}
+        </div>
 
-
-
-            </div>
+        <div class="mt-5">
+            
+            <button type="button" wire:click="printBadgeClicked('{{ $finalDelegate['delegateType'] }}', {{ $finalDelegate['delegateId'] }})" class="bg-blue-800 hover:bg-blue-900 text-white py-2 px-2 rounded-md  text-center w-40">
+                Print Badge
+            </button>
         </div>
     </div>
 

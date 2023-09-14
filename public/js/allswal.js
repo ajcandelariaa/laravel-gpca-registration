@@ -1,3 +1,43 @@
+//PRINT BADGE
+window.addEventListener("swal:print-badge-confirmed", (event) => {
+    swal({
+        title: event.detail.message,
+        text: event.detail.text,
+        icon: event.detail.type,
+    });
+    
+    var win = window.open(event.detail.url, '_blank');
+    win.focus();
+});
+
+window.addEventListener("swal:print-badge-confirmation", (event) => {
+    swal({
+        title: event.detail.message,
+        text: event.detail.text,
+        icon: event.detail.type,
+        buttons: {
+            confirm: {
+                text: "Yes, print it!",
+                value: true,
+                visible: true,
+                closeModal: true,
+            },
+            cancel: {
+                text: "Cancel",
+                value: null,
+                visible: true,
+                closeModal: true,
+            },
+        }
+      }).then((result) => {
+        console.log(result);
+        if (result) {
+            Livewire.emit('printBadgeConfirmed')
+        }
+      });
+});
+
+
 //MARK AS PAID 
 window.addEventListener("swal:mark-as-paid-success", (event) => {
     let registrationLloadingScreen = document.getElementById('registration-loading-screen');

@@ -109,7 +109,7 @@ class DelegateController extends Controller
                 }
 
                 return view('admin.events.delegates.delegates_detail', [
-                    "pageTitle" => "Event Delegates",
+                    "pageTitle" => "Event Delegate",
                     "eventCategory" => $eventCategory,
                     "eventId" => $eventId,
                     "finalDelegate" => $finalDelegate,
@@ -122,6 +122,32 @@ class DelegateController extends Controller
         }
     }
 
+    public function printedBadgeListView($eventCategory, $eventId)
+    {
+
+        if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {
+            return view('admin.events.printed-badge.printed_badge_list', [
+                "pageTitle" => "Printed badges",
+                "eventCategory" => $eventCategory,
+                "eventId" => $eventId,
+            ]);
+        } else {
+            abort(404, 'The URL is incorrect');
+        }
+    }
+
+    public function scannedDelegateListView($eventCategory, $eventId)
+    {
+        if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {
+            return view('admin.events.scanned-delegate.scanned_delegate_list', [
+                "pageTitle" => "Scanned delegates",
+                "eventCategory" => $eventCategory,
+                "eventId" => $eventId,
+            ]);
+        } else {
+            abort(404, 'The URL is incorrect');
+        }
+    }
 
 
     // =========================================================
@@ -147,15 +173,24 @@ class DelegateController extends Controller
             $backtBanner = public_path(Storage::url($event->badge_back_banner));
             $finalBackBanner = str_replace('\/', '/', $backtBanner);
 
-            $finalWidth = (17/2.54) * 72;
-            $finalHeight = (13/2.54) * 72;
-            
+            // $finalWidth = (20.3 / 2.54) * 72;
+            $finalHeight = (15.2 / 2.54) * 72;
+
+            $finalWidth = (22.3 / 2.54) * 72;
+
+
             if ($tempDelegate != null) {
                 $registrationType = EventRegistrationType::where('event_id', $eventId)->where('event_category', $eventCategory)->where('registration_type', $tempDelegate->badge_type)->first();
 
                 if ($delegateType  == "main") {
+                    if($tempDelegate->salutation == "Dr." || $tempDelegate->salutation == "Prof."){
+                        $delegateSalutation = $tempDelegate->salutation;
+                    } else {
+                        $delegateSalutation = null;
+                    }
+
                     $finalDelegate = [
-                        'salutation' => $tempDelegate->salutation,
+                        'salutation' => $delegateSalutation,
                         'first_name' => $tempDelegate->first_name,
                         'middle_name' => $tempDelegate->middle_name,
                         'last_name' => $tempDelegate->last_name,
@@ -179,8 +214,14 @@ class DelegateController extends Controller
                     ];
                 } else {
                     $mainDelegateInfo = MainDelegate::where('id', $tempDelegate->main_delegate_id)->first();
+                    if($tempDelegate->salutation == "Dr." || $tempDelegate->salutation == "Prof."){
+                        $delegateSalutation = $tempDelegate->salutation;
+                    } else {
+                        $delegateSalutation = null;
+                    }
+
                     $finalDelegate = [
-                        'salutation' => $tempDelegate->salutation,
+                        'salutation' => $delegateSalutation,
                         'first_name' => $tempDelegate->first_name,
                         'middle_name' => $tempDelegate->middle_name,
                         'last_name' => $tempDelegate->last_name,
@@ -203,16 +244,15 @@ class DelegateController extends Controller
                         'finalHeight' => $finalHeight,
                     ];
                 }
-                $pdf = Pdf::loadView('admin.events.delegates.delegate_badge', $finalDelegate, [
+
+                $pdf = Pdf::loadView('admin.events.delegates.delegate_badgev3', $finalDelegate, [
                     'margin_top' => 0,
                     'margin_right' => 0,
                     'margin_bottom' => 0,
                     'margin_left' => 0,
                 ]);
 
-
-                $pdf->setPaper(array(0, 0, $finalWidth, $finalHeight), 'custom');  //fixed based on the view
-                // $pdf->setPaper(array(0, 0, 642, 492), 'portrait'); original
+                $pdf->setPaper(array(0, 0, $finalWidth, $finalHeight), 'custom');
 
                 return $pdf->stream('badge.pdf');
             } else {

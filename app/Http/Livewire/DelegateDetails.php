@@ -8,6 +8,8 @@ use App\Models\MainDelegate as MainDelegates;
 use App\Models\AdditionalDelegate as AdditionalDelegates;
 use App\Models\EventRegistrationType as EventRegistrationTypes;
 use App\Models\Event as Events;
+use App\Models\PrintedBadge as PrintedBadges;
+use Carbon\Carbon;
 
 class DelegateDetails extends Component
 {
@@ -31,6 +33,10 @@ class DelegateDetails extends Component
     // MODALS
     public $showDelegateModal = false;
     public $showCompanyModal = false;
+
+    public $printDelegateType, $printDelegateId;
+
+    protected $listeners = ['printBadgeConfirmed' => 'printBadge'];
 
     public function mount($eventCategory, $eventId, $finalDelegate)
     {
@@ -227,5 +233,39 @@ class DelegateDetails extends Component
         $this->companyCity = null;
         $this->companyLandlineNumber = null;
         $this->companyMobileNumber = null;
+    }
+
+    public function printBadgeClicked($delegateType, $delegateId)
+    {
+        $this->printDelegateType = $delegateType;
+        $this->printDelegateId = $delegateId;
+
+        $this->dispatchBrowserEvent('swal:print-badge-confirmation', [
+            'type' => 'warning',
+            'message' => 'Are you sure?',
+            'text' => "",
+        ]);
+    }
+
+    public function printBadge()
+    {
+        PrintedBadges::create([
+            'event_id' => $this->event->id,
+            'event_category' => $this->event->category,
+            'delegate_id' => $this->printDelegateId,
+            'delegate_type' => $this->printDelegateType,
+            'printed_date_time' => Carbon::now(),
+        ]);
+
+        $this->dispatchBrowserEvent('swal:print-badge-confirmed', [
+            'url' => route('admin.event.delegates.detail.printBadge', ['eventCategory' => $this->event->category, 'eventId' => $this->event->id, 'delegateId' => $this->printDelegateId, 'delegateType' => $this->printDelegateType]),
+            
+            'type' => 'success',
+            'message' => 'Badge Printed Successfully!',
+            'text' => ''
+        ]);
+
+        $this->printDelegateType = null;
+        $this->printDelegateId = null;
     }
 }

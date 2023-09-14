@@ -52,6 +52,14 @@ Route::prefix('admin')->group(function () {
                     Route::get('/{delegateType}/{delegateId}', [DelegateController::class, 'delegateDetailView'])->name('admin.event.delegates.detail.view');
                     Route::get('/{delegateType}/{delegateId}/print-badge', [DelegateController::class, 'delegateDetailPrintBadge'])->name('admin.event.delegates.detail.printBadge');
                 });
+
+                Route::prefix('printed-badge')->group(function () {
+                    Route::get('/', [DelegateController::class, 'printedBadgeListView'])->name('admin.printed.badge.list.view');
+                });
+
+                Route::prefix('scanned-delegate')->group(function () {
+                    Route::get('/', [DelegateController::class, 'scannedDelegateListView'])->name('admin.scanned.delegate.list.view');
+                });
                 // Route::get('/onsite/register/', [RegistrationController::class, 'eventOnsiteRegistrationView'])->name('admin.event.onsite.register.view');
             });
         });
