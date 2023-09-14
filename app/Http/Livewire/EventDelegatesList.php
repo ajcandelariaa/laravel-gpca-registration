@@ -5,6 +5,7 @@ namespace App\Http\Livewire;
 use App\Models\MainDelegate as MainDelegates;
 use App\Models\AdditionalDelegate as AdditionalDelegates;
 use App\Models\Event as Events;
+use App\Models\EventRegistrationType as EventRegistrationTypes;
 use App\Models\PrintedBadge as PrintedBadges;
 use App\Models\Transaction as Transactions;
 use Carbon\Carbon;
@@ -18,6 +19,10 @@ class EventDelegatesList extends Component
     public $finalListsOfDelegates = array();
 
     public $printDelegateType, $printDelegateId, $printArrayIndex;
+
+    public $badgeView = false;
+
+    public $name, $company, $jobTitle, $registrationType, $badgeViewFFText, $badgeViewFBText, $badgeViewFFBGColor, $badgeViewFBBGColor, $badgeViewFFTextColor, $badgeViewFBTextColor;
 
     protected $listeners = ['printBadgeConfirmed' => 'printBadge'];
 
@@ -61,6 +66,7 @@ class EventDelegatesList extends Component
                             'delegatePrinted' => $delegatePrinted,
                             'delegateType' => "main",
                             'delegateCompany' => $mainDelegate->company_name,
+                            'delegateJobTitle' => $mainDelegate->job_title,
                             'delegateName' => $mainDelegate->salutation . " " . $mainDelegate->first_name . " " . $mainDelegate->middle_name . " " . $mainDelegate->last_name,
                             'delegateEmailAddress' => $mainDelegate->email_address,
                             'delegateBadgeType' => $mainDelegate->badge_type,
@@ -100,6 +106,7 @@ class EventDelegatesList extends Component
                                     'delegatePrinted' => $delegatePrinted,
                                     'delegateType' => "sub",
                                     'delegateCompany' => $mainDelegate->company_name,
+                                    'delegateJobTitle' => $subDelegate->job_title,
                                     'delegateName' => $subDelegate->salutation . " " . $subDelegate->first_name . " " . $subDelegate->middle_name . " " . $subDelegate->last_name,
                                     'delegateEmailAddress' => $subDelegate->email_address,
                                     'delegateBadgeType' => $subDelegate->badge_type,
@@ -122,6 +129,7 @@ class EventDelegatesList extends Component
                 ->filter(function ($item) {
                     return str_contains(strtolower($item['delegateCompany']), strtolower($this->searchTerm)) ||
                         str_contains(strtolower($item['delegateName']), strtolower($this->searchTerm)) ||
+                        str_contains(strtolower($item['delegateJobTitle']), strtolower($this->searchTerm)) ||
                         str_contains(strtolower($item['delegateEmailAddress']), strtolower($this->searchTerm)) ||
                         str_contains(strtolower($item['delegateTransactionId']), strtolower($this->searchTerm)) ||
                         str_contains(strtolower($item['delegateInvoiceNumber']), strtolower($this->searchTerm)) ||
@@ -170,5 +178,44 @@ class EventDelegatesList extends Component
         $this->printDelegateType = null;
         $this->printDelegateId = null;
         $this->printArrayIndex = null;
+    }
+
+    public function previewBadge($delegateIndex){
+        $this->name = $this->finalListsOfDelegates[$delegateIndex]['delegateName'];
+        $this->jobTitle = $this->finalListsOfDelegates[$delegateIndex]['delegateCompany'];
+        $this->company = $this->finalListsOfDelegates[$delegateIndex]['delegateJobTitle'];
+        $this->registrationType = $this->finalListsOfDelegates[$delegateIndex]['delegateBadgeType'];
+
+        $registrationType = EventRegistrationTypes::where('event_id', $this->event->id)->where('registration_type', $this->registrationType)->first();
+
+        $this->badgeViewFFText = $registrationType->badge_footer_front_name;
+        $this->badgeViewFBText = $registrationType->badge_footer_back_name;
+
+        $this->badgeViewFFBGColor = $registrationType->badge_footer_front_bg_color;
+        $this->badgeViewFBBGColor = $registrationType->badge_footer_back_bg_color;
+
+        $this->badgeViewFFTextColor = $registrationType->badge_footer_front_text_color;
+        $this->badgeViewFBTextColor = $registrationType->badge_footer_back_text_color;
+
+        $this->badgeView = true;
+    }
+
+    
+    public function closePreviewBadge(){
+        $this->name = null;
+        $this->jobTitle = null;
+        $this->company = null;
+        $this->registrationType = null;
+
+        $this->badgeViewFFText = null;
+        $this->badgeViewFBText = null;
+
+        $this->badgeViewFFBGColor = null;
+        $this->badgeViewFBBGColor = null;
+
+        $this->badgeViewFFTextColor = null;
+        $this->badgeViewFBTextColor = null;
+
+        $this->badgeView = false;
     }
 }

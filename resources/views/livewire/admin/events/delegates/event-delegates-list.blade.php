@@ -17,16 +17,17 @@
         <div class="shadow-lg my-5 pt-5 bg-white rounded-md">
             <h1 class="text-center text-2xl bg-registrationPrimaryColor text-white py-4">Confirmed Delegates</h1>
 
-            <div class="grid grid-cols-12 pt-4 pb-2 text-center items-center ">
-                <div class="col-span-1">No.</div>
-                <div class="col-span-1">Transaction ID</div>
-                <div class="col-span-1">Invoice</div>
-                <div class="col-span-2">Name</div>
-                <div class="col-span-2">Company</div>
-                <div class="col-span-1">Email Address</div>
-                <div class="col-span-1">Registration Type</div>
-                <div class="col-span-1">Printed</div>
-                <div class="col-span-2">Action</div>
+            <div class="grid grid-cols-12 gap-5 pt-4 pb-4 text-center items-center bg-blue-600 text-white ">
+                <div class="col-span-1 break-words">No.</div>
+                <div class="col-span-1 break-words">Transaction ID</div>
+                <div class="col-span-1 break-words">Invoice</div>
+                <div class="col-span-2 break-words">Name</div>
+                <div class="col-span-1 break-words">Job title</div>
+                <div class="col-span-1 break-words">Company</div>
+                <div class="col-span-1 break-words">Email Address</div>
+                <div class="col-span-1 break-words">Registration Type</div>
+                <div class="col-span-1 break-words">Printed</div>
+                <div class="col-span-2 break-words">Badge</div>
             </div>
 
             @if (empty($finalListsOfDelegates))
@@ -36,36 +37,42 @@
             @else
                 @foreach ($finalListsOfDelegates as $delegateIndex => $finalListsOfDelegate)
                     <div
-                        class="grid grid-cols-12 pt-2 pb-2 mb-1 text-center items-center  {{ $delegateIndex % 2 == 0 ? 'bg-registrationInputFieldsBGColor' : 'bg-registrationCardBGColor' }}">
-                        <div class="col-span-1">{{ $delegateIndex + 1 }}</div>
+                        class="grid grid-cols-12 gap-5 pt-2 pb-2 mb-1 text-center items-center  {{ $delegateIndex % 2 == 0 ? 'bg-registrationInputFieldsBGColor' : 'bg-registrationCardBGColor' }}">
+                        <div class="col-span-1 break-words">{{ $delegateIndex + 1 }}</div>
 
-                        <div class="col-span-1">
-                            {{ $finalListsOfDelegate['delegateTransactionId'] }}
+                        <div class="col-span-1 break-words">
+                            <a href="{{ route('admin.event.delegates.detail.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'delegateType' => $finalListsOfDelegate['delegateType'], 'delegateId' => $finalListsOfDelegate['delegateId']]) }}" target="_blank" class="text-blue-700 font-semibold hover:underline">
+                                {{ $finalListsOfDelegate['delegateTransactionId'] }}
+                            </a>
                         </div>
 
-                        <div class="col-span-1">
+                        <div class="col-span-1 break-words">
                             <a href="{{ route('admin.event.registrants.detail.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'registrantId' => $finalListsOfDelegate['mainDelegateId']]) }}" target="_blank" class="text-blue-700 font-semibold hover:underline">
                                 {{ $finalListsOfDelegate['delegateInvoiceNumber'] }}
                             </a>
                         </div>
 
-                        <div class="col-span-2">
+                        <div class="col-span-2 break-words">
                             {{ $finalListsOfDelegate['delegateName'] }}
                         </div>
 
-                        <div class="col-span-2">
+                        <div class="col-span-1 break-words">
+                            {{ $finalListsOfDelegate['delegateJobTitle'] }}
+                        </div>
+
+                        <div class="col-span-1 break-words">
                             {{ $finalListsOfDelegate['delegateCompany'] }}
                         </div>
 
-                        <div class="col-span-1">
+                        <div class="col-span-1 break-words">
                             {{ $finalListsOfDelegate['delegateEmailAddress'] }}
                         </div>
 
-                        <div class="col-span-1">
+                        <div class="col-span-1 break-words">
                             {{ $finalListsOfDelegate['delegateBadgeType'] }}
                         </div>
 
-                        <div class="col-span-1 font-bold">
+                        <div class="col-span-1 break-words font-bold">
                             @if ($finalListsOfDelegate['delegatePrinted'] == "Yes")
                                 <span class="text-green-600">
                                     {{ $finalListsOfDelegate['delegatePrinted'] }}
@@ -77,18 +84,23 @@
                             @endif
                         </div>
 
-                        <div class="col-span-2">
-                            <a href="{{ route('admin.event.delegates.detail.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'delegateType' => $finalListsOfDelegate['delegateType'], 'delegateId' => $finalListsOfDelegate['delegateId']]) }}"
-                                class="cursor-pointer hover:text-gray-600 text-gray-500 mr-2" target="_blank">
-                                <i class="fa-solid fa-eye"></i> View
-                            </a>
+                        <div class="col-span-2 break-words">
+                            <button wire:click="previewBadge({{ $delegateIndex }})"
+                                class="cursor-pointer hover:text-gray-600 text-gray-500 mr-4 text-sm" target="_blank">
+                                <i class="fa-solid fa-eye"></i> Preview
+                            </button>
 
                             <button type="button" wire:click="printBadgeClicked('{{ $finalListsOfDelegate['delegateType'] }}', {{ $finalListsOfDelegate['delegateId'] }}, {{ $delegateIndex }})" class="bg-green-800 hover:bg-green-900 text-white py-1 px-2 rounded-md text-xs text-center">
-                                Print Badge
+                                Print
                             </button>
                         </div>
                     </div>
                 @endforeach
+
+                
+                @if ($badgeView)
+                    @include('livewire.admin.events.delegates.view_badge_modal')
+                @endif
             @endif
         </div>
     </div>
