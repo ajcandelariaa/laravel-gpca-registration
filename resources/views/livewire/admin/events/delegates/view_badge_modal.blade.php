@@ -19,7 +19,7 @@
                         <p class="text-center font-bold">{{ $company }}</p>
                     </div>
                     <div>
-                        <p class="text-center py-4 font-bold"
+                        <p class="text-center py-4 font-bold uppercase"
                             style="color: {{ $badgeViewFFTextColor }}; background-color: {{ $badgeViewFFBGColor }}">
                             {{ $badgeViewFFText }}</p>
                     </div>
