@@ -3531,6 +3531,10 @@ class RegistrationController extends Controller
                     }
                 }
 
+                if($mainDelegate->delegate_cancelled != null){
+
+                }
+
                 array_push($finalExcelData, [
                     'transaction_id' => $tempBookReference,
                     'id' => $mainDelegate->id,
@@ -3567,8 +3571,8 @@ class RegistrationController extends Controller
 
                     // PLEASE CONTINUE HERE
                     'total_amount' => $mainDelegate->total_amount,
-                    'payment_status' => $mainDelegate->payment_status,
-                    'registration_status' => $mainDelegate->registration_status,
+                    'payment_status' => $mainDelegate->delegate_refunded ? 'refunded' : $mainDelegate->payment_status,
+                    'registration_status' => $mainDelegate->delegate_cancelled ? 'cancelled' : $mainDelegate->registration_status,
                     'mode_of_payment' => $mainDelegate->mode_of_payment,
                     'invoice_number' => $tempInvoiceNumber,
                     'reference_number' => $tempBookReference,
@@ -3673,8 +3677,8 @@ class RegistrationController extends Controller
 
                             // PLEASE CONTINUE HERE
                             'total_amount' => $mainDelegate->total_amount,
-                            'payment_status' => $mainDelegate->payment_status,
-                            'registration_status' => $mainDelegate->registration_status,
+                            'payment_status' => $subDelegate->delegate_refunded ? 'refunded' : $mainDelegate->payment_status,
+                            'registration_status' => $subDelegate->delegate_cancelled ? 'cancelled' : $mainDelegate->registration_status,
                             'mode_of_payment' => $mainDelegate->mode_of_payment,
                             'invoice_number' => $tempInvoiceNumber,
                             'reference_number' => $tempBookReference,
