@@ -281,21 +281,21 @@ class RegistrantDetails extends Component
             'companyMobileNumber' => 'required',
         ]);
 
-        if ($this->finalData['rate_type'] == "Standard") {
+        if ($this->finalData['rate_type'] == "standard") {
             if ($this->delegatePassType == "fullMember") {
-                $this->rateTypeString = "Standard Full Member Rate";
+                $this->rateTypeString = "Full member standard rate";
             } else if ($this->delegatePassType == "member") {
-                $this->rateTypeString = "Standard Member Rate";
+                $this->rateTypeString = "Member standard rate";
             } else {
-                $this->rateTypeString = "Standard Non-Member Rate";
+                $this->rateTypeString = "Non-Member standard rate";
             }
         } else {
             if ($this->delegatePassType == "fullMember") {
-                $this->rateTypeString = "Early Bird Full Member Rate";
+                $this->rateTypeString = "Full member early bird rate";
             } else if ($this->delegatePassType == "member") {
-                $this->rateTypeString = "Early Bird Member Rate";
+                $this->rateTypeString = "Member early bird rate";
             } else {
-                $this->rateTypeString = "Early Bird Non-Member Rate";
+                $this->rateTypeString = "Non-Member early bird rate";
             }
         }
 
@@ -331,6 +331,7 @@ class RegistrantDetails extends Component
 
     public function openEditCompanyDetailsModal()
     {
+        // dd($this->finalData);
         $this->members = Members::where('active', true)->get();
 
         $this->delegatePassType = $this->finalData['pass_type'];
@@ -509,7 +510,7 @@ class RegistrantDetails extends Component
     public function checkUnitPrice()
     {
         // CHECK UNIT PRICE
-        if ($this->finalData['rate_type'] == "Standard") {
+        if ($this->finalData['rate_type'] == "standard") {
             if ($this->finalData['pass_type'] == "fullMember") {
                 return $this->event->std_full_member_rate;
             } else if ($this->finalData['pass_type'] == "member") {
