@@ -245,7 +245,7 @@ class DelegateController extends Controller
                     ];
                 }
 
-                $pdf = Pdf::loadView('admin.events.delegates.delegate_badgev3', $finalDelegate, [
+                $pdf = Pdf::loadView('admin.events.delegates.delegate_badgev4', $finalDelegate, [
                     'margin_top' => 0,
                     'margin_right' => 0,
                     'margin_bottom' => 0,
