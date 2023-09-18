@@ -393,7 +393,18 @@ class EventController extends Controller
             }
         }
 
-        $totalPrintedBadges = PrintedBadge::where('event_id', $eventId)->count();
+        $printedBadgesArray = array();
+        $printedBadges = PrintedBadge::where('event_id', $eventId)->get();
+
+        foreach($printedBadges as $printedBadge){
+            $finalString = $printedBadge->delegate_id . $printedBadge->delegate_type;
+            array_push($printedBadgesArray, $finalString);
+        }
+
+        $uniquePrintedBadgesArray = array_unique($printedBadgesArray); 
+        $finalPrintedBadgesArray = array_diff_key( $printedBadgesArray, $uniquePrintedBadgesArray ); 
+
+        $totalPrintedBadges = count($finalPrintedBadgesArray);
 
         $finalData = [
             'totalConfirmedDelegates' => $totalConfirmedDelegates,
