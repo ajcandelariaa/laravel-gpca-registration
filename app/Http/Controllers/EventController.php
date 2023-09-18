@@ -402,10 +402,11 @@ class EventController extends Controller
         }
 
         $uniquePrintedBadgesArray = array_unique($printedBadgesArray); 
+
         $finalPrintedBadgesArray = array_diff_key( $printedBadgesArray, $uniquePrintedBadgesArray ); 
 
-        $totalPrintedBadges = count($finalPrintedBadgesArray);
-
+        $totalPrintedBadges = count($printedBadges) - count($finalPrintedBadgesArray);
+        
         $finalData = [
             'totalConfirmedDelegates' => $totalConfirmedDelegates,
             'totalDelegates' => $totalDelegates,
