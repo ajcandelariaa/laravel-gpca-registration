@@ -43,7 +43,7 @@
                     <div>
                         <p class="text-center py-4 font-bold uppercase"
                             style="color: {{ $badgeViewFBTextColor }}; background-color: {{ $badgeViewFBBGColor }}">
-                            {{ $badgeViewFFText }}</p>
+                            {{ $badgeViewFBText }}</p>
                     </div>
                 </div>
 

@@ -18,12 +18,13 @@ module.exports = {
       },
       gridTemplateColumns: {
         addDelegateGrid: '250px auto',
-        delegateDetailGrid: '200px auto',
         horizontalProgressBarGrid: '55px auto 55px auto 55px auto 55px auto 55px',
         horizontalProgressBarGridSpouse: '55px auto 55px auto 55px',
         horizontalProgressBarGridRCCAwards: '55px auto 55px auto 55px auto 55px',
         addDelegateFeeGrid: 'auto 100px',
         delegateFeesGrid: 'auto 150px',
+        delegateDetailGrid: '320px auto',
+        delegateDetailGrid2: '200px auto',
       },
       backgroundImage: {
         loginBg: "url('/public/assets/images/loginbg.png')",

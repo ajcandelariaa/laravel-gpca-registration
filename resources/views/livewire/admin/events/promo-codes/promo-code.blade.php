@@ -1,14 +1,10 @@
 <div>
     <div>
-        <img src="{{ Storage::url($eventBanner) }}" alt="" class="w-full object-cover">
+        <img src="{{ Storage::url($event->banner) }}" alt="" class="w-full object-cover">
     </div>
     <div class="px-5">
         <div class="float-left">
-            @if ($updatePromoCode)
-                @include('livewire.admin.events.promo-codes.edit')
-            @else
-                @include('livewire.admin.events.promo-codes.add')
-            @endif
+            @include('livewire.admin.events.promo-codes.add')
         </div>
 
 
@@ -38,14 +34,15 @@
                         <div class="col-span-1 break-words">{{ $promoCode->promo_code }}</div>
                         <div class="col-span-1 break-words">{{ $promoCode->badge_type }}</div>
                         <div class="col-span-1 break-words">
-                            @if ($promoCode->discount_type == "percentage")
+                            @if ($promoCode->discount_type == 'percentage')
                                 {{ $promoCode->discount }}%
                             @else
                                 $ {{ number_format($promoCode->discount, 2, '.', ',') }}
                             @endif
                         </div>
                         <div class="col-span-2 break-words">{{ $promoCode->description }}</div>
-                        <div class="col-span-1 break-words">{{ $promoCode->number_of_codes - $promoCode->total_usage }}</div>
+                        <div class="col-span-1 break-words">{{ $promoCode->number_of_codes - $promoCode->total_usage }}
+                        </div>
                         <div class="col-span-1 break-words">{{ $promoCode->total_usage }}</div>
                         <div class="col-span-1 break-words">{{ $promoCode->number_of_codes }}</div>
                         <div class="col-span-1 break-words">{{ $promoCode->validity }}</div>
@@ -77,6 +74,10 @@
             <div class="bg-red-400 text-white text-center py-3 mt-5 rounded-md" style="margin-left: 320px; ">
                 There are no create codes yet.
             </div>
+        @endif
+
+        @if ($updatePromoCode)
+            @include('livewire.admin.events.promo-codes.edit')
         @endif
     </div>
 </div>

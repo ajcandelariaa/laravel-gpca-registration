@@ -126,7 +126,9 @@ class EventController extends Controller
         $totalConfirmedDelegates = 0;
         $totalDelegates = 0;
         $totalRegisteredToday = 0;
-        $totalPrintedBadges = 0;
+        $delegateBadgePrinted = 0;
+        $duplicateBadgePrinted = 0;
+        $totalBadgePrinted = 0;
         $totalPaidToday = 0;
         $totalAmountPaidToday = 0;
         $totalAmountPaid = 0;
@@ -402,16 +404,19 @@ class EventController extends Controller
         }
 
         $uniquePrintedBadgesArray = array_unique($printedBadgesArray); 
-
         $finalPrintedBadgesArray = array_diff_key( $printedBadgesArray, $uniquePrintedBadgesArray ); 
 
-        $totalPrintedBadges = count($printedBadges) - count($finalPrintedBadgesArray);
+        $delegateBadgePrinted = count($printedBadges) - count($finalPrintedBadgesArray);
+        $duplicateBadgePrinted = count($finalPrintedBadgesArray);
+        $totalBadgePrinted = count($printedBadges);
         
         $finalData = [
             'totalConfirmedDelegates' => $totalConfirmedDelegates,
             'totalDelegates' => $totalDelegates,
             'totalRegisteredToday' => $totalRegisteredToday,
-            'totalPrintedBadges' => $totalPrintedBadges,
+            'delegateBadgePrinted' => $delegateBadgePrinted,
+            'duplicateBadgePrinted' => $duplicateBadgePrinted,
+            'totalBadgePrinted' => $totalBadgePrinted,
             'totalPaidToday' => $totalPaidToday,
             'totalAmountPaidToday' => $totalAmountPaidToday,
             'totalAmountPaid' => $totalAmountPaid,

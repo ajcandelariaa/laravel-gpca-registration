@@ -7,7 +7,9 @@ use App\Models\AdditionalDelegate;
 use App\Models\Event;
 use App\Models\EventRegistrationType;
 use App\Models\MainDelegate;
+use App\Models\Transaction;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -52,7 +54,23 @@ class DelegateController extends Controller
             }
 
             if ($tempDelegate != null) {
+                $eventYear = Event::where('id', $eventId)->value('year');
+
+                foreach (config('app.eventCategories') as $eventCategoryC => $code) {
+                    if ($eventCategory == $eventCategoryC) {
+                        $eventCode = $code;
+                    }
+                }
+
                 if ($delegateType  == "main") {
+                    
+                    $tempYear = Carbon::parse($tempDelegate->registered_date_time)->format('y');
+                    $transactionId = Transaction::where('event_id', $eventId)->where('delegate_id', $delegateId)->where('delegate_type', "main")->value('id');
+                    $lastDigit = 1000 + intval($transactionId);
+
+                    $finalTransactionId = $eventYear . $eventCode . $lastDigit;
+                    $invoiceNumber = $eventCategory . $tempYear . "/" . $lastDigit;
+
                     $finalDelegate = [
                         'eventCategory' => $eventCategory,
                         'eventId' => $eventId,
@@ -78,9 +96,23 @@ class DelegateController extends Controller
                         'company_city' => $tempDelegate->company_city,
                         'company_telephone_number' => $tempDelegate->company_telephone_number,
                         'company_mobile_number' => $tempDelegate->company_mobile_number,
+                        
+                        'finalTransactionId' => $finalTransactionId,
+                        'invoiceNumber' => $invoiceNumber,
                     ];
                 } else {
                     $mainDelegateInfo = MainDelegate::where('id', $tempDelegate->main_delegate_id)->first();
+
+                    $tempYear = Carbon::parse($mainDelegateInfo->registered_date_time)->format('y');
+                    $transactionId = Transaction::where('event_id', $eventId)->where('delegate_id', $delegateId)->where('delegate_type', "sub")->value('id');
+                    $lastDigit = 1000 + intval($transactionId);
+
+                    
+                    $transactionId2 = Transaction::where('event_id', $eventId)->where('delegate_id', $mainDelegateInfo->id)->where('delegate_type', "main")->value('id');
+                    $lastDigit2 = 1000 + intval($transactionId2);
+
+                    $finalTransactionId = $eventYear . $eventCode . $lastDigit;
+                    $invoiceNumber = $eventCategory . $tempYear . "/" . $lastDigit2;
 
                     $finalDelegate = [
                         'delegateType' => $delegateType,
@@ -105,9 +137,12 @@ class DelegateController extends Controller
                         'company_city' => $mainDelegateInfo->company_city,
                         'company_telephone_number' => $mainDelegateInfo->company_telephone_number,
                         'company_mobile_number' => $mainDelegateInfo->company_mobile_number,
+                        
+                        'finalTransactionId' => $finalTransactionId,
+                        'invoiceNumber' => $invoiceNumber,
                     ];
                 }
-
+                
                 return view('admin.events.delegates.delegates_detail', [
                     "pageTitle" => "Event Delegate",
                     "eventCategory" => $eventCategory,

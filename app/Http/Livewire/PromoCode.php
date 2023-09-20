@@ -9,37 +9,27 @@ use App\Models\EventRegistrationType as EventRegistrationTypes;
 
 class PromoCode extends Component
 {
-    public $eventCategory, $eventId;
-    public $promoCodes;
+    public $event, $promoCodes, $registrationTypes;
+
+    // Add promo code
+    public $promo_code, $description, $badge_type, $discount_type, $discount, $number_of_codes, $total_usage, $validity;
+
+    // Edit promo code
+    public $editPromoCodeId, $editPromoCode, $editDescription, $editBadgeType, $editDiscountType, $editDiscount, $editNumberOfCodes, $editTotalUsage, $editValidity;
+
     public $updatePromoCode = false;
-    public $registrationTypes;
 
-    public $promo_code_id;
-    public $promo_code;
-    public $description;
-    public $badge_type;
-    public $discount_type;
-    public $discount;
-    public $number_of_codes;
-    public $total_usage;
-    public $validity;
-
-    public $eventBanner;
-    
-    
     protected $listeners = ['updatePromoCodeConfirmed' => 'updatePromoCode', 'addPromoCodeConfirmed' => 'addPromoCode'];
     
     public function mount($eventCategory, $eventId)
     {
-        $this->eventBanner = Events::where('id', $eventId)->where('category', $eventCategory)->value('banner');
-        $this->eventCategory = $eventCategory;
-        $this->eventId = $eventId;
+        $this->event = Events::where('id', $eventId)->where('category', $eventCategory)->first();
         $this->registrationTypes = EventRegistrationTypes::where('event_id', $eventId)->where('event_category', $eventCategory)->where('active', true)->get();
     }
 
     public function render()
     {
-        $this->promoCodes = PromoCodes::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->get();
+        $this->promoCodes = PromoCodes::where('event_id', $this->event->id)->where('event_category', $this->event->category)->get();
         return view('livewire.admin.events.promo-codes.promo-code');
     }
 
@@ -82,8 +72,8 @@ class PromoCode extends Component
 
     public function addPromoCode(){
         PromoCodes::create([
-            'event_id' => $this->eventId,
-            'event_category' => $this->eventCategory,
+            'event_id' => $this->event->id,
+            'event_category' => $this->event->category,
             'active' => true,
             'description' => $this->description,
             'badge_type' => $this->badge_type,
@@ -111,7 +101,6 @@ class PromoCode extends Component
 
     }
 
-
     public function updateStatus($promoCodeId, $promoCodeActive)
     {
         PromoCodes::find($promoCodeId)->fill(
@@ -121,61 +110,62 @@ class PromoCode extends Component
         )->save();
     }
 
-
     public function showEditPromoCode($promoCodeId)
     {
         $promoCode = PromoCodes::findOrFail($promoCodeId);
-        $this->promo_code = $promoCode->promo_code;
-        $this->description = $promoCode->description;
-        $this->badge_type = $promoCode->badge_type;
-        $this->discount_type = $promoCode->discount_type;
-        $this->discount = $promoCode->discount;
-        $this->number_of_codes = $promoCode->number_of_codes;
-        $this->total_usage = $promoCode->total_usage;
-        $this->validity = $promoCode->validity;
-        $this->promo_code_id = $promoCode->id;
+        $this->editPromoCodeId = $promoCode->id;
+        $this->editPromoCode = $promoCode->promo_code;
+        $this->editDescription = $promoCode->description;
+        $this->editBadgeType = $promoCode->badge_type;
+        $this->editDiscountType = $promoCode->discount_type;
+        $this->editDiscount = $promoCode->discount;
+        $this->editNumberOfCodes = $promoCode->number_of_codes;
+        $this->editTotalUsage = $promoCode->total_usage;
+        $this->editValidity = $promoCode->validity;
         $this->updatePromoCode = true;
     }
 
     public function hideEditPromoCode()
     {
         $this->updatePromoCode = false;
-        $this->description = null;
-        $this->badge_type = null;
-        $this->promo_code = null;
-        $this->discount_type = null;
-        $this->discount = null;
-        $this->number_of_codes = null;
-        $this->total_usage = null;
-        $this->validity = null;
+
+        $this->editPromoCodeId = null;
+        $this->editPromoCode = null;
+        $this->editDescription = null;
+        $this->editBadgeType = null;
+        $this->editDiscountType = null;
+        $this->editDiscount = null;
+        $this->editNumberOfCodes = null;
+        $this->editTotalUsage = null;
+        $this->editValidity = null;
     }
 
     public function updatePromoCodeConfirmation()
     {
         $this->validate(
             [
-                'promo_code' => 'required',
-                'badge_type' => 'required',
-                'discount_type' => 'required',
-                'discount' => 'required|numeric|min:0',
-                'number_of_codes' => 'required|numeric|min:'.$this->total_usage.'|max:10000',
-                'validity' => 'required',
+                'editPromoCode' => 'required',
+                'editBadgeType' => 'required',
+                'editDiscountType' => 'required',
+                'editDiscount' => 'required|numeric|min:0',
+                'editNumberOfCodes' => 'required|numeric|min:'.$this->editTotalUsage.'|max:10000',
+                'editValidity' => 'required',
             ],
             [
-                'promo_code.required' => 'Code is required',
-                'badge_type.required' => 'Badge Type is required',
-                'discount_type.required' => 'Discount Type is required',
+                'editPromoCode.required' => 'Code is required',
+                'editBadgeType.required' => 'Badge Type is required',
+                'editDiscountType.required' => 'Discount Type is required',
 
-                'discount.required' => 'Discount is required',
-                'discount.numeric' => 'Discount must be a number.',
-                'discount.min' => 'Discount must be at least :min.',
+                'editDiscount.required' => 'Discount is required',
+                'editDiscount.numeric' => 'Discount must be a number.',
+                'editDiscount.min' => 'Discount must be at least :min.',
 
-                'number_of_codes.required' => 'Number of codes is required',
-                'number_of_codes.numeric' => 'Number of codes must be a number.',
-                'number_of_codes.min' => 'Number of codes must be at least :min.',
-                'number_of_codes.max' => 'Number of codes may not be greater than :max.',
+                'editNumberOfCodes.required' => 'Number of codes is required',
+                'editNumberOfCodes.numeric' => 'Number of codes must be a number.',
+                'editNumberOfCodes.min' => 'Number of codes must be at least :min.',
+                'editNumberOfCodes.max' => 'Number of codes may not be greater than :max.',
 
-                'validity.required' => 'Validity is required',
+                'editValidity.required' => 'Validity is required',
             ]
         );
 
@@ -188,28 +178,17 @@ class PromoCode extends Component
     }
 
     public function updatePromoCode(){
-
-        PromoCodes::find($this->promo_code_id)->fill([
-            'description' => $this->description,
-            'badge_type' => $this->badge_type,
-            'promo_code' => $this->promo_code,
-            'discount_type' => $this->discount_type,
-            'discount' => $this->discount,
-            'number_of_codes' => $this->number_of_codes,
-            'validity' => $this->validity,
+        PromoCodes::find($this->editPromoCodeId)->fill([
+            'description' => $this->editDescription,
+            'badge_type' => $this->editBadgeType,
+            'promo_code' => $this->editPromoCode,
+            'discount_type' => $this->editDiscountType,
+            'discount' => $this->editDiscount,
+            'number_of_codes' => $this->editNumberOfCodes,
+            'validity' => $this->editValidity,
         ])->save();
 
-
-        $this->updatePromoCode = false;
-        $this->description = null;
-        $this->badge_type = null;
-        $this->promo_code = null;
-        $this->discount_type = null;
-        $this->discount = null;
-        $this->number_of_codes = null;
-        $this->total_usage = null;
-        $this->validity = null;
-
+        $this->hideEditPromoCode();
         
         $this->dispatchBrowserEvent('swal:update-promo-code', [
             'type' => 'success',

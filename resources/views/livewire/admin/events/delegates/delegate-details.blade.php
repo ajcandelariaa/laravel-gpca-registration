@@ -174,7 +174,7 @@
             </div>
 
 
-            {{-- <div class="col-span-12 mb-20">
+            <div class="col-span-12 mb-20">
                 <div class="text-registrationPrimaryColor italic font-bold text-xl">
                     Delegate Badge
                 </div>
@@ -246,7 +246,7 @@
                         </div>
                     </div>
                 </div>
-            </div> --}}
+            </div>
         </div>
 
         <div class="mt-5">

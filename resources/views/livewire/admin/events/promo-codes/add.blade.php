@@ -11,7 +11,7 @@
                     Code: <span class="text-red-500">*</span>
                 </div>
                 <div>
-                    <input type="text" wire:model="promo_code"
+                    <input type="text" wire:model.lazy="promo_code"
                         class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                     @error('promo_code')
                         <span class="mt-2 text-red-600 italic text-sm">
@@ -26,7 +26,7 @@
                     Registration Type: <span class="text-red-500">*</span>
                 </div>
                 <div>
-                    <select wire:model="badge_type"
+                    <select wire:model.lazy="badge_type"
                         class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                         <option value=""></option>
                         @foreach ($registrationTypes as $registrationType)
@@ -47,7 +47,7 @@
                     Discount Type: <span class="text-red-500">*</span>
                 </div>
                 <div>
-                    <select wire:model="discount_type"
+                    <select wire:model.lazy="discount_type"
                         class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                         <option value=""></option>
                         <option value="percentage">Percentage</option>
@@ -69,9 +69,9 @@
                     </div>
                     <div>
                         @if ($discount_type == "percentage")
-                            <input type="number" wire:model="discount" step="1" min="0" placeholder="0%" max="100" class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                            <input type="number" wire:model.lazy="discount" step="1" min="0" placeholder="0%" max="100" class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                         @else
-                            <input type="number" wire:model="discount" step="1" min="0" placeholder="0" class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                            <input type="number" wire:model.lazy="discount" step="1" min="0" placeholder="0" class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                         @endif
 
                         @error('discount')
@@ -88,7 +88,7 @@
                     Number of Codes: <span class="text-red-500">*</span>
                 </div>
                 <div>
-                    <input type="number" wire:model="number_of_codes" step="1" min="1" placeholder="1"
+                    <input type="number" wire:model.lazy="number_of_codes" step="1" min="1" placeholder="1"
                         max="10000" class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
 
                     @error('number_of_codes')
@@ -104,7 +104,7 @@
                     Code Validity: <span class="text-red-500">*</span>
                 </div>
                 <div>
-                    <input type="datetime-local" wire:model="validity" class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                    <input type="datetime-local" wire:model.lazy="validity" class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
 
                     @error('validity')
                         <span class="mt-2 text-red-600 italic text-sm">
@@ -119,7 +119,7 @@
                     Description:
                 </div>
                 <div>
-                    <input type="text" wire:model="description"
+                    <input type="text" wire:model.lazy="description"
                         class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                     @error('description')
                         <span class="mt-2 text-red-600 italic text-sm">
