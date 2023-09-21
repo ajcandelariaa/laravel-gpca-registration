@@ -479,6 +479,8 @@ window.addEventListener("swal:import-delegate-confirmation", (event) => {
       }).then((result) => {
         console.log(result);
         if (result) {
+            let registrationLloadingScreen = document.getElementById('registration-loading-screen');
+            registrationLloadingScreen.classList.remove('hidden');
             Livewire.emit('importDelegateConfirmed')
         }
       });
@@ -486,6 +488,8 @@ window.addEventListener("swal:import-delegate-confirmation", (event) => {
 
 // DELEGATE ADD DETAILS
 window.addEventListener("swal:import-delegate", (event) => {
+    let registrationLloadingScreen = document.getElementById('registration-loading-screen');
+    registrationLloadingScreen.classList.add('hidden');
     swal({
         title: event.detail.message,
         text: event.detail.text,
