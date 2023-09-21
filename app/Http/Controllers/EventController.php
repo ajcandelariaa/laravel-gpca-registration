@@ -13,6 +13,7 @@ use App\Models\MainVisitor;
 use App\Models\PrintedBadge;
 use App\Models\RccAwardsAdditionalParticipant;
 use App\Models\RccAwardsMainParticipant;
+use App\Models\ScannedDelegate;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -409,14 +410,38 @@ class EventController extends Controller
         $delegateBadgePrinted = count($printedBadges) - count($finalPrintedBadgesArray);
         $duplicateBadgePrinted = count($finalPrintedBadgesArray);
         $totalBadgePrinted = count($printedBadges);
+
+
+        
+
+        $scannedDelegatesArray = array();
+        $scannedDelegates = ScannedDelegate::where('event_id', $eventId)->get();
+
+        foreach($scannedDelegates as $scannedDelegate){
+            $finalString = $scannedDelegate->delegate_id . $scannedDelegate->delegate_type;
+            array_push($scannedDelegatesArray, $finalString);
+        }
+
+        $uniqueScannedDelegateArray = array_unique($scannedDelegatesArray); 
+        $finalScannedDelegateArray = array_diff_key( $scannedDelegatesArray, $uniqueScannedDelegateArray ); 
+
+        $delegateBadgeScanned = count($scannedDelegates) - count($finalScannedDelegateArray);
+        $duplicateBadgeScanned = count($finalScannedDelegateArray);
+        $totalBadgeScanned = count($scannedDelegates);
         
         $finalData = [
             'totalConfirmedDelegates' => $totalConfirmedDelegates,
             'totalDelegates' => $totalDelegates,
             'totalRegisteredToday' => $totalRegisteredToday,
+
             'delegateBadgePrinted' => $delegateBadgePrinted,
             'duplicateBadgePrinted' => $duplicateBadgePrinted,
             'totalBadgePrinted' => $totalBadgePrinted,
+
+            'delegateBadgeScanned' => $delegateBadgeScanned,
+            'duplicateBadgeScanned' => $duplicateBadgeScanned,
+            'totalBadgeScanned' => $totalBadgeScanned,
+
             'totalPaidToday' => $totalPaidToday,
             'totalAmountPaidToday' => $totalAmountPaidToday,
             'totalAmountPaid' => $totalAmountPaid,

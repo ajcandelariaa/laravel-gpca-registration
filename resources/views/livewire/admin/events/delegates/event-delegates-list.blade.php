@@ -27,7 +27,8 @@
                 <div class="col-span-1 break-words">Email Address</div>
                 <div class="col-span-1 break-words">Registration Type</div>
                 <div class="col-span-1 break-words">Printed</div>
-                <div class="col-span-2 break-words">Badge</div>
+                <div class="col-span-1 break-words">Scanned</div>
+                <div class="col-span-1 break-words">Badge</div>
             </div>
 
             @if (empty($finalListsOfDelegates))
@@ -84,13 +85,26 @@
                             @endif
                         </div>
 
-                        <div class="col-span-2 break-words text-sm">
+                        
+                        <div class="col-span-1 break-words text-sm font-bold">
+                            @if ($finalListsOfDelegate['delegateScanned'] == "Yes")
+                                <span class="text-green-600">
+                                    {{ $finalListsOfDelegate['delegateScanned'] }}
+                                </span>
+                            @else 
+                            <span class="text-red-600">
+                                    {{ $finalListsOfDelegate['delegateScanned'] }}
+                                </span>
+                            @endif
+                        </div>
+
+                        <div class="col-span-1 break-words text-sm">
                             <button wire:click="previewBadge({{ $delegateIndex }})"
                                 class="cursor-pointer hover:text-gray-600 text-gray-500 mr-4 text-sm" target="_blank">
                                 <i class="fa-solid fa-eye"></i> Preview
                             </button>
 
-                            <button type="button" wire:click="printBadgeClicked('{{ $finalListsOfDelegate['delegateType'] }}', {{ $finalListsOfDelegate['delegateId'] }}, {{ $delegateIndex }})" class="bg-green-800 hover:bg-green-900 text-white py-1 px-2 rounded-md text-xs text-center">
+                            <button type="button" wire:click="printBadgeClicked('{{ $finalListsOfDelegate['delegateType'] }}', {{ $finalListsOfDelegate['delegateId'] }}, {{ $delegateIndex }})" class="bg-green-800 hover:bg-green-900 text-white py-1 px-2 w-full rounded-md text-xs text-center mt-2">
                                 Print
                             </button>
                         </div>

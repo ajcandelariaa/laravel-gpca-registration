@@ -7,6 +7,7 @@ use App\Models\AdditionalDelegate as AdditionalDelegates;
 use App\Models\Event as Events;
 use App\Models\EventRegistrationType as EventRegistrationTypes;
 use App\Models\PrintedBadge as PrintedBadges;
+use App\Models\ScannedDelegate as ScannedDelegates;
 use App\Models\Transaction as Transactions;
 use Carbon\Carbon;
 use Livewire\Component;
@@ -58,12 +59,21 @@ class EventDelegatesList extends Component
                             $delegatePrinted = "No";
                         }
 
+                        $scannedBadge = ScannedDelegates::where('event_id', $eventId)->where('delegate_id', $mainDelegate->id)->where('delegate_type', "main")->first();
+
+                        if ($scannedBadge != null) {
+                            $delegateScanned = "Yes";
+                        } else {
+                            $delegateScanned = "No";
+                        }
+
                         array_push($this->finalListsOfDelegatesTemp, [
                             'mainDelegateId' => $mainDelegate->id,
                             'delegateId' => $mainDelegate->id,
                             'delegateTransactionId' => $finalTransactionId,
                             'delegateInvoiceNumber' => $invoiceNumber,
                             'delegatePrinted' => $delegatePrinted,
+                            'delegateScanned' => $delegateScanned,
                             'delegateType' => "main",
                             'delegateCompany' => $mainDelegate->company_name,
                             'delegateJobTitle' => $mainDelegate->job_title,
@@ -103,12 +113,21 @@ class EventDelegatesList extends Component
                                     $delegatePrinted = "No";
                                 }
 
+                                $scannedBadge = ScannedDelegates::where('event_id', $eventId)->where('delegate_id', $subDelegate->id)->where('delegate_type', "sub")->first();
+
+                                if ($scannedBadge != null) {
+                                    $delegateScanned = "Yes";
+                                } else {
+                                    $delegateScanned = "No";
+                                }
+
                                 array_push($this->finalListsOfDelegatesTemp, [
                                     'mainDelegateId' => $mainDelegate->id,
                                     'delegateId' => $subDelegate->id,
                                     'delegateTransactionId' => $finalTransactionId,
                                     'delegateInvoiceNumber' => $invoiceNumber,
                                     'delegatePrinted' => $delegatePrinted,
+                                    'delegateScanned' => $delegatePrinted,
                                     'delegateType' => "sub",
                                     'delegateCompany' => $mainDelegate->company_name,
                                     'delegateJobTitle' => $subDelegate->job_title,
@@ -180,7 +199,7 @@ class EventDelegatesList extends Component
 
         $this->dispatchBrowserEvent('swal:print-badge-confirmed', [
             'url' => route('admin.event.delegates.detail.printBadge', ['eventCategory' => $this->event->category, 'eventId' => $this->event->id, 'delegateId' => $this->printDelegateId, 'delegateType' => $this->printDelegateType]),
-            
+
             'type' => 'success',
             'message' => 'Badge Printed Successfully!',
             'text' => ''
@@ -191,9 +210,10 @@ class EventDelegatesList extends Component
         $this->printArrayIndex = null;
     }
 
-    public function previewBadge($delegateIndex){
-        
-        if($this->finalListsOfDelegates[$delegateIndex]['delegateSalutation'] == "Dr." || $this->finalListsOfDelegates[$delegateIndex]['delegateSalutation'] == "Prof." ){
+    public function previewBadge($delegateIndex)
+    {
+
+        if ($this->finalListsOfDelegates[$delegateIndex]['delegateSalutation'] == "Dr." || $this->finalListsOfDelegates[$delegateIndex]['delegateSalutation'] == "Prof.") {
             $this->name = $this->finalListsOfDelegates[$delegateIndex]['delegateSalutation'] . ' ' . $this->finalListsOfDelegates[$delegateIndex]['delegateFName'] . ' ' . $this->finalListsOfDelegates[$delegateIndex]['delegateMName'] . ' ' . $this->finalListsOfDelegates[$delegateIndex]['delegateLName'];
         } else {
             $this->name = $this->finalListsOfDelegates[$delegateIndex]['delegateFName'] . ' ' . $this->finalListsOfDelegates[$delegateIndex]['delegateMName'] . ' ' . $this->finalListsOfDelegates[$delegateIndex]['delegateLName'];
@@ -217,8 +237,9 @@ class EventDelegatesList extends Component
         $this->badgeView = true;
     }
 
-    
-    public function closePreviewBadge(){
+
+    public function closePreviewBadge()
+    {
         $this->name = null;
         $this->jobTitle = null;
         $this->company = null;

@@ -9,6 +9,7 @@ use App\Models\AdditionalDelegate as AdditionalDelegates;
 use App\Models\EventRegistrationType as EventRegistrationTypes;
 use App\Models\Event as Events;
 use App\Models\PrintedBadge as PrintedBadges;
+use App\Models\ScannedDelegate as ScannedDelegates;
 use Carbon\Carbon;
 
 class DelegateDetails extends Component
@@ -34,7 +35,9 @@ class DelegateDetails extends Component
 
     public $printDelegateType, $printDelegateId;
 
-    public $printedBadges;
+    public $printedBadges, $scannedBadges;
+
+    public $scanDelegateUrl;
 
     protected $listeners = ['printBadgeConfirmed' => 'printBadge'];
 
@@ -52,6 +55,7 @@ class DelegateDetails extends Component
         $this->printedBadges = PrintedBadges::where('event_id', $eventId)->where('delegate_id', $finalDelegate['delegateId'])->where('delegate_type', $finalDelegate['delegateType'])->get();
 
         
+        $this->scannedBadges = ScannedDelegates::where('event_id', $eventId)->where('delegate_id', $finalDelegate['delegateId'])->where('delegate_type', $finalDelegate['delegateType'])->get();
 
         $registrationType = EventRegistrationTypes::where('event_id', $eventId)->where('registration_type', $finalDelegate['badge_type'])->first();
 
@@ -63,6 +67,8 @@ class DelegateDetails extends Component
 
         $this->badgeViewFFTextColor = $registrationType->badge_footer_front_text_color;
         $this->badgeViewFBTextColor = $registrationType->badge_footer_back_text_color;
+
+        $this->scanDelegateUrl = route('admin.event.delegates.detail.scanBadge', ['eventCategory' => $eventCategory, 'eventId' => $eventId, 'delegateId' => $finalDelegate['delegateId'], 'delegateType' => $finalDelegate['delegateType']]);
     }
 
 

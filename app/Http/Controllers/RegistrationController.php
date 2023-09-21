@@ -18,6 +18,7 @@ use App\Models\RccAwardsAdditionalParticipant;
 use App\Models\RccAwardsDocument;
 use App\Models\RccAwardsMainParticipant;
 use App\Models\RccAwardsParticipantTransaction;
+use App\Models\ScannedDelegate;
 use App\Models\SpouseTransaction;
 use App\Models\Transaction;
 use App\Models\VisitorTransaction;
@@ -3531,6 +3532,18 @@ class RegistrationController extends Controller
                     }
                 }
 
+                $scannedBadgeCount = 0;
+                $scannedBadgeDateTime = null;
+
+                $scannedBadges = ScannedDelegate::where('event_id', $eventId)->where('delegate_id', $mainDelegate->id)->where('delegate_type', 'main')->get();
+
+                if($scannedBadges->isNotEmpty()){
+                    foreach($scannedBadges as $scannedBadge){
+                        $scannedBadgeCount++;
+                        $scannedBadgeDateTime = $scannedBadge->scanned_date_time;
+                    }
+                }
+
                 if($mainDelegate->delegate_cancelled != null){
 
                 }
@@ -3568,6 +3581,9 @@ class RegistrationController extends Controller
                     'net_amount' => $netAMount,
                     'printed_badge_count' => $printedBadgeCount,
                     'printed_badge_date_time' => $printedBadgeDateTime,
+
+                    'scanned_badge_count' => $scannedBadgeCount,
+                    'scanned_badge_date_time' => $scannedBadgeDateTime,
 
                     // PLEASE CONTINUE HERE
                     'total_amount' => $mainDelegate->total_amount,
@@ -3641,6 +3657,19 @@ class RegistrationController extends Controller
                             }
                         }
 
+                        
+                        $scannedBadgeCount = 0;
+                        $scannedBadgeDateTime = null;
+
+                        $scannedBadges = ScannedDelegate::where('event_id', $eventId)->where('delegate_id', $subDelegate->id)->where('delegate_type', 'sub')->get();
+                        
+                        if($scannedBadges->isNotEmpty()){
+                            foreach($scannedBadges as $scannedBadge){
+                                $scannedBadgeCount++;
+                                $scannedBadgeDateTime = $scannedBadge->scanned_date_time;
+                            }
+                        }
+
                         array_push($finalExcelData, [
                             'transaction_id' => $tempBookReferenceSub,
                             'id' => $subDelegate->id,
@@ -3672,8 +3701,12 @@ class RegistrationController extends Controller
                             'unit_price' => $mainDelegate->unit_price,
                             'discount_price' => $discountPrice,
                             'net_amount' => $netAMount,
+
                             'printed_badge_count' => $printedBadgeCount,
                             'printed_badge_date_time' => $printedBadgeDateTime,
+
+                            'scanned_badge_count' => $scannedBadgeCount,
+                            'scanned_badge_date_time' => $scannedBadgeDateTime,
 
                             // PLEASE CONTINUE HERE
                             'total_amount' => $mainDelegate->total_amount,
@@ -3757,6 +3790,9 @@ class RegistrationController extends Controller
             'Printed badge count',
             'Printed badge date time',
 
+            'Scanned badge count',
+            'Scanned badge date time',
+
             'Company Sector',
 
             'Registration Method',
@@ -3825,6 +3861,9 @@ class RegistrationController extends Controller
                         $data['paid_date_time'],
                         $data['printed_badge_count'],
                         $data['printed_badge_date_time'],
+                        
+                        $data['scanned_badge_count'],
+                        $data['scanned_badge_date_time'],
 
                         $data['company_sector'],
 

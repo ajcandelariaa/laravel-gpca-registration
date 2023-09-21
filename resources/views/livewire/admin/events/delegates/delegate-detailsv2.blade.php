@@ -19,12 +19,20 @@
             </div>
 
             <div class="mt-10">
-                <div>
-                    <p class="text-primaryColor font-bold text-3xl">{{ $finalDelegate['salutation'] }}
-                        {{ $finalDelegate['first_name'] }} {{ $finalDelegate['middle_name'] }}
-                        {{ $finalDelegate['last_name'] }}</p>
-                    <p class="mt-2 italic text-lg">{{ $finalDelegate['job_title'] }}</p>
-                    <p class="font-bold text-lg">{{ $finalDelegate['companyName'] }}</p>
+                <div class="flex justify-between">
+                    <div>
+                        <p class="text-primaryColor font-bold text-3xl">{{ $finalDelegate['salutation'] }}
+                            {{ $finalDelegate['first_name'] }} {{ $finalDelegate['middle_name'] }}
+                            {{ $finalDelegate['last_name'] }}</p>
+                        <p class="mt-2 italic text-lg">{{ $finalDelegate['job_title'] }}</p>
+                        <p class="font-bold text-lg">{{ $finalDelegate['companyName'] }}</p>
+                    </div>
+                    <div>
+                        <p class="text-center">Scan here</p>
+                        <div>
+                            {!! QrCode::size(100)->generate($scanDelegateUrl) !!}
+                        </div>
+                    </div>
                 </div>
 
                 <hr class="my-6">
@@ -154,15 +162,33 @@
                     <div class="col-span-1 break-words">Printed Badge Date Time</div>
                 </div>
 
-                @if (empty($printedBadges))
-                    <div class="bg-red-400 text-white text-center py-3 mt-5 rounded-md">
-                        There are no printed badges yet.
-                    </div>
+                @if ($printedBadges->isEmpty())
+                <div class="bg-red-400 text-white text-center py-2 mt-1 rounded-md">
+                    There are no printed badges yet.
+                </div>
                 @else
                     @foreach ($printedBadges as $printedBadgesIndex => $printedBadges)
                         <div class="grid grid-cols-2 gap-5 py-2 px-4 text-center items-center bg-gray-300">
                             <div class="col-span-1 break-words">{{ $printedBadgesIndex + 1 }}</div>
                             <div class="col-span-1 break-words"> {{ $printedBadges['printed_date_time'] }} </div>
+                        </div>
+                    @endforeach
+                @endif
+
+                <div class="grid grid-cols-2 gap-5 py-2 px-4 text-center items-center bg-registrationPrimaryColor text-white mt-10 ">
+                    <div class="col-span-1 break-words">No.</div>
+                    <div class="col-span-1 break-words">Scanned Delegate Date Time</div>
+                </div>
+
+                @if ($scannedBadges->isEmpty())
+                    <div class="bg-red-400 text-white text-center py-2 mt-1 rounded-md">
+                        There are no scanned badges yet.
+                    </div>
+                @else
+                    @foreach ($scannedBadges as $scannedBadgesIndex => $scannedBadges)
+                        <div class="grid grid-cols-2 gap-5 py-2 px-4 text-center items-center bg-gray-300">
+                            <div class="col-span-1 break-words">{{ $scannedBadgesIndex + 1 }}</div>
+                            <div class="col-span-1 break-words"> {{ $scannedBadges['scanned_date_time'] }} </div>
                         </div>
                     @endforeach
                 @endif

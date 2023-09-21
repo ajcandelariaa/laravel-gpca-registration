@@ -41,6 +41,21 @@
         </div>
 
         <div class="grid grid-cols-3 gap-4 text-center mt-10">
+            <div class="bg-teal-500 p-4 rounded-lg shadow-lg">
+                <h3 class="text-lg font-semibold text-white">Delegate badge scanned</h3>
+                <p class="text-4xl font-bold text-white">{{ $finalData['delegateBadgeScanned'] }}</p>
+            </div>
+            <div class="bg-teal-500 p-4 rounded-lg shadow-lg">
+                <h3 class="text-lg font-semibold text-white">Total scanned</h3>
+                <p class="text-4xl font-bold text-white">{{ $finalData['totalBadgeScanned'] }}</p>
+            </div>
+            <div class="bg-teal-500 p-4 rounded-lg shadow-lg">
+                <h3 class="text-lg font-semibold text-white">Duplicated badge scanned</h3>
+                <p class="text-4xl font-bold text-white">{{ $finalData['duplicateBadgeScanned'] }}</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-4 text-center mt-10">
             <div class="bg-green-500 p-4 rounded-lg shadow-lg">
                 <h3 class="text-lg font-semibold text-white">Total amount paid</h3>
                 <p class="text-4xl font-bold text-white">$ {{ number_format($finalData['totalAmountPaid'], 2, '.', ',') }}</p>

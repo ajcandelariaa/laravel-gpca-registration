@@ -7,6 +7,7 @@ use App\Models\AdditionalDelegate;
 use App\Models\Event;
 use App\Models\EventRegistrationType;
 use App\Models\MainDelegate;
+use App\Models\ScannedDelegate;
 use App\Models\Transaction;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
@@ -63,7 +64,7 @@ class DelegateController extends Controller
                 }
 
                 if ($delegateType  == "main") {
-                    
+
                     $tempYear = Carbon::parse($tempDelegate->registered_date_time)->format('y');
                     $transactionId = Transaction::where('event_id', $eventId)->where('delegate_id', $delegateId)->where('delegate_type', "main")->value('id');
                     $lastDigit = 1000 + intval($transactionId);
@@ -96,7 +97,7 @@ class DelegateController extends Controller
                         'company_city' => $tempDelegate->company_city,
                         'company_telephone_number' => $tempDelegate->company_telephone_number,
                         'company_mobile_number' => $tempDelegate->company_mobile_number,
-                        
+
                         'finalTransactionId' => $finalTransactionId,
                         'invoiceNumber' => $invoiceNumber,
                     ];
@@ -107,7 +108,7 @@ class DelegateController extends Controller
                     $transactionId = Transaction::where('event_id', $eventId)->where('delegate_id', $delegateId)->where('delegate_type', "sub")->value('id');
                     $lastDigit = 1000 + intval($transactionId);
 
-                    
+
                     $transactionId2 = Transaction::where('event_id', $eventId)->where('delegate_id', $mainDelegateInfo->id)->where('delegate_type', "main")->value('id');
                     $lastDigit2 = 1000 + intval($transactionId2);
 
@@ -137,12 +138,12 @@ class DelegateController extends Controller
                         'company_city' => $mainDelegateInfo->company_city,
                         'company_telephone_number' => $mainDelegateInfo->company_telephone_number,
                         'company_mobile_number' => $mainDelegateInfo->company_mobile_number,
-                        
+
                         'finalTransactionId' => $finalTransactionId,
                         'invoiceNumber' => $invoiceNumber,
                     ];
                 }
-                
+
                 return view('admin.events.delegates.delegates_detail', [
                     "pageTitle" => "Event Delegate",
                     "eventCategory" => $eventCategory,
@@ -184,10 +185,53 @@ class DelegateController extends Controller
         }
     }
 
+    public function delegateScanBadgeFeedback($eventCategory, $eventId, $status)
+    {
+        if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {
+            return view('admin.events.scanned-delegate.scanned_feedback', [
+                "pageTitle" => "Scanned delegates",
+                "eventCategory" => $eventCategory,
+                "eventId" => $eventId,
+                "status" => $status,
+            ]);
+        } else {
+            abort(404, 'The URL is incorrect');
+        }
+    }
+
 
     // =========================================================
     //                       RENDER LOGICS
     // =========================================================
+
+    public function delegateDetailScanBadge($eventCategory, $eventId, $delegateType, $delegateId)
+    {
+        if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {
+            $tempDelegate = array();
+
+            if ($delegateType == "main") {
+                $tempDelegate = MainDelegate::where('id', $delegateId)->first();
+            } else {
+                $tempDelegate = AdditionalDelegate::where('id', $delegateId)->first();
+            }
+
+            if ($tempDelegate == null) {
+                return redirect()->route('admin.event.delegates.feedback.scanBadge', ['eventCategory' => $eventCategory, 'eventId' => $eventId, 'status' => 'error'])->with('status', 'error');
+            } else {
+                ScannedDelegate::create([
+                    'event_id' => $eventId,
+                    'event_category' => $eventCategory,
+                    'delegate_id' => $delegateId,
+                    'delegate_type' => $delegateType,
+                    'scanned_date_time' => Carbon::now(),
+                ]);
+
+                return redirect()->route('admin.event.delegates.feedback.scanBadge', ['eventCategory' => $eventCategory, 'eventId' => $eventId, 'status' => 'success'])->with('status', 'success');
+            }
+        } else {
+            abort(404, 'The URL is incorrect');
+        }
+    }
 
     public function delegateDetailPrintBadge($eventCategory, $eventId, $delegateType, $delegateId)
     {
@@ -218,7 +262,7 @@ class DelegateController extends Controller
                 $registrationType = EventRegistrationType::where('event_id', $eventId)->where('event_category', $eventCategory)->where('registration_type', $tempDelegate->badge_type)->first();
 
                 if ($delegateType  == "main") {
-                    if($tempDelegate->salutation == "Dr." || $tempDelegate->salutation == "Prof."){
+                    if ($tempDelegate->salutation == "Dr." || $tempDelegate->salutation == "Prof.") {
                         $delegateSalutation = $tempDelegate->salutation;
                     } else {
                         $delegateSalutation = null;
@@ -249,7 +293,7 @@ class DelegateController extends Controller
                     ];
                 } else {
                     $mainDelegateInfo = MainDelegate::where('id', $tempDelegate->main_delegate_id)->first();
-                    if($tempDelegate->salutation == "Dr." || $tempDelegate->salutation == "Prof."){
+                    if ($tempDelegate->salutation == "Dr." || $tempDelegate->salutation == "Prof.") {
                         $delegateSalutation = $tempDelegate->salutation;
                     } else {
                         $delegateSalutation = null;

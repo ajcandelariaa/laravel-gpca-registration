@@ -41,7 +41,9 @@
                         <div class="col-span-1 break-words">{{ $delegateIndex + 1 }}</div>
 
                         <div class="col-span-1 break-words">
-                            {{ $finalListsOfDelegate['delegateTransactionId'] }}
+                            <a href="{{ route('admin.event.delegates.detail.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'delegateType' => $finalListsOfDelegate['delegateType'], 'delegateId' => $finalListsOfDelegate['delegateId']]) }}" target="_blank" class="text-blue-700 font-semibold hover:underline">
+                                {{ $finalListsOfDelegate['delegateTransactionId'] }}
+                            </a>
                         </div>
 
                         <div class="col-span-1 break-words">
