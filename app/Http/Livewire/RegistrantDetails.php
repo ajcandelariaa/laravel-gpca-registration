@@ -281,7 +281,7 @@ class RegistrantDetails extends Component
             'companyMobileNumber' => 'required',
         ]);
 
-        if ($this->finalData['rate_type'] == "standard") {
+        if ($this->finalData['rate_type'] == "standard" || $this->finalData['rate_type'] == "Standard") {
             if ($this->delegatePassType == "fullMember") {
                 $this->rateTypeString = "Full member standard rate";
             } else if ($this->delegatePassType == "member") {
