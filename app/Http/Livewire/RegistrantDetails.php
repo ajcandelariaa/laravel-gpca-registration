@@ -510,8 +510,7 @@ class RegistrantDetails extends Component
     public function checkUnitPrice()
     {
         // CHECK UNIT PRICE
-        dd($this->finalData);
-        if ($this->finalData['rate_type'] == "standard") {
+        if ($this->finalData['rate_type'] == "standard" || $this->finalData['rate_type'] == "Standard") {
             if ($this->finalData['pass_type'] == "fullMember") {
                 return $this->event->std_full_member_rate;
             } else if ($this->finalData['pass_type'] == "member") {
