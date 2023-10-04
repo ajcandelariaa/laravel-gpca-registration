@@ -28,11 +28,22 @@ Download invoice
 <br><br>
 @endif
 
+<x-mail::button :url="'https://www.gpcaforum.com/conference-at-a-glance/'" color="registration">
+Conference at a glance
+</x-mail::button>
+<span>&nbsp;</span>
+
+<p>To request any changes, kindly respond to this email at the earliest to rectify your badge.</p>
+
 <h2>GENERAL INFORMATION</h2>
 
-<span><strong>Qatar Visa</strong></span><br><span>Please see the <a href="https://visitqatar.com/intl-en/practical-info/visas">link</a> for further information on how to obtain the visa. Kindly notify the GPCA office if you require any assistance.</span>
+<span><strong>Networking day: 4 December 2023</strong></span><br><span>Delegates can start collecting their badges on 4<sup>th</sup> December at the designed registration desk onsite.</span>
 
-<span><strong>Hotel accomodation</strong></span><br><span>Experience a seamless and stress-free event journey with our expert travel partner. For more information on travel and accommodation please contact</span>
+<span>All registered delegates are invited to join the networking dinner on 4<sup>th</sup> December. Join us for an evening filled with meaningful conversations and the opportunity to establish valuable connections with industry peers.</span>
+
+<span><strong>Qatar Visa</strong></span><br><span>Please refer to the <a href="https://visitqatar.com/intl-en/practical-info/visas">link</a> for further information on obtaining the Qatar visa. If you require any assistance, kindly notify the GPCA office.</span>
+
+<span><strong>Hotel Accomodation</strong></span><br><span>Experience a seamless and stress-free event journey with our expert travel partner. For more information on travel and accommodation please contact</span>
 <br><br>
 <span>Uchita Mhatre</span><br>
 <span>+971553079469</span><br>

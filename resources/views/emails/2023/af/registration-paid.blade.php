@@ -43,6 +43,8 @@ Conference at a glance
 </x-mail::button>
 <span>&nbsp;</span>
 
+<p>To request any changes, kindly respond to this email at the earliest to rectify your badge.</p>
+
 <h2>GENERAL INFORMATION</h2>
 
 <span><strong>Networking day: 4 December 2023</strong></span><br><span>Delegates can start collecting their badges on 4<sup>th</sup> December at the designed registration desk onsite.</span>
