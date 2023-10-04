@@ -42,7 +42,7 @@ Download invoice
 
 <span><strong>Qatar Visa</strong></span><br><span>Please see the <a href="https://visitqatar.com/intl-en/practical-info/visas">link</a> for further information on how to obtain the visa. Kindly notify the GPCA office if you require any assistance.</span>
 
-<span><strong>HOTEL ACCOMODATION</strong></span><br><span>Experience a seamless and stress-free event journey with our expert travel partner. For more information on travel and accommodation please contact</span>
+<span><strong>Hotel accomodation</strong></span><br><span>Experience a seamless and stress-free event journey with our expert travel partner. For more information on travel and accommodation please contact</span>
 <br><br>
 <span>Uchita Mhatre</span><br>
 <span>+971553079469</span><br>
