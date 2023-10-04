@@ -25,8 +25,6 @@
         <div class="col-span-2 bg-white p-4">
             <p>{{ $event->name }} – {{ $eventFormattedDate }}</p>
 
-            <p class="mt-4">Spouse registration fee</p>
-
             <ul class="mt-2 list-decimal ml-4">
                 @if ($day_one)
                     <li>December 4, 2023 (Monday)</li>

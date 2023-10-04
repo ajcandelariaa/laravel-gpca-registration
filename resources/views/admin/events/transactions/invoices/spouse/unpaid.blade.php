@@ -65,16 +65,6 @@
 
         <tr class="tr-delegates">
             <td class="first-col">
-                <p>Spouse registration fee</p>
-            </td>
-            <td class="second-col">&nbsp;</td>
-            <td class="third-col">&nbsp;</td>
-            <td class="fourth-col">&nbsp;</td>
-            <td class="fifth-col">&nbsp;</td>
-        </tr>
-
-        <tr class="tr-delegates">
-            <td class="first-col">
                 <ol>
                     @if ($day_one)
                         <li>December 4, 2023 (Monday)</li>

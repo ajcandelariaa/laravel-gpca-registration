@@ -279,8 +279,6 @@
                                 <p>{{ $finalData['invoiceData']['eventName'] }} –
                                     {{ $finalData['invoiceData']['eventFormattedData'] }}</p>
 
-                                <p class="mt-4">Spouse registration fee</p>
-
                                 <ul class="mt-2 list-decimal ml-4">
                                     @if ($finalData['invoiceData']['day_one'])
                                         <li>December 4, 2023 (Monday)</li>
