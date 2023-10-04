@@ -3320,10 +3320,7 @@ class RegistrationController extends Controller
             }
 
             if ($addMainSpouse) {
-                $name = $mainSpouse->first_name . " " . $mainSpouse->middle_name . " " . $mainSpouse->last_name;
-                $transactionId = SpouseTransaction::where('spouse_id', $mainSpouse->id)->where('spouse_type', "main")->value('id');
-                $lastDigit1 = 1000 + intval($transactionId);
-                $lastDigit2 = 1000 + intval($transactionId);
+                $fullname = $mainSpouse->first_name . " " . $mainSpouse->middle_name . " " . $mainSpouse->last_name;
             }
 
 
@@ -3342,17 +3339,15 @@ class RegistrationController extends Controller
                     }
 
                     if ($addSubSpouse) {
-                        $name = $subSpouse->first_name . " " . $subSpouse->middle_name . " " . $subSpouse->last_name;
-                        $transactionId = SpouseTransaction::where('spouse_id', $subSpouse->id)->where('spouse_type', "sub")->value('id');
-                        $lastDigit1 = 1000 + intval($transactionId);
-
-                        $transactionId2 = SpouseTransaction::where('spouse_id', $mainSpouse->id)->where('spouse_type', "main")->value('id');
-                        $lastDigit2 = 1000 + intval($transactionId2);
+                        $fullname = $subSpouse->first_name . " " . $subSpouse->middle_name . " " . $subSpouse->last_name;
                     }
                 }
             }
 
+            $transactionId = SpouseTransaction::where('spouse_id', $mainSpouse->id)->where('spouse_type', "main")->value('id');
+
             $tempYear = Carbon::parse($mainSpouse->registered_date_time)->format('y');
+            $lastDigit = 1000 + intval($transactionId);
 
             foreach (config('app.eventCategories') as $eventCategoryC => $code) {
                 if ($event->category == $eventCategoryC) {
@@ -3360,8 +3355,8 @@ class RegistrationController extends Controller
                 }
             }
 
-            $tempInvoiceNumber = "$event->category" . "$tempYear" . "/" . "$lastDigit2";
-            $tempBookReference = "$event->year" . "$getEventcode" . "$lastDigit1";
+            $tempInvoiceNumber = "$event->category" . "$tempYear" . "/" . "$lastDigit";
+            $tempBookReference = "$event->year" . "$getEventcode" . "$lastDigit";
 
             if ($eventCategory == "AF" || $eventCategory == "AFS" || $eventCategory == "AFV") {
                 $bankDetails = config('app.bankDetails.AF');
@@ -3370,7 +3365,6 @@ class RegistrationController extends Controller
             }
 
             $eventFormattedData = Carbon::parse($event->event_start_date)->format('j') . '-' . Carbon::parse($event->event_end_date)->format('j F Y');
-            $fullname = $mainSpouse->first_name . ' ' . $mainSpouse->middle_name . ' ' . $mainSpouse->last_name;
             $invoiceData = [
                 "finalEventStartDate" => Carbon::parse($event->event_start_date)->format('d M Y'),
                 "finalEventEndDate" => Carbon::parse($event->event_end_date)->format('d M Y'),
