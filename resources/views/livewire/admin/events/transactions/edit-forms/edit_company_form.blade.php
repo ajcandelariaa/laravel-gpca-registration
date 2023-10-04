@@ -58,6 +58,16 @@
                             </div>
                         </div>
 
+                        <div class="space-y-2">
+                            <div class="text-registrationPrimaryColor">
+                                Alternative Company Name 
+                            </div>
+                            <div>
+                                <input placeholder="Alternative Company Name" type="text" wire:model.lazy="alternativeCompanyName"
+                                    class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                            </div>
+                        </div>
+
                         {{-- ROW 2 --}}
                         <div class="space-y-2">
                             <div class="text-registrationPrimaryColor">

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Livewire\PromoCode;
 use App\Models\AdditionalDelegate;
 use App\Models\AdditionalSpouse;
 use App\Models\AdditionalVisitor;
@@ -11,6 +12,8 @@ use App\Models\MainDelegate;
 use App\Models\MainSpouse;
 use App\Models\MainVisitor;
 use App\Models\PrintedBadge;
+use App\Models\PromoCode as ModelsPromoCode;
+use App\Models\PromoCodeAddtionalBadgeType;
 use App\Models\RccAwardsAdditionalParticipant;
 use App\Models\RccAwardsMainParticipant;
 use App\Models\ScannedDelegate;
@@ -1576,6 +1579,116 @@ class EventController extends Controller
                 'status' => '404',
                 'message' => "Event not found",
             ], 404);
+        }
+    }
+
+    public function exportListOfPromoCodes($eventCategory, $eventId){
+        if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {
+            $finalExcelData = array();
+
+            $eventYear = Event::where('category', $eventCategory)->where('id', $eventId)->value('year');
+            $promoCodes = ModelsPromoCode::where('event_id', $eventId)->where('event_category', $eventCategory)->get();
+
+            foreach($promoCodes as $promoCode){
+                $badgeTypesForPromoCode = $promoCode->badge_type;
+
+                $additionalBadgeTypes = PromoCodeAddtionalBadgeType::where('event_id', $eventId)->where('promo_code_id', $promoCode->id)->get();
+
+                if($additionalBadgeTypes->isNotEmpty()){
+                    foreach($additionalBadgeTypes as $additionalBadgeType){
+                        $badgeTypesForPromoCode = "$badgeTypesForPromoCode, $additionalBadgeType->badge_type";
+                    }
+                }
+
+                if($promoCode->discount_type == "percentage"){
+                    $discountType = "Percentage";
+                    $discount = "$promoCode->discount %";
+                    $newRate = 'N/A';
+                    $newRateDescription = 'N/A';
+                } else if ($promoCode->discount_type == "price"){
+                    $discountType = "Price";
+                    $discount = "$ $promoCode->discount";
+                    $newRate = 'N/A';
+                    $newRateDescription = 'N/A';
+                } else {
+                    $discountType = "Fixed rate";
+                    $discount = "N/A";
+                    $newRate = "$ $promoCode->new_rate";
+                    $newRateDescription = $promoCode->new_rate_description;
+                }
+
+                
+                array_push($finalExcelData, [
+                    'promo_code' => $promoCode->promo_code,
+                    'registration_types' => $badgeTypesForPromoCode,
+                    'discount_type' => $discountType,
+                    'discount' => $discount,
+                    'new_rate' => $newRate,
+                    'new_rate_description' => $newRateDescription,
+                    'remaining_usage' => $promoCode->number_of_codes - $promoCode->total_usage,
+                    'total_usage' => $promoCode->total_usage,
+                    'number_of_codes' => $promoCode->number_of_codes,
+                    'validity' => $promoCode->validity,
+                    'description' => $promoCode->description,
+                    'status' => $promoCode->active ? 'Active' : 'Inactive',
+                ]);
+            }
+
+            $currentDate = Carbon::now()->format('Y-m-d');
+            $fileName = $eventCategory . ' ' . $eventYear . ' Promo Codes ' . '[' . $currentDate . '].csv';
+
+            $headers = array(
+                "Content-type"        => "text/csv",
+                "Content-Disposition" => "attachment; filename=$fileName",
+                "Pragma"              => "no-cache",
+                "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+                "Expires"             => "0"
+            );
+            
+            $columns = array(
+                'Promo Code',
+                'Registration types',
+                'Discount type',
+                'Discount',
+                'New rate',
+                'New rate description',
+                'Remaining usage',
+                'Total usage',
+                'Number of codes',
+                'Validity',
+                'Description',
+                'Status'
+            );
+
+            $callback = function () use ($finalExcelData, $columns) {
+                $file = fopen('php://output', 'w');
+                fputcsv($file, $columns);
+    
+                foreach ($finalExcelData as $data) {
+                    fputcsv(
+                        $file,
+                        array(
+                            $data['promo_code'],
+                            $data['registration_types'],
+                            $data['discount_type'],
+                            $data['discount'],
+                            $data['new_rate'],
+                            $data['new_rate_description'],
+                            $data['remaining_usage'],
+                            $data['total_usage'],
+                            $data['number_of_codes'],
+                            $data['validity'],
+                            $data['description'],
+                            $data['status'],
+                        )
+                    );
+                }
+                fclose($file);
+            };
+
+            return response()->stream($callback, 200, $headers);
+        } else {
+            abort(404, 'The URL is incorrect');
         }
     }
 }

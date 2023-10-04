@@ -40,7 +40,7 @@
             <div class="flex flex-col gap-4">
                 @foreach ($delegatInvoiceDetails as $delegatInvoiceDetail)
                     <div class="bg-white p-4">
-                        <p>$ {{ number_format($finalUnitPrice, 2, '.', ',') }}</p>
+                        <p>$ {{ number_format($delegatInvoiceDetail['totalUnitPrice'], 2, '.', ',') }}</p>
                     </div>
                 @endforeach
             </div>

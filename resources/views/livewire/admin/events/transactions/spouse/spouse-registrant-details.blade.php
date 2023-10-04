@@ -15,7 +15,8 @@
 
                 <div class="mt-3 bg-registrationInputFieldsBGColor py-1 px-1">
                     <div class="flex items-center gap-3">
-                        <p class="text-xl text-registrationPrimaryColor font-bold italic py-4 px-3">Additional Details</p>
+                        <p class="text-xl text-registrationPrimaryColor font-bold italic py-4 px-3">Additional Details
+                        </p>
                         <button wire:click="openEditAdditionalDetailsModal"
                             class="cursor-pointer hover:text-yellow-600 text-yellow-500">
                             <i class="fa-solid fa-pen-to-square"></i> Edit
@@ -23,6 +24,25 @@
                     </div>
 
                     <div class="grid grid-cols-2 bg-white py-3 px-4 gap-4">
+                        <p>Days will attend:</p>
+                        <ul class="font-bold">
+                            @if ($finalData['invoiceData']['day_one'])
+                                <li>December 4, 2023 (Monday)</li>
+                            @endif
+
+                            @if ($finalData['invoiceData']['day_two'])
+                                <li>December 5, 2023 (Tuesday)</li>
+                            @endif
+
+                            @if ($finalData['invoiceData']['day_three'])
+                                <li>December 6, 2023 (Wednesday)</li>
+                            @endif
+
+                            @if ($finalData['invoiceData']['day_four'])
+                                <li>December 7, 2023 (Thursday)</li>
+                            @endif
+                        </ul>
+
                         <p>Full name of Annual GPCA Forum registered attendee?</p>
                         <p class="font-bold">{{ $finalData['reference_delegate_name'] }}</p>
 
@@ -92,6 +112,9 @@
 
                     <p>Payment date & time:</p>
                     <p class="font-bold">{{ $finalData['paid_date_time'] }}</p>
+
+                    <p>Last registration confirmation sent:</p>
+                    <p class="font-bold">{{ $finalData['registration_confirmation_sent_datetime'] }}</p>
                 </div>
 
 
@@ -113,7 +136,10 @@
                         class="bg-orange-800 hover:bg-orange-900 text-white py-2 rounded-md text-lg text-center"
                         target="_blank">View Invoice</a>
 
-                    @if ($finalData['payment_status'] != 'paid' && $finalData['payment_status'] != 'refunded' && $finalData['paid_date_time'] == "N/A")
+                    @if (
+                        $finalData['payment_status'] != 'paid' &&
+                            $finalData['payment_status'] != 'refunded' &&
+                            $finalData['paid_date_time'] == 'N/A')
                         <button wire:click="openMarkAsPaidModal"
                             class="bg-green-600 hover:bg-green-700 text-white py-2 rounded-md text-lg text-center">Mark
                             as
@@ -125,7 +151,10 @@
                             Paid</button>
                     @endif
 
-                    @if ($finalData['payment_status'] != 'paid' && $finalData['payment_status'] != 'refunded' && $finalData['paid_date_time'] == "N/A")
+                    @if (
+                        $finalData['payment_status'] != 'paid' &&
+                            $finalData['payment_status'] != 'refunded' &&
+                            $finalData['paid_date_time'] == 'N/A')
                         <button wire:click="sendEmailReminderConfirmation"
                             class="col-span-1 bg-sky-600 hover:bg-sky-700 text-white py-2 rounded-md text-lg text-center">Send
                             Payment Reminder</button>
@@ -137,8 +166,8 @@
 
                     @if ($finalData['registration_status'] == 'confirmed' || $finalData['registration_status'] == 'pending')
                         <button wire:click="sendEmailRegistrationConfirmationConfirmation"
-                        class="col-span-1 {{ $finalData['registration_confirmation_sent_count'] > 0 ? 'bg-gray-400' : 'bg-yellow-600 hover:bg-yellow-700' }}  text-white py-2 rounded-md text-lg text-center">Send
-                        Registration Confirmation</button>
+                            class="col-span-1 {{ $finalData['registration_confirmation_sent_count'] > 0 ? 'bg-gray-400' : 'bg-yellow-600 hover:bg-yellow-700' }}  text-white py-2 rounded-md text-lg text-center">Send
+                            Registration Confirmation</button>
                     @endif
                 </div>
             </div>
@@ -245,48 +274,112 @@
                             </div>
                         </div>
 
-                        @php
-                            $count = 1;
-                        @endphp
-                        @foreach ($finalData['invoiceData']['invoiceDetails'] as $delegatInvoiceDetail)
-                            <div class="grid grid-cols-6 gap-x-2">
-                                <div class="col-span-2 bg-white p-4">
-                                    @if ($count == 1)
-                                        <p>{{ $finalData['invoiceData']['eventName'] }} –
-                                            {{ $finalData['invoiceData']['eventFormattedData'] }}
-                                            at {{ $finalData['invoiceData']['eventLocation'] }}</p>
-                                        <p class="mt-10">{{ $delegatInvoiceDetail['delegateDescription'] }}</p>
-                                    @else
-                                        <p>{{ $delegatInvoiceDetail['delegateDescription'] }}</p>
+                        <div class="grid grid-cols-6 gap-x-2">
+                            <div class="col-span-2 bg-white p-4">
+                                <p>{{ $finalData['invoiceData']['eventName'] }} –
+                                    {{ $finalData['invoiceData']['eventFormattedData'] }}</p>
+
+                                <p class="mt-4">Spouse registration fee</p>
+
+                                <ul class="mt-2 list-decimal ml-4">
+                                    @if ($finalData['invoiceData']['day_one'])
+                                        <li>December 4, 2023 (Monday)</li>
                                     @endif
-                                    <ul class="mt-2 list-decimal ml-4">
-                                        @foreach ($delegatInvoiceDetail['delegateNames'] as $name)
-                                            <li>{{ $name }}</li>
-                                        @endforeach
-                                    </ul>
-                                </div>
 
-                                <div class="col-span-1 bg-white p-4 flex justify-center items-center">
-                                    <p>{{ $delegatInvoiceDetail['quantity'] }}</p>
-                                </div>
+                                    @if ($finalData['invoiceData']['day_two'])
+                                        <li>December 5, 2023 (Tuesday)</li>
+                                    @endif
 
-                                <div class="col-span-1 bg-white p-4 flex justify-center items-center">
-                                    <p>$ {{ number_format($finalData['invoiceData']['unit_price'], 2, '.', ',') }}</p>
-                                </div>
+                                    @if ($finalData['invoiceData']['day_three'])
+                                        <li>December 6, 2023 (Wednesday)</li>
+                                    @endif
 
-                                <div class="col-span-1 bg-white p-4 flex justify-center items-center">
-                                    <p>$ {{ number_format($delegatInvoiceDetail['totalDiscount'], 2, '.', ',') }}</p>
-                                </div>
+                                    @if ($finalData['invoiceData']['day_four'])
+                                        <li>December 7, 2023 (Thursday)</li>
+                                    @endif
+                                </ul>
+                            </div>
 
-                                <div class="col-span-1 bg-white p-4 flex justify-center items-center">
-                                    <p>$ {{ number_format($delegatInvoiceDetail['totalNetAmount'], 2, '.', ',') }}</p>
+                            <div class="col-span-1 bg-white p-4 flex justify-center items-end">
+                                <div class="mt-2">
+                                    @if ($finalData['invoiceData']['day_one'])
+                                        <p>1</p>
+                                    @endif
+
+                                    @if ($finalData['invoiceData']['day_two'])
+                                        <p>1</p>
+                                    @endif
+
+                                    @if ($finalData['invoiceData']['day_three'])
+                                        <p>1</p>
+                                    @endif
+
+                                    @if ($finalData['invoiceData']['day_four'])
+                                        <p>1</p>
+                                    @endif
                                 </div>
                             </div>
 
-                            @php
-                                $count += 1;
-                            @endphp
-                        @endforeach
+                            <div class="col-span-1 bg-white p-4 flex justify-center items-end">
+                                <div class="mt-2">
+                                    @if ($finalData['invoiceData']['day_one'])
+                                        <p>$ 200.00</p>
+                                    @endif
+
+                                    @if ($finalData['invoiceData']['day_two'])
+                                        <p>$ 220.00</p>
+                                    @endif
+
+                                    @if ($finalData['invoiceData']['day_three'])
+                                        <p>$ 200.00</p>
+                                    @endif
+
+                                    @if ($finalData['invoiceData']['day_four'])
+                                        <p>$ 200.00</p>
+                                    @endif
+                                </div>
+                            </div>
+
+                            <div class="col-span-1 bg-white p-4 flex justify-center items-end">
+                                <div class="mt-2">
+                                    @if ($finalData['invoiceData']['day_one'])
+                                        <p>$ 0.00</p>
+                                    @endif
+
+                                    @if ($finalData['invoiceData']['day_two'])
+                                        <p>$ 0.00</p>
+                                    @endif
+
+                                    @if ($finalData['invoiceData']['day_three'])
+                                        <p>$ 0.00</p>
+                                    @endif
+
+                                    @if ($finalData['invoiceData']['day_four'])
+                                        <p>$ 0.00</p>
+                                    @endif
+                                </div>
+                            </div>
+
+                            <div class="col-span-1 bg-white p-4 flex justify-center items-end">
+                                <div class="mt-2">
+                                    @if ($finalData['invoiceData']['day_one'])
+                                        <p>$ 200.00</p>
+                                    @endif
+
+                                    @if ($finalData['invoiceData']['day_two'])
+                                        <p>$ 220.00</p>
+                                    @endif
+
+                                    @if ($finalData['invoiceData']['day_three'])
+                                        <p>$ 200.00</p>
+                                    @endif
+
+                                    @if ($finalData['invoiceData']['day_four'])
+                                        <p>$ 200.00</p>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
 
                         <div class="grid grid-cols-5 gap-2 mt-2">
                             <div class="col-span-4 bg-white p-4">

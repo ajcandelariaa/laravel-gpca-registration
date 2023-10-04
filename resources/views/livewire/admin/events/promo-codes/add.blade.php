@@ -30,7 +30,8 @@
                         class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                         <option value=""></option>
                         @foreach ($registrationTypes as $registrationType)
-                            <option value="{{ $registrationType->registration_type }}">{{ $registrationType->registration_type }}</option>
+                            <option value="{{ $registrationType->registration_type }}">
+                                {{ $registrationType->registration_type }}</option>
                         @endforeach
                     </select>
 
@@ -52,6 +53,7 @@
                         <option value=""></option>
                         <option value="percentage">Percentage</option>
                         <option value="price">Price</option>
+                        <option value="fixed">Fixed</option>
                     </select>
 
                     @error('discount_type')
@@ -62,19 +64,56 @@
                 </div>
             </div>
 
-            @if ($discount_type != null)
+            @if ($discount_type != null && $discount_type != 'fixed')
                 <div class="space-y-2 mt-5">
                     <div class="text-registrationPrimaryColor">
                         Discount: <span class="text-red-500">*</span>
                     </div>
                     <div>
-                        @if ($discount_type == "percentage")
-                            <input type="number" wire:model.lazy="discount" step="1" min="0" placeholder="0%" max="100" class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                        @if ($discount_type == 'percentage')
+                            <input type="number" wire:model.lazy="discount" step="1" min="0"
+                                placeholder="0%" max="100"
+                                class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                         @else
-                            <input type="number" wire:model.lazy="discount" step="1" min="0" placeholder="0" class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                            <input type="number" wire:model.lazy="discount" step="1" min="0"
+                                placeholder="0"
+                                class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                         @endif
 
                         @error('discount')
+                            <span class="mt-2 text-red-600 italic text-sm">
+                                {{ $message }}
+                            </span>
+                        @enderror
+                    </div>
+                </div>
+            @endif
+
+            @if ($discount_type != null && $discount_type == 'fixed')
+                <div class="space-y-2 mt-5">
+                    <div class="text-registrationPrimaryColor">
+                        New rate: <span class="text-red-500">*</span>
+                    </div>
+                    <div>
+                        <input type="number" wire:model.lazy="new_rate" step="1" min="0" placeholder="0"
+                            class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+
+                        @error('new_rate')
+                            <span class="mt-2 text-red-600 italic text-sm">
+                                {{ $message }}
+                            </span>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="space-y-2 mt-5">
+                    <div class="text-registrationPrimaryColor">
+                        New rate description: <span class="text-red-500">*</span>
+                    </div>
+                    <div>
+                        <input type="text" wire:model.lazy="new_rate_description"
+                            class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                        @error('new_rate_description')
                             <span class="mt-2 text-red-600 italic text-sm">
                                 {{ $message }}
                             </span>
@@ -88,8 +127,9 @@
                     Number of Codes: <span class="text-red-500">*</span>
                 </div>
                 <div>
-                    <input type="number" wire:model.lazy="number_of_codes" step="1" min="1" placeholder="1"
-                        max="10000" class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                    <input type="number" wire:model.lazy="number_of_codes" step="1" min="1"
+                        placeholder="1" max="10000"
+                        class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
 
                     @error('number_of_codes')
                         <span class="mt-2 text-red-600 italic text-sm">
@@ -104,7 +144,8 @@
                     Code Validity: <span class="text-red-500">*</span>
                 </div>
                 <div>
-                    <input type="datetime-local" wire:model.lazy="validity" class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                    <input type="datetime-local" wire:model.lazy="validity"
+                        class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
 
                     @error('validity')
                         <span class="mt-2 text-red-600 italic text-sm">

@@ -84,7 +84,7 @@
                    <p>{{ $delegatInvoiceDetail['quantity'] }}</p>
                </td>
                <td class="third-col">
-                   <p>$ {{ number_format($unit_price, 2, '.', ',') }}</p>
+                   <p>$ {{ number_format($delegatInvoiceDetail['totalUnitPrice'], 2, '.', ',') }}</p>
                </td>
                <td class="fourth-col">
                    <p>$ {{ number_format($delegatInvoiceDetail['totalDiscount'], 2, '.', ',') }}</p>

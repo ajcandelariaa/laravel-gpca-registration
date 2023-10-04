@@ -15,6 +15,7 @@ use App\Models\Event as Events;
 use App\Models\AdditionalDelegate as AdditionalDelegates;
 use App\Models\Transaction as Transactions;
 use App\Models\EventRegistrationType as EventRegistrationTypes;
+use App\Models\PromoCodeAddtionalBadgeType as PromoCodeAddtionalBadgeTypes;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
 use NumberFormatter;
@@ -28,7 +29,7 @@ class RegistrantDetails extends Component
     public $rateType, $finalUnitPrice;
 
     // COMPANY INFO
-    public $delegatePassType, $rateTypeString, $companyName, $companySector, $companyAddress, $companyCountry, $companyCity, $companyLandlineNumber, $assistantEmailAddress, $companyMobileNumber;
+    public $delegatePassType, $rateTypeString, $companyName, $alternativeCompanyName, $companySector, $companyAddress, $companyCountry, $companyCity, $companyLandlineNumber, $assistantEmailAddress, $companyMobileNumber;
 
     // DELEGATE DETAILS
     public $mainDelegateId, $delegateId, $salutation, $firstName, $middleName, $lastName, $emailAddress, $mobileNumber, $nationality, $jobTitle, $badgeType, $promoCode, $promoCodeDiscount, $discountType, $promoCodeSuccess, $promoCodeFail, $type, $delegateIndex, $delegateInnerIndex;
@@ -68,9 +69,6 @@ class RegistrantDetails extends Component
         } else {
             $this->sendInvoice = true;
         }
-        // dd($this->finalData);
-
-        // $this->ccEmailNotif = config('app.ccEmailNotif.test');
 
         if ($eventCategory == "DAW") {
             $this->ccEmailNotif = config('app.ccEmailNotif.daw');
@@ -168,6 +166,7 @@ class RegistrantDetails extends Component
 
     public function openEditDelegateModal($index, $innerIndex)
     {
+        // dd($this->finalData['allDelegates'][$index][$innerIndex]);
         $this->delegateIndex = $index;
         $this->delegateInnerIndex = $innerIndex;
         $this->mainDelegateId = $this->finalData['allDelegates'][$index][$innerIndex]['mainDelegateId'];
@@ -186,8 +185,12 @@ class RegistrantDetails extends Component
         $this->discountType = $this->finalData['allDelegates'][$index][$innerIndex]['discount_type'];
         $this->type = $this->finalData['allDelegates'][$index][$innerIndex]['delegateType'];
 
-        if ($this->promoCode != null) {
-            $this->promoCodeSuccess = $this->promoCodeDiscount;
+        if($this->discountType == "fixed"){
+            $this->promoCodeSuccess = "Fixed rate applied";
+        } else{
+            if ($this->promoCode != null) {
+                $this->promoCodeSuccess = $this->promoCodeDiscount;
+            }
         }
 
         $this->showDelegateModal = true;
@@ -209,22 +212,40 @@ class RegistrantDetails extends Component
             'promoCode.required' => 'Promo code is required',
         ]);
 
-        $promoCode = PromoCodes::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->where('active', true)->where('promo_code', $this->promoCode)->where('badge_type', $this->badgeType)->first();
+        $promoCode = PromoCodes::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->where('active', true)->where('promo_code', $this->promoCode)->first();
 
-        if ($promoCode == null) {
-            $this->promoCodeFail = "Invalid Code";
+        $promoCodeChecker = true;
+
+        if($promoCode != null){
+            if($promoCode->badge_type == $this->badgeType){
+                $promoCodeChecker = true;
+            } else {
+                $promoCodeAdditionalBadgeType = PromoCodeAddtionalBadgeTypes::where('event_id', $this->eventId)->where('promo_code_id', $promoCode->id)->where('badge_type', $this->badgeType)->first();
+
+                if($promoCodeAdditionalBadgeType != null){
+                    $promoCodeChecker = true;
+                } else {
+                    $promoCodeChecker = false;
+                }
+            }
         } else {
+            $promoCodeChecker = false;
+        }
+
+        if($promoCodeChecker){
             if ($promoCode->total_usage < $promoCode->number_of_codes) {
                 $validityDateTime = Carbon::parse($promoCode->validity);
                 if (Carbon::now()->lt($validityDateTime)) {
                     $this->promoCodeFail = null;
+                    $this->discountType = $promoCode->discount_type;
                     $this->promoCodeDiscount = $promoCode->discount;
 
                     if ($promoCode->discount_type == "percentage") {
-                        $this->discountType = $promoCode->discount_type;
                         $this->promoCodeSuccess = "$promoCode->discount% discount";
-                    } else {
+                    } else if ($promoCode->discount_type == "price") {
                         $this->promoCodeSuccess = "$$promoCode->discount discount";
+                    } else {
+                        $this->promoCodeSuccess = "Fixed rate applied";
                     }
                 } else {
                     $this->promoCodeFail = "Code is expired already";
@@ -232,6 +253,8 @@ class RegistrantDetails extends Component
             } else {
                 $this->promoCodeFail = "Code has reached its capacity";
             }
+        } else {
+            $this->promoCodeFail = "Invalid Code";
         }
     }
 
@@ -299,10 +322,15 @@ class RegistrantDetails extends Component
             }
         }
 
+        if(trim($this->alternativeCompanyName) == ""  || $this->alternativeCompanyName == null){
+            $this->alternativeCompanyName = null;
+        }
+
         MainDelegates::find($this->finalData['mainDelegateId'])->fill([
             'pass_type' => $this->delegatePassType,
             'rate_type_string' => $this->rateTypeString,
             'company_name' => $this->companyName,
+            'alternative_company_name' => $this->alternativeCompanyName,
             'company_sector' => $this->companySector,
             'company_address' => $this->companyAddress,
             'company_country' => $this->companyCountry,
@@ -315,6 +343,7 @@ class RegistrantDetails extends Component
         $this->finalData['rate_type_string'] = $this->rateTypeString;
         $this->finalData['pass_type'] = $this->delegatePassType;
         $this->finalData['company_name'] = $this->companyName;
+        $this->finalData['alternative_company_name'] = $this->alternativeCompanyName;
         $this->finalData['company_sector'] = $this->companySector;
         $this->finalData['company_address'] = $this->companyAddress;
         $this->finalData['company_country'] = $this->companyCountry;
@@ -336,6 +365,7 @@ class RegistrantDetails extends Component
 
         $this->delegatePassType = $this->finalData['pass_type'];
         $this->companyName = $this->finalData['company_name'];
+        $this->alternativeCompanyName = $this->finalData['alternative_company_name'];
         $this->companySector = $this->finalData['company_sector'];
         $this->companyAddress = $this->finalData['company_address'];
         $this->companyCountry = $this->finalData['company_country'];
@@ -358,6 +388,7 @@ class RegistrantDetails extends Component
         $this->members = null;
         $this->delegatePassType = null;
         $this->companyName = null;
+        $this->alternativeCompanyName = null;
         $this->companySector = null;
         $this->companyAddress = null;
         $this->companyCountry = null;
@@ -421,7 +452,6 @@ class RegistrantDetails extends Component
         foreach ($this->finalData['allDelegates'] as $delegatesIndex => $delegates) {
             foreach ($delegates as $innerDelegate) {
                 if (end($delegates) == $innerDelegate) {
-
                     $amountPaid = $this->finalData['invoiceData']['unit_price'];
 
                     $promoCode = PromoCodes::where('event_id', $this->event->id)->where('promo_code', $innerDelegate['pcode_used'])->first();
@@ -429,8 +459,10 @@ class RegistrantDetails extends Component
                     if ($promoCode != null) {
                         if ($promoCode->discount_type == "percentage") {
                             $amountPaid = $this->finalData['invoiceData']['unit_price'] - ($this->finalData['invoiceData']['unit_price'] * ($promoCode->discount / 100));
-                        } else {
+                        } else if ($promoCode->discount_type == "price") {
                             $amountPaid = $this->finalData['invoiceData']['unit_price'] - $promoCode->discount;
+                        } else {
+                            $amountPaid = $promoCode->new_rate;
                         }
                     }
 
@@ -470,10 +502,18 @@ class RegistrantDetails extends Component
                         $assistantDetails2 = $details2;
                     }
 
-                    Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaid($details1, $this->sendInvoice));
+                    try {
+                        Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaid($details1, $this->sendInvoice));
+                    } catch (\Exception $e) {
+                        Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaid($details1, $this->sendInvoice));
+                    }
                     if ($this->sendInvoice) {
                         if ($delegatesIndex == 0) {
-                            Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+                            try {
+                                Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+                            } catch (\Exception $e) {
+                                Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+                            }
                         }
                     }
                 }
@@ -483,9 +523,17 @@ class RegistrantDetails extends Component
         $assistantDetails1['amountPaid'] = $this->finalData['invoiceData']['total_amount'];
 
         if ($this->finalData['assistant_email_address'] != null) {
-            Mail::to($this->finalData['assistant_email_address'])->send(new RegistrationPaid($assistantDetails1, $this->sendInvoice));
+            try {
+                Mail::to($this->finalData['assistant_email_address'])->send(new RegistrationPaid($assistantDetails1, $this->sendInvoice));
+            } catch (\Exception $e) {
+                Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaid($assistantDetails1, $this->sendInvoice));
+            }
             if ($this->sendInvoice) {
-                Mail::to($this->finalData['assistant_email_address'])->send(new RegistrationPaymentConfirmation($assistantDetails2, $this->sendInvoice));
+                try {
+                    Mail::to($this->finalData['assistant_email_address'])->send(new RegistrationPaymentConfirmation($assistantDetails2, $this->sendInvoice));
+                } catch (\Exception $e) {
+                    Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaymentConfirmation($assistantDetails2, $this->sendInvoice));
+                }
             }
         }
 
@@ -550,13 +598,36 @@ class RegistrantDetails extends Component
         }
 
         if ($addMainDelegate) {
-            $promoCode = PromoCodes::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->where('promo_code', $mainDelegate->pcode_used)->where('badge_type', $mainDelegate->badge_type)->first();
+            $promoCode = PromoCodes::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->where('promo_code', $mainDelegate->pcode_used)->first();
 
             if ($promoCode != null) {
-                $mainDiscount = $promoCode->discount;
-                $mainDiscountType = $promoCode->discount_type;
 
+                if($promoCode->badge_type == $mainDelegate->badge_type){
+                    $promoCodeUsed = $mainDelegate->pcode_used;
+                    $mainDiscount = $promoCode->discount;
+                    $mainDiscountType = $promoCode->discount_type;
+                } else {
+                    $promoCodeAdditionalBadgeType = PromoCodeAddtionalBadgeTypes::where('event_id', $this->eventId)->where('promo_code_id', $promoCode->id)->where('badge_type', $mainDelegate->badge_type)->first();
+
+                    if($promoCodeAdditionalBadgeType != null){
+                        $promoCodeUsed = $mainDelegate->pcode_used;
+                        $mainDiscount = $promoCode->discount;
+                        $mainDiscountType = $promoCode->discount_type;
+                    } else {
+                        $promoCodeUsed = null;
+                        $mainDiscount = 0;
+                        $mainDiscountType = null;
+                    }
+                }
+            } else {
+                $promoCodeUsed = null;
+                $mainDiscount = 0;
+                $mainDiscountType = null;
+            }
+
+            if($mainDiscountType != null){
                 if ($mainDiscountType == "percentage") {
+
                     if ($mainDiscount == 100) {
                         $delegateDescription = "Delegate Registration Fee - Complimentary";
                     } else if ($mainDiscount > 0 && $mainDiscount < 100) {
@@ -564,22 +635,26 @@ class RegistrantDetails extends Component
                     } else {
                         $delegateDescription = "Delegate Registration Fee - {$mainDelegate->rate_type_string}";
                     }
-                } else {
+
+                    $tempTotalUnitPrice = $this->checkUnitPrice();
+                    $tempTotalDiscount = $this->checkUnitPrice() * ($mainDiscount / 100);
+                    $tempTotalNetAmount = $this->checkUnitPrice() - ($this->checkUnitPrice() * ($mainDiscount / 100));
+                } else if ($mainDiscountType == "price") {
+                    $tempTotalUnitPrice = $this->checkUnitPrice();
+                    $tempTotalDiscount = $mainDiscount;
+                    $tempTotalNetAmount = $this->checkUnitPrice() - $mainDiscount;
                     $delegateDescription = "Delegate Registration Fee - {$mainDelegate->rate_type_string}";
+                } else {
+                    $tempTotalUnitPrice = $promoCode->new_rate;
+                    $tempTotalDiscount = 0;
+                    $tempTotalNetAmount = $promoCode->new_rate;
+                    $delegateDescription = $promoCode->new_rate_description;
                 }
             } else {
-                $mainDiscount = 0;
-                $mainDiscountType = null;
-
+                $tempTotalUnitPrice = $this->checkUnitPrice();
+                $tempTotalDiscount = 0;
+                $tempTotalNetAmount = $this->checkUnitPrice();
                 $delegateDescription = "Delegate Registration Fee - {$mainDelegate->rate_type_string}";
-            }
-
-            if ($mainDiscountType == "percentage") {
-                $tempTotalDiscount = $this->checkUnitPrice() * ($mainDiscount / 100);
-                $tempTotalNetAmount = $this->checkUnitPrice() - ($this->checkUnitPrice() * ($mainDiscount / 100));
-            } else {
-                $tempTotalDiscount = $mainDiscount;
-                $tempTotalNetAmount = $this->checkUnitPrice() - $mainDiscount;
             }
 
             array_push($invoiceDetails, [
@@ -589,9 +664,11 @@ class RegistrantDetails extends Component
                 ],
                 'badgeType' => $mainDelegate->badge_type,
                 'quantity' => 1,
+                'totalUnitPrice' => $tempTotalUnitPrice,
                 'totalDiscount' => $tempTotalDiscount,
                 'totalNetAmount' =>  $tempTotalNetAmount,
                 'promoCodeDiscount' => $mainDiscount,
+                'promoCodeUsed' => $promoCodeUsed,
             ]);
         }
 
@@ -613,23 +690,39 @@ class RegistrantDetails extends Component
 
 
                 if ($addSubDelegate) {
-                    $subPromoCode = PromoCodes::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->where('promo_code', $subDelegate->pcode_used)->where('badge_type', $subDelegate->badge_type)->first();
+                    $subPromoCode = PromoCodes::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->where('promo_code', $subDelegate->pcode_used)->first();
 
                     $checkIfExisting = false;
                     $existingIndex = 0;
 
 
                     if ($subPromoCode != null) {
-                        $subDiscount = $subPromoCode->discount;
-                        $subDiscountType = $subPromoCode->discount_type;
+                        if($subPromoCode->badge_type == $subDelegate->badge_type){
+                            $subPromoCodeUsed = $subDelegate->pcode_used;
+                            $subDiscount = $subPromoCode->discount;
+                            $subDiscountType = $subPromoCode->discount_type;
+                        } else {
+                            $subPromoCodeAdditionalBadgeType = PromoCodeAddtionalBadgeTypes::where('event_id', $this->eventId)->where('promo_code_id', $subPromoCode->id)->where('badge_type', $subDelegate->badge_type)->first();
+                            
+                            if($subPromoCodeAdditionalBadgeType != null){
+                                $subPromoCodeUsed = $subDelegate->pcode_used;
+                                $subDiscount = $subPromoCode->discount;
+                                $subDiscountType = $subPromoCode->discount_type;
+                            } else {
+                                $subPromoCodeUsed = null;
+                                $subDiscount = 0;
+                                $subDiscountType = null;
+                            }
+                        }
                     } else {
+                        $subPromoCodeUsed = null;
                         $subDiscount = 0;
                         $subDiscountType = null;
                     }
 
 
                     for ($j = 0; $j < count($invoiceDetails); $j++) {
-                        if ($subDelegate->badge_type == $invoiceDetails[$j]['badgeType'] && $subDiscount == $invoiceDetails[$j]['promoCodeDiscount']) {
+                        if ($subDelegate->badge_type == $invoiceDetails[$j]['badgeType'] && $subPromoCodeUsed == $invoiceDetails[$j]['promoCodeUsed']) {
                             $existingIndex = $j;
                             $checkIfExisting = true;
                             break;
@@ -644,11 +737,19 @@ class RegistrantDetails extends Component
 
                         $quantityTemp = $invoiceDetails[$existingIndex]['quantity'] + 1;
 
-                        if ($subDiscountType == "percentage") {
-                            $totalDiscountTemp = ($this->checkUnitPrice() * ($invoiceDetails[$existingIndex]['promoCodeDiscount'] / 100)) * $quantityTemp;
-                            $totalNetAmountTemp = ($this->checkUnitPrice() * $quantityTemp) - $totalDiscountTemp;
+                        if($subDiscountType != null){
+                            if ($subDiscountType == "percentage") {
+                                $totalDiscountTemp = ($this->checkUnitPrice() * ($invoiceDetails[$existingIndex]['promoCodeDiscount'] / 100)) * $quantityTemp;
+                                $totalNetAmountTemp = ($this->checkUnitPrice() * $quantityTemp) - $totalDiscountTemp;
+                            } else if ($subDiscountType == "price") {
+                                $totalDiscountTemp = $invoiceDetails[$existingIndex]['promoCodeDiscount'] * $quantityTemp;
+                                $totalNetAmountTemp = ($this->checkUnitPrice() * $quantityTemp) - $totalDiscountTemp;
+                            } else {
+                                $totalDiscountTemp = 0;
+                                $totalNetAmountTemp = $subPromoCode->new_rate * $quantityTemp;
+                            }
                         } else {
-                            $totalDiscountTemp = $invoiceDetails[$existingIndex]['promoCodeDiscount'] * $quantityTemp;
+                            $totalDiscountTemp = $invoiceDetails[$existingIndex]['promoCodeDiscount'];
                             $totalNetAmountTemp = ($this->checkUnitPrice() * $quantityTemp) - $totalDiscountTemp;
                         }
 
@@ -658,7 +759,7 @@ class RegistrantDetails extends Component
                         $invoiceDetails[$existingIndex]['totalNetAmount'] = $totalNetAmountTemp;
                     } else {
 
-                        if ($subDiscount != null) {
+                        if ($subDiscountType != null) {
                             if ($subDiscountType == "percentage") {
                                 if ($subDiscount == 100) {
                                     $subDelegateDescription = "Delegate Registration Fee - Complimentary";
@@ -667,19 +768,28 @@ class RegistrantDetails extends Component
                                 } else {
                                     $subDelegateDescription = "Delegate Registration Fee - {$mainDelegate->rate_type_string}";
                                 }
-                            } else {
+
+                                $tempSubTotalUnitPrice = $this->checkUnitPrice();
+                                $tempSubTotalDiscount = $this->checkUnitPrice() * ($subDiscount / 100);
+                                $tempSubTotalNetAmount = $this->checkUnitPrice() - ($this->checkUnitPrice() * ($subDiscount / 100));
+                            } else if ($subDiscountType == "price") {
                                 $subDelegateDescription = "Delegate Registration Fee - {$mainDelegate->rate_type_string}";
+                                
+                                $tempSubTotalUnitPrice = $this->checkUnitPrice();
+                                $tempSubTotalDiscount = $subDiscount;
+                                $tempSubTotalNetAmount = $this->checkUnitPrice() - $subDiscount;
+                            } else {
+                                $subDelegateDescription = $subPromoCode->new_rate_description;
+                                
+                                $tempSubTotalUnitPrice = $subPromoCode->new_rate;
+                                $tempSubTotalDiscount = 0;
+                                $tempSubTotalNetAmount = $subPromoCode->new_rate;
                             }
                         } else {
                             $subDelegateDescription = "Delegate Registration Fee - {$mainDelegate->rate_type_string}";
-                        }
-
-                        if ($subDiscountType == "percentage") {
-                            $tempSubTotalDiscount = $this->checkUnitPrice() * ($subDiscount / 100);
-                            $tempSubTotalNetAmount = $this->checkUnitPrice() - ($this->checkUnitPrice() * ($subDiscount / 100));
-                        } else {
-                            $tempSubTotalDiscount = $subDiscount;
-                            $tempSubTotalNetAmount = $this->checkUnitPrice() - $subDiscount;
+                            $tempSubTotalUnitPrice = $this->checkUnitPrice();
+                            $tempSubTotalDiscount = 0;
+                            $tempSubTotalNetAmount = $this->checkUnitPrice();
                         }
 
                         array_push($invoiceDetails, [
@@ -689,9 +799,11 @@ class RegistrantDetails extends Component
                             ],
                             'badgeType' => $subDelegate->badge_type,
                             'quantity' => 1,
+                            'totalUnitPrice' => $tempSubTotalUnitPrice,
                             'totalDiscount' => $tempSubTotalDiscount,
                             'totalNetAmount' =>  $tempSubTotalNetAmount,
                             'promoCodeDiscount' => $subDiscount,
+                            'promoCodeUsed' => $subPromoCodeUsed,
                         ]);
                     }
                 }
@@ -788,8 +900,10 @@ class RegistrantDetails extends Component
                     if ($promoCode != null) {
                         if ($promoCode->discount_type == "percentage") {
                             $amountPaid = $this->finalData['invoiceData']['unit_price'] - ($this->finalData['invoiceData']['unit_price'] * ($promoCode->discount / 100));
-                        } else {
+                        } else if ($promoCode->discount_type == "price") {
                             $amountPaid = $this->finalData['invoiceData']['unit_price'] - $promoCode->discount;
+                        } else {
+                            $amountPaid = $promoCode->new_rate;
                         }
                     }
 
@@ -830,14 +944,30 @@ class RegistrantDetails extends Component
                     }
 
                     if ($this->finalData['payment_status'] == "unpaid") {
-                        Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationUnpaid($details1, $this->sendInvoice));
+                        try {
+                            Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationUnpaid($details1, $this->sendInvoice));
+                        } catch (\Exception $e) {
+                            Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationUnpaid($details1, $this->sendInvoice));
+                        }
                     } else if ($this->finalData['payment_status'] == "free" && $this->finalData['registration_status'] == "pending") {
-                        Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationFree($details1, $this->sendInvoice));
+                        try {
+                            Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationFree($details1, $this->sendInvoice));
+                        } catch (\Exception $e) {
+                            Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationFree($details1, $this->sendInvoice));
+                        }
                     } else {
-                        Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaid($details1, $this->sendInvoice));
+                        try {
+                            Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaid($details1, $this->sendInvoice));
+                        } catch (\Exception $e) {
+                            Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaid($details1, $this->sendInvoice));
+                        }
                         if ($this->sendInvoice) {
                             if ($delegatesIndex == 0) {
-                                Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+                                try {
+                                    Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+                                } catch (\Exception $e) {
+                                    Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+                                }
                             }
                         }
                     }
@@ -849,13 +979,29 @@ class RegistrantDetails extends Component
 
         if ($this->finalData['assistant_email_address'] != null) {
             if ($this->finalData['payment_status'] == "unpaid") {
-                Mail::to($this->finalData['assistant_email_address'])->send(new RegistrationUnpaid($assistantDetails1, $this->sendInvoice));
+                try {
+                    Mail::to($this->finalData['assistant_email_address'])->send(new RegistrationUnpaid($assistantDetails1, $this->sendInvoice));
+                } catch (\Exception $e) {
+                    Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationUnpaid($assistantDetails1, $this->sendInvoice));
+                }
             } else if ($this->finalData['payment_status'] == "free" && $this->finalData['registration_status'] == "pending") {
-                Mail::to($this->finalData['assistant_email_address'])->send(new RegistrationFree($assistantDetails1, $this->sendInvoice));
+                try {
+                    Mail::to($this->finalData['assistant_email_address'])->send(new RegistrationFree($assistantDetails1, $this->sendInvoice));
+                } catch (\Exception $e) {
+                    Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationFree($assistantDetails1, $this->sendInvoice));
+                }
             } else {
-                Mail::to($this->finalData['assistant_email_address'])->send(new RegistrationPaid($assistantDetails1, $this->sendInvoice));
+                try {
+                    Mail::to($this->finalData['assistant_email_address'])->send(new RegistrationPaid($assistantDetails1, $this->sendInvoice));
+                } catch (\Exception $e) {
+                    Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaid($assistantDetails1, $this->sendInvoice));
+                }
                 if ($this->sendInvoice) {
-                    Mail::to($this->finalData['assistant_email_address'])->send(new RegistrationPaymentConfirmation($assistantDetails2, $this->sendInvoice));
+                    try {
+                        Mail::to($this->finalData['assistant_email_address'])->send(new RegistrationPaymentConfirmation($assistantDetails2, $this->sendInvoice));
+                    } catch (\Exception $e) {
+                        Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaymentConfirmation($assistantDetails2, $this->sendInvoice));
+                    }
                 }
             }
         }
@@ -901,13 +1047,21 @@ class RegistrantDetails extends Component
                         'earlyBirdValidityDate' => $earlyBirdValidityDate->format('jS F'),
                         'eventYear' => $this->event->year,
                     ];
-                    Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaymentReminder($details, $this->sendInvoice));
+                    try {
+                        Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaymentReminder($details, $this->sendInvoice));
+                    } catch (\Exception $e) {
+                        Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaymentReminder($details, $this->sendInvoice));
+                    }
                 }
             }
         }
 
         if ($this->finalData['assistant_email_address'] != null) {
-            Mail::to($this->finalData['assistant_email_address'])->send(new RegistrationPaymentReminder($details, $this->sendInvoice));
+            try {
+                Mail::to($this->finalData['assistant_email_address'])->send(new RegistrationPaymentReminder($details, $this->sendInvoice));
+            } catch (\Exception $e) {
+                Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaymentReminder($details, $this->sendInvoice));
+            }
         }
 
         $this->dispatchBrowserEvent('swal:payment-reminder-success', [
@@ -1268,21 +1422,41 @@ class RegistrantDetails extends Component
             'replacePromoCode.required' => 'Promo code is required',
         ]);
 
-        $promoCode = PromoCodes::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->where('active', true)->where('promo_code', $this->replacePromoCode)->where('badge_type', $this->replaceBadgeType)->first();
-        if ($promoCode == null) {
-            $this->replacePromoCodeFail = "Invalid Code";
+        $promoCode = PromoCodes::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->where('active', true)->where('promo_code', $this->replacePromoCode)->first();
+
+        $promoCodeChecker = true;
+
+        if($promoCode != null){
+            if($promoCode->badge_type == $this->replaceBadgeType){
+                $promoCodeChecker = true;
+            } else {
+                $promoCodeAdditionalBadgeType = PromoCodeAddtionalBadgeTypes::where('event_id', $this->eventId)->where('promo_code_id', $promoCode->id)->where('badge_type', $this->replaceBadgeType)->first();
+
+                if($promoCodeAdditionalBadgeType != null){
+                    $promoCodeChecker = true;
+                } else {
+                    $promoCodeChecker = false;
+                }
+            }
         } else {
+            $promoCodeChecker = false;
+        }
+
+
+        if($promoCodeChecker){
             if ($promoCode->total_usage < $promoCode->number_of_codes) {
                 $validityDateTime = Carbon::parse($promoCode->validity);
                 if (Carbon::now()->lt($validityDateTime)) {
                     $this->replacePromoCodeFail = null;
                     $this->replacePromoCodeDiscount = $promoCode->discount;
+                    $this->replaceDiscountType = $promoCode->discount_type;
 
                     if ($promoCode->discount_type == "percentage") {
-                        $this->replaceDiscountType = $promoCode->discount_type;
                         $this->replacePromoCodeSuccess = "$promoCode->discount% discount";
-                    } else {
+                    } else if ($promoCode->discount_type == "price") {
                         $this->replacePromoCodeSuccess = "$$promoCode->discount discount";
+                    } else {
+                        $this->promoCodeSuccess = "Fixed rate applied";
                     }
                 } else {
                     $this->replacePromoCodeFail = "Code is expired already";
@@ -1290,6 +1464,8 @@ class RegistrantDetails extends Component
             } else {
                 $this->replacePromoCodeFail = "Code has reached its capacity";
             }
+        } else {
+            $this->replacePromoCodeFail = "Invalid Code";
         }
     }
 

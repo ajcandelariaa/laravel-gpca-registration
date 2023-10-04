@@ -14,10 +14,10 @@
         </tr>
         <tr>
             <td class="invoice-intro-left">
-                <p>{{ $companyName }}</p>
-                <p>{{ $companyAddress }}</p>
-                <p>{{ $companyCity }}</p>
-                <p>{{ $companyCountry }}</p>
+                <p>{{ $fullname }}</p>
+                <p>{{ $address }}</p>
+                <p>{{ $city }}</p>
+                <p>{{ $country }}</p>
             </td>
             <td class="invoice-intro-right">
                 <table align="right">
@@ -44,6 +44,7 @@
         </tr>
     </table>
 
+
     <table class="invoice-body">
         <tr class="tr-header">
             <td class="first-col">Description</td>
@@ -52,66 +53,127 @@
             <td class="fourth-col">Discount</td>
             <td class="fifth-col">Net <br> Amount <br> (USD)</td>
         </tr>
-        @php
-            $count = 1;
-        @endphp
 
-        @foreach ($invoiceDetails as $delegatInvoiceDetail)
-            @if ($count == 1)
-                <tr class="tr-description">
-                    <td class="first-col">
-                        <p><strong>{{ $eventName }} – {{ $eventFormattedData }} at
-                                {{ $eventLocation }}</strong></p>
-                    </td>
-                    <td class="second-col">&nbsp;</td>
-                    <td class="third-col">&nbsp;</td>
-                    <td class="fourth-col">&nbsp;</td>
-                    <td class="fifth-col">&nbsp;</td>
-                </tr>
-            @endif
+        <tr class="tr-description">
+            <td class="first-col">
+                <p><strong>{{ $eventName }} – {{ $eventFormattedData }}</strong></p>
+            </td>
+            <td class="second-col">&nbsp;</td>
+            <td class="third-col">&nbsp;</td>
+            <td class="fourth-col">&nbsp;</td>
+            <td class="fifth-col">&nbsp;</td>
+        </tr>
 
+        <tr class="tr-delegates">
+            <td class="first-col">
+                <p>Spouse registration fee</p>
+            </td>
+            <td class="second-col">&nbsp;</td>
+            <td class="third-col">&nbsp;</td>
+            <td class="fourth-col">&nbsp;</td>
+            <td class="fifth-col">&nbsp;</td>
+        </tr>
 
-            <tr class="tr-delegates">
-                <td class="first-col">
-                    <p>{{ $delegatInvoiceDetail['delegateDescription'] }}</p>
-                    <ol>
-                        @foreach ($delegatInvoiceDetail['delegateNames'] as $name)
-                            <li>{{ $name }}</li>
-                        @endforeach
-                    </ol>
-                </td>
-                <td class="second-col">
-                    <p>{{ $delegatInvoiceDetail['quantity'] }}</p>
-                </td>
-                <td class="third-col">
-                    <p>$ {{ number_format($delegatInvoiceDetail['totalUnitPrice'], 2, '.', ',') }}</p>
-                </td>
-                <td class="fourth-col">
-                    <p>$ {{ number_format($delegatInvoiceDetail['totalDiscount'], 2, '.', ',') }}</p>
-                </td>
-                <td class="fifth-col">
-                    <p>$ {{ number_format($delegatInvoiceDetail['totalNetAmount'], 2, '.', ',') }}</p>
-                </td>
-            </tr>
+        <tr class="tr-delegates">
+            <td class="first-col">
+                <ol>
+                    @if ($day_one)
+                        <li>December 4, 2023 (Monday)</li>
+                    @endif
 
+                    @if ($day_two)
+                        <li>December 5, 2023 (Tuesday)</li>
+                    @endif
 
-            @if (count($invoiceDetails) == $count)
-                <tr class="tr-note">
-                    <td class="first-col">
-                        <p><em>(Note: Please quote the invoice number during payment and ensure that all bank charges and
-                                withholding taxes (if any) should be borne by the sender to avoid underpayments)</em></p>
-                    </td>
-                    <td class="second-col">&nbsp;</td>
-                    <td class="third-col">&nbsp;</td>
-                    <td class="fourth-col">&nbsp;</td>
-                    <td class="fifth-col">&nbsp;</td>
-                </tr>
-            @endif
+                    @if ($day_three)
+                        <li>December 6, 2023 (Wednesday)</li>
+                    @endif
 
-            @php
-                $count++;
-            @endphp
-        @endforeach
+                    @if ($day_four)
+                        <li>December 7, 2023 (Thursday)</li>
+                    @endif
+                </ol>
+            </td>
+            <td class="second-col">
+                @if ($day_one)
+                    <div class="bg-white p-4">1</div>
+                @endif
+
+                @if ($day_two)
+                    <div class="bg-white p-4">1</div>
+                @endif
+
+                @if ($day_three)
+                    <div class="bg-white p-4">1</div>
+                @endif
+
+                @if ($day_four)
+                    <div class="bg-white p-4">1</div>
+                @endif
+            </td>
+            <td class="third-col">
+                @if ($day_one)
+                    <div class="bg-white p-4">$ 200.00</div>
+                @endif
+
+                @if ($day_two)
+                    <div class="bg-white p-4">$ 220.00</div>
+                @endif
+
+                @if ($day_three)
+                    <div class="bg-white p-4">$ 200.00</div>
+                @endif
+
+                @if ($day_four)
+                    <div class="bg-white p-4">$ 200.00</div>
+                @endif
+            </td>
+            <td class="fourth-col">
+                @if ($day_one)
+                    <div class="bg-white p-4">$ 0.00</div>
+                @endif
+
+                @if ($day_two)
+                    <div class="bg-white p-4">$ 0.00</div>
+                @endif
+
+                @if ($day_three)
+                    <div class="bg-white p-4">$ 0.00</div>
+                @endif
+
+                @if ($day_four)
+                    <div class="bg-white p-4">$ 0.00</div>
+                @endif
+            </td>
+            <td class="fifth-col">
+                @if ($day_one)
+                    <div class="bg-white p-4">$ 200.00</div>
+                @endif
+
+                @if ($day_two)
+                    <div class="bg-white p-4">$ 220.00</div>
+                @endif
+
+                @if ($day_three)
+                    <div class="bg-white p-4">$ 200.00</div>
+                @endif
+
+                @if ($day_four)
+                    <div class="bg-white p-4">$ 200.00</div>
+                @endif
+            </td>
+        </tr>
+
+        <tr class="tr-note">
+            <td class="first-col">
+                <p><em>(Note: Please quote the invoice number during payment and ensure that all bank charges and
+                        withholding taxes (if any) should be borne by the sender to avoid underpayments)</em></p>
+            </td>
+            <td class="second-col">&nbsp;</td>
+            <td class="third-col">&nbsp;</td>
+            <td class="fourth-col">&nbsp;</td>
+            <td class="fifth-col">&nbsp;</td>
+        </tr>
 
         {{-- INVOICE FOOTER --}}
         <tr class="tr-totals totals-first-row">
@@ -201,14 +263,16 @@
     <p style="text-align: center; font-size: 11px; margin-top: 30px"><em>This is an autogenerated invoice no signature
             required.</em></p>
 
-   <table class="invoice-main-footer">
-       <tr>
+    <table class="invoice-main-footer">
+        <tr>
             <td class="left">
-                <img src="data:image/PNG;base64,{{ base64_encode(file_get_contents(public_path('/assets/images/invoice_footer_left.PNG'))) }}" alt="invoice-footer" width="200">
+                <img src="data:image/PNG;base64,{{ base64_encode(file_get_contents(public_path('/assets/images/invoice_footer_left.PNG'))) }}"
+                    alt="invoice-footer" width="200">
             </td>
             <td class="right">
-                <img src="data:image/PNG;base64,{{ base64_encode(file_get_contents(public_path('/assets/images/invoice_footer_right.PNG'))) }}" alt="invoice-footer" width="150">
+                <img src="data:image/PNG;base64,{{ base64_encode(file_get_contents(public_path('/assets/images/invoice_footer_right.PNG'))) }}"
+                    alt="invoice-footer" width="150">
             </td>
-       </tr>
-   </table>
+        </tr>
+    </table>
 @endsection

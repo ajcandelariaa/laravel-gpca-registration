@@ -3,24 +3,39 @@
 
 <p>Greetings from GPCA!</p>
 
-<p>Thank you for registering to attend the <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a> taking place from {{ $details['eventDates'] }} at {{ $details['eventLocation'] }}.</p>
+<p>Thank you for your registering to attend the Spouse Program at the 17<sup>th</sup> Annual GPCA Forum in Qatar. We are excited to welcome you to this exclusive experience!</p>
 
-<p>
-    Your registration has been confirmed, and we are pleased to provide you with the booking confirmation below for your reference.
-</p>
+<p>Your registration has been confirmed, and we are pleased to provide you with the booking confirmation below for your reference.</p>
 
+<span><strong>Key Details:</strong></span>
+<br>
 <span>
-    Spouse Full name: <strong>{{  $details['name'] }}</strong>
+    <strong>Event Dates:</strong> {{  $details['eventDatesDescription'] }}
     <br>
-    Nationality: <strong>{{  $details['nationality'] }}</strong>
+    <strong>Location:</strong> Qatar, a hub of architectural marvels and cultural richness.
     <br>
-    Country: <strong>{{  $details['country'] }}</strong>
+    <strong>Program Highlights:</strong> Enjoy guided tours of iconic landmarks, immersive cultural experiences, and networking opportunities with fellow spouses. As a valued participant, you'll witness Qatar's architectural wonders, experience the delightful weather in December, and engage in discussions that are vital to the petrochemical sector's growth in the region.
+</span>
+<br><br>
+
+<span><strong>Booking Details:</strong></span>
+<br>
+<span>
+    <strong>Name:</strong> {{  $details['name'] }}
     <br>
-    City: <strong>{{  $details['city'] }}</strong>
+    <strong>Accompanying Delegate Name:</strong>  {{  $details['referenceDelegateName'] }}
     <br>
-    Amount paid: <strong>$ {{ number_format($details['amountPaid'], 2, '.', ',') }}</strong>
+    <strong>Email Address:</strong> {{  $details['emailAddress'] }}
     <br>
-    Transaction ID: <strong>{{  $details['transactionId'] }}</strong>
+    <strong>Mobile Phone Number (While in Qatar):</strong> {{  $details['mobileNumber'] }}
+    <br>
+    <strong>Country:</strong> {{  $details['country'] }}
+    <br>
+    <strong>City:</strong> {{  $details['city'] }}
+    <br>
+    <strong>Amount paid:</strong> $ {{ number_format($details['amountPaid'], 2, '.', ',') }}
+    <br>
+    <strong>Transaction ID:</strong> {{  $details['transactionId'] }}
 </span>
 <br><br>
 <x-mail::button :url="$details['invoiceLink']" color="registration">
@@ -28,9 +43,11 @@ Download invoice
 </x-mail::button>
 <span>&nbsp;</span>
 
-<p>For the latest updates on the event, please visit the event website at <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a>.</p>
+<p>Stay tuned for updates and a detailed itinerary closer to the event. If you have any specific preferences or questions, feel free to reach out to our dedicated support team.</p>
+
+<p>We look forward to providing you with a truly exceptional Spouse Program experience. Your presence will add to the success of this event.</p>
 
 Best regards,
-<br><br>
-GPCA Team
+<br>
+GPCA Events Team
 </x-mail::message>

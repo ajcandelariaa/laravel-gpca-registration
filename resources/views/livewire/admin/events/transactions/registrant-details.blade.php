@@ -45,6 +45,15 @@
                         <p>Name:</p>
                         <p class="font-bold">{{ $finalData['company_name'] }}</p>
 
+                        <p>Alternative Name:</p>
+                        <p class="font-bold">
+                            @if ($finalData['alternative_company_name'] != null)
+                                {{ $finalData['alternative_company_name'] }}
+                            @else
+                                N/A
+                            @endif
+                        </p>
+
                         <p>Sector:</p>
                         <p class="font-bold">{{ $finalData['company_sector'] }}</p>
 
@@ -206,8 +215,8 @@
 
                     @if ($finalData['registration_status'] == 'confirmed' || $finalData['registration_status'] == 'pending')
                         <button wire:click="sendEmailRegistrationConfirmationConfirmation"
-                        class="col-span-1 {{ $finalData['registration_confirmation_sent_count'] > 0 ? 'bg-gray-400' : 'bg-yellow-600 hover:bg-yellow-700' }}  text-white py-2 rounded-md text-lg text-center">Send
-                        Registration Confirmation</button>
+                            class="col-span-1 {{ $finalData['registration_confirmation_sent_count'] > 0 ? 'bg-gray-400' : 'bg-yellow-600 hover:bg-yellow-700' }}  text-white py-2 rounded-md text-lg text-center">Send
+                            Registration Confirmation</button>
                     @endif
                 </div>
             </div>
@@ -270,11 +279,17 @@
                                                         discount
                                                     </span>
                                                 </p>
-                                            @else
+                                            @elseif ($innerDelegate['discount_type'] == 'price')
                                                 <p class="font-bold">{{ $innerDelegate['pcode_used'] }}
-                                                    <span class="text-green-500 text-sm italic ml-2">${{ $innerDelegate['discount'] }}
+                                                    <span
+                                                        class="text-green-500 text-sm italic ml-2">${{ $innerDelegate['discount'] }}
                                                         discount
                                                     </span>
+                                                </p>
+                                            @else
+                                                <p class="font-bold">{{ $innerDelegate['pcode_used'] }}
+                                                    <span class="text-green-500 text-sm italic ml-2">Fixed rate
+                                                        applied</span>
                                                 </p>
                                             @endif
                                         @endif
@@ -361,7 +376,7 @@
                                 </div>
 
                                 <div class="col-span-1 bg-white p-4 flex justify-center items-center">
-                                    <p>$ {{ number_format($finalData['invoiceData']['unit_price'], 2, '.', ',') }}</p>
+                                    <p>$ {{ number_format($delegatInvoiceDetail['totalUnitPrice'], 2, '.', ',') }}</p>
                                 </div>
 
                                 <div class="col-span-1 bg-white p-4 flex justify-center items-center">

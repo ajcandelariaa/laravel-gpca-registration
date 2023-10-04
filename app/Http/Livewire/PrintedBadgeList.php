@@ -47,13 +47,20 @@ class PrintedBadgeList extends Component
                         $this->finalListsOfDelegatesTemp[$result[1]]['delegatePrintBadgeCount'] += 1;
                         $this->finalListsOfDelegatesTemp[$result[1]]['delegatePrintedDateTime'] = $printedBadge->printed_date_time;
                     } else {
+
+                        if($mainDelegate->alternative_company_name != null){
+                            $companyName = $mainDelegate->alternative_company_name;
+                        } else {
+                            $companyName = $mainDelegate->company_name;
+                        }
+
                         array_push($this->finalListsOfDelegatesTemp, [
                             'mainDelegateId' => $mainDelegate->id,
                             'delegateId' => $mainDelegate->id,
                             'delegateTransactionId' => $finalTransactionId,
                             'delegateInvoiceNumber' => $invoiceNumber,
                             'delegateType' => "main",
-                            'delegateCompany' => $mainDelegate->company_name,
+                            'delegateCompany' => $companyName,
                             'delegateName' => $mainDelegate->salutation . " " . $mainDelegate->first_name . " " . $mainDelegate->middle_name . " " . $mainDelegate->last_name,
                             'delegateEmailAddress' => $mainDelegate->email_address,
                             'delegateBadgeType' => $mainDelegate->badge_type,
@@ -75,7 +82,13 @@ class PrintedBadgeList extends Component
                     $lastDigit2 = 1000 + intval($transactionId2);
                     $invoiceNumber = $eventCategory . $tempYear . "/" . $lastDigit2;
 
-                    $mainDelegateCompany = MainDelegates::where('id', $additionalDelegate->main_delegate_id)->value('company_name');
+                    $mainDelegate = MainDelegates::where('id', $additionalDelegate->main_delegate_id)->first();
+
+                    if($mainDelegate->alternative_company_name != null){
+                        $mainDelegateCompany = $mainDelegate->alternative_company_name;
+                    } else {
+                        $mainDelegateCompany = $mainDelegate->company_name;
+                    }
 
                     $result = $this->checkIfBadgePrintedExist($finalTransactionId, $this->finalListsOfDelegatesTemp);
                     if ($result[0]) {

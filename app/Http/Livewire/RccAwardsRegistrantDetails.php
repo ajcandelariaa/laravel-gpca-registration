@@ -46,7 +46,7 @@ class RccAwardsRegistrantDetails extends Component
     public $showTransactionRemarksModal = false;
     public $showParticipantCancellationModal = false;
     public $showMarkAsPaidModal = false;
-    
+
     public $ccEmailNotif;
 
     protected $listeners = ['paymentReminderConfirmed' => 'sendEmailReminder', 'sendEmailRegistrationConfirmationConfirmed' => 'sendEmailRegistrationConfirmation', 'cancelRefundDelegateConfirmed' => 'cancelOrRefundParticipant', 'cancelReplaceDelegateConfirmed' => 'addReplaceParticipant', 'markAsPaidConfirmed' => 'markAsPaid'];
@@ -67,7 +67,7 @@ class RccAwardsRegistrantDetails extends Component
         } else {
             $this->sendInvoice = true;
         }
-        
+
         $this->ccEmailNotif = config('app.ccEmailNotif.default');
     }
 
@@ -170,11 +170,12 @@ class RccAwardsRegistrantDetails extends Component
         $this->showParticipantModal = true;
     }
 
-    
-    public function openEditAdditionalDetailsModal(){
+
+    public function openEditAdditionalDetailsModal()
+    {
         $this->members = Members::where('active', true)->get();
         $this->resetEditAdditionalDetailsFields();
-        
+
         $this->category = $this->finalData['category'];
         $this->subCategory = $this->finalData['sub_category'];
         $this->participantPassType = $this->finalData['pass_type'];
@@ -182,7 +183,8 @@ class RccAwardsRegistrantDetails extends Component
         $this->showAdditionalDetailsModal = true;
     }
 
-    public function updateAdditionalDetails(){
+    public function updateAdditionalDetails()
+    {
         $this->validate(
             [
                 'category' => 'required',
@@ -212,7 +214,7 @@ class RccAwardsRegistrantDetails extends Component
             ]
         );
 
-        
+
         if ($this->finalData['rate_type'] == "Standard") {
             if ($this->participantPassType == "fullMember") {
                 $this->rateTypeString = "Full member standard rate";
@@ -377,7 +379,7 @@ class RccAwardsRegistrantDetails extends Component
                         'transactionId' => $innerParticipant['transactionId'],
                         'invoiceLink' => $invoiceLink,
 
-                        'badgeLink' => env('APP_URL')."/".$this->event->category."/".$this->event->id."/view-badge"."/".$innerParticipant['participantType']."/".$innerParticipant['participantId'],
+                        'badgeLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-badge" . "/" . $innerParticipant['participantType'] . "/" . $innerParticipant['participantId'],
                     ];
 
                     $details2 = [
@@ -393,12 +395,19 @@ class RccAwardsRegistrantDetails extends Component
                         'invoiceLink' => $invoiceLink,
                     ];
 
-                    Mail::to($innerParticipant['email_address'])->cc($this->ccEmailNotif)->queue(new RegistrationPaid($details1));
+                    try {
+                        Mail::to($innerParticipant['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaid($details1));
+                    } catch (\Exception $e) {
+                        Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaid($details1));
+                    }
 
-                    
                     if ($this->sendInvoice) {
                         if ($participantsIndex == 0) {
-                            Mail::to($innerParticipant['email_address'])->cc($this->ccEmailNotif)->queue(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+                            try {
+                                Mail::to($innerParticipant['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+                            } catch (\Exception $e) {
+                                Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+                            }
                         }
                     }
                 }
@@ -613,7 +622,7 @@ class RccAwardsRegistrantDetails extends Component
                         'transactionId' => $innerParticipant['transactionId'],
                         'invoiceLink' => $invoiceLink,
 
-                        'badgeLink' => env('APP_URL')."/".$this->event->category."/".$this->event->id."/view-badge"."/".$innerParticipant['participantType']."/".$innerParticipant['participantId'],
+                        'badgeLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-badge" . "/" . $innerParticipant['participantType'] . "/" . $innerParticipant['participantId'],
                     ];
 
                     $details2 = [
@@ -630,21 +639,37 @@ class RccAwardsRegistrantDetails extends Component
                     ];
 
                     if ($this->finalData['payment_status'] == "unpaid") {
-                        Mail::to($innerParticipant['email_address'])->cc($this->ccEmailNotif)->queue(new RegistrationUnpaid($details1, $this->sendInvoice));
+                        try {
+                            Mail::to($innerParticipant['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationUnpaid($details1, $this->sendInvoice));
+                        } catch (\Exception $e) {
+                            Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationUnpaid($details1, $this->sendInvoice));
+                        }
                     } else if ($this->finalData['payment_status'] == "free" && $this->finalData['registration_status'] == "pending") {
-                        Mail::to($innerParticipant['email_address'])->cc($this->ccEmailNotif)->queue(new RegistrationFree($details1, $this->sendInvoice));
+                        try {
+                            Mail::to($innerParticipant['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationFree($details1, $this->sendInvoice));
+                        } catch (\Exception $e) {
+                            Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationFree($details1, $this->sendInvoice));
+                        }
                     } else {
-                        Mail::to($innerParticipant['email_address'])->cc($this->ccEmailNotif)->queue(new RegistrationPaid($details1, $this->sendInvoice));
+                        try {
+                            Mail::to($innerParticipant['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaid($details1, $this->sendInvoice));
+                        } catch (\Exception $e) {
+                            Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaid($details1, $this->sendInvoice));
+                        }
                         if ($this->sendInvoice) {
                             if ($participantsIndex == 0) {
-                                Mail::to($innerParticipant['email_address'])->cc($this->ccEmailNotif)->queue(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+                                try {
+                                    Mail::to($innerParticipant['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+                                } catch (\Exception $e) {
+                                    Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+                                }
                             }
                         }
                     }
                 }
             }
         }
-        
+
 
         $this->finalData['registration_confirmation_sent_count'] = $this->finalData['registration_confirmation_sent_count'] + 1;
         $this->finalData['registration_confirmation_sent_datetime'] = Carbon::parse(Carbon::now())->format('M j, Y g:i A');
@@ -680,7 +705,11 @@ class RccAwardsRegistrantDetails extends Component
                         'invoiceLink' => $invoiceLink,
                         'eventYear' => $this->event->year,
                     ];
-                    Mail::to($innerParticipant['email_address'])->cc($this->ccEmailNotif)->queue(new RegistrationPaymentReminder($details));
+                    try {
+                        Mail::to($innerParticipant['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaymentReminder($details));
+                    } catch (\Exception $e) {
+                        Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaymentReminder($details));
+                    }
                 }
             }
         }

@@ -90,7 +90,8 @@ class DelegateController extends Controller
                         'badge_type' => $tempDelegate->badge_type,
 
                         'pass_type' => $tempDelegate->pass_type,
-                        'companyName' => $tempDelegate->company_name,
+                        'company_name' => $tempDelegate->company_name,
+                        'alternative_company_name' => $tempDelegate->alternative_company_name,
                         'company_sector' => $tempDelegate->company_sector,
                         'company_address' => $tempDelegate->company_address,
                         'company_country' => $tempDelegate->company_country,
@@ -131,7 +132,8 @@ class DelegateController extends Controller
                         'badge_type' => $tempDelegate->badge_type,
 
                         'pass_type' => $mainDelegateInfo->pass_type,
-                        'companyName' => $mainDelegateInfo->company_name,
+                        'company_name' => $mainDelegateInfo->company_name,
+                        'alternative_company_name' => $mainDelegateInfo->alternative_company_name,
                         'company_sector' => $mainDelegateInfo->company_sector,
                         'company_address' => $mainDelegateInfo->company_address,
                         'company_country' => $mainDelegateInfo->company_country,
@@ -268,6 +270,13 @@ class DelegateController extends Controller
                         $delegateSalutation = null;
                     }
 
+                    
+                    if($tempDelegate->alternative_company_name != null){
+                        $companyName = $tempDelegate->alternative_company_name;
+                    } else {
+                        $companyName = $tempDelegate->company_name;
+                    }
+
                     $finalDelegate = [
                         'salutation' => $delegateSalutation,
                         'first_name' => $tempDelegate->first_name,
@@ -275,7 +284,7 @@ class DelegateController extends Controller
                         'last_name' => $tempDelegate->last_name,
                         'job_title' => $tempDelegate->job_title,
                         'badge_type' => $tempDelegate->badge_type,
-                        'companyName' => $tempDelegate->company_name,
+                        'companyName' => $companyName,
                         'frontBanner' =>  $finalFrontBanner,
                         'backBanner' =>  $finalBackBanner,
                         'textColor' => $event->badge_footer_link_color,
@@ -298,6 +307,12 @@ class DelegateController extends Controller
                     } else {
                         $delegateSalutation = null;
                     }
+                    
+                    if($mainDelegateInfo->alternative_company_name != null){
+                        $companyName = $mainDelegateInfo->alternative_company_name;
+                    } else {
+                        $companyName = $mainDelegateInfo->company_name;
+                    }
 
                     $finalDelegate = [
                         'salutation' => $delegateSalutation,
@@ -306,7 +321,7 @@ class DelegateController extends Controller
                         'last_name' => $tempDelegate->last_name,
                         'job_title' => $tempDelegate->job_title,
                         'badge_type' => $tempDelegate->badge_type,
-                        'companyName' => $mainDelegateInfo->company_name,
+                        'companyName' => $companyName,
                         'frontBanner' =>  $finalFrontBanner,
                         'backBanner' =>  $finalBackBanner,
                         'textColor' => $event->badge_footer_link_color,

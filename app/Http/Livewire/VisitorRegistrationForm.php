@@ -3,8 +3,6 @@
 namespace App\Http\Livewire;
 
 use App\Mail\RegistrationFree;
-use App\Mail\RegistrationPaid;
-use App\Mail\RegistrationPaymentConfirmation;
 use App\Mail\RegistrationUnpaid;
 use App\Models\VisitorTransaction as VisitorTransactions;
 use App\Models\MainVisitor as MainVisitors;
@@ -437,9 +435,17 @@ class VisitorRegistrationForm extends Component
         ];
 
         if ($paymentStatus == "free") {
-            Mail::to($this->emailAddress)->cc($this->ccEmailNotif)->queue(new RegistrationFree($details1));
+            try {
+                Mail::to($this->emailAddress)->cc($this->ccEmailNotif)->send(new RegistrationFree($details1));
+            } catch (\Exception $e) {
+                Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationFree($details1));
+            }
         } else {
-            Mail::to($this->emailAddress)->cc($this->ccEmailNotif)->queue(new RegistrationUnpaid($details1));
+            try {
+                Mail::to($this->emailAddress)->cc($this->ccEmailNotif)->send(new RegistrationUnpaid($details1));
+            } catch (\Exception $e) {
+                Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationUnpaid($details1));
+            }
         }
 
         $additionalVisitors = AdditionalVisitors::where('main_visitor_id', $this->currentMainVisitorId)->get();
@@ -470,9 +476,17 @@ class VisitorRegistrationForm extends Component
                 ];
 
                 if ($paymentStatus == "free") {
-                    Mail::to($additionalVisitor->email_address)->cc($this->ccEmailNotif)->queue(new RegistrationFree($details1));
+                    try {
+                        Mail::to($additionalVisitor->email_address)->cc($this->ccEmailNotif)->send(new RegistrationFree($details1));
+                    } catch (\Exception $e) {
+                        Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationFree($details1));
+                    }
                 } else {
-                    Mail::to($additionalVisitor->email_address)->cc($this->ccEmailNotif)->queue(new RegistrationUnpaid($details1));
+                    try {
+                        Mail::to($additionalVisitor->email_address)->cc($this->ccEmailNotif)->send(new RegistrationUnpaid($details1));
+                    } catch (\Exception $e) {
+                        Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationUnpaid($details1));
+                    }
                 }
             }
         }

@@ -201,10 +201,16 @@
                                         </div>
                                     @endif
 
-                                    @if ($promoCodeDiscount != null)
+                                    @if ($discountType == 'fixed')
                                         <div class="text-green-500 text-xs italic mt-1">
-                                            {{ $promoCodeDiscount }}% discount
+                                            Fixed rate applied
                                         </div>
+                                    @else
+                                        @if ($promoCodeDiscount != null)
+                                            <div class="text-green-500 text-xs italic mt-1">
+                                                {{ $promoCodeDiscount }}% discount
+                                            </div>
+                                        @endif
                                     @endif
                                 @endif
                             </div>

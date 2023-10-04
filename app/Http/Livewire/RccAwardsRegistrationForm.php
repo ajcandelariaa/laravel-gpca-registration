@@ -478,9 +478,17 @@ class RccAwardsRegistrationForm extends Component
         ];
 
         if ($paymentStatus == "free") {
-            Mail::to($this->emailAddress)->cc($this->ccEmailNotif)->queue(new RegistrationFree($details1));
+            try {
+                Mail::to($this->emailAddress)->cc($this->ccEmailNotif)->send(new RegistrationFree($details1));
+            } catch (\Exception $e) {
+                Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationFree($details1));
+            }
         } else {
-            Mail::to($this->emailAddress)->cc($this->ccEmailNotif)->queue(new RegistrationUnpaid($details1));
+            try {
+                Mail::to($this->emailAddress)->cc($this->ccEmailNotif)->send(new RegistrationUnpaid($details1));
+            } catch (\Exception $e) {
+                Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationUnpaid($details1));
+            }
         }
 
         return redirect()->route('register.success.view', ['eventCategory' => $this->event->category, 'eventId' => $this->event->id, 'eventYear' => $this->event->year, 'mainDelegateId' => $this->currentMainPartcipantId]);

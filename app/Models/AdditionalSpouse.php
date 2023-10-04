@@ -20,6 +20,10 @@ class AdditionalSpouse extends Model
         'nationality',
         'country',
         'city',
+        'day_one',
+        'day_two',
+        'day_three',
+        'day_four',
 
         'spouse_cancelled',
         'spouse_replaced',

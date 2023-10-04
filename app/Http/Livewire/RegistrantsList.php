@@ -6,10 +6,9 @@ use App\Models\MainDelegate as MainDelegates;
 use App\Models\AdditionalDelegate as AdditionalDelegates;
 use App\Models\Transaction as Transactions;
 use App\Models\Event as Events;
-use App\Models\Member as Members;
 use App\Models\PromoCode as PromoCodes;
+use App\Models\PromoCodeAddtionalBadgeType as PromoCodeAddtionalBadgeTypes;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -122,10 +121,17 @@ class RegistrantsList extends Component
                     }
                 }
 
+                if($mainDelegate->alternative_company_name != null){
+                    $companyName = $mainDelegate->alternative_company_name;
+                } else {
+                    $companyName = $mainDelegate->company_name;
+                }
+
                 array_push($this->finalListOfRegistrants, [
                     'mainDelegateId' => $mainDelegate->id,
                     'invoiceNumber' => $tempInvoiceNumber,
-                    'companyName' => $mainDelegate->company_name,
+                    'companyName' => $companyName,
+                    'alternativeCompanyName' => $mainDelegate->alternative_company_name,
                     'country' => $mainDelegate->company_country,
                     'city' => $mainDelegate->company_city,
                     'passType' => $passType,
@@ -253,29 +259,30 @@ class RegistrantsList extends Component
         $checkIfCorrectFormat = true;
         for ($i = 0; $i < count($rows); $i++) {
             if ($i == 0) {
-                if (count($rows[$i]) == 21) {
+                if (count($rows[$i]) == 22) {
                     if (
                         $rows[$i][0] != "Rate type" ||
                         $rows[$i][1] != "Pass type" ||
                         $rows[$i][2] != "Company Name" ||
-                        $rows[$i][3] != "Company Sector" ||
-                        $rows[$i][4] != "Company Address" ||
-                        $rows[$i][5] != "Country" ||
-                        $rows[$i][6] != "City" ||
-                        $rows[$i][7] != "Landline Number" ||
-                        $rows[$i][8] != "Mobile Number" ||
-                        $rows[$i][9] != "Assistants email address" ||
-                        $rows[$i][10] != "Payment status" ||
-                        $rows[$i][11] != "Promo Code used" ||
-                        $rows[$i][12] != "Badge Type" ||
-                        $rows[$i][13] != "Salutation" ||
-                        $rows[$i][14] != "First Name" ||
-                        $rows[$i][15] != "Middle Name" ||
-                        $rows[$i][16] != "Last Name" ||
-                        $rows[$i][17] != "Email Address" ||
-                        $rows[$i][18] != "Mobile Number" ||
-                        $rows[$i][19] != "Nationality" ||
-                        $rows[$i][20] != "Job Title"
+                        $rows[$i][3] != "Alternative Company Name" ||
+                        $rows[$i][4] != "Company Sector" ||
+                        $rows[$i][5] != "Company Address" ||
+                        $rows[$i][6] != "Country" ||
+                        $rows[$i][7] != "City" ||
+                        $rows[$i][8] != "Landline Number" ||
+                        $rows[$i][9] != "Mobile Number" ||
+                        $rows[$i][10] != "Assistants email address" ||
+                        $rows[$i][11] != "Payment status" ||
+                        $rows[$i][12] != "Promo Code used" ||
+                        $rows[$i][13] != "Badge Type" ||
+                        $rows[$i][14] != "Salutation" ||
+                        $rows[$i][15] != "First Name" ||
+                        $rows[$i][16] != "Middle Name" ||
+                        $rows[$i][17] != "Last Name" ||
+                        $rows[$i][18] != "Email Address" ||
+                        $rows[$i][19] != "Mobile Number" ||
+                        $rows[$i][20] != "Nationality" ||
+                        $rows[$i][21] != "Job Title"
                     ) {
                         $checkIfCorrectFormat = false;
                     }
@@ -296,19 +303,19 @@ class RegistrantsList extends Component
                         empty($rows[$i][0]) ||
                         empty($rows[$i][1]) ||
                         empty($rows[$i][2]) ||
-                        empty($rows[$i][3]) ||
                         empty($rows[$i][4]) ||
                         empty($rows[$i][5]) ||
                         empty($rows[$i][6]) ||
-                        empty($rows[$i][8]) ||
-                        empty($rows[$i][10]) ||
-                        empty($rows[$i][12]) ||
-                        empty($rows[$i][14]) ||
-                        empty($rows[$i][16]) ||
+                        empty($rows[$i][7]) ||
+                        empty($rows[$i][9]) ||
+                        empty($rows[$i][11]) ||
+                        empty($rows[$i][13]) ||
+                        empty($rows[$i][15]) ||
                         empty($rows[$i][17]) ||
                         empty($rows[$i][18]) ||
                         empty($rows[$i][19]) ||
-                        empty($rows[$i][20])
+                        empty($rows[$i][20]) ||
+                        empty($rows[$i][21])
                     ) {
                         $lineNumber = $i + 1;
                         array_push($this->incompleDetails, "Line $lineNumber have missing details!");
@@ -324,9 +331,9 @@ class RegistrantsList extends Component
                     if ($i == 0) {
                         continue;
                     } else {
-                        $email = $rows[$i][17];
+                        $email = $rows[$i][18];
                         for ($j = $i + 1; $j < count($rows); $j++) {
-                            $tempEmail = $rows[$j][17];
+                            $tempEmail = $rows[$j][18];
                             if ($email === $tempEmail) {
                                 $lineNumber = $i + 1;
                                 array_push($this->emailYouAlreadyUsed, "Line $lineNumber email address is duplicated!");
@@ -349,7 +356,7 @@ class RegistrantsList extends Component
                             $mainDelegate = null;
                             $subDelegate = null;
 
-                            $tempEmail = $rows[$i][17];
+                            $tempEmail = $rows[$i][18];
                             $lineNumber = $i + 1;
 
                             foreach ($allDelegates as $delegate) {
@@ -381,15 +388,32 @@ class RegistrantsList extends Component
                                 continue;
                             } else {
                                 // check promo codes if valid
-                                $promoCodeUsed = $rows[$i][11];
-                                $badgeType = $rows[$i][12];
+                                $promoCodeUsed = $rows[$i][12];
+                                $badgeType = $rows[$i][13];
                                 $lineNumber = $i + 1;
 
                                 if ($promoCodeUsed != null) {
-                                    $promoCode = PromoCodes::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->where('active', true)->where('promo_code', $promoCodeUsed)->where('badge_type', $badgeType)->first();
-                                    if ($promoCode == null) {
-                                        array_push($this->promoCodeErrors, "Line $lineNumber promo code is invalid");
+                                    $promoCode = PromoCodes::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->where('active', true)->where('promo_code', $promoCodeUsed)->first();
+
+                                    $promoCodeChecker = true;
+
+                                    if($promoCode != null){
+                                        if($promoCode->badge_type == $badgeType){
+                                            $promoCodeChecker = true;
+                                        } else {
+                                            $promoCodeAddtionalBadgeType = PromoCodeAddtionalBadgeTypes::where('event_id', $this->eventId)->where('promo_code_id', $promoCode->id)->where('badge_type', $badgeType)->first();
+
+                                            if($promoCodeAddtionalBadgeType != null){
+                                                $promoCodeChecker = true;
+                                            } else {
+                                                $promoCodeChecker = false;
+                                            }
+                                        }
                                     } else {
+                                        $promoCodeChecker = false;
+                                    }
+
+                                    if($promoCodeChecker){
                                         if ($promoCode->total_usage < $promoCode->number_of_codes) {
                                             $validityDateTime = Carbon::parse($promoCode->validity);
                                             if (Carbon::now()->lt($validityDateTime)) {
@@ -399,9 +423,11 @@ class RegistrantsList extends Component
                                         } else {
                                             array_push($this->promoCodeErrors, "Line $lineNumber promo code has reached its capacity");
                                         }
+                                    } else {
+                                        array_push($this->promoCodeErrors, "Line $lineNumber promo code is invalid");
                                     }
                                 } else {
-                                    if ($rows[$i][10] == "Free") {
+                                    if ($rows[$i][11] == "Free") {
                                         array_push($this->promoCodeErrors, "Line $lineNumber promo code is required since the payment status is Free");
                                     }
                                 }
@@ -491,27 +517,25 @@ class RegistrantsList extends Component
         // dd($finalData);
         foreach ($finalData as $transactions) {
             foreach ($transactions as $transaction) {
-                if ($transaction['pass_type'] != "Non-Member") {
-                    if ($this->event->eb_full_member_rate != null && $this->event->std_full_member_rate != null) {
-                        $delegatePassType = 'fullMember';
+                if($transaction['pass_type'] == "Full Member"){
+                    $delegatePassType = 'fullMember';
 
-                        if ($transaction['rate_type'] == "earlyBird") {
-                            $rateTypeString = "Full member early bird rate";
-                            $finalUnitPrice = $this->event->eb_full_member_rate;
-                        } else {
-                            $rateTypeString = "Full member standard rate";
-                            $finalUnitPrice = $this->event->std_full_member_rate;
-                        }
+                    if ($transaction['rate_type'] == "earlyBird") {
+                        $rateTypeString = "Full member early bird rate";
+                        $finalUnitPrice = $this->event->eb_full_member_rate;
                     } else {
-                        $delegatePassType = 'member';
+                        $rateTypeString = "Full member standard rate";
+                        $finalUnitPrice = $this->event->std_full_member_rate;
+                    }
+                } else if($transaction['pass_type'] == "Member"){
+                    $delegatePassType = 'member';
 
-                        if ($transaction['rate_type'] == "earlyBird") {
-                            $rateTypeString = "Member early bird rate";
-                            $finalUnitPrice = $this->event->eb_member_rate;
-                        } else {
-                            $rateTypeString = "Member standard rate";
-                            $finalUnitPrice = $this->event->std_member_rate;
-                        }
+                    if ($transaction['rate_type'] == "earlyBird") {
+                        $rateTypeString = "Member early bird rate";
+                        $finalUnitPrice = $this->event->eb_member_rate;
+                    } else {
+                        $rateTypeString = "Member standard rate";
+                        $finalUnitPrice = $this->event->std_member_rate;
                     }
                 } else {
                     $delegatePassType = 'nonMember';
@@ -589,6 +613,7 @@ class RegistrantsList extends Component
                     'rate_type_string' => $rateTypeString,
 
                     'company_name' => $transaction['company_name'],
+                    'alternative_company_name' => $transaction['alternative_company_name'],
                     'company_sector' => $transaction['company_sector'],
                     'company_address' => $transaction['company_address'],
                     'company_country' => $transaction['company_country'],
@@ -680,7 +705,7 @@ class RegistrantsList extends Component
             $checkIfMatch = 0;
             $arrayDataIndex = 0;
             foreach ($arrayData as $index => $data) {
-                if ($data['company_name'] == $rows[$i][2]) {
+                if ($data['company_name'] == $rows[$i][3] && $data['alternative_company_name'] == $rows[$i][4]) {
                     $checkIfMatch++;
                     $arrayDataIndex = $index;
                     break;
@@ -689,46 +714,47 @@ class RegistrantsList extends Component
 
             if ($checkIfMatch > 0) {
                 $delegate = [
-                    'payment_status' => $rows[$i][10],
-                    'pcode_used' => $rows[$i][11] == "" ? null : $rows[$i][11],
-                    'badge_type' => $rows[$i][12],
-                    'salutation' => $rows[$i][13] == "" ? null : $rows[$i][13],
-                    'first_name' => $rows[$i][14],
-                    'middle_name' => $rows[$i][15] == "" ? null : $rows[$i][15],
-                    'last_name' => $rows[$i][16],
-                    'email_address' => $rows[$i][17],
-                    'mobile_number' => $rows[$i][18],
-                    'nationality' => $rows[$i][19],
-                    'job_title' => $rows[$i][20],
+                    'payment_status' => $rows[$i][11],
+                    'pcode_used' => $rows[$i][12] == "" ? null : $rows[$i][12],
+                    'badge_type' => $rows[$i][13],
+                    'salutation' => $rows[$i][14] == "" ? null : $rows[$i][14],
+                    'first_name' => $rows[$i][15],
+                    'middle_name' => $rows[$i][16] == "" ? null : $rows[$i][16],
+                    'last_name' => $rows[$i][17],
+                    'email_address' => $rows[$i][18],
+                    'mobile_number' => $rows[$i][19],
+                    'nationality' => $rows[$i][20],
+                    'job_title' => $rows[$i][21],
                 ];
 
                 array_push($arrayData[$arrayDataIndex]['delegates'], $delegate);
             } else {
                 $delegate = [
-                    'payment_status' => $rows[$i][10],
-                    'pcode_used' => $rows[$i][11] == "" ? null : $rows[$i][11],
-                    'badge_type' => $rows[$i][12],
-                    'salutation' => $rows[$i][13] == "" ? null : $rows[$i][13],
-                    'first_name' => $rows[$i][14],
-                    'middle_name' => $rows[$i][15] == "" ? null : $rows[$i][15],
-                    'last_name' => $rows[$i][16],
-                    'email_address' => $rows[$i][17],
-                    'mobile_number' => $rows[$i][18],
-                    'nationality' => $rows[$i][19],
-                    'job_title' => $rows[$i][20],
+                    'payment_status' => $rows[$i][11],
+                    'pcode_used' => $rows[$i][12] == "" ? null : $rows[$i][12],
+                    'badge_type' => $rows[$i][13],
+                    'salutation' => $rows[$i][14] == "" ? null : $rows[$i][14],
+                    'first_name' => $rows[$i][15],
+                    'middle_name' => $rows[$i][16] == "" ? null : $rows[$i][16],
+                    'last_name' => $rows[$i][17],
+                    'email_address' => $rows[$i][18],
+                    'mobile_number' => $rows[$i][19],
+                    'nationality' => $rows[$i][20],
+                    'job_title' => $rows[$i][21],
                 ];
 
                 array_push($arrayData, [
                     'rate_type' => $rateType,
                     'pass_type' => $rows[$i][1],
                     'company_name' => $rows[$i][2],
-                    'company_sector' => $rows[$i][3],
-                    'company_address' => $rows[$i][4],
-                    'company_country' => $rows[$i][5],
-                    'company_city' => $rows[$i][6],
-                    'company_telephone_number' => $rows[$i][7] == "" ? null : $rows[$i][7],
-                    'company_mobile_number' => $rows[$i][8],
-                    'assistant_email_address' => $rows[$i][9] == "" ? null : $rows[$i][9],
+                    'alternative_company_name' => $rows[$i][3] == "" ? null : $rows[$i][3],
+                    'company_sector' => $rows[$i][4],
+                    'company_address' => $rows[$i][5],
+                    'company_country' => $rows[$i][6],
+                    'company_city' => $rows[$i][7],
+                    'company_telephone_number' => $rows[$i][8] == "" ? null : $rows[$i][8],
+                    'company_mobile_number' => $rows[$i][9],
+                    'assistant_email_address' => $rows[$i][10] == "" ? null : $rows[$i][10],
                     'delegates' => [
                         $delegate
                     ],
@@ -736,30 +762,31 @@ class RegistrantsList extends Component
             }
         } else {
             $delegate = [
-                'payment_status' => $rows[$i][10],
-                'pcode_used' => $rows[$i][11] == "" ? null : $rows[$i][11],
-                'badge_type' => $rows[$i][12],
-                'salutation' => $rows[$i][13] == "" ? null : $rows[$i][13],
-                'first_name' => $rows[$i][14],
-                'middle_name' => $rows[$i][15] == "" ? null : $rows[$i][15],
-                'last_name' => $rows[$i][16],
-                'email_address' => $rows[$i][17],
-                'mobile_number' => $rows[$i][18],
-                'nationality' => $rows[$i][19],
-                'job_title' => $rows[$i][20],
+                'payment_status' => $rows[$i][11],
+                'pcode_used' => $rows[$i][12] == "" ? null : $rows[$i][12],
+                'badge_type' => $rows[$i][13],
+                'salutation' => $rows[$i][14] == "" ? null : $rows[$i][14],
+                'first_name' => $rows[$i][15],
+                'middle_name' => $rows[$i][16] == "" ? null : $rows[$i][16],
+                'last_name' => $rows[$i][17],
+                'email_address' => $rows[$i][18],
+                'mobile_number' => $rows[$i][19],
+                'nationality' => $rows[$i][20],
+                'job_title' => $rows[$i][21],
             ];
 
             array_push($arrayData, [
                 'rate_type' => $rateType,
                 'pass_type' => $rows[$i][1],
                 'company_name' => $rows[$i][2],
-                'company_sector' => $rows[$i][3],
-                'company_address' => $rows[$i][4],
-                'company_country' => $rows[$i][5],
-                'company_city' => $rows[$i][6],
-                'company_telephone_number' => $rows[$i][7] == "" ? null : $rows[$i][7],
-                'company_mobile_number' => $rows[$i][8],
-                'assistant_email_address' => $rows[$i][9] == "" ? null : $rows[$i][9],
+                'alternative_company_name' => $rows[$i][3] == "" ? null : $rows[$i][3],
+                'company_sector' => $rows[$i][4],
+                'company_address' => $rows[$i][5],
+                'company_country' => $rows[$i][6],
+                'company_city' => $rows[$i][7],
+                'company_telephone_number' => $rows[$i][8] == "" ? null : $rows[$i][8],
+                'company_mobile_number' => $rows[$i][9],
+                'assistant_email_address' => $rows[$i][10] == "" ? null : $rows[$i][10],
                 'delegates' => [
                     $delegate
                 ],

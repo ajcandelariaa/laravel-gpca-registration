@@ -21,48 +21,111 @@
         </div>
     </div>
 
-    @php
-        $count = 1;
-    @endphp
+    <div class="grid grid-cols-6 gap-2 justify-end">
+        <div class="col-span-2 bg-white p-4">
+            <p>{{ $event->name }} – {{ $eventFormattedDate }}</p>
 
-    @foreach ($spouseInvoiceDetails as $spouseInvoiceDetail)
-        <div class="grid grid-cols-6 gap-2">
-            <div class="col-span-2 bg-white p-4">
-                @if ($count == 1)
-                    <p>{{ $event->name }} – {{ $eventFormattedDate }} at
-                        {{ $event->location }}</p>
-                    <p class="mt-10">{{ $spouseInvoiceDetail['spouseDescription'] }}</p>
-                @else
-                    <p>{{ $spouseInvoiceDetail['spouseDescription'] }}</p>
+            <p class="mt-4">Spouse registration fee</p>
+
+            <ul class="mt-2 list-decimal ml-4">
+                @if ($day_one)
+                    <li>December 4, 2023 (Monday)</li>
                 @endif
-                <ul class="mt-2 list-decimal ml-4">
-                    @foreach ($spouseInvoiceDetail['spouseNames'] as $name)
-                        <li>{{ $name }}</li>
-                    @endforeach
-                </ul>
-            </div>
 
-            <div class="col-span-1 bg-white p-4 flex justify-center items-center">
-                <p>{{ $spouseInvoiceDetail['quantity'] }}</p>
-            </div>
+                @if ($day_two)
+                    <li>December 5, 2023 (Tuesday)</li>
+                @endif
 
-            <div class="col-span-1 bg-white p-4 flex justify-center items-center">
-                <p>$ {{ number_format($finalUnitPrice, 2, '.', ',') }}</p>
-            </div>
+                @if ($day_three)
+                    <li>December 6, 2023 (Wednesday)</li>
+                @endif
 
-            <div class="col-span-1 bg-white p-4 flex justify-center items-center">
-                <p>$ {{ number_format($spouseInvoiceDetail['totalDiscount'], 2, '.', ',') }}</p>
-            </div>
+                @if ($day_four)
+                    <li>December 7, 2023 (Thursday)</li>
+                @endif
+            </ul>
+        </div>
 
-            <div class="col-span-1 bg-white p-4 flex justify-center items-center">
-                <p>$ {{ number_format($spouseInvoiceDetail['totalNetAmount'], 2, '.', ',') }}</p>
+        <div class="col-span-1 bg-white p-4 flex justify-center items-end">
+            <div class="mt-2">
+                @if ($day_one)
+                    <p>1</p>
+                @endif
+
+                @if ($day_two)
+                    <p>1</p>
+                @endif
+
+                @if ($day_three)
+                    <p>1</p>
+                @endif
+
+                @if ($day_four)
+                    <p>1</p>
+                @endif
             </div>
         </div>
 
-        @php
-            $count += 1;
-        @endphp
-    @endforeach
+        <div class="col-span-1 bg-white p-4 flex justify-center items-end">
+            <div class="mt-2">
+                @if ($day_one)
+                    <p>$ 200.00</p>
+                @endif
+
+                @if ($day_two)
+                    <p>$ 220.00</p>
+                @endif
+
+                @if ($day_three)
+                    <p>$ 200.00</p>
+                @endif
+
+                @if ($day_four)
+                    <p>$ 200.00</p>
+                @endif
+            </div>
+        </div>
+
+        <div class="col-span-1 bg-white p-4 flex justify-center items-end">
+            <div class="mt-2">
+                @if ($day_one)
+                    <p>$ 0.00</p>
+                @endif
+
+                @if ($day_two)
+                    <p>$ 0.00</p>
+                @endif
+
+                @if ($day_three)
+                    <p>$ 0.00</p>
+                @endif
+
+                @if ($day_four)
+                    <p>$ 0.00</p>
+                @endif
+            </div>
+        </div>
+
+        <div class="col-span-1 bg-white p-4 flex justify-center items-end">
+            <div class="mt-2">
+                @if ($day_one)
+                    <p>$ 200.00</p>
+                @endif
+
+                @if ($day_two)
+                    <p>$ 220.00</p>
+                @endif
+
+                @if ($day_three)
+                    <p>$ 200.00</p>
+                @endif
+
+                @if ($day_four)
+                    <p>$ 200.00</p>
+                @endif
+            </div>
+        </div>
+    </div>
 
     <div class="grid grid-cols-5 gap-2 mt-2">
         <div class="col-span-4 bg-white p-4">

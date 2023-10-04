@@ -24,6 +24,10 @@ class MainSpouse extends Model
         'nationality',
         'country',
         'city',
+        'day_one',
+        'day_two',
+        'day_three',
+        'day_four',
 
         'reference_delegate_name',
 

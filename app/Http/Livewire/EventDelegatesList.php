@@ -67,6 +67,12 @@ class EventDelegatesList extends Component
                             $delegateScanned = "No";
                         }
 
+                        if($mainDelegate->alternative_company_name != null){
+                            $companyName = $mainDelegate->alternative_company_name;
+                        } else {
+                            $companyName = $mainDelegate->company_name;
+                        }
+
                         array_push($this->finalListsOfDelegatesTemp, [
                             'mainDelegateId' => $mainDelegate->id,
                             'delegateId' => $mainDelegate->id,
@@ -75,7 +81,7 @@ class EventDelegatesList extends Component
                             'delegatePrinted' => $delegatePrinted,
                             'delegateScanned' => $delegateScanned,
                             'delegateType' => "main",
-                            'delegateCompany' => $mainDelegate->company_name,
+                            'delegateCompany' => $companyName,
                             'delegateJobTitle' => $mainDelegate->job_title,
                             'delegateSalutation' => $mainDelegate->salutation,
                             'delegateFName' => $mainDelegate->first_name,
@@ -129,7 +135,7 @@ class EventDelegatesList extends Component
                                     'delegatePrinted' => $delegatePrinted,
                                     'delegateScanned' => $delegatePrinted,
                                     'delegateType' => "sub",
-                                    'delegateCompany' => $mainDelegate->company_name,
+                                    'delegateCompany' => $companyName,
                                     'delegateJobTitle' => $subDelegate->job_title,
                                     'delegateSalutation' => $subDelegate->salutation,
                                     'delegateFName' => $subDelegate->first_name,
@@ -219,8 +225,8 @@ class EventDelegatesList extends Component
             $this->name = $this->finalListsOfDelegates[$delegateIndex]['delegateFName'] . ' ' . $this->finalListsOfDelegates[$delegateIndex]['delegateMName'] . ' ' . $this->finalListsOfDelegates[$delegateIndex]['delegateLName'];
         }
 
-        $this->jobTitle = $this->finalListsOfDelegates[$delegateIndex]['delegateCompany'];
-        $this->company = $this->finalListsOfDelegates[$delegateIndex]['delegateJobTitle'];
+        $this->jobTitle = $this->finalListsOfDelegates[$delegateIndex]['delegateJobTitle'];
+        $this->company = $this->finalListsOfDelegates[$delegateIndex]['delegateCompany'];
         $this->registrationType = $this->finalListsOfDelegates[$delegateIndex]['delegateBadgeType'];
 
         $registrationType = EventRegistrationTypes::where('event_id', $this->event->id)->where('registration_type', $this->registrationType)->first();

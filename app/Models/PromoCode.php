@@ -18,6 +18,8 @@ class PromoCode extends Model
         'promo_code',
         'discount_type',
         'discount',
+        'new_rate',
+        'new_rate_description',
         'total_usage',
         'number_of_codes',
         'validity',

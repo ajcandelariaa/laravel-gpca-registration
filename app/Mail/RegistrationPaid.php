@@ -35,11 +35,18 @@ class RegistrationPaid extends Mailable
      */
     public function envelope()
     {
-        if ($this->details['eventCategory'] == "RCCA") {
-            $subject = 'Thank you for your entry submission to the ' . $this->details['eventName'];
+        if ($this->details['eventYear'] == '2023') {
+            if ($this->details['eventCategory'] == "RCCA") {
+                $subject = 'Thank you for your entry submission to the ' . $this->details['eventName'];
+            } else if ($this->details['eventCategory'] == "AFS") {
+                $subject = 'Registration confirmation for the ' . $this->details['eventName'];
+            } else {
+                $subject = 'Registration confirmation for the ' . $this->details['eventName'];
+            }
         } else {
             $subject = 'Registration confirmation for the ' . $this->details['eventName'];
         }
+
         return new Envelope(
             from: new Address('forumregistration@gpca.org.ae', 'GPCA Events Registration'),
             subject: $subject,

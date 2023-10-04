@@ -36,9 +36,14 @@ class RegistrationUnpaid extends Mailable
      */
     public function envelope()
     {
-
-        if ($this->details['eventCategory'] == "RCCA") {
-            $subject = 'Outstanding payment for your entry submission on the ' . $this->details['eventName'];
+        if ($this->details['eventYear'] == '2023') {
+            if ($this->details['eventCategory'] == "RCCA") {
+                $subject = 'Outstanding payment for your entry submission on the ' . $this->details['eventName'];
+            } else if ($this->details['eventCategory'] == "AFS") {
+                $subject = 'Your Exclusive Spouse Program Experience at the 17th Annual GPCA Forum';
+            } else {
+                $subject = 'Outstanding payment for your ' . $this->details['eventName'] . ' registration';
+            }
         } else {
             $subject = 'Outstanding payment for your ' . $this->details['eventName'] . ' registration';
         }

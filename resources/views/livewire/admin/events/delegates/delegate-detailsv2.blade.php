@@ -25,7 +25,7 @@
                             {{ $finalDelegate['first_name'] }} {{ $finalDelegate['middle_name'] }}
                             {{ $finalDelegate['last_name'] }}</p>
                         <p class="mt-2 italic text-lg">{{ $finalDelegate['job_title'] }}</p>
-                        <p class="font-bold text-lg">{{ $finalDelegate['companyName'] }}</p>
+                        <p class="font-bold text-lg">{{ $finalDelegate['company_name'] }}</p>
                     </div>
                     <div>
                         <p class="text-center">Scan here</p>
@@ -38,6 +38,15 @@
                 <hr class="my-6">
 
                 <div class="grid grid-cols-delegateDetailGrid2 gap-y-2 items-center">
+                    <p class="font-bold">Other Company name:</p>
+                    <p>
+                        @if ($finalDelegate['alternative_company_name'] != null)
+                            {{ $finalDelegate['alternative_company_name'] }}
+                        @else
+                            N/A
+                        @endif
+                    </p>
+
                     <p class="font-bold">Pass type:</p>
                     <p>
                         @if ($finalDelegate['pass_type'] == 'fullMember')
@@ -111,7 +120,7 @@
                                 @endif
                             </p>
                             <p class="text-center">{{ $finalDelegate['job_title'] }}</p>
-                            <p class="text-center font-bold">{{ $finalDelegate['companyName'] }}</p>
+                            <p class="text-center font-bold">{{ $finalDelegate['company_name'] }}</p>
                         </div>
                         <div>
                             <p class="text-center py-4 font-bold uppercase"
@@ -141,7 +150,7 @@
                                 @endif
                             </p>
                             <p class="text-center">{{ $finalDelegate['job_title'] }}</p>
-                            <p class="text-center font-bold">{{ $finalDelegate['companyName'] }}</p>
+                            <p class="text-center font-bold">{{ $finalDelegate['company_name'] }}</p>
                         </div>
                         <div>
                             <p class="text-center py-4 font-bold uppercase"

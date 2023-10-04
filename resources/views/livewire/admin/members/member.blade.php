@@ -10,6 +10,9 @@
     <div class="shadow-lg my-5 pt-5 bg-white rounded-md" style="margin-left: 320px; ">
         <div class="flex gap-5 items-center">
             <div>
+                <a href="{{ route('admin.member.export.data') }}" target="_blank"
+                    class="bg-green-600 hover:bg-green-700 text-white py-2 px-5 rounded-md text-lg text-center">Export
+                    Data to Excel</a>
                 <button type="button" wire:click="openImportModal" wire:key="openImportModal"
                     class="bg-sky-600 hover:bg-sky-700 text-white py-2 px-5 rounded-md text-lg text-center">Import
                     Members</button>

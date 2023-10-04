@@ -7,6 +7,39 @@
         {{-- ROW 1 --}}
         <div class="col-span-2 space-y-2">
             <div class="text-registrationPrimaryColor">
+                Select which day(s) you want to attend <span class="text-red-500">*</span>
+            </div>
+            <div>
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" wire:model.lazy="selectedDays" value="1">
+                    <label>December 4, 2023 (Monday)</label>
+                </div>
+                
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" wire:model.lazy="selectedDays" value="2">
+                    <label>December 5, 2023 (Tuesday)</label>
+                </div>
+                
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" wire:model.lazy="selectedDays" value="3">
+                    <label>December 6, 2023 (Wednesday)</label>
+                </div>
+                
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" wire:model.lazy="selectedDays" value="4">
+                    <label>December 7, 2023 (Thursday)</label>
+                </div>
+
+                @error('selectedDays')
+                    <div class="text-red-500 text-xs italic mt-1">
+                        {{ $message }}
+                    </div>
+                @enderror
+            </div>
+        </div>
+
+        <div class="col-span-2 space-y-2">
+            <div class="text-registrationPrimaryColor">
                 Full name of Annual GPCA Forum registered attendee? <span class="text-red-500">*</span>
             </div>
             <div>
@@ -173,12 +206,6 @@
                                 {{ $emailMainExistingError }}
                             </div>
                         @endif
-
-                        @if ($emailMainAlreadyUsedError != null)
-                            <div class="text-red-500 text-xs italic mt-1">
-                                {{ $emailMainAlreadyUsedError }}
-                            </div>
-                        @endif
                     </div>
                 </div>
 
@@ -228,90 +255,3 @@
         </div>
     </div>
 </div>
-
-{{-- @if (!empty($additionalSpouses))
-    <div class="mt-10 mx-5">
-        <div class="text-registrationPrimaryColor italic font-bold text-xl">
-            Additional spouse(s)
-        </div>
-
-        <div class="mt-5">
-            @php $count = 2; @endphp
-            @foreach ($additionalSpouses as $additionSpouse)
-                <div class="bg-registrationCardBGColor px-5 py-2 mt-5 flex justify-between rounded-md">
-                    <div>
-                        <div class="font-bold text-2xl flex items-center gap-2 mt-1">
-                            <p>{{ $additionSpouse['subSalutation'] }} {{ $additionSpouse['subFirstName'] }}
-                                {{ $additionSpouse['subMiddleName'] }} {{ $additionSpouse['subLastName'] }}
-                            </p>
-                        </div>
-                        <p class="mt-2"> {{ $additionSpouse['subEmailAddress'] }},
-                            {{ $additionSpouse['subMobileNumber'] }}</p>
-                        <p>Nationality: {{ $additionSpouse['subNationality'] }}</p>
-                        <p>Country & City: {{ $additionSpouse['subCountry'] }} & {{ $additionSpouse['subCity'] }}</p>
-                    </div>
-                    <div class="flex flex-col justify-between items-end">
-                        <p class="text-registrationPrimaryColor font-bold">Spouse {{ $count }}</p>
-                        <div class="flex gap-3">
-                            <div wire:click.prevent="openEditModal('{{ $additionSpouse['subSpouseId'] }}')"
-                                class="cursor-pointer hover:text-yellow-600 text-yellow-500">
-                                <i class="fa-solid fa-pen-to-square"></i>
-                                Edit
-                            </div>
-
-                            <div wire:click.prevent="removeAdditionalSpouse('{{ $additionSpouse['subSpouseId'] }}')"
-                                class="cursor-pointer hover:text-red-600 text-red-500">
-                                <i class="fa-solid fa-trash"></i>
-                                Remove
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                @php $count++; @endphp
-            @endforeach
-        </div>
-    </div>
-@endif
-
-<div class="mt-10 flex flex-col sm:flex-row gap-10 mx-5">
-    <div class="col-span-1">
-
-        @if ($showAddSpouseModal)
-            @include('livewire.registration.spouse.modal.add_spouse_modal')
-        @endif
-
-        @if ($showEditSpouseModal)
-            @include('livewire.registration.spouse.modal.edit_spouse_modal')
-        @endif
-
-        @if (
-            $firstName != null &&
-                $lastName != null &&
-                $emailAddress != null &&
-                $mobileNumber != null &&
-                $nationality != null &&
-                $country != null &&
-                $city != null &&
-                count($additionalSpouses) < 4)
-            <button wire:click.prevent="openAddModal" type="button" wire:key="btnOpenAddModal"
-                class="cursor-pointer hover:bg-registrationPrimaryColor hover:text-white font-bold border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor rounded-md py-4 px-10">+
-                Add more</button>
-        @else
-            <button disabled type="button"
-                class="cursor-not-allowed font-bold border-gray-600 border-2 bg-white text-gray-600  rounded-md py-4 px-10">+
-                Add more</button>
-        @endif
-    </div>
-
-   <div class="col-span-1">
-        <div class="text-registrationPrimaryColor italic font-bold text-xl">
-            Do you wish to invite more delegates?
-        </div>
-
-        <div class="text-registrationPrimaryColor italic text-sm mt-2 w-full sm:w-3/5">
-            If you wish to register more than 5 delegates, please contact our sales team at
-            forumregistration@gpca.org.ae or call +971 4 5106666 ext. 153
-        </div>
-    </div> 
-</div> --}}

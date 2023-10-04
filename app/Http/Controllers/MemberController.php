@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Member;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class MemberController extends Controller
@@ -42,4 +43,54 @@ class MemberController extends Controller
             'data' => $finalMembers,
         ], 200);
     }
+
+    public function exportListOfMembers(){
+        $members = Member::get();
+        $finalExcelData = array();
+
+        foreach($members as  $member){
+            array_push($finalExcelData, [
+                'name' => $member->name,
+                'type' => $member->type,
+                'status' => $member->active ? 'Active' : 'Inactive',
+            ]);
+        }
+
+        $currentDate = Carbon::now()->format('Y-m-d');
+        $fileName = 'Registration Member List ' . '[' . $currentDate . '].csv';
+
+        $headers = array(
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=$fileName",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        );
+        
+        $columns = array(
+            'Company Name',
+            'Type',
+            'Status',
+        );
+
+        $callback = function () use ($finalExcelData, $columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+
+            foreach ($finalExcelData as $data) {
+                fputcsv(
+                    $file,
+                    array(
+                        $data['name'],
+                        $data['type'],
+                        $data['status'],
+                    )
+                );
+            }
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
 }

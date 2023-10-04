@@ -141,7 +141,8 @@
                 class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                 <option value=""></option>
                 @foreach ($registrationTypes as $registrationType)
-                    <option value="{{ $registrationType->registration_type }}">{{ $registrationType->registration_type }}</option>
+                    <option value="{{ $registrationType->registration_type }}">
+                        {{ $registrationType->registration_type }}</option>
                 @endforeach
             </select>
         @endif
@@ -181,10 +182,16 @@
                 </div>
             @endif
 
-            @if ($replacePromoCodeDiscount != null)
+            @if ($replaceDiscountType == 'fixed')
                 <div class="text-green-500 text-xs italic mt-1">
-                    {{ $replacePromoCodeDiscount }}% discount
+                    Fixed rate applied
                 </div>
+            @else
+                @if ($replacePromoCodeDiscount != null)
+                    <div class="text-green-500 text-xs italic mt-1">
+                        {{ $replacePromoCodeDiscount }}% discount
+                    </div>
+                @endif
             @endif
         @endif
     </div>

@@ -16,7 +16,7 @@
                         <div class="mt-5 grid grid-cols-2 gap-y-3 gap-x-5">
                             {{-- ROW 1 --}}
 
-                            <div class="col-span-1">
+                            <div class="col-span-2">
                                 <div class="text-registrationPrimaryColor">
                                     Code: <span class="text-red-500">*</span>
                                 </div>
@@ -31,7 +31,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-span-1">
+                            <div class="col-span-2">
                                 <div class="text-registrationPrimaryColor">
                                     Registration Type: <span class="text-red-500">*</span>
                                 </div>
@@ -53,7 +53,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-span-1">
+                            <div class="col-span-2">
                                 <div class="text-registrationPrimaryColor">
                                     Discount Type: <span class="text-red-500">*</span>
                                 </div>
@@ -63,6 +63,7 @@
                                         <option value=""></option>
                                         <option value="percentage">Percentage</option>
                                         <option value="price">Price</option>
+                                        <option value="fixed">Fixed</option>
                                     </select>
 
                                     @error('editDiscountType')
@@ -74,20 +75,19 @@
                             </div>
 
 
-                            @if ($editDiscountType != null)
-
-                                <div class="col-span-1">
+                            @if ($editDiscountType != null && $editDiscountType != 'fixed')
+                                <div class="col-span-2">
                                     <div class="text-registrationPrimaryColor">
                                         Discount: <span class="text-red-500">*</span>
                                     </div>
                                     <div>
                                         @if ($editDiscountType == 'percentage')
-                                            <input type="number" wire:model.lazy="editDiscount" step="1" min="0"
-                                                placeholder="0%" max="100"
+                                            <input type="number" wire:model.lazy="editDiscount" step="1"
+                                                min="0" placeholder="0%" max="100"
                                                 class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                                         @else
-                                            <input type="number" wire:model.lazy="editDiscount" step="1" min="0"
-                                                placeholder="0"
+                                            <input type="number" wire:model.lazy="editDiscount" step="1"
+                                                min="0" placeholder="0"
                                                 class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                                         @endif
 
@@ -100,13 +100,47 @@
                                 </div>
                             @endif
 
-                            <div class="col-span-1">
+                            @if ($editDiscountType != null && $editDiscountType == 'fixed')
+                                <div class="col-span-2">
+                                    <div class="text-registrationPrimaryColor">
+                                        New rate: <span class="text-red-500">*</span>
+                                    </div>
+                                    <div>
+                                        <input type="number" wire:model.lazy="editNewRate" step="1" min="0"
+                                            placeholder="0"
+                                            class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+
+                                        @error('editNewRate')
+                                            <span class="mt-2 text-red-600 italic text-sm">
+                                                {{ $message }}
+                                            </span>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <div class="col-span-2">
+                                    <div class="text-registrationPrimaryColor">
+                                        New rate description: <span class="text-red-500">*</span>
+                                    </div>
+                                    <div>
+                                        <input type="text" wire:model.lazy="editNewRateDescription"
+                                            class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                                        @error('editNewRateDescription')
+                                            <span class="mt-2 text-red-600 italic text-sm">
+                                                {{ $message }}
+                                            </span>
+                                        @enderror
+                                    </div>
+                                </div>
+                            @endif
+
+                            <div class="col-span-2">
                                 <div class="text-registrationPrimaryColor">
                                     Number of Codes: <span class="text-red-500">*</span>
                                 </div>
                                 <div>
-                                    <input type="number" wire:model.lazy="editNumberOfCodes" step="1" min="1"
-                                        placeholder="1" max="10000"
+                                    <input type="number" wire:model.lazy="editNumberOfCodes" step="1"
+                                        min="1" placeholder="1" max="10000"
                                         class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
 
                                     @error('editNumberOfCodes')
@@ -117,7 +151,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-span-1">
+                            <div class="col-span-2">
                                 <div class="text-registrationPrimaryColor">
                                     Code Validity: <span class="text-red-500">*</span>
                                 </div>

@@ -14,6 +14,7 @@ use App\Models\MainDelegate;
 use App\Models\MainSpouse;
 use App\Models\MainVisitor;
 use App\Models\PrintedBadge;
+use App\Models\PromoCodeAddtionalBadgeType;
 use App\Models\RccAwardsAdditionalParticipant;
 use App\Models\RccAwardsDocument;
 use App\Models\RccAwardsMainParticipant;
@@ -300,11 +301,23 @@ class RegistrationController extends Controller
             $eventYear = Event::where('id', $eventId)->value('year');
             $mainDelegate = MainDelegate::where('id', $registrantId)->where('event_id', $eventId)->first();
 
-            $promoCode = PromoCode::where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $mainDelegate->pcode_used)->where('badge_type', $mainDelegate->badge_type)->first();
+            $promoCode = PromoCode::where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $mainDelegate->pcode_used)->first();
 
             if ($promoCode != null) {
-                $mainDiscount = $promoCode->discount;
-                $mainDiscountType = $promoCode->discount_type;
+                if ($promoCode->badge_type == $mainDelegate->badge_type) {
+                    $mainDiscount = $promoCode->discount;
+                    $mainDiscountType = $promoCode->discount_type;
+                } else {
+                    $promoCodeAdditionalBadgeType = PromoCodeAddtionalBadgeType::where('event_id', $eventId)->where('promo_code_id', $promoCode->id)->where('badge_type', $mainDelegate->badge_type)->first();
+
+                    if ($promoCodeAdditionalBadgeType != null) {
+                        $mainDiscount = $promoCode->discount;
+                        $mainDiscountType = $promoCode->discount_type;
+                    } else {
+                        $mainDiscount = 0;
+                        $mainDiscountType = null;
+                    }
+                }
             } else {
                 $mainDiscount = 0;
                 $mainDiscountType = null;
@@ -333,11 +346,23 @@ class RegistrationController extends Controller
                         $countFinalQuantity++;
                     }
 
-                    $subPromoCode = PromoCode::where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $subDelegate->pcode_used)->where('badge_type', $subDelegate->badge_type)->first();
+                    $subPromoCode = PromoCode::where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $subDelegate->pcode_used)->first();
 
                     if ($subPromoCode != null) {
-                        $subDiscount = $subPromoCode->discount;
-                        $subDiscountType = $subPromoCode->discount_type;
+                        if ($subPromoCode->badge_type == $subDelegate->badge_type) {
+                            $subDiscount = $subPromoCode->discount;
+                            $subDiscountType = $subPromoCode->discount_type;
+                        } else {
+                            $subPromoCodeAdditionalBadgeType = PromoCodeAddtionalBadgeType::where('event_id', $eventId)->where('promo_code_id', $subPromoCode->id)->where('badge_type', $subDelegate->badge_type)->first();
+
+                            if ($subPromoCodeAdditionalBadgeType != null) {
+                                $subDiscount = $subPromoCode->discount;
+                                $subDiscountType = $subPromoCode->discount_type;
+                            } else {
+                                $subDiscount = 0;
+                                $subDiscountType = null;
+                            }
+                        }
                     } else {
                         $subDiscount = 0;
                         $subDiscountType = null;
@@ -600,6 +625,7 @@ class RegistrationController extends Controller
                 'rate_type' => $mainDelegate->rate_type,
                 'rate_type_string' => $mainDelegate->rate_type_string,
                 'company_name' => $mainDelegate->company_name,
+                'alternative_company_name' => $mainDelegate->alternative_company_name,
                 'company_sector' => $mainDelegate->company_sector,
                 'company_address' => $mainDelegate->company_address,
                 'company_country' => $mainDelegate->company_country,
@@ -630,7 +656,7 @@ class RegistrationController extends Controller
 
                 'invoiceData' => $this->getInvoice($eventCategory, $eventId, $registrantId),
             ];
-
+            // dd($finalData);
             return $finalData;
         } else {
             abort(404, 'The URL is incorrect');
@@ -1464,6 +1490,12 @@ class RegistrationController extends Controller
                 } else {
                     $pdf = Pdf::loadView('admin.events.transactions.invoices.rcca.paid', $finalData);
                 }
+            } else if ($eventCategory == "AFS") {
+                if ($finalData['paymentStatus'] == "unpaid") {
+                    $pdf = Pdf::loadView('admin.events.transactions.invoices.spouse.unpaid', $finalData);
+                } else {
+                    $pdf = Pdf::loadView('admin.events.transactions.invoices.spouse.paid', $finalData);
+                }
             } else {
                 if ($finalData['paymentStatus'] == "unpaid") {
                     $pdf = Pdf::loadView('admin.events.transactions.invoices.unpaid', $finalData);
@@ -1487,6 +1519,12 @@ class RegistrationController extends Controller
                         $pdf = Pdf::loadView('admin.events.transactions.invoices.rcca.unpaid', $finalData);
                     } else {
                         $pdf = Pdf::loadView('admin.events.transactions.invoices.rcca.paid', $finalData);
+                    }
+                } else if ($eventCategory == "AFS") {
+                    if ($finalData['paymentStatus'] == "unpaid") {
+                        $pdf = Pdf::loadView('admin.events.transactions.invoices.spouse.unpaid', $finalData);
+                    } else {
+                        $pdf = Pdf::loadView('admin.events.transactions.invoices.spouse.paid', $finalData);
                     }
                 } else {
                     if ($finalData['paymentStatus'] == "unpaid") {
@@ -1632,8 +1670,10 @@ class RegistrationController extends Controller
                         if ($promoCode != null) {
                             if ($promoCode->discount_type == "percentage") {
                                 $amountPaid = $mainDelegate->unit_price - ($mainDelegate->unit_price * ($promoCode->discount / 100));
-                            } else {
+                            } else if ($promoCode->discount_type == "price") {
                                 $amountPaid = $mainDelegate->unit_price - $promoCode->discount;
+                            } else {
+                                $amountPaid = $promoCode->new_rate;
                             }
                         }
                     }
@@ -1674,14 +1714,24 @@ class RegistrationController extends Controller
                         $ccEmailNotif = config('app.ccEmailNotif.default');
                     }
 
-                    Mail::to($mainDelegate->email_address)->cc($ccEmailNotif)->send(new RegistrationPaid($details1));
-                    Mail::to($mainDelegate->email_address)->cc($ccEmailNotif)->send(new RegistrationPaymentConfirmation($details2));
+                    try {
+                        Mail::to($mainDelegate->email_address)->cc($ccEmailNotif)->send(new RegistrationPaid($details1));
+                        Mail::to($mainDelegate->email_address)->cc($ccEmailNotif)->send(new RegistrationPaymentConfirmation($details2));
+                    } catch (\Exception $e) {
+                        Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaid($details1));
+                        Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaymentConfirmation($details2));
+                    }
 
                     if ($mainDelegate->assistant_email_address != null) {
                         $details1['amountPaid'] = $mainDelegate->total_amount;
 
-                        Mail::to($mainDelegate->assistant_email_address)->send(new RegistrationPaid($details1));
-                        Mail::to($mainDelegate->assistant_email_address)->send(new RegistrationPaymentConfirmation($details2));
+                        try {
+                            Mail::to($mainDelegate->assistant_email_address)->send(new RegistrationPaid($details1));
+                            Mail::to($mainDelegate->assistant_email_address)->send(new RegistrationPaymentConfirmation($details2));
+                        } catch (\Exception $e) {
+                            Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaid($details1));
+                            Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaymentConfirmation($details2));
+                        }
                     }
 
                     $additionalDelegates = AdditionalDelegate::where('main_delegate_id', $mainDelegateId)->get();
@@ -1700,8 +1750,10 @@ class RegistrationController extends Controller
                                 if ($promoCode != null) {
                                     if ($promoCode->discount_type == "percentage") {
                                         $amountPaidSub = $mainDelegate->unit_price - ($mainDelegate->unit_price * ($promoCode->discount / 100));
-                                    } else {
+                                    } else if ($promoCode->discount_type == "price") {
                                         $amountPaidSub = $mainDelegate->unit_price - $promoCode->discount;
+                                    } else {
+                                        $amountPaidSub = $promoCode->new_rate;
                                     }
                                 }
                             }
@@ -1722,8 +1774,11 @@ class RegistrationController extends Controller
                                 'invoiceLink' => $invoiceLink,
                                 'badgeLink' => env('APP_URL') . "/" . $event->category . "/" . $event->id . "/view-badge" . "/" . "sub" . "/" . $additionalDelegate->id,
                             ];
-
-                            Mail::to($additionalDelegate->email_address)->cc($ccEmailNotif)->send(new RegistrationPaid($details1));
+                            try {
+                                Mail::to($additionalDelegate->email_address)->cc($ccEmailNotif)->send(new RegistrationPaid($details1));
+                            } catch (\Exception $e) {
+                                Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaid($details1));
+                            }
                         }
                     }
                     return redirect()->route('register.loading.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'eventYear' => $event->year, 'mainDelegateId' => $mainDelegateId, 'status' => "success"]);
@@ -1765,10 +1820,18 @@ class RegistrationController extends Controller
                         $ccEmailNotif = config('app.ccEmailNotif.default');
                     }
 
-                    Mail::to($mainDelegate->email_address)->cc($ccEmailNotif)->send(new RegistrationCardDeclined($details));
+                    try {
+                        Mail::to($mainDelegate->email_address)->cc($ccEmailNotif)->send(new RegistrationCardDeclined($details));
+                    } catch (\Exception $e) {
+                        Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationCardDeclined($details));
+                    }
 
                     if ($mainDelegate->assistant_email_address != null) {
-                        Mail::to($mainDelegate->assistant_email_address)->send(new RegistrationCardDeclined($details));
+                        try {
+                            Mail::to($mainDelegate->assistant_email_address)->send(new RegistrationCardDeclined($details));
+                        } catch (\Exception $e) {
+                            Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationCardDeclined($details));
+                        }
                     }
 
                     $additionalDelegates = AdditionalDelegate::where('main_delegate_id', $mainDelegateId)->get();
@@ -1786,7 +1849,11 @@ class RegistrationController extends Controller
                                 'invoiceLink' => $invoiceLink,
                                 'eventYear' => $event->year,
                             ];
-                            Mail::to($additionalDelegate->email_address)->cc($ccEmailNotif)->send(new RegistrationCardDeclined($details));
+                            try {
+                                Mail::to($additionalDelegate->email_address)->cc($ccEmailNotif)->send(new RegistrationCardDeclined($details));
+                            } catch (\Exception $e) {
+                                Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationCardDeclined($details));
+                            }
                         }
                     }
                     return redirect()->route('register.loading.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'eventYear' => $event->year, 'mainDelegateId' => $mainDelegateId, 'status' => "failed"]);
@@ -1828,10 +1895,18 @@ class RegistrationController extends Controller
                     $ccEmailNotif = config('app.ccEmailNotif.default');
                 }
 
-                Mail::to($mainDelegate->email_address)->cc($ccEmailNotif)->send(new RegistrationCardDeclined($details));
+                try {
+                    Mail::to($mainDelegate->email_address)->cc($ccEmailNotif)->send(new RegistrationCardDeclined($details));
+                } catch (\Exception $e) {
+                    Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationCardDeclined($details));
+                }
 
                 if ($mainDelegate->assistant_email_address != null) {
-                    Mail::to($mainDelegate->assistant_email_address)->send(new RegistrationCardDeclined($details));
+                    try {
+                        Mail::to($mainDelegate->assistant_email_address)->send(new RegistrationCardDeclined($details));
+                    } catch (\Exception $e) {
+                        Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationCardDeclined($details));
+                    }
                 }
 
                 $additionalDelegates = AdditionalDelegate::where('main_delegate_id', $mainDelegateId)->get();
@@ -1849,7 +1924,11 @@ class RegistrationController extends Controller
                             'invoiceLink' => $invoiceLink,
                             'eventYear' => $event->year,
                         ];
-                        Mail::to($additionalDelegate->email_address)->cc($ccEmailNotif)->send(new RegistrationCardDeclined($details));
+                        try {
+                            Mail::to($additionalDelegate->email_address)->cc($ccEmailNotif)->send(new RegistrationCardDeclined($details));
+                        } catch (\Exception $e) {
+                            Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationCardDeclined($details));
+                        }
                     }
                 }
                 return redirect()->route('register.loading.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'eventYear' => $event->year, 'mainDelegateId' => $mainDelegateId, 'status' => "failed"]);
@@ -1964,8 +2043,13 @@ class RegistrationController extends Controller
                         'invoiceLink' => $invoiceLink,
                     ];
 
-                    Mail::to($mainSpouse->email_address)->cc(config('app.ccEmailNotif.default'))->queue(new RegistrationPaid($details1));
-                    Mail::to($mainSpouse->email_address)->cc(config('app.ccEmailNotif.default'))->queue(new RegistrationPaymentConfirmation($details2));
+                    try {
+                        Mail::to($mainSpouse->email_address)->cc(config('app.ccEmailNotif.default'))->send(new RegistrationPaid($details1));
+                        Mail::to($mainSpouse->email_address)->cc(config('app.ccEmailNotif.default'))->send(new RegistrationPaymentConfirmation($details2));
+                    } catch (\Exception $e) {
+                        Mail::to($mainSpouse->email_address)->cc(config('app.ccEmailNotif.default'))->send(new RegistrationPaid($details1));
+                        Mail::to($mainSpouse->email_address)->cc(config('app.ccEmailNotif.default'))->send(new RegistrationPaymentConfirmation($details2));
+                    }
 
 
                     $additionalSpouses = AdditionalSpouse::where('main_spouse_id', $mainDelegateId)->get();
@@ -1994,7 +2078,11 @@ class RegistrationController extends Controller
                                 'badgeLink' => env('APP_URL') . "/" . $event->category . "/" . $event->id . "/view-badge" . "/" . "sub" . "/" . $additionalSpouse->id,
                             ];
 
-                            Mail::to($additionalSpouse->email_address)->cc(config('app.ccEmailNotif.default'))->queue(new RegistrationPaid($details1));
+                            try {
+                                Mail::to($additionalSpouse->email_address)->cc(config('app.ccEmailNotif.default'))->send(new RegistrationPaid($details1));
+                            } catch (\Exception $e) {
+                                Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaid($details1));
+                            }
                         }
                     }
                     return redirect()->route('register.loading.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'eventYear' => $event->year, 'mainDelegateId' => $mainDelegateId, 'status' => "success"]);
@@ -2029,7 +2117,11 @@ class RegistrationController extends Controller
                         'eventYear' => $event->year,
                     ];
 
-                    Mail::to($mainSpouse->email_address)->cc(config('app.ccEmailNotif.default'))->queue(new RegistrationCardDeclined($details));
+                    try {
+                        Mail::to($mainSpouse->email_address)->cc(config('app.ccEmailNotif.default'))->send(new RegistrationCardDeclined($details));
+                    } catch (\Exception $e) {
+                        Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationCardDeclined($details));
+                    }
 
                     $additionalSpouses = AdditionalSpouse::where('main_spouse_id', $mainDelegateId)->get();
 
@@ -2046,7 +2138,12 @@ class RegistrationController extends Controller
                                 'invoiceLink' => $invoiceLink,
                                 'eventYear' => $event->year,
                             ];
-                            Mail::to($additionalSpouse->email_address)->cc(config('app.ccEmailNotif.default'))->queue(new RegistrationCardDeclined($details));
+
+                            try {
+                                Mail::to($additionalSpouse->email_address)->cc(config('app.ccEmailNotif.default'))->send(new RegistrationCardDeclined($details));
+                            } catch (\Exception $e) {
+                                Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationCardDeclined($details));
+                            }
                         }
                     }
                     return redirect()->route('register.loading.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'eventYear' => $event->year, 'mainDelegateId' => $mainDelegateId, 'status' => "failed"]);
@@ -2082,7 +2179,11 @@ class RegistrationController extends Controller
                     'eventYear' => $event->year,
                 ];
 
-                Mail::to($mainSpouse->email_address)->cc(config('app.ccEmailNotif.default'))->queue(new RegistrationCardDeclined($details));
+                try {
+                    Mail::to($mainSpouse->email_address)->cc(config('app.ccEmailNotif.default'))->send(new RegistrationCardDeclined($details));
+                } catch (\Exception $e) {
+                    Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationCardDeclined($details));
+                }
 
                 $additionalSpouses = AdditionalSpouse::where('main_spouse_id', $mainDelegateId)->get();
 
@@ -2099,7 +2200,12 @@ class RegistrationController extends Controller
                             'invoiceLink' => $invoiceLink,
                             'eventYear' => $event->year,
                         ];
-                        Mail::to($additionalSpouse->email_address)->cc(config('app.ccEmailNotif.default'))->queue(new RegistrationCardDeclined($details));
+
+                        try {
+                            Mail::to($additionalSpouse->email_address)->cc(config('app.ccEmailNotif.default'))->send(new RegistrationCardDeclined($details));
+                        } catch (\Exception $e) {
+                            Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationCardDeclined($details));
+                        }
                     }
                 }
                 return redirect()->route('register.loading.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'eventYear' => $event->year, 'mainDelegateId' => $mainDelegateId, 'status' => "failed"]);
@@ -2214,8 +2320,13 @@ class RegistrationController extends Controller
                         'invoiceLink' => $invoiceLink,
                     ];
 
-                    Mail::to($mainVisitor->email_address)->cc(config('app.ccEmailNotif.default'))->queue(new RegistrationPaid($details1));
-                    Mail::to($mainVisitor->email_address)->cc(config('app.ccEmailNotif.default'))->queue(new RegistrationPaymentConfirmation($details2));
+                    try {
+                        Mail::to($mainVisitor->email_address)->cc(config('app.ccEmailNotif.default'))->send(new RegistrationPaid($details1));
+                        Mail::to($mainVisitor->email_address)->cc(config('app.ccEmailNotif.default'))->send(new RegistrationPaymentConfirmation($details2));
+                    } catch (\Exception $e) {
+                        Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaid($details1));
+                        Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaymentConfirmation($details2));
+                    }
 
 
                     $additionalVisitors = AdditionalVisitor::where('main_visitor_id', $mainDelegateId)->get();
@@ -2244,7 +2355,11 @@ class RegistrationController extends Controller
                                 'badgeLink' => env('APP_URL') . "/" . $event->category . "/" . $event->id . "/view-badge" . "/" . "sub" . "/" . $additionalVisitor->id,
                             ];
 
-                            Mail::to($additionalVisitor->email_address)->cc(config('app.ccEmailNotif.default'))->queue(new RegistrationPaid($details1));
+                            try {
+                                Mail::to($additionalVisitor->email_address)->cc(config('app.ccEmailNotif.default'))->send(new RegistrationPaid($details1));
+                            } catch (\Exception $e) {
+                                Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaid($details1));
+                            }
                         }
                     }
                     return redirect()->route('register.loading.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'eventYear' => $event->year, 'mainDelegateId' => $mainDelegateId, 'status' => "success"]);
@@ -2279,7 +2394,11 @@ class RegistrationController extends Controller
                         'eventYear' => $event->year,
                     ];
 
-                    Mail::to($mainVisitor->email_address)->cc(config('app.ccEmailNotif.default'))->queue(new RegistrationCardDeclined($details));
+                    try {
+                        Mail::to($mainVisitor->email_address)->cc(config('app.ccEmailNotif.default'))->send(new RegistrationCardDeclined($details));
+                    } catch (\Exception $e) {
+                        Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationCardDeclined($details));
+                    }
 
                     $additionalVisitors = AdditionalVisitor::where('main_visitor_id', $mainDelegateId)->get();
 
@@ -2296,7 +2415,12 @@ class RegistrationController extends Controller
                                 'invoiceLink' => $invoiceLink,
                                 'eventYear' => $event->year,
                             ];
-                            Mail::to($additionalVisitor->email_address)->cc(config('app.ccEmailNotif.default'))->queue(new RegistrationCardDeclined($details));
+
+                            try {
+                                Mail::to($additionalVisitor->email_address)->cc(config('app.ccEmailNotif.default'))->send(new RegistrationCardDeclined($details));
+                            } catch (\Exception $e) {
+                                Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationCardDeclined($details));
+                            }
                         }
                     }
                     return redirect()->route('register.loading.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'eventYear' => $event->year, 'mainDelegateId' => $mainDelegateId, 'status' => "failed"]);
@@ -2332,7 +2456,11 @@ class RegistrationController extends Controller
                     'eventYear' => $event->year,
                 ];
 
-                Mail::to($mainVisitor->email_address)->cc(config('app.ccEmailNotif.default'))->queue(new RegistrationCardDeclined($details));
+                try {
+                    Mail::to($mainVisitor->email_address)->cc(config('app.ccEmailNotif.default'))->send(new RegistrationCardDeclined($details));
+                } catch (\Exception $e) {
+                    Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationCardDeclined($details));
+                }
 
                 $additionalVisitors = AdditionalVisitor::where('main_visitor_id', $mainDelegateId)->get();
 
@@ -2349,7 +2477,12 @@ class RegistrationController extends Controller
                             'invoiceLink' => $invoiceLink,
                             'eventYear' => $event->year,
                         ];
-                        Mail::to($additionalVisitor->email_address)->cc(config('app.ccEmailNotif.default'))->queue(new RegistrationCardDeclined($details));
+
+                        try {
+                            Mail::to($additionalVisitor->email_address)->cc(config('app.ccEmailNotif.default'))->send(new RegistrationCardDeclined($details));
+                        } catch (\Exception $e) {
+                            Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationCardDeclined($details));
+                        }
                     }
                 }
                 return redirect()->route('register.loading.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'eventYear' => $event->year, 'mainDelegateId' => $mainDelegateId, 'status' => "failed"]);
@@ -2488,8 +2621,13 @@ class RegistrationController extends Controller
                         'invoiceLink' => $invoiceLink,
                     ];
 
-                    Mail::to($mainParticipant->email_address)->cc(config('app.ccEmailNotif.default'))->queue(new RegistrationPaid($details1));
-                    Mail::to($mainParticipant->email_address)->cc(config('app.ccEmailNotif.default'))->queue(new RegistrationPaymentConfirmation($details2));
+                    try {
+                        Mail::to($mainParticipant->email_address)->cc(config('app.ccEmailNotif.default'))->send(new RegistrationPaid($details1));
+                        Mail::to($mainParticipant->email_address)->cc(config('app.ccEmailNotif.default'))->send(new RegistrationPaymentConfirmation($details2));
+                    } catch (\Exception $e) {
+                        Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaid($details1));
+                        Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaymentConfirmation($details2));
+                    }
 
 
                     return redirect()->route('register.loading.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'eventYear' => $event->year, 'mainDelegateId' => $mainDelegateId, 'status' => "success"]);
@@ -2524,7 +2662,11 @@ class RegistrationController extends Controller
                         'eventYear' => $event->year,
                     ];
 
-                    Mail::to($mainParticipant->email_address)->cc(config('app.ccEmailNotif.default'))->queue(new RegistrationCardDeclined($details));
+                    try {
+                        Mail::to($mainParticipant->email_address)->cc(config('app.ccEmailNotif.default'))->send(new RegistrationCardDeclined($details));
+                    } catch (\Exception $e) {
+                        Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationCardDeclined($details));
+                    }
 
                     return redirect()->route('register.loading.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'eventYear' => $event->year, 'mainDelegateId' => $mainDelegateId, 'status' => "failed"]);
                 }
@@ -2559,7 +2701,11 @@ class RegistrationController extends Controller
                     'eventYear' => $event->year,
                 ];
 
-                Mail::to($mainParticipant->email_address)->cc(config('app.ccEmailNotif.default'))->queue(new RegistrationCardDeclined($details));
+                try {
+                    Mail::to($mainParticipant->email_address)->cc(config('app.ccEmailNotif.default'))->send(new RegistrationCardDeclined($details));
+                } catch (\Exception $e) {
+                    Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationCardDeclined($details));
+                }
 
                 return redirect()->route('register.loading.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'eventYear' => $event->year, 'mainDelegateId' => $mainDelegateId, 'status' => "failed"]);
             }
@@ -2873,12 +3019,28 @@ class RegistrationController extends Controller
             }
 
             if ($addMainDelegate) {
-                $promoCode = PromoCode::where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $mainDelegate->pcode_used)->where('badge_type', $mainDelegate->badge_type)->first();
+                $promoCode = PromoCode::where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $mainDelegate->pcode_used)->first();
 
                 if ($promoCode != null) {
-                    $mainDiscount = $promoCode->discount;
-                    $mainDiscountType = $promoCode->discount_type;
+                    if ($promoCode->badge_type == $mainDelegate->badge_type) {
+                        $promoCodeUsed = $mainDelegate->pcode_used;
+                        $mainDiscount = $promoCode->discount;
+                        $mainDiscountType = $promoCode->discount_type;
+                    } else {
+                        $promoCodeAdditionalBadgeType = PromoCodeAddtionalBadgeType::where('event_id', $eventId)->where('promo_code_id', $promoCode->id)->where('badge_type', $mainDelegate->badge_type)->first();
+
+                        if ($promoCodeAdditionalBadgeType != null) {
+                            $promoCodeUsed = $mainDelegate->pcode_used;
+                            $mainDiscount = $promoCode->discount;
+                            $mainDiscountType = $promoCode->discount_type;
+                        } else {
+                            $promoCodeUsed = null;
+                            $mainDiscount = 0;
+                            $mainDiscountType = null;
+                        }
+                    }
                 } else {
+                    $promoCodeUsed = null;
                     $mainDiscount = 0;
                     $mainDiscountType = null;
                 }
@@ -2887,7 +3049,7 @@ class RegistrationController extends Controller
                 if ($mainDelegate->badge_type == "Leaders of Tomorrow") {
                     $delegateDescription = "Delegate Registration Fee - Leaders of Tomorrow";
                 } else {
-                    if ($mainDiscount != null) {
+                    if ($mainDiscountType != null) {
                         if ($mainDiscountType == "percentage") {
                             if ($mainDiscount == 100) {
                                 $delegateDescription = "Delegate Registration Fee - Complimentary";
@@ -2896,20 +3058,33 @@ class RegistrationController extends Controller
                             } else {
                                 $delegateDescription = "Delegate Registration Fee - {$mainDelegate->rate_type_string}";
                             }
-                        } else {
+                        } else if ($mainDiscountType == "price") {
                             $delegateDescription = "Delegate Registration Fee - {$mainDelegate->rate_type_string}";
+                        } else {
+                            $delegateDescription = $promoCode->new_rate_description;
                         }
                     } else {
                         $delegateDescription = "Delegate Registration Fee - {$mainDelegate->rate_type_string}";
                     }
                 }
-
-                if ($mainDiscountType == "percentage") {
-                    $tempTotalDiscount = $mainDelegate->unit_price * ($mainDiscount / 100);
-                    $tempTotalAmount = $mainDelegate->unit_price - ($mainDelegate->unit_price * ($mainDiscount / 100));
+                if ($mainDiscountType != null) {
+                    if ($mainDiscountType == "percentage") {
+                        $tempUnitPrice = $mainDelegate->unit_price;
+                        $tempTotalDiscount = $mainDelegate->unit_price * ($mainDiscount / 100);
+                        $tempTotalAmount = $mainDelegate->unit_price - ($mainDelegate->unit_price * ($mainDiscount / 100));
+                    } else if ($mainDiscountType == "price") {
+                        $tempUnitPrice = $mainDelegate->unit_price;
+                        $tempTotalDiscount = $mainDiscount;
+                        $tempTotalAmount = $mainDelegate->unit_price - $mainDiscount;
+                    } else {
+                        $tempUnitPrice = $promoCode->new_rate;
+                        $tempTotalDiscount = 0;
+                        $tempTotalAmount = $promoCode->new_rate;
+                    }
                 } else {
-                    $tempTotalDiscount = $mainDiscount;
-                    $tempTotalAmount = $mainDelegate->unit_price - $mainDiscount;
+                    $tempUnitPrice = $mainDelegate->unit_price;
+                    $tempTotalDiscount = 0;
+                    $tempTotalAmount = $mainDelegate->unit_price;
                 }
 
                 array_push($invoiceDetails, [
@@ -2919,9 +3094,11 @@ class RegistrationController extends Controller
                     ],
                     'badgeType' => $mainDelegate->badge_type,
                     'quantity' => 1,
+                    'totalUnitPrice' => $tempUnitPrice,
                     'totalDiscount' => $tempTotalDiscount,
                     'totalNetAmount' =>  $tempTotalAmount,
                     'promoCodeDiscount' => $mainDiscount,
+                    'promoCodeUsed' => $promoCodeUsed,
                 ]);
             }
 
@@ -2942,12 +3119,28 @@ class RegistrationController extends Controller
                     }
 
                     if ($addSubDelegate) {
-                        $subPromoCode = PromoCode::where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $subDelegate->pcode_used)->where('badge_type', $subDelegate->badge_type)->first();
+                        $subPromoCode = PromoCode::where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $subDelegate->pcode_used)->first();
 
                         if ($subPromoCode != null) {
-                            $subDiscount = $subPromoCode->discount;
-                            $subDiscountType = $subPromoCode->discount_type;
+                            if ($subPromoCode->badge_type == $subDelegate->badge_type) {
+                                $subPromoCodeUsed = $subDelegate->pcode_used;
+                                $subDiscount = $subPromoCode->discount;
+                                $subDiscountType = $subPromoCode->discount_type;
+                            } else {
+                                $subPromoCodeAdditionalBadgeType = PromoCodeAddtionalBadgeType::where('event_id', $eventId)->where('promo_code_id', $subPromoCode->id)->where('badge_type', $subDelegate->badge_type)->first();
+
+                                if ($subPromoCodeAdditionalBadgeType != null) {
+                                    $subPromoCodeUsed = $subDelegate->pcode_used;
+                                    $subDiscount = $subPromoCode->discount;
+                                    $subDiscountType = $subPromoCode->discount_type;
+                                } else {
+                                    $subPromoCodeUsed = null;
+                                    $subDiscount = 0;
+                                    $subDiscountType = null;
+                                }
+                            }
                         } else {
+                            $subPromoCodeUsed = null;
                             $subDiscount = 0;
                             $subDiscountType = null;
                         }
@@ -2957,7 +3150,7 @@ class RegistrationController extends Controller
                         $existingIndex = 0;
 
                         for ($j = 0; $j < count($invoiceDetails); $j++) {
-                            if ($subDelegate->badge_type == $invoiceDetails[$j]['badgeType'] && $subDiscount == $invoiceDetails[$j]['promoCodeDiscount']) {
+                            if ($subDelegate->badge_type == $invoiceDetails[$j]['badgeType'] && $subPromoCodeUsed == $invoiceDetails[$j]['promoCodeUsed']) {
                                 $existingIndex = $j;
                                 $checkIfExisting = true;
                                 break;
@@ -2972,11 +3165,19 @@ class RegistrationController extends Controller
 
                             $quantityTemp = $invoiceDetails[$existingIndex]['quantity'] + 1;
 
-                            if ($subDiscountType == "percentage") {
-                                $totalDiscountTemp = ($mainDelegate->unit_price * ($invoiceDetails[$existingIndex]['promoCodeDiscount'] / 100)) * $quantityTemp;
-                                $totalNetAmountTemp = ($mainDelegate->unit_price * $quantityTemp) - $totalDiscountTemp;
+                            if ($subDiscountType != null) {
+                                if ($subDiscountType == "percentage") {
+                                    $totalDiscountTemp = ($mainDelegate->unit_price * ($invoiceDetails[$existingIndex]['promoCodeDiscount'] / 100)) * $quantityTemp;
+                                    $totalNetAmountTemp = ($mainDelegate->unit_price * $quantityTemp) - $totalDiscountTemp;
+                                } else if ($subDiscountType == "price") {
+                                    $totalDiscountTemp = $invoiceDetails[$existingIndex]['promoCodeDiscount'] * $quantityTemp;
+                                    $totalNetAmountTemp = ($mainDelegate->unit_price * $quantityTemp) - $totalDiscountTemp;
+                                } else {
+                                    $totalDiscountTemp = 0;
+                                    $totalNetAmountTemp = $subPromoCode->new_rate * $quantityTemp;
+                                }
                             } else {
-                                $totalDiscountTemp = $invoiceDetails[$existingIndex]['promoCodeDiscount'] * $quantityTemp;
+                                $totalDiscountTemp = $invoiceDetails[$existingIndex]['promoCodeDiscount'];
                                 $totalNetAmountTemp = ($mainDelegate->unit_price * $quantityTemp) - $totalDiscountTemp;
                             }
 
@@ -2988,7 +3189,7 @@ class RegistrationController extends Controller
                             if ($subDelegate->badge_type == "Leaders of Tomorrow") {
                                 $subDelegateDescription = "Delegate Registration Fee - Leaders of Tomorrow";
                             } else {
-                                if ($subDiscount != null) {
+                                if ($subDiscountType != null) {
                                     if ($subDiscountType == "percentage") {
                                         if ($subDiscount == 100) {
                                             $subDelegateDescription = "Delegate Registration Fee - Complimentary";
@@ -2997,20 +3198,33 @@ class RegistrationController extends Controller
                                         } else {
                                             $subDelegateDescription = "Delegate Registration Fee - {$mainDelegate->rate_type_string}";
                                         }
-                                    } else {
+                                    } else if ($subDiscountType == "price") {
                                         $subDelegateDescription = "Delegate Registration Fee - {$mainDelegate->rate_type_string}";
+                                    } else {
+                                        $subDelegateDescription = $subPromoCode->new_rate_description;
                                     }
                                 } else {
                                     $subDelegateDescription = "Delegate Registration Fee - {$mainDelegate->rate_type_string}";
                                 }
                             }
-
-                            if ($subDiscountType == "percentage") {
-                                $tempSubTotalDiscount = $mainDelegate->unit_price * ($subDiscount / 100);
-                                $tempSubTotalAmount = $mainDelegate->unit_price - ($mainDelegate->unit_price * ($subDiscount / 100));
+                            if ($subDiscountType != null) {
+                                if ($subDiscountType == "percentage") {
+                                    $tempSubUnitPrice = $mainDelegate->unit_price;
+                                    $tempSubTotalDiscount = $mainDelegate->unit_price * ($subDiscount / 100);
+                                    $tempSubTotalAmount = $mainDelegate->unit_price - ($mainDelegate->unit_price * ($subDiscount / 100));
+                                } else if ($subDiscountType == "price") {
+                                    $tempSubUnitPrice = $mainDelegate->unit_price;
+                                    $tempSubTotalDiscount = $subDiscount;
+                                    $tempSubTotalAmount = $mainDelegate->unit_price - $subDiscount;
+                                } else {
+                                    $tempSubUnitPrice = $subPromoCode->new_rate;
+                                    $tempSubTotalDiscount = 0;
+                                    $tempSubTotalAmount = $subPromoCode->new_rate;
+                                }
                             } else {
-                                $tempSubTotalDiscount = $subDiscount;
-                                $tempSubTotalAmount = $mainDelegate->unit_price - $subDiscount;
+                                $tempSubUnitPrice = $mainDelegate->unit_price;
+                                $tempSubTotalDiscount = 0;
+                                $tempSubTotalAmount = $mainDelegate->unit_price;
                             }
 
                             array_push($invoiceDetails, [
@@ -3020,9 +3234,11 @@ class RegistrationController extends Controller
                                 ],
                                 'badgeType' => $subDelegate->badge_type,
                                 'quantity' => 1,
+                                'totalUnitPrice' => $tempSubUnitPrice,
                                 'totalDiscount' => $tempSubTotalDiscount,
                                 'totalNetAmount' =>  $tempSubTotalAmount,
                                 'promoCodeDiscount' => $subDiscount,
+                                'promoCodeUsed' => $subPromoCodeUsed,
                             ]);
                         }
                     }
@@ -3088,7 +3304,6 @@ class RegistrationController extends Controller
     {
         if (MainSpouse::where('id', $registrantId)->where('event_id', $eventId)->exists()) {
             $event = Event::where('category', $eventCategory)->where('id', $eventId)->first();
-            $invoiceDetails = array();
             $countFinalQuantity = 0;
 
             $mainSpouse = MainSpouse::where('id', $registrantId)->where('event_id', $eventId)->first();
@@ -3105,17 +3320,10 @@ class RegistrationController extends Controller
             }
 
             if ($addMainSpouse) {
-                array_push($invoiceDetails, [
-                    'delegateDescription' => "Spouse Registration Fee",
-                    'delegateNames' => [
-                        $mainSpouse->first_name . " " . $mainSpouse->middle_name . " " . $mainSpouse->last_name,
-                    ],
-                    'badgeType' => null,
-                    'quantity' => 1,
-                    'totalDiscount' => 0,
-                    'totalNetAmount' =>  $mainSpouse->unit_price,
-                    'promoCodeDiscount' => 0,
-                ]);
+                $name = $mainSpouse->first_name . " " . $mainSpouse->middle_name . " " . $mainSpouse->last_name;
+                $transactionId = SpouseTransaction::where('spouse_id', $mainSpouse->id)->where('spouse_type', "main")->value('id');
+                $lastDigit1 = 1000 + intval($transactionId);
+                $lastDigit2 = 1000 + intval($transactionId);
             }
 
 
@@ -3134,38 +3342,17 @@ class RegistrationController extends Controller
                     }
 
                     if ($addSubSpouse) {
-                        $existingIndex = 0;
+                        $name = $subSpouse->first_name . " " . $subSpouse->middle_name . " " . $subSpouse->last_name;
+                        $transactionId = SpouseTransaction::where('spouse_id', $subSpouse->id)->where('spouse_type', "sub")->value('id');
+                        $lastDigit1 = 1000 + intval($transactionId);
 
-                        if (count($invoiceDetails) == 0) {
-                            array_push($invoiceDetails, [
-                                'delegateDescription' => "Spouse Registration Fee",
-                                'delegateNames' => [
-                                    $subSpouse->first_name . " " . $subSpouse->middle_name . " " . $subSpouse->last_name,
-                                ],
-                                'badgeType' => null,
-                                'quantity' => 1,
-                                'totalDiscount' => 0,
-                                'totalNetAmount' =>  $mainSpouse->unit_price,
-                                'promoCodeDiscount' => 0,
-                            ]);
-                        } else {
-                            array_push(
-                                $invoiceDetails[$existingIndex]['delegateNames'],
-                                $subSpouse->first_name . " " . $subSpouse->middle_name . " " . $subSpouse->last_name
-                            );
-
-                            $quantityTemp = $invoiceDetails[$existingIndex]['quantity'] + 1;
-                            $invoiceDetails[$existingIndex]['quantity'] = $quantityTemp;
-                            $invoiceDetails[$existingIndex]['totalNetAmount'] = $mainSpouse->unit_price * $quantityTemp;
-                        }
+                        $transactionId2 = SpouseTransaction::where('spouse_id', $mainSpouse->id)->where('spouse_type', "main")->value('id');
+                        $lastDigit2 = 1000 + intval($transactionId2);
                     }
                 }
             }
 
-            $transactionId = SpouseTransaction::where('spouse_id', $mainSpouse->id)->where('spouse_type', "main")->value('id');
-
             $tempYear = Carbon::parse($mainSpouse->registered_date_time)->format('y');
-            $lastDigit = 1000 + intval($transactionId);
 
             foreach (config('app.eventCategories') as $eventCategoryC => $code) {
                 if ($event->category == $eventCategoryC) {
@@ -3173,10 +3360,10 @@ class RegistrationController extends Controller
                 }
             }
 
-            $tempInvoiceNumber = "$event->category" . "$tempYear" . "/" . "$lastDigit";
-            $tempBookReference = "$event->year" . "$getEventcode" . "$lastDigit";
+            $tempInvoiceNumber = "$event->category" . "$tempYear" . "/" . "$lastDigit2";
+            $tempBookReference = "$event->year" . "$getEventcode" . "$lastDigit1";
 
-            if ($eventCategory == "AF") {
+            if ($eventCategory == "AF" || $eventCategory == "AFS" || $eventCategory == "AFV") {
                 $bankDetails = config('app.bankDetails.AF');
             } else {
                 $bankDetails = config('app.bankDetails.DEFAULT');
@@ -3188,10 +3375,10 @@ class RegistrationController extends Controller
                 "finalEventStartDate" => Carbon::parse($event->event_start_date)->format('d M Y'),
                 "finalEventEndDate" => Carbon::parse($event->event_end_date)->format('d M Y'),
                 "eventFormattedData" => $eventFormattedData,
-                "companyName" => $fullname,
-                "companyAddress" => $mainSpouse->country,
-                "companyCity" => $mainSpouse->city,
-                "companyCountry" => null,
+                "fullname" => $fullname,
+                "address" => $mainSpouse->address,
+                "country" => $mainSpouse->country,
+                "city" => $mainSpouse->city,
                 "invoiceDate" => Carbon::parse($mainSpouse->registered_date_time)->format('d/m/Y'),
                 "invoiceNumber" => $tempInvoiceNumber,
                 "bookRefNumber" => $tempBookReference,
@@ -3203,7 +3390,14 @@ class RegistrationController extends Controller
                 'net_amount' => $mainSpouse->net_amount,
                 'total_amount' => $mainSpouse->total_amount,
                 'unit_price' => $mainSpouse->unit_price,
-                'invoiceDetails' => $invoiceDetails,
+
+                'registrationMethod' => "online",
+
+                'day_one' => $mainSpouse->day_one,
+                'day_two' => $mainSpouse->day_two,
+                'day_three' => $mainSpouse->day_three,
+                'day_four' => $mainSpouse->day_four,
+
                 'bankDetails' => $bankDetails,
                 'finalQuantity' => $countFinalQuantity,
                 'total_amount_string' => ucwords($this->numberToWords($mainSpouse->total_amount)),
@@ -3525,8 +3719,8 @@ class RegistrationController extends Controller
 
                 $printedBadges = PrintedBadge::where('event_id', $eventId)->where('delegate_id', $mainDelegate->id)->where('delegate_type', 'main')->get();
 
-                if($printedBadges->isNotEmpty()){
-                    foreach($printedBadges as $printedBadge){
+                if ($printedBadges->isNotEmpty()) {
+                    foreach ($printedBadges as $printedBadge) {
                         $printedBadgeCount++;
                         $printedBadgeDateTime = $printedBadge->printed_date_time;
                     }
@@ -3537,15 +3731,14 @@ class RegistrationController extends Controller
 
                 $scannedBadges = ScannedDelegate::where('event_id', $eventId)->where('delegate_id', $mainDelegate->id)->where('delegate_type', 'main')->get();
 
-                if($scannedBadges->isNotEmpty()){
-                    foreach($scannedBadges as $scannedBadge){
+                if ($scannedBadges->isNotEmpty()) {
+                    foreach ($scannedBadges as $scannedBadge) {
                         $scannedBadgeCount++;
                         $scannedBadgeDateTime = $scannedBadge->scanned_date_time;
                     }
                 }
 
-                if($mainDelegate->delegate_cancelled != null){
-
+                if ($mainDelegate->delegate_cancelled != null) {
                 }
 
                 array_push($finalExcelData, [
@@ -3644,27 +3837,27 @@ class RegistrationController extends Controller
 
                         $lastDigit = 1000 + intval($subTransactionId);
                         $tempBookReferenceSub = "$event->year" . "$getEventcode" . "$lastDigit";
-                        
+
                         $printedBadgeCount = 0;
                         $printedBadgeDateTime = null;
 
                         $printedBadges = PrintedBadge::where('event_id', $eventId)->where('delegate_id', $subDelegate->id)->where('delegate_type', 'sub')->get();
-                        
-                        if($printedBadges->isNotEmpty()){
-                            foreach($printedBadges as $printedBadge){
+
+                        if ($printedBadges->isNotEmpty()) {
+                            foreach ($printedBadges as $printedBadge) {
                                 $printedBadgeCount++;
                                 $printedBadgeDateTime = $printedBadge->printed_date_time;
                             }
                         }
 
-                        
+
                         $scannedBadgeCount = 0;
                         $scannedBadgeDateTime = null;
 
                         $scannedBadges = ScannedDelegate::where('event_id', $eventId)->where('delegate_id', $subDelegate->id)->where('delegate_type', 'sub')->get();
-                        
-                        if($scannedBadges->isNotEmpty()){
-                            foreach($scannedBadges as $scannedBadge){
+
+                        if ($scannedBadges->isNotEmpty()) {
+                            foreach ($scannedBadges as $scannedBadge) {
                                 $scannedBadgeCount++;
                                 $scannedBadgeDateTime = $scannedBadge->scanned_date_time;
                             }
@@ -3861,7 +4054,7 @@ class RegistrationController extends Controller
                         $data['paid_date_time'],
                         $data['printed_badge_count'],
                         $data['printed_badge_date_time'],
-                        
+
                         $data['scanned_badge_count'],
                         $data['scanned_badge_date_time'],
 
@@ -3927,6 +4120,11 @@ class RegistrationController extends Controller
                     'pass_type' => $mainSpouse->pass_type,
                     'rate_type' => $mainSpouse->rate_type,
 
+                    'day_one' => $mainSpouse->day_one,
+                    'day_two' => $mainSpouse->day_two,
+                    'day_three' => $mainSpouse->day_three,
+                    'day_four' => $mainSpouse->day_four,
+
                     'reference_delegate_name' => $mainSpouse->reference_delegate_name,
 
                     'salutation' => $mainSpouse->salutation,
@@ -3946,8 +4144,8 @@ class RegistrationController extends Controller
 
                     // PLEASE CONTINUE HERE
                     'total_amount' => $mainSpouse->total_amount,
-                    'payment_status' => $mainSpouse->payment_status,
-                    'registration_status' => $mainSpouse->registration_status,
+                    'payment_status' => $mainSpouse->spouse_refunded ? 'refunded' : $mainSpouse->payment_status,
+                    'registration_status' => $mainSpouse->spouse_cancelled ? 'cancelled' : $mainSpouse->registration_status,
                     'mode_of_payment' => $mainSpouse->mode_of_payment,
                     'invoice_number' => $tempInvoiceNumber,
                     'reference_number' => $tempBookReference,
@@ -3992,6 +4190,11 @@ class RegistrationController extends Controller
                             'pass_type' => $mainSpouse->pass_type,
                             'rate_type' => $mainSpouse->rate_type,
 
+                            'day_one' => $mainSpouse->day_one,
+                            'day_two' => $mainSpouse->day_two,
+                            'day_three' => $mainSpouse->day_three,
+                            'day_four' => $mainSpouse->day_four,
+
                             'reference_delegate_name' => $mainSpouse->reference_delegate_name,
 
                             'salutation' => $subSpouse->salutation,
@@ -4011,8 +4214,8 @@ class RegistrationController extends Controller
 
                             // PLEASE CONTINUE HERE
                             'total_amount' => $mainSpouse->total_amount,
-                            'payment_status' => $mainSpouse->payment_status,
-                            'registration_status' => $mainSpouse->registration_status,
+                            'payment_status' => $subSpouse->spouse_refunded ? 'refunded' : $mainSpouse->payment_status,
+                            'registration_status' => $subSpouse->spouse_cancelled ? 'cancelled' : $mainSpouse->registration_status,
                             'mode_of_payment' => $mainSpouse->mode_of_payment,
                             'invoice_number' => $tempInvoiceNumber,
                             'reference_number' => $tempBookReference,
@@ -4057,6 +4260,11 @@ class RegistrationController extends Controller
             'Spouse Type',
             'Event',
             'Rate Type',
+
+            'Day one',
+            'Day two',
+            'Day three',
+            'Day four',
 
             'Reference Delegate Full Name',
 
@@ -4113,6 +4321,11 @@ class RegistrationController extends Controller
                         $data['spouseType'],
                         $data['event'],
                         $data['rate_type'],
+
+                        $data['day_one'],
+                        $data['day_two'],
+                        $data['day_three'],
+                        $data['day_four'],
 
                         $data['reference_delegate_name'],
 
