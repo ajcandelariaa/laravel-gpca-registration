@@ -51,7 +51,11 @@ Conference at a glance
 
 <span>All registered delegates are invited to join the networking dinner on 4<sup>th</sup> December. Join us for an evening filled with meaningful conversations and the opportunity to establish valuable connections with industry peers.</span>
 
-<span><strong>Qatar Visa</strong></span><br><span>Please refer to the <a href="https://visitqatar.com/intl-en/practical-info/visas">link</a> for further information on obtaining the Qatar visa. If you require any assistance, kindly notify the GPCA office.</span>
+<span><strong>Qatar Visa</strong></span><br><span><strong>For travellers with passports issued by India, Pakistan, Iran, Thailand, and Ukraine</strong> who will apply for the E-visa through Hayya App and booked their accommodation through our travel partner, please approach Cozmo Travel to obtain DQ voucher as a requirement for visa application. Other nationalities may be added to this requirement at the discretion of the State of Qatar.</span>
+
+<span><strong>For other non GCC nationalities</strong> who will apply visa through Hayya App and booked their accommodation through our travel partner, please approach Cozmo Travel to obtain hotel confirmation letter as a requirement for visa application.</span>
+
+<span><strong>Nationals of the Gulf Cooperation Council countries (Bahrain, Kuwait, Oman, Saudi Arabia, and United Arab Emirates)</strong> do not require a visa to enter Qatar.</span>
 
 <span><strong>Hotel Accomodation</strong></span><br><span>Experience a seamless and stress-free event journey with our expert travel partner. For more information on travel and accommodation please contact</span>
 <br><br>
@@ -68,12 +72,6 @@ Conference at a glance
 <span>t.aziz@cozmotravel.com</span>
 <br>
 <p>For the latest updates on the event, please visit the event website at <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a>.</p>
-
-<p><strong>For travellers with passports issued by India, Pakistan, Iran, Thailand, and Ukraine</strong> who will apply for the E-visa through Hayya App and booked their accommodation through our travel partner, please approach Cozmo Travel to obtain DQ voucher as a requirement for visa application. Other nationalities may be added to this requirement at the discretion of the State of Qatar.</p>
-
-<p><strong>For other non GCC nationalities</strong> who will apply visa through Hayya App and booked their accommodation through our travel partner, please approach Cozmo Travel to obtain hotel confirmation letter as a requirement for visa application.</p>
-
-<p><strong>Nationals of the Gulf Cooperation Council countries (Bahrain, Kuwait, Oman, Saudi Arabia, and United Arab Emirates)</strong> do not require a visa to enter Qatar.</p>
 
 Best regards,
 <br>
