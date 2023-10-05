@@ -242,15 +242,20 @@ class RegistrationForm extends Component
 
                     $quantityTemp = $this->delegatInvoiceDetails[$existingIndex]['quantity'] + 1;
                     
-                    if($this->additionalDelegates[$i]['subDiscountType'] == "percentage"){
-                        $totalDiscountTemp = ($this->finalUnitPrice * ($this->delegatInvoiceDetails[$existingIndex]['promoCodeDiscount'] / 100)) * $quantityTemp;
-                        $totalNetAmountTemp = ($this->finalUnitPrice * $quantityTemp) - $totalDiscountTemp;
-                    } else if($this->additionalDelegates[$i]['subDiscountType'] == "price"){
-                        $totalDiscountTemp = $this->delegatInvoiceDetails[$existingIndex]['promoCodeDiscount'] * $quantityTemp;
-                        $totalNetAmountTemp = ($this->finalUnitPrice * $quantityTemp) - $totalDiscountTemp;
+                    if($this->additionalDelegates[$i]['subDiscountType'] != null){
+                        if($this->additionalDelegates[$i]['subDiscountType'] == "percentage"){
+                            $totalDiscountTemp = ($this->finalUnitPrice * ($this->delegatInvoiceDetails[$existingIndex]['promoCodeDiscount'] / 100)) * $quantityTemp;
+                            $totalNetAmountTemp = ($this->finalUnitPrice * $quantityTemp) - $totalDiscountTemp;
+                        } else if($this->additionalDelegates[$i]['subDiscountType'] == "price"){
+                            $totalDiscountTemp = $this->delegatInvoiceDetails[$existingIndex]['promoCodeDiscount'] * $quantityTemp;
+                            $totalNetAmountTemp = ($this->finalUnitPrice * $quantityTemp) - $totalDiscountTemp;
+                        } else {
+                            $totalDiscountTemp = 0;
+                            $totalNetAmountTemp = $this->delegatInvoiceDetails[$existingIndex]['totalNetAmount'] * $quantityTemp;
+                        }
                     } else {
                         $totalDiscountTemp = 0;
-                        $totalNetAmountTemp = $this->delegatInvoiceDetails[$existingIndex]['totalNetAmount'] * $quantityTemp;
+                        $totalNetAmountTemp = $this->finalUnitPrice * $quantityTemp;
                     }
 
 
@@ -264,7 +269,7 @@ class RegistrationForm extends Component
                     
                     if ($this->additionalDelegates[$i]['subPromoCodeDiscount'] == null) {
                         $this->additionalDelegates[$i]['subPromoCode'] = null;
-                        $delegateSubDescription = "Delegate registration fee - {$this->rateTypeString} - {$this->badgeType}";
+                        $delegateSubDescription = "Delegate registration fee - {$this->rateTypeString} - {$this->additionalDelegates[$i]['subBadgeType']}";
                     } else {
                         if($this->additionalDelegates[$i]['subDiscountType'] == "percentage"){
                             $tempSubTotalDiscount = $this->finalUnitPrice * ($this->additionalDelegates[$i]['subPromoCodeDiscount'] / 100);
@@ -929,6 +934,7 @@ class RegistrationForm extends Component
         $this->subMobileNumber = null;
         $this->subNationality = null;
         $this->subJobTitle = null;
+        $this->subBadgeType = "Delegate";
         $this->promoCodeSuccessSub = null;
         $this->promoCodeFailSub = null;
         $this->subPromoCode = null;
@@ -980,6 +986,7 @@ class RegistrationForm extends Component
         $this->subMobileNumberEdit = null;
         $this->subNationalityEdit = null;
         $this->subJobTitleEdit = null;
+        $this->subBadgeTypeEdit = "Delegate";
         $this->subPromoCodeEdit = null;
         $this->subPromoCodeDiscountEdit = null;
         $this->subDiscountTypeEdit = null;
@@ -1233,6 +1240,7 @@ class RegistrationForm extends Component
         $this->subPromoCode = null;
         $this->subPromoCodeDiscount = null;
         $this->subDiscountType = null;
+        $this->subBadgeType = "Delegate";
         $this->promoCodeFailSub = null;
         $this->promoCodeSuccessSub = null;
     }
@@ -1278,6 +1286,7 @@ class RegistrationForm extends Component
         $this->subPromoCodeEdit = null;
         $this->subPromoCodeDiscountEdit = null;
         $this->subDiscountTypeEdit = null;
+        $this->subBadgeTypeEdit = "Delegate";
         $this->promoCodeFailSubEdit = null;
         $this->promoCodeSuccessSubEdit = null;
     }

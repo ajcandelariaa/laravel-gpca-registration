@@ -338,51 +338,53 @@ class SpouseRegistrantDetails extends Component
         foreach ($this->finalData['allSpouses'] as $spousesIndex => $spouses) {
             foreach ($spouses as $innerSpouse) {
                 if (end($spouses) == $innerSpouse) {
-                    $details1 = [
-                        'eventCategory' => $this->event->category,
-                        'eventYear' => $this->event->year,
-                        'eventName' => $this->event->name,
+                    if (!$innerSpouse['spouse_cancelled']) {
+                        $details1 = [
+                            'eventCategory' => $this->event->category,
+                            'eventYear' => $this->event->year,
+                            'eventName' => $this->event->name,
 
-                        'eventDatesDescription' => $eventDatesDescription,
+                            'eventDatesDescription' => $eventDatesDescription,
 
-                        'name' => $innerSpouse['name'],
-                        'referenceDelegateName' => $this->finalData['reference_delegate_name'],
+                            'name' => $innerSpouse['name'],
+                            'referenceDelegateName' => $this->finalData['reference_delegate_name'],
 
-                        'emailAddress' => $innerSpouse['email_address'],
-                        'mobileNumber' => $innerSpouse['mobile_number'],
-                        'country' => $innerSpouse['country'],
-                        'city' => $innerSpouse['city'],
-                        'amountPaid' => $this->finalData['invoiceData']['unit_price'],
-                        'transactionId' => $innerSpouse['transactionId'],
+                            'emailAddress' => $innerSpouse['email_address'],
+                            'mobileNumber' => $innerSpouse['mobile_number'],
+                            'country' => $innerSpouse['country'],
+                            'city' => $innerSpouse['city'],
+                            'amountPaid' => $this->finalData['invoiceData']['unit_price'],
+                            'transactionId' => $innerSpouse['transactionId'],
 
-                        'invoiceLink' => $invoiceLink,
-                    ];
+                            'invoiceLink' => $invoiceLink,
+                        ];
 
-                    $details2 = [
-                        'name' => $innerSpouse['name'],
-                        'eventLink' => $this->event->link,
-                        'eventName' => $this->event->name,
-                        'eventCategory' => $this->event->category,
-                        'eventYear' => $this->event->year,
+                        $details2 = [
+                            'name' => $innerSpouse['name'],
+                            'eventLink' => $this->event->link,
+                            'eventName' => $this->event->name,
+                            'eventCategory' => $this->event->category,
+                            'eventYear' => $this->event->year,
 
-                        'invoiceAmount' => $this->finalData['invoiceData']['total_amount'],
-                        'amountPaid' => $this->finalData['invoiceData']['total_amount'],
-                        'balance' => 0,
-                        'invoiceLink' => $invoiceLink,
-                    ];
+                            'invoiceAmount' => $this->finalData['invoiceData']['total_amount'],
+                            'amountPaid' => $this->finalData['invoiceData']['total_amount'],
+                            'balance' => 0,
+                            'invoiceLink' => $invoiceLink,
+                        ];
 
-                    try {
-                        Mail::to($innerSpouse['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaid($details1));
-                    } catch (\Exception $e) {
-                        Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaid($details1));
-                    }
+                        try {
+                            Mail::to($innerSpouse['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaid($details1));
+                        } catch (\Exception $e) {
+                            Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaid($details1));
+                        }
 
-                    if ($this->sendInvoice) {
-                        if ($spousesIndex == 0) {
-                            try {
-                                Mail::to($innerSpouse['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
-                            } catch (\Exception $e) {
-                                Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+                        if ($this->sendInvoice) {
+                            if ($spousesIndex == 0) {
+                                try {
+                                    Mail::to($innerSpouse['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+                                } catch (\Exception $e) {
+                                    Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+                                }
                             }
                         }
                     }
@@ -585,63 +587,65 @@ class SpouseRegistrantDetails extends Component
         foreach ($this->finalData['allSpouses'] as $spousesIndex => $spouses) {
             foreach ($spouses as $innerSpouse) {
                 if (end($spouses) == $innerSpouse) {
-                    $details1 = [
-                        'eventCategory' => $this->event->category,
-                        'eventYear' => $this->event->year,
-                        'eventName' => $this->event->name,
+                    if (!$innerSpouse['spouse_cancelled']) {
+                        $details1 = [
+                            'eventCategory' => $this->event->category,
+                            'eventYear' => $this->event->year,
+                            'eventName' => $this->event->name,
 
-                        'eventDatesDescription' => $eventDatesDescription,
+                            'eventDatesDescription' => $eventDatesDescription,
 
-                        'name' => $innerSpouse['name'],
-                        'referenceDelegateName' => $this->finalData['reference_delegate_name'],
+                            'name' => $innerSpouse['name'],
+                            'referenceDelegateName' => $this->finalData['reference_delegate_name'],
 
-                        'emailAddress' => $innerSpouse['email_address'],
-                        'mobileNumber' => $innerSpouse['mobile_number'],
-                        'country' => $innerSpouse['country'],
-                        'city' => $innerSpouse['city'],
-                        'amountPaid' => $this->finalData['invoiceData']['unit_price'],
-                        'transactionId' => $innerSpouse['transactionId'],
+                            'emailAddress' => $innerSpouse['email_address'],
+                            'mobileNumber' => $innerSpouse['mobile_number'],
+                            'country' => $innerSpouse['country'],
+                            'city' => $innerSpouse['city'],
+                            'amountPaid' => $this->finalData['invoiceData']['unit_price'],
+                            'transactionId' => $innerSpouse['transactionId'],
 
-                        'invoiceLink' => $invoiceLink,
-                    ];
+                            'invoiceLink' => $invoiceLink,
+                        ];
 
-                    $details2 = [
-                        'name' => $innerSpouse['name'],
-                        'eventLink' => $this->event->link,
-                        'eventName' => $this->event->name,
-                        'eventCategory' => $this->event->category,
-                        'eventYear' => $this->event->year,
+                        $details2 = [
+                            'name' => $innerSpouse['name'],
+                            'eventLink' => $this->event->link,
+                            'eventName' => $this->event->name,
+                            'eventCategory' => $this->event->category,
+                            'eventYear' => $this->event->year,
 
-                        'invoiceAmount' => $this->finalData['invoiceData']['total_amount'],
-                        'amountPaid' => $this->finalData['invoiceData']['total_amount'],
-                        'balance' => 0,
-                        'invoiceLink' => $invoiceLink,
-                    ];
+                            'invoiceAmount' => $this->finalData['invoiceData']['total_amount'],
+                            'amountPaid' => $this->finalData['invoiceData']['total_amount'],
+                            'balance' => 0,
+                            'invoiceLink' => $invoiceLink,
+                        ];
 
-                    if ($this->finalData['payment_status'] == "unpaid") {
-                        try {
-                            Mail::to($innerSpouse['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationUnpaid($details1, $this->sendInvoice));
-                        } catch (\Exception $e) {
-                            Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationUnpaid($details1, $this->sendInvoice));
-                        }
-                    } else if ($this->finalData['payment_status'] == "free" && $this->finalData['registration_status'] == "pending") {
-                        try {
-                            Mail::to($innerSpouse['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationFree($details1, $this->sendInvoice));
-                        } catch (\Exception $e) {
-                            Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationFree($details1, $this->sendInvoice));
-                        }
-                    } else {
-                        try {
-                            Mail::to($innerSpouse['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaid($details1, $this->sendInvoice));
-                        } catch (\Exception $e) {
-                            Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaid($details1, $this->sendInvoice));
-                        }
-                        if ($this->sendInvoice) {
-                            if ($spousesIndex == 0) {
-                                try {
-                                    Mail::to($innerSpouse['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
-                                } catch (\Exception $e) {
-                                    Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+                        if ($this->finalData['payment_status'] == "unpaid") {
+                            try {
+                                Mail::to($innerSpouse['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationUnpaid($details1, $this->sendInvoice));
+                            } catch (\Exception $e) {
+                                Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationUnpaid($details1, $this->sendInvoice));
+                            }
+                        } else if ($this->finalData['payment_status'] == "free" && $this->finalData['registration_status'] == "pending") {
+                            try {
+                                Mail::to($innerSpouse['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationFree($details1, $this->sendInvoice));
+                            } catch (\Exception $e) {
+                                Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationFree($details1, $this->sendInvoice));
+                            }
+                        } else {
+                            try {
+                                Mail::to($innerSpouse['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaid($details1, $this->sendInvoice));
+                            } catch (\Exception $e) {
+                                Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaid($details1, $this->sendInvoice));
+                            }
+                            if ($this->sendInvoice) {
+                                if ($spousesIndex == 0) {
+                                    try {
+                                        Mail::to($innerSpouse['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+                                    } catch (\Exception $e) {
+                                        Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+                                    }
                                 }
                             }
                         }
@@ -677,18 +681,20 @@ class SpouseRegistrantDetails extends Component
         foreach ($this->finalData['allSpouses'] as $spouses) {
             foreach ($spouses as $innerDelegate) {
                 if (end($spouses) == $innerDelegate) {
-                    $details = [
-                        'name' => $innerDelegate['name'],
-                        'eventName' => $this->event->name,
-                        'eventLink' => $this->event->link,
-                        'eventCategory' => $this->event->category,
-                        'invoiceLink' => $invoiceLink,
-                        'eventYear' => $this->event->year,
-                    ];
-                    try {
-                        Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaymentReminder($details));
-                    } catch (\Exception $e) {
-                        Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaymentReminder($details));
+                    if (!$innerDelegate['spouse_cancelled']) {
+                        $details = [
+                            'name' => $innerDelegate['name'],
+                            'eventName' => $this->event->name,
+                            'eventLink' => $this->event->link,
+                            'eventCategory' => $this->event->category,
+                            'invoiceLink' => $invoiceLink,
+                            'eventYear' => $this->event->year,
+                        ];
+                        try {
+                            Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaymentReminder($details));
+                        } catch (\Exception $e) {
+                            Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaymentReminder($details));
+                        }
                     }
                 }
             }
