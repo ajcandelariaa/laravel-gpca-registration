@@ -946,10 +946,18 @@ class RegistrantDetails extends Component
                         }
 
                         if ($this->finalData['payment_status'] == "unpaid") {
-                            try {
-                                Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationUnpaid($details1, $this->sendInvoice));
-                            } catch (\Exception $e) {
-                                Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationUnpaid($details1, $this->sendInvoice));
+                            if($amountPaid == 0){
+                                try {
+                                    Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationFree($details1, $this->sendInvoice));
+                                } catch (\Exception $e) {
+                                    Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationFree($details1, $this->sendInvoice));
+                                }
+                            } else {
+                                try {
+                                    Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationUnpaid($details1, $this->sendInvoice));
+                                } catch (\Exception $e) {
+                                    Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationUnpaid($details1, $this->sendInvoice));
+                                }
                             }
                         } else if ($this->finalData['payment_status'] == "free" && $this->finalData['registration_status'] == "pending") {
                             try {
