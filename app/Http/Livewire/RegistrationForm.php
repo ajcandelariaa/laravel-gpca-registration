@@ -206,10 +206,11 @@ class RegistrationForm extends Component
                 $delegateDescription = $promoCode->new_rate_description;
             }
 
-            if ($tempTotalNetAmount = 0) {
+            if ($tempTotalNetAmount == 0) {
                 $this->isMainFree = true;
             }
         }
+
 
         array_push($this->delegatInvoiceDetails, [
             'delegateDescription' => $delegateDescription,
