@@ -486,9 +486,11 @@ class RegistrantsList extends Component
         fclose($file);
 
         $earlyBirdUnpaid = array();
-        $earlyBirdPaidFree = array();
+        $earlyBirdPaid = array();
+        $earlyBirdFree = array();
         $standardUnpaid = array();
-        $standardPaidFree = array();
+        $standardPaid = array();
+        $standardFree = array();
         $finalData = array();
 
         for ($i = 0; $i < count($rows); $i++) {
@@ -496,24 +498,28 @@ class RegistrantsList extends Component
                 continue;
             } else {
                 $rateType = $rows[$i][0];
-                $paymentStatus = $rows[$i][10];
+                $paymentStatus = $rows[$i][11];
 
                 if ($rateType == "Early Bird") {
                     if ($paymentStatus == "Unpaid") {
                         $earlyBirdUnpaid = $this->groupDelegatesByCompany($earlyBirdUnpaid, $rows, $i, 'earlyBird');
+                    } else if ($paymentStatus == "Paid") {
+                        $earlyBirdPaid = $this->groupDelegatesByCompany($earlyBirdPaid, $rows, $i, 'earlyBird');
                     } else {
-                        $earlyBirdPaidFree = $this->groupDelegatesByCompany($earlyBirdPaidFree, $rows, $i, 'earlyBird');
+                        $earlyBirdFree = $this->groupDelegatesByCompany($earlyBirdFree, $rows, $i, 'earlyBird');
                     }
                 } else {
                     if ($paymentStatus == "Unpaid") {
                         $standardUnpaid = $this->groupDelegatesByCompany($standardUnpaid, $rows, $i, 'standard');
+                    } else if ($paymentStatus == "Paid") {
+                        $standardPaid = $this->groupDelegatesByCompany($standardPaid, $rows, $i, 'standard');
                     } else {
-                        $standardPaidFree = $this->groupDelegatesByCompany($standardPaidFree, $rows, $i, 'standard');
+                        $standardFree = $this->groupDelegatesByCompany($standardFree, $rows, $i, 'standard');
                     }
                 }
             }
         }
-        $finalData = [$earlyBirdUnpaid, $earlyBirdPaidFree, $standardUnpaid, $standardPaidFree];
+        $finalData = [$earlyBirdUnpaid, $earlyBirdPaid, $earlyBirdFree, $standardUnpaid, $standardPaid, $standardFree];
         // dd($finalData);
         foreach ($finalData as $transactions) {
             foreach ($transactions as $transaction) {
@@ -557,36 +563,34 @@ class RegistrantsList extends Component
 
                 $finalNetAmount = 0;
                 $finalDiscount = 0;
+                $finalVat = 0;
+                $finalTotal = 0;
 
                 foreach ($transaction['delegates'] as $delegate) {
                     if($delegate['pcode_used'] != null){
-                        $promoCode = PromoCodes::where('event_id', $this->event->id)->where('event_category', $this->event->category)->where('badge_type', $delegate['badge_type'])->where('promo_code', $delegate['pcode_used'])->first();
+                        $promoCode = PromoCodes::where('event_id', $this->event->id)->where('event_category', $this->event->category)->where('promo_code', $delegate['pcode_used'])->first();
 
                         if($promoCode != null){
                             PromoCodes::where('event_id', $this->event->id)->where('event_category', $this->event->category)->where('badge_type', $delegate['badge_type'])->where('promo_code', $delegate['pcode_used'])->increment('total_usage');
 
-                            $promoCodeDiscount = $promoCode->discount;
-                            $promoCodeDiscountType = $promoCode->discount_type;
-
-                            if($promoCodeDiscountType == "percentage"){
-                                $finalDiscount += $finalUnitPrice * ($promoCodeDiscount / 100);
-                                $finalNetAmount += $finalUnitPrice - ($finalUnitPrice * ($promoCodeDiscount / 100));
+                            if($promoCode->discount_type == "percentage"){
+                                $finalDiscount += $finalUnitPrice * ($promoCode->discount / 100);
+                                $finalNetAmount += $finalUnitPrice - ($finalUnitPrice * ($promoCode->discount / 100));
+                            } else if ($promoCode->discount_type == "price") {
+                                $finalDiscount += $promoCode->discount;
+                                $finalNetAmount += $finalUnitPrice - $promoCode->discount;
                             } else {
-                                $finalDiscount += $promoCodeDiscount;
-                                $finalNetAmount += $finalUnitPrice - $promoCodeDiscount;
+                                $finalDiscount += 0;
+                                $finalNetAmount += $promoCode->new_rate;
                             }
                             
                         } else {
                             $finalDiscount += 0;
                             $finalNetAmount += $finalUnitPrice;
-                            $promoCodeDiscount = 0;
-                            $promoCodeDiscountType = null;
                         }
                     } else {
                         $finalDiscount += 0;
                         $finalNetAmount += $finalUnitPrice;
-                        $promoCodeDiscount = 0;
-                        $promoCodeDiscountType = null;
                     }
                 }
 
@@ -633,7 +637,6 @@ class RegistrantsList extends Component
                     'badge_type' => $transaction['delegates'][0]['badge_type'],
                     'pcode_used' => $transaction['delegates'][0]['pcode_used'],
 
-                    'heard_where' => null,
                     'quantity' => count($transaction['delegates']),
                     'unit_price' => $finalUnitPrice,
                     'net_amount' => $finalNetAmount,
@@ -705,7 +708,7 @@ class RegistrantsList extends Component
             $checkIfMatch = 0;
             $arrayDataIndex = 0;
             foreach ($arrayData as $index => $data) {
-                if ($data['company_name'] == $rows[$i][3] && $data['alternative_company_name'] == $rows[$i][4]) {
+                if ($data['company_name'] == $rows[$i][2] && $data['alternative_company_name'] == $rows[$i][3]) {
                     $checkIfMatch++;
                     $arrayDataIndex = $index;
                     break;
