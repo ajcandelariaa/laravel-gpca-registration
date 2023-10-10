@@ -170,37 +170,39 @@
             </div>
         </div>
 
-        <div class="col-span-2 sm:col-span-1 space-y-2">
-            <div class="text-registrationPrimaryColor">
-                Please check the sessions you are interested in attending: <span class="text-red-500">*</span>
-            </div>
-            <div>
-                <div class="flex items-center gap-2">
-                    <input type="checkbox" wire:model.lazy="attendingTo" value="1" id="1">
-                    <label for="1">17<sup>th</sup> Annual GPCA Forum Plenary</label>
+        @if ($event->category == 'AF' && $event->year == '2023')
+            <div class="col-span-2 sm:col-span-1 space-y-2">
+                <div class="text-registrationPrimaryColor">
+                    Please check the sessions you are interested in attending: <span class="text-red-500">*</span>
                 </div>
-
-                <div class="flex items-center gap-2">
-                    <input type="checkbox" wire:model.lazy="attendingTo" value="2" id="2">
-                    <label for="2">GPCA Symposium</label>
-                </div>
-
-                <div class="flex items-center gap-2">
-                    <input type="checkbox" wire:model.lazy="attendingTo" value="3" id="3">
-                    <label for="3">Solutions XChange</label> 
-                </div>
-
-                @error('attendingTo')
-                    <div class="text-red-500 text-xs italic mt-1">
-                        {{ $message }}
+                <div>
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" wire:model.lazy="attendingTo" value="1" id="1">
+                        <label for="1">17<sup>th</sup> Annual GPCA Forum Plenary</label>
                     </div>
-                @enderror
+
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" wire:model.lazy="attendingTo" value="2" id="2">
+                        <label for="2">GPCA Symposium</label>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" wire:model.lazy="attendingTo" value="3" id="3">
+                        <label for="3">Solutions XChange</label>
+                    </div>
+
+                    @error('attendingTo')
+                        <div class="text-red-500 text-xs italic mt-1">
+                            {{ $message }}
+                        </div>
+                    @enderror
+                </div>
             </div>
-        </div>
+        @endif
 
 
         <div class="col-span-2 sm:col-span-1 space-y-2">
-            @if (($event->category == 'AF') && ($event->year == '2023'))
+            @if ($event->category == 'AF' && $event->year == '2023')
                 <p>If you are interested with the GPCA spouse program, please click here to <a
                         href="https://www.gpcaforum.com/spouse-program/" target="_blank"
                         class="text-blue-600 hover:underline font-semibold">learn more</a> and <a
