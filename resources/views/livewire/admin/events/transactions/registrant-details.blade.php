@@ -92,7 +92,7 @@
                             @endif
                         </p>
 
-                        @if ($eventCategory == 'AF' $event->year == '2023')
+                        @if ($eventCategory == 'AF' && $event->year == '2023')
                             <p>Attending to: </p>
                             <div class="font-bold">
                                 @if ($finalData['attending_plenary'] || $finalData['attending_symposium'] || $finalData['attending_solxchange'])
