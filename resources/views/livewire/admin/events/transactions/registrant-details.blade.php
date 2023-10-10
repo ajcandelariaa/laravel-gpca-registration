@@ -92,24 +92,26 @@
                             @endif
                         </p>
 
-                        <p>Attending to: </p>
-                        <div class="font-bold">
-                            @if ($finalData['attending_plenary'] || $finalData['attending_symposium'] || $finalData['attending_solxchange'])
-                                @if ($finalData['attending_plenary'])
-                                    17<sup>th</sup> Annual GPCA Forum Plenary
-                                @endif
+                        @if ($eventCategory == 'AF' $event->year == '2023')
+                            <p>Attending to: </p>
+                            <div class="font-bold">
+                                @if ($finalData['attending_plenary'] || $finalData['attending_symposium'] || $finalData['attending_solxchange'])
+                                    @if ($finalData['attending_plenary'])
+                                        17<sup>th</sup> Annual GPCA Forum Plenary
+                                    @endif
 
-                                @if ($finalData['attending_symposium'])
-                                    GPCA Symposium
-                                @endif
+                                    @if ($finalData['attending_symposium'])
+                                        GPCA Symposium
+                                    @endif
 
-                                @if ($finalData['attending_solxchange'])
-                                    Solutions XChange
+                                    @if ($finalData['attending_solxchange'])
+                                        Solutions XChange
+                                    @endif
+                                @else
+                                    N/A
                                 @endif
-                            @else
-                                N/A
-                            @endif
-                        </div>
+                            </div>
+                        @endif
 
                         @if ($eventCategory == 'PC' && $event->year == '2023')
                             <p> Would you be attending the Networking Gala Dinner and Plastics Circul-A-Thon Awards

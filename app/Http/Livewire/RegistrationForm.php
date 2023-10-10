@@ -348,26 +348,47 @@ class RegistrationForm extends Component
                 $this->delegatePassTypeError = "Delegate pass type is required";
             }
         } else if ($this->currentStep == 2) {
-            $this->validate(
-                [
-                    'companySector' => 'required',
-                    'companyAddress' => 'required',
-                    'companyCountry' => 'required',
-                    'companyCity' => 'required',
-                    'companyMobileNumber' => 'required',
-                    'assistantEmailAddress' => 'nullable|email',
-                    'attendingTo' => 'required',
-                ],
-                [
-                    'companySector.required' => 'Company sector is required',
-                    'companyAddress.required' => 'Company address is required',
-                    'companyCountry.required' => 'Country is required',
-                    'companyCity.required' => 'City is required',
-                    'companyMobileNumber.required' => 'Mobile number is required',
-                    'assistantEmailAddress.email' => 'Assistant\'s email address must be a valid email',
-                    'attendingTo.required' => 'Please choose at least one',
-                ]
-            );
+            if ($this->event->category == "AF") {
+                $this->validate(
+                    [
+                        'companySector' => 'required',
+                        'companyAddress' => 'required',
+                        'companyCountry' => 'required',
+                        'companyCity' => 'required',
+                        'companyMobileNumber' => 'required',
+                        'assistantEmailAddress' => 'nullable|email',
+                        'attendingTo' => 'required',
+                    ],
+                    [
+                        'companySector.required' => 'Company sector is required',
+                        'companyAddress.required' => 'Company address is required',
+                        'companyCountry.required' => 'Country is required',
+                        'companyCity.required' => 'City is required',
+                        'companyMobileNumber.required' => 'Mobile number is required',
+                        'assistantEmailAddress.email' => 'Assistant\'s email address must be a valid email',
+                        'attendingTo.required' => 'Please choose at least one',
+                    ]
+                );
+            } else {
+                $this->validate(
+                    [
+                        'companySector' => 'required',
+                        'companyAddress' => 'required',
+                        'companyCountry' => 'required',
+                        'companyCity' => 'required',
+                        'companyMobileNumber' => 'required',
+                        'assistantEmailAddress' => 'nullable|email',
+                    ],
+                    [
+                        'companySector.required' => 'Company sector is required',
+                        'companyAddress.required' => 'Company address is required',
+                        'companyCountry.required' => 'Country is required',
+                        'companyCity.required' => 'City is required',
+                        'companyMobileNumber.required' => 'Mobile number is required',
+                        'assistantEmailAddress.email' => 'Assistant\'s email address must be a valid email',
+                    ]
+                );
+            }
             $this->currentStep += 1;
         } else if ($this->currentStep == 3) {
             $this->resetCalculations();
