@@ -660,7 +660,7 @@ class RegistrationController extends Controller
 
                 'invoiceData' => $this->getInvoice($eventCategory, $eventId, $registrantId),
             ];
-            // dd($finalData);
+            dd($finalData);
             return $finalData;
         } else {
             abort(404, 'The URL is incorrect');
