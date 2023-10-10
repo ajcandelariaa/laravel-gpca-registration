@@ -571,19 +571,37 @@ class RegistrantsList extends Component
                         $promoCode = PromoCodes::where('event_id', $this->event->id)->where('event_category', $this->event->category)->where('promo_code', $delegate['pcode_used'])->first();
 
                         if($promoCode != null){
-                            PromoCodes::where('event_id', $this->event->id)->where('event_category', $this->event->category)->where('badge_type', $delegate['badge_type'])->where('promo_code', $delegate['pcode_used'])->increment('total_usage');
+                            $checker = false;
 
-                            if($promoCode->discount_type == "percentage"){
-                                $finalDiscount += $finalUnitPrice * ($promoCode->discount / 100);
-                                $finalNetAmount += $finalUnitPrice - ($finalUnitPrice * ($promoCode->discount / 100));
-                            } else if ($promoCode->discount_type == "price") {
-                                $finalDiscount += $promoCode->discount;
-                                $finalNetAmount += $finalUnitPrice - $promoCode->discount;
+                            if($delegate['badge_type'] == $promoCode->badge_type ){
+                                $checker = true;
+                            } else {
+                                $additionalBadgeType = PromoCodeAddtionalBadgeTypes::where('event_id', $this->event->id)->where('promo_code_id', $promoCode->id)->where('badge_type', $delegate['badge_type'])->first();
+
+                                if($additionalBadgeType != null){
+                                    $checker = true;
+                                } else {
+                                    $checker = false;
+                                }
+                            }
+
+                            if($checker){
+                                PromoCodes::where('event_id', $this->event->id)->where('event_category', $this->event->category)->where('badge_type', $delegate['badge_type'])->where('promo_code', $delegate['pcode_used'])->increment('total_usage');
+
+                                if($promoCode->discount_type == "percentage"){
+                                    $finalDiscount += $finalUnitPrice * ($promoCode->discount / 100);
+                                    $finalNetAmount += $finalUnitPrice - ($finalUnitPrice * ($promoCode->discount / 100));
+                                } else if ($promoCode->discount_type == "price") {
+                                    $finalDiscount += $promoCode->discount;
+                                    $finalNetAmount += $finalUnitPrice - $promoCode->discount;
+                                } else {
+                                    $finalDiscount += 0;
+                                    $finalNetAmount += $promoCode->new_rate;
+                                }
                             } else {
                                 $finalDiscount += 0;
-                                $finalNetAmount += $promoCode->new_rate;
+                                $finalNetAmount += $finalUnitPrice;
                             }
-                            
                         } else {
                             $finalDiscount += 0;
                             $finalNetAmount += $finalUnitPrice;
