@@ -37,7 +37,7 @@ class RegistrationForm extends Component
     public $delegatePassType, $rateType;
 
     // COMPANY INFO
-    public $companyName, $companySector, $companyAddress, $companyCountry, $companyCity, $companyLandlineNumber, $companyMobileNumber, $assistantEmailAddress, $heardWhere;
+    public $companyName, $companySector, $companyAddress, $companyCountry, $companyCity, $companyLandlineNumber, $companyMobileNumber, $assistantEmailAddress, $heardWhere, $attendingTo = [];
 
     // MAIN DELEGATE
     public $salutation, $firstName, $middleName, $lastName, $emailAddress, $mobileNumber, $nationality, $jobTitle, $badgeType, $promoCode, $promoCodeDiscount, $discountType, $isMainFree = false;
@@ -356,6 +356,7 @@ class RegistrationForm extends Component
                     'companyCity' => 'required',
                     'companyMobileNumber' => 'required',
                     'assistantEmailAddress' => 'nullable|email',
+                    'attendingTo' => 'required',
                 ],
                 [
                     'companySector.required' => 'Company sector is required',
@@ -364,6 +365,7 @@ class RegistrationForm extends Component
                     'companyCity.required' => 'City is required',
                     'companyMobileNumber.required' => 'Mobile number is required',
                     'assistantEmailAddress.email' => 'Assistant\'s email address must be a valid email',
+                    'attendingTo.required' => 'Please choose at least one',
                 ]
             );
             $this->currentStep += 1;
@@ -449,6 +451,22 @@ class RegistrationForm extends Component
             $paymentStatus = "unpaid";
         }
 
+        $attending_plenary = false;
+        $attending_symposium = false;
+        $attending_solxchange = false;
+
+        if (count($this->attendingTo) > 0) {
+            foreach ($this->attendingTo as $attendTo) {
+                if ($attendTo == 1) {
+                    $attending_plenary = true;
+                } else if ($attendTo == 2) {
+                    $attending_symposium = true;
+                } else {
+                    $attending_solxchange = true;
+                }
+            }
+        }
+
         $newRegistrant = MainDelegates::create([
             'event_id' => $this->event->id,
             'pass_type' => $this->delegatePassType,
@@ -476,6 +494,11 @@ class RegistrationForm extends Component
             'pcode_used' => $this->promoCode,
 
             'heard_where' => $this->heardWhere,
+
+            'attending_plenary' => $attending_plenary,
+            'attending_symposium' => $attending_symposium,
+            'attending_solxchange' => $attending_solxchange,
+
             'quantity' => $this->finalQuantity,
             'unit_price' => $this->finalUnitPrice,
             'net_amount' => $this->finalNetAmount,

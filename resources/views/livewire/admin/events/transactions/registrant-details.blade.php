@@ -92,6 +92,25 @@
                             @endif
                         </p>
 
+                        <p>Attending to: </p>
+                        <div class="font-bold">
+                            @if ($finalData['attending_plenary'] || $finalData['attending_symposium'] || $finalData['attending_solxchange'])
+                                @if ($finalData['attending_plenary'])
+                                    17<sup>th</sup> Annual GPCA Forum Plenary
+                                @endif
+
+                                @if ($finalData['attending_symposium'])
+                                    GPCA Symposium
+                                @endif
+
+                                @if ($finalData['attending_solxchange'])
+                                    Solutions XChange
+                                @endif
+                            @else
+                                N/A
+                            @endif
+                        </div>
+
                         @if ($eventCategory == 'PC' && $event->year == '2023')
                             <p> Would you be attending the Networking Gala Dinner and Plastics Circul-A-Thon Awards
                                 14<sup>th</sup> May 2023?</p>

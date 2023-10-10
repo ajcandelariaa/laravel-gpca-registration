@@ -37,6 +37,11 @@ class MainDelegate extends Model
         'pcode_used',
 
         'heard_where',
+
+        'attending_plenary',
+        'attending_symposium',
+        'attending_solxchange',
+
         'quantity',
         'unit_price',
         'net_amount',

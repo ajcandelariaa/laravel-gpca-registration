@@ -49,6 +49,14 @@
         @endif
     </div>
 
+    @if (($event->category == 'AF') && ($event->year == '2023'))
+        <p class="mt-5">If you are interested with the GPCA spouse program, please click here to <a
+                href="https://www.gpcaforum.com/spouse-program/" target="_blank"
+                class="text-blue-600 hover:underline font-semibold">learn more</a> and <a
+                href="https://www.gpcaregistration.com/register/2023/AFS/11" target="_blank"
+                class="text-blue-600 hover:underline font-semibold">register.</a></p>
+    @endif
+
     <div class="mt-10 flex justify-between gap-5">
         <button type="button" wire:key="btnDecreaseStep"
             class="hover:bg-registrationPrimaryColor hover:text-white font-bold border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor w-52 rounded-md py-2"

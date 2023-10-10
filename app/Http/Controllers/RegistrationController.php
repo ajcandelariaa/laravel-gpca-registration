@@ -639,6 +639,10 @@ class RegistrationController extends Controller
                 'pc_attending_nd' => $mainDelegate->pc_attending_nd,
                 'scc_attending_nd' => $mainDelegate->scc_attending_nd,
 
+                'attending_plenary' => $mainDelegate->attending_plenary,
+                'attending_symposium' => $mainDelegate->attending_symposium,
+                'attending_solxchange' => $mainDelegate->attending_solxchange,
+
                 'mode_of_payment' => $mainDelegate->mode_of_payment,
                 'registration_status' => "$mainDelegate->registration_status",
                 'payment_status' => $mainDelegate->payment_status,
@@ -3763,6 +3767,12 @@ class RegistrationController extends Controller
                     'badge_type' => $mainDelegate->badge_type,
                     'pcode_used' => $mainDelegate->pcode_used,
 
+                    'heard_where' => $mainDelegate->heard_where,
+
+                    'attending_plenary' => $mainDelegate->attending_plenary,
+                    'attending_symposium' => $mainDelegate->attending_symposium,
+                    'attending_solxchange' => $mainDelegate->attending_solxchange,
+
                     'unit_price' => $mainDelegate->unit_price,
                     'discount_price' => $discountPrice,
                     'net_amount' => $netAMount,
@@ -3885,6 +3895,12 @@ class RegistrationController extends Controller
                             'badge_type' => $subDelegate->badge_type,
                             'pcode_used' => $subDelegate->pcode_used,
 
+                            'heard_where' => $mainDelegate->heard_where,
+        
+                            'attending_plenary' => $mainDelegate->attending_plenary,
+                            'attending_symposium' => $mainDelegate->attending_symposium,
+                            'attending_solxchange' => $mainDelegate->attending_solxchange,
+
                             'unit_price' => $mainDelegate->unit_price,
                             'discount_price' => $discountPrice,
                             'net_amount' => $netAMount,
@@ -3998,6 +4014,11 @@ class RegistrationController extends Controller
             'Delegate Refunded Date & Time',
             'Delegate Replaced Date & Time',
 
+            'Heard Where',
+
+            'Attending to Plenary',
+            'Attending to Symposium',
+            'Attending to Solutions XChange',
         );
 
         $callback = function () use ($finalExcelData, $columns) {
@@ -4070,6 +4091,11 @@ class RegistrationController extends Controller
                         $data['delegate_refunded_datetime'],
                         $data['delegate_replaced_datetime'],
 
+                        $data['heard_where'],
+
+                        $data['attending_plenary'],
+                        $data['attending_symposium'],
+                        $data['attending_solxchange'],
                     )
                 );
             }

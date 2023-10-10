@@ -19,7 +19,7 @@
                 @include('livewire.registration.step.fifth')
             @endif
 
-            <div class="mt-20 mx-5 flex justify-between gap-5">
+            <div class="mt-10 mx-5 flex justify-between gap-5">
                 @if ($currentStep == 1)
                     <div></div>
                 @endif
