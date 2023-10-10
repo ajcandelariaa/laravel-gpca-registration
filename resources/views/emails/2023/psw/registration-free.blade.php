@@ -28,6 +28,8 @@ Download invoice
 <br><br>
 @endif
 
+<span><strong>Hotel booking</strong></span><br><span>For the hotel accommodation, please click the <a href="https://www.ihg.com/crowneplaza/hotels/us/en/manama/mnaba/hoteldetail?fromRedirect=true&qSrt=sBR&qIta=99801505&icdv=99801505&qSlH=MNABA&qGrpCd=GU1&setPMCookies=true&qSHBrC=CP&qDest=Diplomatic%20Area%20317%2C%20Manama%2C%20BH&srb_u=1" target="_blank">hotel booking reservation</a> where we have special rates.</span>
+
 <p>For the latest updates on the event, please visit the event website at <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a>.</p>
 
 <p>We look forward to welcoming you to the {{ $details['eventName'] }} to share industry insights, explore networking opportunities, and share valuable industry experiences.</p>

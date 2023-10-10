@@ -1304,13 +1304,39 @@ class RegistrantDetails extends Component
     public function addReplaceDelegate()
     {
         if ($this->replacePromoCodeSuccess != null) {
-            PromoCodes::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->where('active', true)->where('promo_code', $this->replacePromoCode)->where('badge_type', $this->replaceBadgeType)->increment('total_usage');
+            PromoCodes::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->where('active', true)->where('promo_code', $this->replacePromoCode)->increment('total_usage');
 
             $subPromoCode = PromoCodes::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->where('promo_code', $this->replacePromoCode)->where('badge_type', $this->replaceBadgeType)->first();
 
             if ($subPromoCode != null) {
-                $subDiscount = $subPromoCode->discount;
-                $subDiscountType = $subPromoCode->discount_type;
+                $subChecker = false;
+
+                if($subPromoCode->badge_type == $this->replaceBadgeType){
+                    $subChecker = true;
+                } else {
+                    $promoCodeAdditionalBadgeType = PromoCodeAddtionalBadgeTypes::where('event_id', $this->eventId)->where('promo_code_id', $subPromoCode->id)->where('badge_type', $this->replaceBadgeType)->first();
+
+                    if($promoCodeAdditionalBadgeType != null){
+                        $subChecker = true;
+                    } else {
+                        $subChecker = false;
+                    }
+                }
+
+                if($subChecker){
+                    $subDiscountType = $subPromoCode->discount_type;
+
+                    if($subPromoCode->discount_type == 'percentage'){
+                        $subDiscount = $subPromoCode->discount;
+                    } else if($subPromoCode->discount_type == 'price'){
+                        $subDiscount = $subPromoCode->discount;
+                    } else {
+                        $subDiscount = 0;
+                    }
+                } else {
+                    $subDiscount = 0;
+                    $subDiscountType = null;
+                }
             } else {
                 $subDiscount = 0;
                 $subDiscountType = null;
@@ -1318,6 +1344,7 @@ class RegistrantDetails extends Component
         } else {
             $this->replacePromoCode = null;
             $subDiscount = null;
+            $subDiscountType = null;
         }
 
         $replacedDelegate = AdditionalDelegates::create([
