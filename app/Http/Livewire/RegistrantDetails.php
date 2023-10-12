@@ -467,6 +467,12 @@ class RegistrantDetails extends Component
                             }
                         }
 
+                        if($this->finalData['alternative_company_name'] == null){
+                            $finalCompanyName = $this->finalData['company_name'];
+                        } else {
+                            $finalCompanyName = $this->finalData['alternative_company_name'];
+                        }
+
                         $details1 = [
                             'name' => $innerDelegate['name'],
                             'eventLink' => $this->event->link,
@@ -477,7 +483,7 @@ class RegistrantDetails extends Component
                             'eventYear' => $this->event->year,
 
                             'jobTitle' => $innerDelegate['job_title'],
-                            'companyName' => $this->finalData['company_name'],
+                            'companyName' => $finalCompanyName,
                             'amountPaid' => $amountPaid,
                             'transactionId' => $innerDelegate['transactionId'],
                             'invoiceLink' => $invoiceLink,
@@ -909,6 +915,12 @@ class RegistrantDetails extends Component
                             }
                         }
 
+                        if($this->finalData['alternative_company_name'] == null){
+                            $finalCompanyName = $this->finalData['company_name'];
+                        } else {
+                            $finalCompanyName = $this->finalData['alternative_company_name'];
+                        }
+
                         $details1 = [
                             'name' => $innerDelegate['name'],
                             'eventLink' => $this->event->link,
@@ -919,7 +931,7 @@ class RegistrantDetails extends Component
                             'eventYear' => $this->event->year,
 
                             'jobTitle' => $innerDelegate['job_title'],
-                            'companyName' => $this->finalData['company_name'],
+                            'companyName' => $finalCompanyName,
                             'amountPaid' => $amountPaid,
                             'transactionId' => $innerDelegate['transactionId'],
                             'invoiceLink' => $invoiceLink,

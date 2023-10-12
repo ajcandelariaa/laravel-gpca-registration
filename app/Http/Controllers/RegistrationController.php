@@ -3272,11 +3272,17 @@ class RegistrationController extends Controller
 
             $eventFormattedData = Carbon::parse($event->event_start_date)->format('j') . '-' . Carbon::parse($event->event_end_date)->format('j F Y');
 
+            if($mainDelegate->alternative_company_name == null){
+                $finalCompanyName = $mainDelegate->company_name;
+            } else {
+                $finalCompanyName = $mainDelegate->alternative_company_name;
+            }
+
             $invoiceData = [
                 "finalEventStartDate" => Carbon::parse($event->event_start_date)->format('d M Y'),
                 "finalEventEndDate" => Carbon::parse($event->event_end_date)->format('d M Y'),
                 "eventFormattedData" => $eventFormattedData,
-                "companyName" => $mainDelegate->company_name,
+                "companyName" => $finalCompanyName,
                 "companyAddress" => $mainDelegate->company_address,
                 "companyCity" => $mainDelegate->company_city,
                 "companyCountry" => $mainDelegate->company_country,
