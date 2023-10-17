@@ -475,6 +475,11 @@ class RegistrationForm extends Component
         $attending_plenary = false;
         $attending_symposium = false;
         $attending_solxchange = false;
+        $attending_yf = false;
+        $attending_networking_dinner = false;
+        $attending_welcome_dinner = false;
+        $attending_gala_dinner = false;
+
 
         if (count($this->attendingTo) > 0) {
             foreach ($this->attendingTo as $attendTo) {
@@ -482,8 +487,16 @@ class RegistrationForm extends Component
                     $attending_plenary = true;
                 } else if ($attendTo == 2) {
                     $attending_symposium = true;
-                } else {
+                } else if ($attendTo == 3) {
                     $attending_solxchange = true;
+                } else if ($attendTo == 4) {
+                    $attending_yf = true;
+                } else if ($attendTo == 5) {
+                    $attending_networking_dinner = true;
+                } else if ($attendTo == 6) {
+                    $attending_welcome_dinner = true;
+                } else {
+                    $attending_gala_dinner = true;
                 }
             }
         }
@@ -519,6 +532,10 @@ class RegistrationForm extends Component
             'attending_plenary' => $attending_plenary,
             'attending_symposium' => $attending_symposium,
             'attending_solxchange' => $attending_solxchange,
+            'attending_yf' => $attending_yf,
+            'attending_networking_dinner' => $attending_networking_dinner,
+            'attending_welcome_dinner' => $attending_welcome_dinner,
+            'attending_gala_dinner' => $attending_gala_dinner,
 
             'quantity' => $this->finalQuantity,
             'unit_price' => $this->finalUnitPrice,

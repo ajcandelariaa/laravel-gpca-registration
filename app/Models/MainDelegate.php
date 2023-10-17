@@ -41,6 +41,10 @@ class MainDelegate extends Model
         'attending_plenary',
         'attending_symposium',
         'attending_solxchange',
+        'attending_yf',
+        'attending_networking_dinner',
+        'attending_welcome_dinner',
+        'attending_gala_dinner',
 
         'quantity',
         'unit_price',

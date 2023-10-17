@@ -26,7 +26,7 @@
             </div>
         </div>
 
-        <div class="mt-5 flex gap-5">
+        <div class="mt-5 flex gap-5 items-start">
             @if ($finalTotal == 0)
                 <button wire:click.prevent="btClicked" type="button"
                     class="{{ $paymentMethod == 'bankTransfer' ? 'bg-registrationSecondaryColor text-white' : 'hover:bg-registrationSecondaryColor hover:text-white border-registrationSecondaryColor border-2 bg-white text-registrationSecondaryColor' }} font-bold w-52 rounded-md py-5 ">
@@ -36,9 +36,13 @@
                     class="{{ $paymentMethod == 'bankTransfer' ? 'bg-registrationSecondaryColor text-white' : 'hover:bg-registrationSecondaryColor hover:text-white border-registrationSecondaryColor border-2 bg-white text-registrationSecondaryColor' }} font-bold w-52 rounded-md py-5 ">
                     <i class="fa-solid fa-building-columns mr-2"></i> Bank transfer</button>
 
-                <button wire:click.prevent="ccClicked" type="button"
-                    class="{{ $paymentMethod == 'creditCard' ? 'bg-registrationSecondaryColor text-white' : 'hover:bg-registrationSecondaryColor hover:text-white border-registrationSecondaryColor border-2 bg-white text-registrationSecondaryColor' }} font-bold w-52 rounded-md py-5 ">
-                    <i class="fa-solid fa-credit-card mr-2"></i> Credit card</button>
+                <div class="flex flex-col">
+                    <button wire:click.prevent="ccClicked" type="button"
+                        class="{{ $paymentMethod == 'creditCard' ? 'bg-registrationSecondaryColor text-white' : 'hover:bg-registrationSecondaryColor hover:text-white border-registrationSecondaryColor border-2 bg-white text-registrationSecondaryColor' }} font-bold w-52 rounded-md py-5 ">
+                        <i class="fa-solid fa-credit-card mr-2"></i> Credit card</button>
+
+                    <span class="text-registrationPrimaryColor italic text-sm text-center mt-1">for Visa and MasterCard only</span>
+                </div>
             @endif
         </div>
 
@@ -49,7 +53,7 @@
         @endif
     </div>
 
-    @if (($event->category == 'AF') && ($event->year == '2023'))
+    @if ($event->category == 'AF' && $event->year == '2023')
         <p class="mt-5">If you are interested with the GPCA spouse program, please click here to <a
                 href="https://www.gpcaforum.com/spouse-program/" target="_blank"
                 class="text-blue-600 hover:underline font-semibold">learn more</a> and <a

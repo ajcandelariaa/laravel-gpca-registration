@@ -173,22 +173,42 @@
         @if ($event->category == 'AF' && $event->year == '2023')
             <div class="col-span-2 sm:col-span-1 space-y-2">
                 <div class="text-registrationPrimaryColor">
-                    Please check the sessions you are interested in attending: <span class="text-red-500">*</span>
+                    Please select the sessions you will be attending from below: <span class="text-red-500">*</span>
                 </div>
                 <div>
                     <div class="flex items-center gap-2">
                         <input type="checkbox" wire:model.lazy="attendingTo" value="1" id="1">
-                        <label for="1">17<sup>th</sup> Annual GPCA Forum Plenary</label>
+                        <label for="1">17<sup>th</sup> Annual GPCA Forum Main Plenary | 5-7 December 2023</label>
                     </div>
 
                     <div class="flex items-center gap-2">
                         <input type="checkbox" wire:model.lazy="attendingTo" value="2" id="2">
-                        <label for="2">GPCA Symposium</label>
+                        <label for="2">GPCA Symposium | 5-7 December 2023</label>
                     </div>
 
                     <div class="flex items-center gap-2">
                         <input type="checkbox" wire:model.lazy="attendingTo" value="3" id="3">
-                        <label for="3">Solutions XChange</label>
+                        <label for="3">Solutions XChange | 5-7 December 2023</label>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" wire:model.lazy="attendingTo" value="4" id="4">
+                        <label for="4">GPCA Youth Forum | 4-7 December 2023</label>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" wire:model.lazy="attendingTo" value="5" id="5">
+                        <label for="5">Networking Dinner | 4 December 2023</label>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" wire:model.lazy="attendingTo" value="6" id="6">
+                        <label for="6">Welcome Dinner Sponsored by QatarEnergy | 5 December 2023</label>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" wire:model.lazy="attendingTo" value="7" id="7">
+                        <label for="7">Gala Dinner Sponsored by SABIC | 6 December 2023</label>
                     </div>
 
                     @error('attendingTo')

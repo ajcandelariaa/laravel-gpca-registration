@@ -642,6 +642,10 @@ class RegistrationController extends Controller
                 'attending_plenary' => $mainDelegate->attending_plenary,
                 'attending_symposium' => $mainDelegate->attending_symposium,
                 'attending_solxchange' => $mainDelegate->attending_solxchange,
+                'attending_yf' => $mainDelegate->attending_yf,
+                'attending_networking_dinner' => $mainDelegate->attending_networking_dinner,
+                'attending_welcome_dinner' => $mainDelegate->attending_welcome_dinner,
+                'attending_gala_dinner' => $mainDelegate->attending_gala_dinner,
 
                 'mode_of_payment' => $mainDelegate->mode_of_payment,
                 'registration_status' => "$mainDelegate->registration_status",
@@ -3778,6 +3782,10 @@ class RegistrationController extends Controller
                     'attending_plenary' => $mainDelegate->attending_plenary,
                     'attending_symposium' => $mainDelegate->attending_symposium,
                     'attending_solxchange' => $mainDelegate->attending_solxchange,
+                    'attending_yf' => $mainDelegate->attending_yf,
+                    'attending_networking_dinner' => $mainDelegate->attending_networking_dinner,
+                    'attending_welcome_dinner' => $mainDelegate->attending_welcome_dinner,
+                    'attending_gala_dinner' => $mainDelegate->attending_gala_dinner,
 
                     'unit_price' => $mainDelegate->unit_price,
                     'discount_price' => $discountPrice,
@@ -3906,6 +3914,10 @@ class RegistrationController extends Controller
                             'attending_plenary' => $mainDelegate->attending_plenary,
                             'attending_symposium' => $mainDelegate->attending_symposium,
                             'attending_solxchange' => $mainDelegate->attending_solxchange,
+                            'attending_yf' => $mainDelegate->attending_yf,
+                            'attending_networking_dinner' => $mainDelegate->attending_networking_dinner,
+                            'attending_welcome_dinner' => $mainDelegate->attending_welcome_dinner,
+                            'attending_gala_dinner' => $mainDelegate->attending_gala_dinner,
 
                             'unit_price' => $mainDelegate->unit_price,
                             'discount_price' => $discountPrice,
@@ -4025,6 +4037,10 @@ class RegistrationController extends Controller
             'Attending to Plenary',
             'Attending to Symposium',
             'Attending to Solutions XChange',
+            'Attending to Youth Forum',
+            'Attending to Networking Dinner',
+            'Attending to Welcome Dinner',
+            'Attending to Gala Dinner',
         );
 
         $callback = function () use ($finalExcelData, $columns) {
@@ -4102,6 +4118,10 @@ class RegistrationController extends Controller
                         $data['attending_plenary'],
                         $data['attending_symposium'],
                         $data['attending_solxchange'],
+                        $data['attending_yf'],
+                        $data['attending_networking_dinner'],
+                        $data['attending_welcome_dinner'],
+                        $data['attending_gala_dinner'],
                     )
                 );
             }

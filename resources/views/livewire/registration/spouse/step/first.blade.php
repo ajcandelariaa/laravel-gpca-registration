@@ -16,23 +16,23 @@
             </div>
             <div>
                 <div class="flex items-center gap-2">
-                    <input type="checkbox" wire:model.lazy="selectedDays" value="1">
-                    <label>December 4, 2023 (Monday) - <span class="font-semibold">$ 200.00</span></label>
+                    <input type="checkbox" wire:model.lazy="selectedDays" value="1" id="1">
+                    <label for="1">December 4, 2023 (Monday) - <span class="font-semibold">$ 200.00</span></label>
                 </div>
                 
                 <div class="flex items-center gap-2">
-                    <input type="checkbox" wire:model.lazy="selectedDays" value="2">
-                    <label>December 5, 2023 (Tuesday) - <span class="font-semibold">$ 220.00</span></label>
+                    <input type="checkbox" wire:model.lazy="selectedDays" value="2" id="2">
+                    <label for="2">December 5, 2023 (Tuesday) - <span class="font-semibold">$ 220.00</span></label>
                 </div>
                 
                 <div class="flex items-center gap-2">
-                    <input type="checkbox" wire:model.lazy="selectedDays" value="3">
-                    <label>December 6, 2023 (Wednesday) - <span class="font-semibold">$ 200.00</span></label>
+                    <input type="checkbox" wire:model.lazy="selectedDays" value="3" id="3">
+                    <label for="3">December 6, 2023 (Wednesday) - <span class="font-semibold">$ 200.00</span></label>
                 </div>
                 
                 <div class="flex items-center gap-2">
-                    <input type="checkbox" wire:model.lazy="selectedDays" value="4">
-                    <label>December 7, 2023 (Thursday) - <span class="font-semibold">$ 200.00</span></label>
+                    <input type="checkbox" wire:model.lazy="selectedDays" value="4" id="4">
+                    <label for="4">December 7, 2023 (Thursday) - <span class="font-semibold">$ 200.00</span></label>
                 </div>
 
                 @error('selectedDays')

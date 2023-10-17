@@ -92,27 +92,6 @@
                             @endif
                         </p>
 
-                        @if ($eventCategory == 'AF' && $event->year == '2023')
-                            <p>Attending to: </p>
-                            <div class="font-bold">
-                                @if ($finalData['attending_plenary'] || $finalData['attending_symposium'] || $finalData['attending_solxchange'])
-                                    @if ($finalData['attending_plenary'])
-                                        17<sup>th</sup> Annual GPCA Forum Plenary
-                                    @endif
-
-                                    @if ($finalData['attending_symposium'])
-                                        GPCA Symposium
-                                    @endif
-
-                                    @if ($finalData['attending_solxchange'])
-                                        Solutions XChange
-                                    @endif
-                                @else
-                                    N/A
-                                @endif
-                            </div>
-                        @endif
-
                         @if ($eventCategory == 'PC' && $event->year == '2023')
                             <p> Would you be attending the Networking Gala Dinner and Plastics Circul-A-Thon Awards
                                 14<sup>th</sup> May 2023?</p>
@@ -126,6 +105,56 @@
                         @endif
                     </div>
                 </div>
+
+                @if ($eventCategory == 'AF' && $event->year == '2023')
+                    <div
+                        class="bg-registrationCardBGColor text-lg text-center text-registrationPrimaryColor font-bold py-2 mt-3">
+                        Attending to:
+                    </div>
+                    <div class="font-semibold mt-2 bg-registrationInputFieldsBGColor py-2">
+                        @if (
+                            $finalData['attending_plenary'] ||
+                                $finalData['attending_symposium'] ||
+                                $finalData['attending_solxchange'] ||
+                                $finalData['attending_yf'] ||
+                                $finalData['attending_networking_dinner'] ||
+                                $finalData['attending_welcome_dinner'] ||
+                                $finalData['attending_gala_dinner']
+                        )
+                            <ul class="list-disc ml-10">
+                                @if ($finalData['attending_plenary'])
+                                    <li>17<sup>th</sup> Annual GPCA Forum Main Plenary | 5-7 December 2023</li>
+                                @endif
+
+                                @if ($finalData['attending_symposium'])
+                                    <li>GPCA Symposium | 5-7 December 2023</li>
+                                @endif
+
+                                @if ($finalData['attending_solxchange'])
+                                    <li>Solutions XChange | 5-7 December 2023</li>
+                                @endif
+
+                                @if ($finalData['attending_yf'])
+                                    <li>GPCA Youth Forum | 4-7 December 2023</li>
+                                @endif
+
+                                @if ($finalData['attending_networking_dinner'])
+                                    <li>Networking Dinner | 4 December 2023</li>
+                                @endif
+
+                                @if ($finalData['attending_welcome_dinner'])
+                                    <li>Welcome Dinner Sponsored by QatarEnergy | 5 December 2023</li>
+                                @endif
+
+                                @if ($finalData['attending_gala_dinner'])
+                                    <li>Gala Dinner Sponsored by SABIC | 6 December 2023</li>
+                                @endif
+                            </ul>
+                        @else
+                            N/A
+                        @endif
+                    </div>
+                @endif
 
                 <div class="grid grid-cols-2 bg-registrationCardBGColor py-3 px-4 gap-4 mt-3">
                     <p>Invoice number:</p>
