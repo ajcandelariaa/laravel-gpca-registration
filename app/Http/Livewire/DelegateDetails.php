@@ -3,14 +3,13 @@
 namespace App\Http\Livewire;
 
 use Livewire\Component;
-use App\Models\Member as Members;
-use App\Models\MainDelegate as MainDelegates;
-use App\Models\AdditionalDelegate as AdditionalDelegates;
 use App\Models\EventRegistrationType as EventRegistrationTypes;
 use App\Models\Event as Events;
 use App\Models\PrintedBadge as PrintedBadges;
 use App\Models\ScannedDelegate as ScannedDelegates;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Crypt;
+
 
 class DelegateDetails extends Component
 {
@@ -68,7 +67,10 @@ class DelegateDetails extends Component
         $this->badgeViewFFTextColor = $registrationType->badge_footer_front_text_color;
         $this->badgeViewFBTextColor = $registrationType->badge_footer_back_text_color;
 
-        $this->scanDelegateUrl = route('admin.event.delegates.detail.scanBadge', ['eventCategory' => $eventCategory, 'eventId' => $eventId, 'delegateId' => $finalDelegate['delegateId'], 'delegateType' => $finalDelegate['delegateType']]);
+        $combinedString = $eventId . ',' . $eventCategory . ',' . $finalDelegate['delegateId'] . ',' . $finalDelegate['delegateType'];
+        $finalCryptString = Crypt::encryptString($combinedString);
+        
+        $this->scanDelegateUrl = route('scan.qr', ['id' => $finalCryptString]);
     }
 
 

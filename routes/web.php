@@ -73,6 +73,7 @@ Route::prefix('admin')->group(function () {
 
     });
 
+
     Route::get('/login', [AdminController::class, 'loginView'])->name('admin.login.view');
     Route::post('/login', [AdminController::class, 'login'])->name('admin.login.post');
 });
@@ -91,3 +92,5 @@ Route::get('/{eventCategory}/{eventId}/view-invoice/{registrantId}', [Registrati
 Route::get('/{eventCategory}/{eventId}/view-badge/{delegateType}/{delegateId}', [DelegateController::class, 'delegateDetailPrintBadge'])->name('generate-public-badge');
 
 Route::get('/download-file/{documentId}', [RegistrationController::class, 'downloadFile'])->name('download-file');
+
+Route::get('/scan-qr/{id}', [DelegateController::class, 'scanQr'])->name('scan.qr');

@@ -11,8 +11,9 @@ use App\Models\ScannedDelegate;
 use App\Models\Transaction;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Crypt;
 
 class DelegateController extends Controller
 {
@@ -270,8 +271,8 @@ class DelegateController extends Controller
                         $delegateSalutation = null;
                     }
 
-                    
-                    if($tempDelegate->alternative_company_name != null){
+
+                    if ($tempDelegate->alternative_company_name != null) {
                         $companyName = $tempDelegate->alternative_company_name;
                     } else {
                         $companyName = $tempDelegate->company_name;
@@ -307,8 +308,8 @@ class DelegateController extends Controller
                     } else {
                         $delegateSalutation = null;
                     }
-                    
-                    if($mainDelegateInfo->alternative_company_name != null){
+
+                    if ($mainDelegateInfo->alternative_company_name != null) {
                         $companyName = $mainDelegateInfo->alternative_company_name;
                     } else {
                         $companyName = $mainDelegateInfo->company_name;
@@ -355,5 +356,18 @@ class DelegateController extends Controller
         } else {
             abort(404, 'The URL is incorrect');
         }
+    }
+
+    public function scanQr($id)
+    {
+        if (Session::has('userType')) {
+            if (Session::get('userType') == 'gpcaAdmin') {
+                $decryptedText = Crypt::decryptString($id);
+                $arrayString = explode(",", $decryptedText);
+
+                return redirect()->route('admin.event.delegates.detail.scanBadge', ['eventCategory' => $arrayString[1], 'eventId' => $arrayString[0], 'delegateId' => $arrayString[2], 'delegateType' => $arrayString[3]]);
+            }
+        }
+        return redirect()->away('https://www.gpca.org.ae/');
     }
 }
