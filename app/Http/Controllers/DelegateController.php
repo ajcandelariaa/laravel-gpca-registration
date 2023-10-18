@@ -255,11 +255,18 @@ class DelegateController extends Controller
             $backtBanner = public_path(Storage::url($event->badge_back_banner));
             $finalBackBanner = str_replace('\/', '/', $backtBanner);
 
-            // $finalWidth = (20.3 / 2.54) * 72;
-            $finalHeight = (15.2 / 2.54) * 72;
+            if($eventCategory == "PSW"){
+                $finalHeight = (15.2 / 2.54) * 72;
+                $finalWidth = (23.3 / 2.54) * 72;
+            } else {
+                $finalHeight = (15.2 / 2.54) * 72;
+                $finalWidth = (22.3 / 2.54) * 72;
+            }
 
-            $finalWidth = (22.3 / 2.54) * 72;
+            $combinedString = $eventId . ',' . $eventCategory . ',' . $delegateId . ',' . $delegateType;
+            $finalCryptString = Crypt::encryptString($combinedString);
 
+            $scanDelegateUrl = route('scan.qr', ['id' => $finalCryptString]);
 
             if ($tempDelegate != null) {
                 $registrationType = EventRegistrationType::where('event_id', $eventId)->where('event_category', $eventCategory)->where('registration_type', $tempDelegate->badge_type)->first();
@@ -300,6 +307,8 @@ class DelegateController extends Controller
                         'backTextBGColor' => $registrationType->badge_footer_back_bg_color,
                         'finalWidth' => $finalWidth,
                         'finalHeight' => $finalHeight,
+
+                        'scanDelegateUrl' => $scanDelegateUrl,
                     ];
                 } else {
                     $mainDelegateInfo = MainDelegate::where('id', $tempDelegate->main_delegate_id)->first();
@@ -337,15 +346,26 @@ class DelegateController extends Controller
                         'backTextBGColor' => $registrationType->badge_footer_back_bg_color,
                         'finalWidth' => $finalWidth,
                         'finalHeight' => $finalHeight,
+
+                        'scanDelegateUrl' => $scanDelegateUrl,
                     ];
                 }
 
-                $pdf = Pdf::loadView('admin.events.delegates.delegate_badgev4', $finalDelegate, [
-                    'margin_top' => 0,
-                    'margin_right' => 0,
-                    'margin_bottom' => 0,
-                    'margin_left' => 0,
-                ]);
+                if($eventCategory == "PSW"){
+                    $pdf = Pdf::loadView('admin.events.delegates.delegate_badgev5', $finalDelegate, [
+                        'margin_top' => 0,
+                        'margin_right' => 0,
+                        'margin_bottom' => 0,
+                        'margin_left' => 0,
+                    ]);
+                } else {
+                    $pdf = Pdf::loadView('admin.events.delegates.delegate_badgev4', $finalDelegate, [
+                        'margin_top' => 0,
+                        'margin_right' => 0,
+                        'margin_bottom' => 0,
+                        'margin_left' => 0,
+                    ]);
+                }
 
                 $pdf->setPaper(array(0, 0, $finalWidth, $finalHeight), 'custom');
 

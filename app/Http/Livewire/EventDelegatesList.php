@@ -41,6 +41,8 @@ class EventDelegatesList extends Component
 
         if (!$mainDelegates->isEmpty()) {
             foreach ($mainDelegates as $mainDelegate) {
+                $companyName = "";
+                
                 if ($mainDelegate->delegate_replaced_by_id == null && (!$mainDelegate->delegate_refunded)) {
                     if ($mainDelegate->registration_status == "confirmed") {
 
