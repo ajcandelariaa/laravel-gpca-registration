@@ -43,7 +43,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('/promo-code', [EventController::class, 'eventPromoCodeView'])->name('admin.event.promo-codes.view');
                 Route::get('/promo-code/export', [EventController::class, 'exportListOfPromoCodes'])->name('admin.event.promo-codes.export.data');
                 Route::prefix('registrant')->group(function (){
-                    Route::get('/', [RegistrationController::class, 'eventRegistrantsView'])->name('admin.event.registrants.view');
+                Route::get('/', [RegistrationController::class, 'eventRegistrantsView'])->name('admin.event.registrants.view');
                     Route::get('/export', [RegistrationController::class, 'registrantsExportData'])->name('admin.event.registrants.exportData');
                     Route::get('/{registrantId}', [RegistrationController::class, 'registrantDetailView'])->name('admin.event.registrants.detail.view');
                     Route::get('/{registrantId}/view-invoice', [RegistrationController::class, 'generateAdminInvoice'])->name('admin.event.registrants.view.invoice');
@@ -53,7 +53,6 @@ Route::prefix('admin')->group(function () {
                     Route::get('/{delegateType}/{delegateId}', [DelegateController::class, 'delegateDetailView'])->name('admin.event.delegates.detail.view');
                     Route::get('/{delegateType}/{delegateId}/print-badge', [DelegateController::class, 'delegateDetailPrintBadge'])->name('admin.event.delegates.detail.printBadge');
                     Route::get('/{delegateType}/{delegateId}/scan-badge', [DelegateController::class, 'delegateDetailScanBadge'])->name('admin.event.delegates.detail.scanBadge');
-                    Route::get('/scan-badge/feedback/{status}', [DelegateController::class, 'delegateScanBadgeFeedback'])->name('admin.event.delegates.feedback.scanBadge');
                 });
 
                 Route::prefix('printed-badge')->group(function () {

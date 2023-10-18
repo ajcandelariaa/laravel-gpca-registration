@@ -188,21 +188,6 @@ class DelegateController extends Controller
         }
     }
 
-    public function delegateScanBadgeFeedback($eventCategory, $eventId, $status)
-    {
-        if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {
-            return view('admin.events.scanned-delegate.scanned_feedback', [
-                "pageTitle" => "Scanned delegates",
-                "eventCategory" => $eventCategory,
-                "eventId" => $eventId,
-                "status" => $status,
-            ]);
-        } else {
-            abort(404, 'The URL is incorrect');
-        }
-    }
-
-
     // =========================================================
     //                       RENDER LOGICS
     // =========================================================
@@ -219,7 +204,14 @@ class DelegateController extends Controller
             }
 
             if ($tempDelegate == null) {
-                return redirect()->route('admin.event.delegates.feedback.scanBadge', ['eventCategory' => $eventCategory, 'eventId' => $eventId, 'status' => 'error'])->with('status', 'error');
+                return view('admin.events.scanned-delegate.scanned_feedback', [
+                    "pageTitle" => "Scanned delegate",
+                    "eventCategory" => $eventCategory,
+                    "eventId" => $eventId,
+                    "delegateType" => $delegateType,
+                    "delegateId" => $delegateId,
+                    "status" => "Failed",
+                ]);
             } else {
                 ScannedDelegate::create([
                     'event_id' => $eventId,
@@ -229,7 +221,23 @@ class DelegateController extends Controller
                     'scanned_date_time' => Carbon::now(),
                 ]);
 
-                return redirect()->route('admin.event.delegates.feedback.scanBadge', ['eventCategory' => $eventCategory, 'eventId' => $eventId, 'status' => 'success'])->with('status', 'success');
+                if($delegateType == "main"){
+                    $companyName = $tempDelegate->company_name;
+                } else {
+                    $companyName = MainDelegate::where('id', $tempDelegate->main_delegate_id)->value('company_name');
+                }
+
+                return view('admin.events.scanned-delegate.scanned_feedback', [
+                    "pageTitle" => "Scanned delegate",
+                    "eventCategory" => $eventCategory,
+                    "eventId" => $eventId,
+                    "delegateType" => $delegateType,
+                    "delegateId" => $delegateId,
+                    "status" => "Success",
+                    "name" => $tempDelegate->salutation . ' ' . $tempDelegate->first_name . ' ' . $tempDelegate->middle_name . ' ' . $tempDelegate->last_name,
+                    "jobTitle" => $tempDelegate->job_title,
+                    "companyName" => $companyName,
+                ]);
             }
         } else {
             abort(404, 'The URL is incorrect');
@@ -255,7 +263,7 @@ class DelegateController extends Controller
             $backtBanner = public_path(Storage::url($event->badge_back_banner));
             $finalBackBanner = str_replace('\/', '/', $backtBanner);
 
-            if($eventCategory == "PSW"){
+            if ($eventCategory == "PSW") {
                 $finalHeight = (15.2 / 2.54) * 72;
                 $finalWidth = (23.3 / 2.54) * 72;
             } else {
@@ -351,7 +359,7 @@ class DelegateController extends Controller
                     ];
                 }
 
-                if($eventCategory == "PSW"){
+                if ($eventCategory == "PSW") {
                     $pdf = Pdf::loadView('admin.events.delegates.delegate_badgev5', $finalDelegate, [
                         'margin_top' => 0,
                         'margin_right' => 0,
@@ -384,10 +392,9 @@ class DelegateController extends Controller
             if (Session::get('userType') == 'gpcaAdmin') {
                 $decryptedText = Crypt::decryptString($id);
                 $arrayString = explode(",", $decryptedText);
-
                 return redirect()->route('admin.event.delegates.detail.scanBadge', ['eventCategory' => $arrayString[1], 'eventId' => $arrayString[0], 'delegateId' => $arrayString[2], 'delegateType' => $arrayString[3]]);
             }
         }
-        return redirect()->away('https://www.gpca.org.ae/');
+        return view('admin.events.scanned-delegate.unauthorized_scanned');
     }
 }
