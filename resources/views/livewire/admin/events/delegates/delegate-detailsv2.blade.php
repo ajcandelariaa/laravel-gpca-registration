@@ -30,7 +30,7 @@
                     <div>
                         <p class="text-center">Scan here</p>
                         <div>
-                            {!! QrCode::size(100)->generate($scanDelegateUrl) !!}
+                            {!! QrCode::size(150)->generate($scanDelegateUrl) !!}
                         </div>
                     </div>
                 </div>
