@@ -117,37 +117,36 @@
                                 $finalData['attending_symposium'] ||
                                 $finalData['attending_solxchange'] ||
                                 $finalData['attending_yf'] ||
-                                $finalData['attending_networking_dinner'] ||
                                 $finalData['attending_welcome_dinner'] ||
                                 $finalData['attending_gala_dinner']
                         )
                             <ul class="list-disc ml-10">
                                 @if ($finalData['attending_plenary'])
-                                    <li>17<sup>th</sup> Annual GPCA Forum Main Plenary | 5-7 December 2023</li>
+                                    <li>17<sup>th</sup> Annual GPCA Forum Main Plenary | 4-6 December 2023</li>
                                 @endif
 
                                 @if ($finalData['attending_symposium'])
-                                    <li>GPCA Symposium | 5-7 December 2023</li>
+                                    <li>GPCA Symposium | 4-5 December 2023</li>
                                 @endif
 
                                 @if ($finalData['attending_solxchange'])
-                                    <li>Solutions XChange | 5-7 December 2023</li>
+                                    <li>Solutions XChange | 4-5 December 2023</li>
                                 @endif
 
                                 @if ($finalData['attending_yf'])
-                                    <li>GPCA Youth Forum | 4-7 December 2023</li>
+                                    <li>GPCA Youth Forum | 4-6 December 2023</li>
                                 @endif
 
-                                @if ($finalData['attending_networking_dinner'])
+                                {{-- @if ($finalData['attending_networking_dinner'])
                                     <li>Networking Dinner | 4 December 2023</li>
-                                @endif
+                                @endif --}}
 
                                 @if ($finalData['attending_welcome_dinner'])
-                                    <li>Welcome Dinner Sponsored by QatarEnergy | 5 December 2023</li>
+                                    <li>Welcome Dinner Sponsored by QatarEnergy | 4 December 2023</li>
                                 @endif
 
                                 @if ($finalData['attending_gala_dinner'])
-                                    <li>Gala Dinner Sponsored by SABIC | 6 December 2023</li>
+                                    <li>Gala Dinner Sponsored by SABIC | 5 December 2023</li>
                                 @endif
                             </ul>
                         @else

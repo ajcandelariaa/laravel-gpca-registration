@@ -38,9 +38,9 @@
                                 <li>December 6, 2023 (Wednesday)</li>
                             @endif
 
-                            @if ($finalData['invoiceData']['day_four'])
+                            {{-- @if ($finalData['invoiceData']['day_four'])
                                 <li>December 7, 2023 (Thursday)</li>
-                            @endif
+                            @endif --}}
                         </ul>
 
                         <p>Full name of Annual GPCA Forum registered attendee?</p>

@@ -30,10 +30,10 @@
                     <label for="3">December 6, 2023 (Wednesday) - <span class="font-semibold">$ 200.00</span></label>
                 </div>
                 
-                <div class="flex items-center gap-2">
+                {{-- <div class="flex items-center gap-2">
                     <input type="checkbox" wire:model.lazy="selectedDays" value="4" id="4">
                     <label for="4">December 7, 2023 (Thursday) - <span class="font-semibold">$ 200.00</span></label>
-                </div>
+                </div> --}}
 
                 @error('selectedDays')
                     <div class="text-red-500 text-xs italic mt-1">

@@ -89,13 +89,10 @@ class SpouseRegistrationForm extends Component
             } else if ($selectedDay == 2) {
                 $price += 220;
                 $this->day_two = true;
-            } else if ($selectedDay == 3) {
-                $price += 200;
-                $this->day_three = true;
-            } else {
+            } else if ($selectedDay == 4){
                 $price += 200;
                 $this->day_four = true;
-            }
+            } else {}
         }
 
         $this->finalUnitPrice = $price;

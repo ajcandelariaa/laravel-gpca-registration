@@ -476,10 +476,10 @@ class RegistrationForm extends Component
         $attending_symposium = false;
         $attending_solxchange = false;
         $attending_yf = false;
-        $attending_networking_dinner = false;
         $attending_welcome_dinner = false;
         $attending_gala_dinner = false;
 
+        $attending_networking_dinner = null;
 
         if (count($this->attendingTo) > 0) {
             foreach ($this->attendingTo as $attendTo) {
@@ -491,12 +491,12 @@ class RegistrationForm extends Component
                     $attending_solxchange = true;
                 } else if ($attendTo == 4) {
                     $attending_yf = true;
-                } else if ($attendTo == 5) {
-                    $attending_networking_dinner = true;
                 } else if ($attendTo == 6) {
                     $attending_welcome_dinner = true;
-                } else {
+                } else if ($attendTo == 7) {
                     $attending_gala_dinner = true;
+                } else {
+                    $attending_networking_dinner = null;
                 }
             }
         }
