@@ -47,9 +47,7 @@ Conference at a glance
 
 <h2>GENERAL INFORMATION</h2>
 
-<span><strong>Networking day: 4 December 2023</strong></span><br><span>Delegates can start collecting their badges on 4<sup>th</sup> December at the designed registration desk onsite.</span>
-
-<span>All registered delegates are invited to join the networking dinner on 4<sup>th</sup> December. Join us for an evening filled with meaningful conversations and the opportunity to establish valuable connections with industry peers.</span>
+<span>Delegates can start collecting their badges on 3<sup>rd</sup> December at the designed registration desk onsite.</span>
 
 <span><strong>Qatar Visa</strong></span><br><span><strong>For travellers with passports issued by India, Pakistan, Iran, Thailand, and Ukraine</strong> please reach out to Cozmo Travel for visa assistant if you booked your accommodation through them.</span>
 

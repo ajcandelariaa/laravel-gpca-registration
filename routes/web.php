@@ -93,3 +93,7 @@ Route::get('/{eventCategory}/{eventId}/view-badge/{delegateType}/{delegateId}', 
 Route::get('/download-file/{documentId}', [RegistrationController::class, 'downloadFile'])->name('download-file');
 
 Route::get('/scan-qr/{id}', [DelegateController::class, 'scanQr'])->name('scan.qr');
+
+// Route::get('/phpinfo', function () {
+//     phpinfo();
+// });
