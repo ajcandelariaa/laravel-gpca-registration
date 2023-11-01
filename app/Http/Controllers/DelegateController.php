@@ -264,8 +264,16 @@ class DelegateController extends Controller
             $finalBackBanner = str_replace('\/', '/', $backtBanner);
 
             if ($eventCategory == "PSW") {
-                $finalHeight = (15.2 / 2.54) * 72;
-                $finalWidth = (23.3 / 2.54) * 72;
+                // $finalHeight = (15.2 / 2.54) * 72;
+                // $finalWidth = (23.3 / 2.54) * 72;
+
+                
+                // $finalHeight = (12.5 / 2.54) * 72;
+                // $finalWidth = (17.2 / 2.54) * 72;
+
+                
+                $finalHeight = (13.1 / 2.54) * 72;
+                $finalWidth = (18.2 / 2.54) * 72;
             } else {
                 $finalHeight = (15.2 / 2.54) * 72;
                 $finalWidth = (22.3 / 2.54) * 72;
@@ -360,7 +368,7 @@ class DelegateController extends Controller
                 }
 
                 if ($eventCategory == "PSW") {
-                    $pdf = Pdf::loadView('admin.events.delegates.delegate_badgev5', $finalDelegate, [
+                    $pdf = Pdf::loadView('admin.events.delegates.delegate_badgev6', $finalDelegate, [
                         'margin_top' => 0,
                         'margin_right' => 0,
                         'margin_bottom' => 0,
@@ -375,7 +383,7 @@ class DelegateController extends Controller
                     ]);
                 }
 
-                $pdf->setPaper(array(0, 0, $finalWidth, $finalHeight), 'custom');
+                $pdf->setPaper('A4', 'portrait');
 
                 return $pdf->stream('badge.pdf');
             } else {
