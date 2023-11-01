@@ -396,13 +396,13 @@ class DelegateController extends Controller
 
     public function scanQr($id)
     {
-        if (Session::has('userType')) {
-            if (Session::get('userType') == 'gpcaAdmin') {
+        // if (Session::has('userType')) {
+        //     if (Session::get('userType') == 'gpcaAdmin') {
                 $decryptedText = Crypt::decryptString($id);
                 $arrayString = explode(",", $decryptedText);
                 return redirect()->route('admin.event.delegates.detail.scanBadge', ['eventCategory' => $arrayString[1], 'eventId' => $arrayString[0], 'delegateId' => $arrayString[2], 'delegateType' => $arrayString[3]]);
-            }
-        }
-        return view('admin.events.scanned-delegate.unauthorized_scanned');
+        //     }
+        // }
+        // return view('admin.events.scanned-delegate.unauthorized_scanned');
     }
 }
