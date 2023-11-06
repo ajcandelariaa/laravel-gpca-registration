@@ -107,21 +107,6 @@
 
                             <div class="space-y-2">
                                 <div class="text-registrationPrimaryColor">
-                                    Company name 
-                                </div>
-                                <div>
-                                    <input placeholder="Company name" type="text" wire:model.lazy="companyName"
-                                        class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                                    @error('companyName')
-                                        <div class="text-red-500 text-xs italic mt-1">
-                                            {{ $message }}
-                                        </div>
-                                    @enderror
-                                </div>
-                            </div>
-
-                            <div class="space-y-2">
-                                <div class="text-registrationPrimaryColor">
                                     Job title 
                                 </div>
                                 <div>

@@ -3528,7 +3528,7 @@ class RegistrationController extends Controller
                 "finalEventStartDate" => Carbon::parse($event->event_start_date)->format('d M Y'),
                 "finalEventEndDate" => Carbon::parse($event->event_end_date)->format('d M Y'),
                 "eventFormattedData" => $eventFormattedData,
-                "companyName" => $fullname,
+                "companyName" => $mainVisitor->company_name,
                 "companyAddress" => $mainVisitor->country,
                 "companyCity" => $mainVisitor->city,
                 "companyCountry" => null,

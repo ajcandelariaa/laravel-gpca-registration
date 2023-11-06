@@ -14,23 +14,6 @@
                     </div>
 
                     <div class="mt-5 grid grid-cols-2 gap-y-3 gap-x-5">
-                        {{-- ROW 1 --}}
-
-                        <div class="space-y-2">
-                            <div class="text-registrationPrimaryColor">
-                                Company name <span class="text-red-500">*</span>
-                            </div>
-                            <div>
-                                <input placeholder="Company name" type="text" wire:model.lazy="subCompanyName"
-                                    class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                                @error('subCompanyName')
-                                    <div class="text-red-500 text-xs italic mt-1">
-                                        {{ $message }}
-                                    </div>
-                                @enderror
-                            </div>
-                        </div>
-
                         <div class="space-y-2">
                             <div class="text-registrationPrimaryColor">
                                 Job title <span class="text-red-500">*</span>
@@ -195,7 +178,7 @@
                             </div>
                         </div>
 
-                        <div class="space-y-2 col-span-2">
+                        <div class="space-y-2">
                             <div class="text-registrationPrimaryColor">
                                 City <span class="text-red-500">*</span>
                             </div>

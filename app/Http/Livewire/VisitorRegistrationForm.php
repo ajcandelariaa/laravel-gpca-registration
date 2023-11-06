@@ -348,7 +348,7 @@ class VisitorRegistrationForm extends Component
                     'nationality' => $additionalVisitor['subNationality'],
                     'country' => $additionalVisitor['subCountry'],
                     'city' => $additionalVisitor['subCity'],
-                    'company_name' => $additionalVisitor['subCompanyName'],
+                    'company_name' => $this->companyName,
                     'job_title' => $additionalVisitor['subJobTitle'],
                 ]);
 
@@ -747,7 +747,6 @@ class VisitorRegistrationForm extends Component
 
         $this->validate(
             [
-                'subCompanyName' => 'required',
                 'subJobTitle' => 'required',
                 'subFirstName' => 'required',
                 'subLastName' => 'required',
@@ -758,7 +757,6 @@ class VisitorRegistrationForm extends Component
                 'subMobileNumber' => 'required',
             ],
             [
-                'subCompanyName.required' => "Company name is required",
                 'subJobTitle.required' => "Job title is required",
                 'subFirstName.required' => "First name is required",
                 'subLastName.required' => "Last name is required",
@@ -823,7 +821,6 @@ class VisitorRegistrationForm extends Component
 
         $this->validate(
             [
-                'subCompanyNameEdit' => 'required',
                 'subJobTitleEdit' => 'required',
                 'subFirstNameEdit' => 'required',
                 'subLastNameEdit' => 'required',
@@ -834,7 +831,6 @@ class VisitorRegistrationForm extends Component
                 'subMobileNumberEdit' => 'required',
             ],
             [
-                'subCompanyNameEdit.required' => "Company name is required",
                 'subJobTitleEdit.required' => "Job title is required",
                 'subFirstNameEdit.required' => "First name is required",
                 'subLastNameEdit.required' => "Last name is required",
