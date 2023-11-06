@@ -156,6 +156,7 @@
                                 <select wire:model.lazy="subNationality"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                                     <option value=""></option>
+                                    <option value="N/A">N/A</option>
                                     @foreach ($countries as $country)
                                         <option value="{{ $country }}">
                                             {{ $country }}

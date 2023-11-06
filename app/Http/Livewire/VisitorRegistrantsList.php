@@ -91,6 +91,7 @@ class VisitorRegistrantsList extends Component
                     'invoiceNumber' => $tempInvoiceNumber,
                     'fullName' => $mainVisitorFullName,
                     'country' => $mainVisitor->country,
+                    'company_name' => $mainVisitor->company_name,
                     'city' => $mainVisitor->city,
                     'totalAmount' => $mainVisitor->total_amount,
                     'regDateTime' => Carbon::parse($mainVisitor->registered_date_time)->format('M j, Y g:iA'),

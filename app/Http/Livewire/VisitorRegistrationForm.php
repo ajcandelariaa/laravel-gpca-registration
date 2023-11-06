@@ -101,7 +101,7 @@ class VisitorRegistrationForm extends Component
         return view('livewire.registration.visitor.visitor-registration-form');
     }
 
-    
+
 
     public function checkUnitPrice()
     {
@@ -149,7 +149,7 @@ class VisitorRegistrationForm extends Component
         }
     }
 
-    
+
     public function calculateAmount()
     {
         array_push($this->visitorInvoiceDetails, [
@@ -190,7 +190,7 @@ class VisitorRegistrationForm extends Component
         $this->finalVat = $this->finalNetAmount * ($this->event->event_vat / 100);
         $this->finalTotal = $this->finalNetAmount + $this->finalVat;
     }
-    
+
 
     public function resetCalculations()
     {
@@ -202,7 +202,7 @@ class VisitorRegistrationForm extends Component
         $this->finalTotal = 0;
     }
 
-    
+
     public function increaseStep()
     {
         if ($this->currentStep == 1) {
@@ -259,7 +259,7 @@ class VisitorRegistrationForm extends Component
         }
     }
 
-    
+
     public function submitStep3()
     {
         if ($this->checkEmailIfUsedAlreadyMain($this->emailAddress)) {
@@ -279,7 +279,7 @@ class VisitorRegistrationForm extends Component
         $this->dispatchBrowserEvent('swal:remove-registration-loading-screen');
     }
 
-    
+
     public function addtoDatabase()
     {
         if ($this->finalTotal == 0) {
@@ -370,7 +370,7 @@ class VisitorRegistrationForm extends Component
 
         $this->currentStep += 1;
     }
-    
+
     public function decreaseStep()
     {
         $this->resetCalculations();
@@ -383,17 +383,12 @@ class VisitorRegistrationForm extends Component
             $this->dispatchBrowserEvent('swal:add-registration-loading-screen');
         }
     }
-    
+
     public function submitBankTransfer()
     {
         // UPDATE DETAILS
-        if ($this->finalTotal == 0) {
-            $paymentStatus = "free";
-            $registrationStatus = "pending";
-        } else {
-            $paymentStatus = "unpaid";
-            $registrationStatus = "pending";
-        }
+        $paymentStatus = "unpaid";
+        $registrationStatus = "pending";
 
         MainVisitors::find($this->currentMainVisitorId)->fill([
             'registration_status' => $registrationStatus,
@@ -430,22 +425,14 @@ class VisitorRegistrationForm extends Component
             'amountPaid' => 0,
             'transactionId' => $tempTransactionId,
             'invoiceLink' => $invoiceLink,
-            
-            'badgeLink' => env('APP_URL')."/".$this->event->category."/".$this->event->id."/view-badge"."/"."main"."/".$this->currentMainVisitorId,
+
+            'badgeLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-badge" . "/" . "main" . "/" . $this->currentMainVisitorId,
         ];
 
-        if ($paymentStatus == "free") {
-            try {
-                Mail::to($this->emailAddress)->cc($this->ccEmailNotif)->send(new RegistrationFree($details1));
-            } catch (\Exception $e) {
-                Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationFree($details1));
-            }
-        } else {
-            try {
-                Mail::to($this->emailAddress)->cc($this->ccEmailNotif)->send(new RegistrationUnpaid($details1));
-            } catch (\Exception $e) {
-                Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationUnpaid($details1));
-            }
+        try {
+            Mail::to($this->emailAddress)->cc($this->ccEmailNotif)->send(new RegistrationUnpaid($details1));
+        } catch (\Exception $e) {
+            Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationUnpaid($details1));
         }
 
         $additionalVisitors = AdditionalVisitors::where('main_visitor_id', $this->currentMainVisitorId)->get();
@@ -471,29 +458,21 @@ class VisitorRegistrationForm extends Component
                     'amountPaid' => 0,
                     'transactionId' => $tempTransactionId,
                     'invoiceLink' => $invoiceLink,
-            
-                    'badgeLink' => env('APP_URL')."/".$this->event->category."/".$this->event->id."/view-badge"."/"."sub"."/".$additionalVisitor->id,
+
+                    'badgeLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-badge" . "/" . "sub" . "/" . $additionalVisitor->id,
                 ];
 
-                if ($paymentStatus == "free") {
-                    try {
-                        Mail::to($additionalVisitor->email_address)->cc($this->ccEmailNotif)->send(new RegistrationFree($details1));
-                    } catch (\Exception $e) {
-                        Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationFree($details1));
-                    }
-                } else {
-                    try {
-                        Mail::to($additionalVisitor->email_address)->cc($this->ccEmailNotif)->send(new RegistrationUnpaid($details1));
-                    } catch (\Exception $e) {
-                        Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationUnpaid($details1));
-                    }
+                try {
+                    Mail::to($additionalVisitor->email_address)->cc($this->ccEmailNotif)->send(new RegistrationUnpaid($details1));
+                } catch (\Exception $e) {
+                    Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationUnpaid($details1));
                 }
             }
         }
         return redirect()->route('register.success.view', ['eventCategory' => $this->event->category, 'eventId' => $this->event->id, 'eventYear' => $this->event->year, 'mainDelegateId' => $this->currentMainVisitorId]);
     }
 
-    
+
     public function btClicked()
     {
         $this->paymentMethodError = null;
@@ -518,7 +497,7 @@ class VisitorRegistrationForm extends Component
         }
     }
 
-    
+
     public function setSessionCC()
     {
         $apiEndpoint = env('MERCHANT_API_URL');
@@ -683,13 +662,13 @@ class VisitorRegistrationForm extends Component
         }
     }
 
-    
+
     public function openAddModal()
     {
         $this->showAddVisitorModal = true;
     }
 
-    
+
     public function resetAddModalFields()
     {
         $this->subSalutation = null;
@@ -714,7 +693,7 @@ class VisitorRegistrationForm extends Component
         $this->resetAddModalFields();
     }
 
-    
+
     public function openEditModal($subVisitorId)
     {
         $this->showEditVisitorModal = true;
@@ -735,7 +714,7 @@ class VisitorRegistrationForm extends Component
             }
         }
     }
-    
+
     public function resetEditModalFields()
     {
         $this->subIdEdit = null;
@@ -823,7 +802,7 @@ class VisitorRegistrationForm extends Component
             }
         }
     }
-    
+
     public function removeAdditionalVisitor($subVisitorId)
     {
         $arrayTemp = array_filter($this->additionalVisitors, function ($item) use ($subVisitorId) {
@@ -947,7 +926,7 @@ class VisitorRegistrationForm extends Component
         }
     }
 
-    
+
     public function checkEmailIfUsedAlreadyMain($emailAddress)
     {
         if (count($this->additionalVisitors) == 0) {
@@ -962,7 +941,7 @@ class VisitorRegistrationForm extends Component
         }
     }
 
-    
+
     public function checkEmailIfUsedAlreadySub($emailAddress)
     {
         if ($this->emailAddress == $emailAddress) {

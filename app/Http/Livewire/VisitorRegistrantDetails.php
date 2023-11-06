@@ -219,11 +219,7 @@ class VisitorRegistrantDetails extends Component
 
     public function markAsPaid()
     {
-        if ($this->finalData['invoiceData']['total_amount'] == 0) {
-            $paymentStatus = "free";
-        } else {
-            $paymentStatus = "paid";
-        }
+        $paymentStatus = "paid";
 
         MainVisitors::find($this->finalData['mainVisitorId'])->fill([
             'registration_status' => "confirmed",
@@ -241,52 +237,53 @@ class VisitorRegistrantDetails extends Component
         foreach ($this->finalData['allVisitors'] as $visitorsIndex => $visitors) {
             foreach ($visitors as $innerVisitor) {
                 if (end($visitors) == $innerVisitor) {
-                    $details1 = [
-                        'name' => $innerVisitor['name'],
-                        'eventLink' => $this->event->link,
-                        'eventName' => $this->event->name,
-                        'eventDates' => $eventFormattedData,
-                        'eventLocation' => $this->event->location,
-                        'eventCategory' => $this->event->category,
-                        'eventYear' => $this->event->year,
+                    if (!$innerVisitor['visitor_cancelled']) {
+                        $details1 = [
+                            'name' => $innerVisitor['name'],
+                            'eventLink' => $this->event->link,
+                            'eventName' => $this->event->name,
+                            'eventDates' => $eventFormattedData,
+                            'eventLocation' => $this->event->location,
+                            'eventCategory' => $this->event->category,
+                            'eventYear' => $this->event->year,
 
-                        'nationality' => $innerVisitor['nationality'],
-                        'country' => $innerVisitor['country'],
-                        'city' => $innerVisitor['city'],
-                        'amountPaid' => $this->finalData['invoiceData']['unit_price'],
-                        'transactionId' => $innerVisitor['transactionId'],
-                        'invoiceLink' => $invoiceLink,
+                            'nationality' => $innerVisitor['nationality'],
+                            'country' => $innerVisitor['country'],
+                            'city' => $innerVisitor['city'],
+                            'amountPaid' => $this->finalData['invoiceData']['unit_price'],
+                            'transactionId' => $innerVisitor['transactionId'],
+                            'invoiceLink' => $invoiceLink,
 
-                        'badgeLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-badge" . "/" . $innerVisitor['visitorType'] . "/" . $innerVisitor['visitorId'],
-                    ];
+                            'badgeLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-badge" . "/" . $innerVisitor['visitorType'] . "/" . $innerVisitor['visitorId'],
+                        ];
 
-                    $details2 = [
-                        'name' => $innerVisitor['name'],
-                        'eventLink' => $this->event->link,
-                        'eventName' => $this->event->name,
-                        'eventCategory' => $this->event->category,
-                        'eventYear' => $this->event->year,
+                        $details2 = [
+                            'name' => $innerVisitor['name'],
+                            'eventLink' => $this->event->link,
+                            'eventName' => $this->event->name,
+                            'eventCategory' => $this->event->category,
+                            'eventYear' => $this->event->year,
 
-                        'invoiceAmount' => $this->finalData['invoiceData']['total_amount'],
-                        'amountPaid' => $this->finalData['invoiceData']['total_amount'],
-                        'balance' => 0,
-                        'invoiceLink' => $invoiceLink,
-                    ];
+                            'invoiceAmount' => $this->finalData['invoiceData']['total_amount'],
+                            'amountPaid' => $this->finalData['invoiceData']['total_amount'],
+                            'balance' => 0,
+                            'invoiceLink' => $invoiceLink,
+                        ];
 
-                    try {
-                        Mail::to($innerVisitor['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaid($details1));
-                    } catch (\Exception $e) {
-                        Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaid($details1));
-                    }
-                    
-                    if ($this->sendInvoice) {
-                        if ($visitorsIndex == 0) {
-                            try {
-                                Mail::to($innerVisitor['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
-                            } catch (\Exception $e) {
-                                Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+                        try {
+                            Mail::to($innerVisitor['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaid($details1));
+                        } catch (\Exception $e) {
+                            Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaid($details1));
+                        }
+
+                        if ($this->sendInvoice) {
+                            if ($visitorsIndex == 0) {
+                                try {
+                                    Mail::to($innerVisitor['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+                                } catch (\Exception $e) {
+                                    Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+                                }
                             }
-                            
                         }
                     }
                 }
@@ -475,63 +472,65 @@ class VisitorRegistrantDetails extends Component
         foreach ($this->finalData['allVisitors'] as $visitorsIndex => $visitors) {
             foreach ($visitors as $innerVisitor) {
                 if (end($visitors) == $innerVisitor) {
-                    $details1 = [
-                        'name' => $innerVisitor['name'],
-                        'eventLink' => $this->event->link,
-                        'eventName' => $this->event->name,
-                        'eventDates' => $eventFormattedData,
-                        'eventLocation' => $this->event->location,
-                        'eventCategory' => $this->event->category,
-                        'eventYear' => $this->event->year,
+                    if (!$innerVisitor['visitor_cancelled']) {
+                        $details1 = [
+                            'name' => $innerVisitor['name'],
+                            'eventLink' => $this->event->link,
+                            'eventName' => $this->event->name,
+                            'eventDates' => $eventFormattedData,
+                            'eventLocation' => $this->event->location,
+                            'eventCategory' => $this->event->category,
+                            'eventYear' => $this->event->year,
 
-                        'nationality' => $innerVisitor['nationality'],
-                        'country' => $innerVisitor['country'],
-                        'city' => $innerVisitor['city'],
-                        'amountPaid' => $this->finalData['invoiceData']['unit_price'],
-                        'transactionId' => $innerVisitor['transactionId'],
-                        'invoiceLink' => $invoiceLink,
-                        'earlyBirdValidityDate' => $earlyBirdValidityDate->format('jS F'),
+                            'nationality' => $innerVisitor['nationality'],
+                            'country' => $innerVisitor['country'],
+                            'city' => $innerVisitor['city'],
+                            'amountPaid' => $this->finalData['invoiceData']['unit_price'],
+                            'transactionId' => $innerVisitor['transactionId'],
+                            'invoiceLink' => $invoiceLink,
+                            'earlyBirdValidityDate' => $earlyBirdValidityDate->format('jS F'),
 
-                        'badgeLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-badge" . "/" . $innerVisitor['visitorType'] . "/" . $innerVisitor['visitorId'],
-                    ];
+                            'badgeLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-badge" . "/" . $innerVisitor['visitorType'] . "/" . $innerVisitor['visitorId'],
+                        ];
 
-                    $details2 = [
-                        'name' => $innerVisitor['name'],
-                        'eventLink' => $this->event->link,
-                        'eventName' => $this->event->name,
-                        'eventCategory' => $this->event->category,
-                        'eventYear' => $this->event->year,
+                        $details2 = [
+                            'name' => $innerVisitor['name'],
+                            'eventLink' => $this->event->link,
+                            'eventName' => $this->event->name,
+                            'eventCategory' => $this->event->category,
+                            'eventYear' => $this->event->year,
 
-                        'invoiceAmount' => $this->finalData['invoiceData']['total_amount'],
-                        'amountPaid' => $this->finalData['invoiceData']['total_amount'],
-                        'balance' => 0,
-                        'invoiceLink' => $invoiceLink,
-                    ];
+                            'invoiceAmount' => $this->finalData['invoiceData']['total_amount'],
+                            'amountPaid' => $this->finalData['invoiceData']['total_amount'],
+                            'balance' => 0,
+                            'invoiceLink' => $invoiceLink,
+                        ];
 
-                    if ($this->finalData['payment_status'] == "unpaid") {
-                        try {
-                            Mail::to($innerVisitor['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationUnpaid($details1, $this->sendInvoice));
-                        } catch (\Exception $e) {
-                            Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationUnpaid($details1, $this->sendInvoice));
-                        }
-                    } else if ($this->finalData['payment_status'] == "free" && $this->finalData['registration_status'] == "pending") {
-                        try {
-                            Mail::to($innerVisitor['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationFree($details1, $this->sendInvoice));
-                        } catch (\Exception $e) {
-                            Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationFree($details1, $this->sendInvoice));
-                        }
-                    } else {
-                        try {
-                            Mail::to($innerVisitor['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaid($details1, $this->sendInvoice));
-                        } catch (\Exception $e) {
-                            Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaid($details1, $this->sendInvoice));
-                        }
-                        if ($this->sendInvoice) {
-                            if ($visitorsIndex == 0) {
-                                try {
-                                    Mail::to($innerVisitor['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
-                                } catch (\Exception $e) {
-                                    Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+                        if ($this->finalData['payment_status'] == "unpaid") {
+                            try {
+                                Mail::to($innerVisitor['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationUnpaid($details1, $this->sendInvoice));
+                            } catch (\Exception $e) {
+                                Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationUnpaid($details1, $this->sendInvoice));
+                            }
+                        } else if ($this->finalData['payment_status'] == "free" && $this->finalData['registration_status'] == "pending") {
+                            try {
+                                Mail::to($innerVisitor['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationFree($details1, $this->sendInvoice));
+                            } catch (\Exception $e) {
+                                Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationFree($details1, $this->sendInvoice));
+                            }
+                        } else {
+                            try {
+                                Mail::to($innerVisitor['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaid($details1, $this->sendInvoice));
+                            } catch (\Exception $e) {
+                                Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaid($details1, $this->sendInvoice));
+                            }
+                            if ($this->sendInvoice) {
+                                if ($visitorsIndex == 0) {
+                                    try {
+                                        Mail::to($innerVisitor['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+                                    } catch (\Exception $e) {
+                                        Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+                                    }
                                 }
                             }
                         }
@@ -539,7 +538,7 @@ class VisitorRegistrantDetails extends Component
                 }
             }
         }
-        
+
 
         $this->finalData['registration_confirmation_sent_count'] = $this->finalData['registration_confirmation_sent_count'] + 1;
         $this->finalData['registration_confirmation_sent_datetime'] = Carbon::parse(Carbon::now())->format('M j, Y g:i A');

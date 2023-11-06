@@ -1504,6 +1504,12 @@ class RegistrationController extends Controller
                 } else {
                     $pdf = Pdf::loadView('admin.events.transactions.invoices.spouse.paid', $finalData);
                 }
+            } else if ($eventCategory == "AFV") {
+                if ($finalData['paymentStatus'] == "unpaid") {
+                    $pdf = Pdf::loadView('admin.events.transactions.invoices.afv.unpaid', $finalData);
+                } else {
+                    $pdf = Pdf::loadView('admin.events.transactions.invoices.afv.paid', $finalData);
+                }
             } else {
                 if ($finalData['paymentStatus'] == "unpaid") {
                     $pdf = Pdf::loadView('admin.events.transactions.invoices.unpaid', $finalData);
@@ -1533,6 +1539,12 @@ class RegistrationController extends Controller
                         $pdf = Pdf::loadView('admin.events.transactions.invoices.spouse.unpaid', $finalData);
                     } else {
                         $pdf = Pdf::loadView('admin.events.transactions.invoices.spouse.paid', $finalData);
+                    }
+                } else if ($eventCategory == "AFV") {
+                    if ($finalData['paymentStatus'] == "unpaid") {
+                        $pdf = Pdf::loadView('admin.events.transactions.invoices.afv.unpaid', $finalData);
+                    } else {
+                        $pdf = Pdf::loadView('admin.events.transactions.invoices.afv.paid', $finalData);
                     }
                 } else {
                     if ($finalData['paymentStatus'] == "unpaid") {
@@ -3508,12 +3520,7 @@ class RegistrationController extends Controller
 
             $tempInvoiceNumber = "$event->category" . "$tempYear" . "/" . "$lastDigit";
             $tempBookReference = "$event->year" . "$getEventcode" . "$lastDigit";
-
-            if ($eventCategory == "AF") {
-                $bankDetails = config('app.bankDetails.AF');
-            } else {
-                $bankDetails = config('app.bankDetails.DEFAULT');
-            }
+            $bankDetails = config('app.bankDetails.AF');
 
             $eventFormattedData = Carbon::parse($event->event_start_date)->format('j') . '-' . Carbon::parse($event->event_end_date)->format('j F Y');
             $fullname = $mainVisitor->first_name . ' ' . $mainVisitor->middle_name . ' ' . $mainVisitor->last_name;
@@ -3539,6 +3546,7 @@ class RegistrationController extends Controller
                 'invoiceDetails' => $invoiceDetails,
                 'bankDetails' => $bankDetails,
                 'finalQuantity' => $countFinalQuantity,
+                'registrationMethod' => "online",
                 'total_amount_string' => ucwords($this->numberToWords($mainVisitor->total_amount)),
             ];
 
