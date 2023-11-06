@@ -11,17 +11,29 @@
                 @include('livewire.registration.visitor.step.first')
             @elseif ($currentStep == 2)
                 @include('livewire.registration.visitor.step.second')
-            @else
+            @elseif ($currentStep == 3)
                 @include('livewire.registration.visitor.step.third')
+            @elseif ($currentStep == 4)
+                @include('livewire.registration.visitor.step.fourth')
+            @else
+                @include('livewire.registration.visitor.step.fifth')
             @endif
 
-            @if ($currentStep == 1)
-                <div class="mt-10 mx-5 flex justify-end gap-5">
+            <div class="mt-10 mx-5 flex justify-between gap-5">
+                @if ($currentStep == 1)
+                    <div></div>
+                @endif
+                @if ($currentStep == 2 || $currentStep == 3)
+                    <button type="button" wire:key="btnDecreaseStep"
+                        class="hover:bg-registrationPrimaryColor hover:text-white font-bold border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor w-52 rounded-md py-2"
+                        wire:click.prevent="decreaseStep">PREVIOUS</button>
+                @endif
+                @if ($currentStep == 1 || $currentStep == 2 || $currentStep == 3)
                     <button type="button" wire:key="btnIncreaseStep"
                         class="hover:bg-registrationPrimaryColor hover:text-white font-bold border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor w-52 rounded-md py-2"
                         wire:click.prevent="increaseStep">NEXT</button>
-                </div>
-            @endif
+                @endif
+            </div>
         </form>
     </div>
 

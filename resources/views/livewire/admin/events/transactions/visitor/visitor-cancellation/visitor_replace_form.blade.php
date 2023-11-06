@@ -94,14 +94,16 @@
         </div>
     </div>
 
+
+    {{-- ROW 4 --}}
     <div class="space-y-2">
         <div class="text-registrationPrimaryColor">
-            Company name
+            Nationality <span class="text-red-500">*</span>
         </div>
         <div>
-            <input placeholder="Company name" type="text" wire:model.lazy="replaceCompanyName"
+            <input placeholder="Nationality" type="text" wire:model.lazy="replaceNationality"
                 class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-            @error('replaceCompanyName')
+            @error('replaceNationality')
                 <div class="text-red-500 text-xs italic mt-1">
                     {{ $message }}
                 </div>
@@ -111,10 +113,10 @@
 
     <div class="space-y-2">
         <div class="text-registrationPrimaryColor">
-            Job title
+            Job Title <span class="text-red-500">*</span>
         </div>
         <div>
-            <input placeholder="Job title" type="text" wire:model.lazy="replaceJobTitle"
+            <input placeholder="Job Title" type="text" wire:model.lazy="replaceJobTitle"
                 class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
             @error('replaceJobTitle')
                 <div class="text-red-500 text-xs italic mt-1">
@@ -125,67 +127,72 @@
     </div>
 
 
-    {{-- ROW 4 --}}
-    <div class="space-y-2">
+    {{-- ROW 6 --}}
+    <div class="space-y-2 col-span-1">
         <div class="text-registrationPrimaryColor">
-            Nationality <span class="text-red-500">*</span>
+            Registration type <span class="text-red-500">*</span>
         </div>
-        <div>
-            <select wire:model.lazy="replaceNationality"
+
+        @if ($replacePromoCodeSuccess != null)
+            <input readonly wire:model.lazy="replaceBadgeType" type="text"
+                class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-none cursor-not-allowed">
+        @else
+            <select wire:model.lazy="replaceBadgeType"
                 class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                 <option value=""></option>
-                @foreach ($countries as $country)
-                    <option value="{{ $country }}">
-                        {{ $country }}
-                    </option>
+                @foreach ($registrationTypes as $registrationType)
+                    <option value="{{ $registrationType->registration_type }}">
+                        {{ $registrationType->registration_type }}</option>
                 @endforeach
             </select>
+        @endif
 
-            @error('replaceNationality')
-                <div class="text-red-500 text-xs italic mt-1">
-                    {{ $message }}
-                </div>
-            @enderror
-        </div>
+        @error('replaceBadgeType')
+            <div class="text-red-500 text-xs italic mt-1">
+                {{ $message }}
+            </div>
+        @enderror
     </div>
-
-
-    {{-- ROW 4 --}}
-    <div class="space-y-2">
+    <div class="space-y-2 col-span-1">
         <div class="text-registrationPrimaryColor">
-            Country <span class="text-red-500">*</span>
+            Promo Code
         </div>
-        <div>
-            <select wire:model.lazy="replaceCountry"
-                class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                <option value=""></option>
-                @foreach ($countries as $country)
-                    <option value="{{ $country }}">
-                        {{ $country }}
-                    </option>
-                @endforeach
-            </select>
 
-            @error('replaceCountry')
-                <div class="text-red-500 text-xs italic mt-1">
-                    {{ $message }}
-                </div>
-            @enderror
-        </div>
-    </div>
+        <div class="flex">
+            @if ($replacePromoCodeSuccess != null)
+                <input readonly type="text" wire:model.lazy="replacePromoCode"
+                    class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-none cursor-not-allowed">
 
-    <div class="space-y-2 col-span-2">
-        <div class="text-registrationPrimaryColor">
-            City <span class="text-red-500">*</span>
+                <button wire:click.prevent="replaceRemovePromoCode" wire:key="btnReplaceRemovePromoCodeEdit"
+                    type="button" class="bg-red-300 px-5 ml-2">Remove</button>
+            @else
+                <input placeholder="Enter your promo code here" type="text" wire:model.lazy="replacePromoCode"
+                    class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+
+                <button wire:click.prevent="replaceApplyPromoCode" wire:key="btnReplaceApplyPromoCodeEdit"
+                    type="button"
+                    class="bg-registrationPrimaryColor text-white px-5 ml-2 hover:bg-registrationPrimaryColorHover">Apply</button>
+            @endif
         </div>
-        <div>
-            <input placeholder="City" type="text" wire:model.lazy="replaceCity"
-                class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-            @error('replaceCity')
+
+        @if ($replacePromoCode != null)
+            @if ($replacePromoCodeFail != null)
                 <div class="text-red-500 text-xs italic mt-1">
-                    {{ $message }}
+                    {{ $replacePromoCodeFail }}
                 </div>
-            @enderror
-        </div>
+            @endif
+
+            @if ($replaceDiscountType == 'fixed')
+                <div class="text-green-500 text-xs italic mt-1">
+                    Fixed rate applied
+                </div>
+            @else
+                @if ($replacePromoCodeDiscount != null)
+                    <div class="text-green-500 text-xs italic mt-1">
+                        {{ $replacePromoCodeDiscount }}% discount
+                    </div>
+                @endif
+            @endif
+        @endif
     </div>
 </div>

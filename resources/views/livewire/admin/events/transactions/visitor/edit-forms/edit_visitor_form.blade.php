@@ -105,21 +105,6 @@
                                 </div>
                             </div>
 
-                            <div class="space-y-2">
-                                <div class="text-registrationPrimaryColor">
-                                    Job title 
-                                </div>
-                                <div>
-                                    <input placeholder="Job title" type="text" wire:model.lazy="jobTitle"
-                                        class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                                    @error('jobTitle')
-                                        <div class="text-red-500 text-xs italic mt-1">
-                                            {{ $message }}
-                                        </div>
-                                    @enderror
-                                </div>
-                            </div>
-
 
                             {{-- ROW 4 --}}
                             <div class="space-y-2">
@@ -127,17 +112,8 @@
                                     Nationality <span class="text-red-500">*</span>
                                 </div>
                                 <div>
-                                    <select wire:model.lazy="nationality"
+                                    <input placeholder="Nationality" type="text" wire:model.lazy="nationality"
                                         class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                                        <option value=""></option>
-                                        <option value="N/A">N/A</option>
-                                        @foreach ($countries as $country)
-                                            <option value="{{ $country }}">
-                                                {{ $country }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                        
                                     @error('nationality')
                                         <div class="text-red-500 text-xs italic mt-1">
                                             {{ $message }}
@@ -148,20 +124,12 @@
 
                             <div class="space-y-2">
                                 <div class="text-registrationPrimaryColor">
-                                    Country <span class="text-red-500">*</span>
+                                    Job Title <span class="text-red-500">*</span>
                                 </div>
                                 <div>
-                                    <select wire:model.lazy="country"
+                                    <input placeholder="Job Title" type="text" wire:model.lazy="jobTitle"
                                         class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                                        <option value=""></option>
-                                        @foreach ($countries as $country)
-                                            <option value="{{ $country }}">
-                                                {{ $country }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                        
-                                    @error('country')
+                                    @error('jobTitle')
                                         <div class="text-red-500 text-xs italic mt-1">
                                             {{ $message }}
                                         </div>
@@ -169,19 +137,82 @@
                                 </div>
                             </div>
 
-                            <div class="space-y-2">
+
+                            {{-- ROW 6 --}}
+                            <div class="space-y-2 col-span-1">
                                 <div class="text-registrationPrimaryColor">
-                                    City <span class="text-red-500">*</span>
+                                    Registration type <span class="text-red-500">*</span>
                                 </div>
-                                <div>
-                                    <input placeholder="City" type="text" wire:model.lazy="city"
+
+                                @if ($promoCodeSuccess != null)
+                                    <input readonly wire:model.lazy="badgeType" type="text"
+                                        class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-none cursor-not-allowed">
+                                @else
+                                    <select wire:model.lazy="badgeType"
                                         class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                                    @error('city')
-                                        <div class="text-red-500 text-xs italic mt-1">
-                                            {{ $message }}
-                                        </div>
-                                    @enderror
+                                        <option value=""></option>
+                                        @foreach ($registrationTypes as $registrationType)
+                                            <option value="{{ $registrationType->registration_type }}"
+                                                {{ $registrationType->registration_type == $badgeType ? 'selected' : '' }}>
+                                                {{ $registrationType->registration_type }}</option>
+                                        @endforeach
+                                    </select>
+                                @endif
+
+                                @error('badgeType')
+                                    <div class="text-red-500 text-xs italic mt-1">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
+                            </div>
+                            <div class="space-y-2 col-span-1">
+                                <div class="text-registrationPrimaryColor">
+                                    Promo Code
                                 </div>
+
+                                <div class="flex">
+                                    @if ($promoCodeSuccess != null)
+                                        <input readonly type="text" wire:model.lazy="promoCode"
+                                            class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-none cursor-not-allowed">
+
+                                        <button wire:click.prevent="removePromoCode" wire:key="btnRemovePromoCodeEdit"
+                                            type="button" class="bg-red-300 px-5 ml-2">Remove</button>
+                                    @else
+                                        <input placeholder="Enter your promo code here" type="text"
+                                            wire:model.lazy="promoCode"
+                                            class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+
+                                        <button wire:click.prevent="applyPromoCode" wire:key="btnApplyPromoCodeEdit"
+                                            type="button"
+                                            class="bg-registrationPrimaryColor text-white px-5 ml-2 hover:bg-registrationPrimaryColorHover">Apply</button>
+                                    @endif
+                                </div>
+
+                                @error('promoCode')
+                                    <div class="text-red-500 text-xs italic mt-1">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
+
+                                @if ($promoCode != null)
+                                    @if ($promoCodeFail != null)
+                                        <div class="text-red-500 text-xs italic mt-1">
+                                            {{ $promoCodeFail }}
+                                        </div>
+                                    @endif
+
+                                    @if ($discountType == 'fixed')
+                                        <div class="text-green-500 text-xs italic mt-1">
+                                            Fixed rate applied
+                                        </div>
+                                    @else
+                                        @if ($promoCodeDiscount != null)
+                                            <div class="text-green-500 text-xs italic mt-1">
+                                                {{ $promoCodeDiscount }}% discount
+                                            </div>
+                                        @endif
+                                    @endif
+                                @endif
                             </div>
                         </div>
                     </div>

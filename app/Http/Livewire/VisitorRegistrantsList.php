@@ -4,7 +4,10 @@ namespace App\Http\Livewire;
 
 use App\Models\Event as Events;
 use App\Models\MainVisitor as MainVisitors;
+use App\Models\AdditionalVisitor as AdditionalVisitors;
 use App\Models\VisitorTransaction as VisitorTransactions;
+use App\Models\PromoCode as PromoCodes;
+use App\Models\PromoCodeAddtionalBadgeType as PromoCodeAddtionalBadgeTypes;
 use Carbon\Carbon;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -14,32 +17,41 @@ class VisitorRegistrantsList extends Component
     use WithFileUploads;
 
     public $event;
+    public $members;
     public $countries;
+    public $companySectors;
 
     public $finalListOfRegistrants = array(), $finalListOfRegistrantsConst = array();
     public $eventId, $eventCategory;
     public $searchTerm;
+    public $showImportModal = false;
 
     // COMPANY INFO
-    public $heardWhere;
+    public $csvFile;
+    public $rateType;
+    public $rateTypeString;
     public $finalUnitPrice;
 
     // FILTERS
-    public $filterByRegStatus, $filterByPayStatus, $filterByPaymentMethod;
+    public $filterByPassType, $filterByRegStatus, $filterByPayStatus;
 
     // ERRORS
-    public $incompleDetails = array(), $emailYouAlreadyUsed = array(), $emailAlreadyExisting = array();
+    public $incompleDetails = array(), $emailYouAlreadyUsed = array(), $emailAlreadyExisting = array(), $promoCodeErrors = array();
+    public $csvFileError;
 
     public $getEventCode;
+
+    protected $listeners = ['importDelegateConfirmed' => 'submitImportRegistrants'];
 
     public function mount($eventId, $eventCategory)
     {
         $this->event = Events::where('id', $eventId)->where('category', $eventCategory)->first();
         $this->countries = config('app.countries');
+        $this->companySectors = config('app.companySectors');
         $this->eventId = $eventId;
         $this->eventCategory = $eventCategory;
 
-        $mainVisitors = MainVisitors::where('event_id', $this->eventId)->orderBy('registered_date_time', 'DESC')->get();
+        $mainVisitors = MainVisitors::where('event_id', $this->eventId)->orderBy('id', 'DESC')->get();
 
         foreach (config('app.eventCategories') as $eventCategoryC => $code) {
             if ($this->event->category == $eventCategoryC) {
@@ -55,6 +67,15 @@ class VisitorRegistrantsList extends Component
                 $tempYear = Carbon::parse($mainVisitor->registered_date_time)->format('y');
                 $lastDigit = 1000 + intval($transactionId);
                 $tempInvoiceNumber = $this->event->category . $tempYear . "/" . $lastDigit;
+
+                // get pass type
+                if ($mainVisitor->pass_type == 'member') {
+                    $passType = "Member";
+                } else if ($mainVisitor->pass_type == 'nonMember') {
+                    $passType = "Non-Member";
+                } else {
+                    $passType = "Full Member";
+                }
 
                 // get reg status
                 if ($mainVisitor->registration_status == 'confirmed') {
@@ -78,21 +99,40 @@ class VisitorRegistrantsList extends Component
                     $payStatus = "Refunded";
                 }
 
-                if($mainVisitor->mode_of_payment == "bankTransfer"){
+                if ($mainVisitor->mode_of_payment == "bankTransfer") {
                     $paymentMethod = "Bank Transfer";
                 } else {
                     $paymentMethod = "Credit Card";
                 }
 
-                $mainVisitorFullName = $mainVisitor->salutation . " " . $mainVisitor->first_name . " " . $mainVisitor->middle_name . " " . $mainVisitor->last_name;
+
+                $totalVisitors = 0;
+                if ($mainVisitor->visitor_replaced_by_id == null && (!$mainVisitor->visitor_refunded)) {
+                    $totalVisitors++;
+                }
+
+                $additionalVisitors = AdditionalVisitors::where('main_visitor_id', $mainVisitor->id)->get();
+                foreach ($additionalVisitors as $additionalVisitor) {
+                    if ($additionalVisitor->visitor_replaced_by_id == null && (!$additionalVisitor->visitor_refunded)) {
+                        $totalVisitors++;
+                    }
+                }
+
+                if ($mainVisitor->alternative_company_name != null) {
+                    $companyName = $mainVisitor->alternative_company_name;
+                } else {
+                    $companyName = $mainVisitor->company_name;
+                }
 
                 array_push($this->finalListOfRegistrants, [
                     'mainVisitorId' => $mainVisitor->id,
                     'invoiceNumber' => $tempInvoiceNumber,
-                    'fullName' => $mainVisitorFullName,
-                    'country' => $mainVisitor->country,
-                    'company_name' => $mainVisitor->company_name,
-                    'city' => $mainVisitor->city,
+                    'companyName' => $companyName,
+                    'alternativeCompanyName' => $mainVisitor->alternative_company_name,
+                    'country' => $mainVisitor->company_country,
+                    'city' => $mainVisitor->company_city,
+                    'passType' => $passType,
+                    'quantity' => $totalVisitors,
                     'totalAmount' => $mainVisitor->total_amount,
                     'regDateTime' => Carbon::parse($mainVisitor->registered_date_time)->format('M j, Y g:iA'),
                     'regStatus' => $regStatus,
@@ -109,8 +149,9 @@ class VisitorRegistrantsList extends Component
         return view('livewire.admin.events.transactions.visitor.visitor-registrants-list');
     }
 
-    public function clearFilter(){
-        $this->filterByPaymentMethod = null;
+    public function clearFilter()
+    {
+        $this->filterByPassType = null;
         $this->filterByRegStatus = null;
         $this->filterByPayStatus = null;
         $this->filter();
@@ -118,36 +159,36 @@ class VisitorRegistrantsList extends Component
 
     public function filter()
     {
-        if ($this->filterByPaymentMethod == null && $this->filterByRegStatus == null && $this->filterByPayStatus == null) {
+        if ($this->filterByPassType == null && $this->filterByRegStatus == null && $this->filterByPayStatus == null) {
             $this->finalListOfRegistrants = $this->finalListOfRegistrantsConst;
-        } else if ($this->filterByPaymentMethod != null && $this->filterByRegStatus == null && $this->filterByPayStatus == null) {
+        } else if ($this->filterByPassType != null && $this->filterByRegStatus == null && $this->filterByPayStatus == null) {
             $this->finalListOfRegistrants = collect($this->finalListOfRegistrantsConst)
                 ->filter(function ($item) {
-                    return strtolower($item['paymentMethod'] === ($this->filterByPaymentMethod));
+                    return strtolower($item['passType'] === ($this->filterByPassType));
                 })->all();
-        } else if ($this->filterByPaymentMethod == null && $this->filterByRegStatus != null && $this->filterByPayStatus == null) {
+        } else if ($this->filterByPassType == null && $this->filterByRegStatus != null && $this->filterByPayStatus == null) {
             $this->finalListOfRegistrants = collect($this->finalListOfRegistrantsConst)
                 ->filter(function ($item) {
                     return strtolower($item['regStatus'] === ($this->filterByRegStatus));
                 })->all();
-        } else if ($this->filterByPaymentMethod == null && $this->filterByRegStatus == null && $this->filterByPayStatus != null) {
+        } else if ($this->filterByPassType == null && $this->filterByRegStatus == null && $this->filterByPayStatus != null) {
             $this->finalListOfRegistrants = collect($this->finalListOfRegistrantsConst)
                 ->filter(function ($item) {
                     return strtolower($item['payStatus'] === ($this->filterByPayStatus));
                 })->all();
-        } else if ($this->filterByPaymentMethod != null && $this->filterByRegStatus != null && $this->filterByPayStatus == null) {
+        } else if ($this->filterByPassType != null && $this->filterByRegStatus != null && $this->filterByPayStatus == null) {
             $this->finalListOfRegistrants = collect($this->finalListOfRegistrantsConst)
                 ->filter(function ($item) {
-                    return strtolower($item['paymentMethod'] === ($this->filterByPaymentMethod)) &&
+                    return strtolower($item['passType'] === ($this->filterByPassType)) &&
                         strtolower($item['regStatus'] === ($this->filterByRegStatus));
                 })->all();
-        } else if ($this->filterByPaymentMethod != null && $this->filterByRegStatus == null && $this->filterByPayStatus != null) {
+        } else if ($this->filterByPassType != null && $this->filterByRegStatus == null && $this->filterByPayStatus != null) {
             $this->finalListOfRegistrants = collect($this->finalListOfRegistrantsConst)
                 ->filter(function ($item) {
-                    return strtolower($item['paymentMethod'] === ($this->filterByPaymentMethod)) &&
+                    return strtolower($item['passType'] === ($this->filterByPassType)) &&
                         strtolower($item['payStatus'] === ($this->filterByPayStatus));
                 })->all();
-        } else if ($this->filterByPaymentMethod == null && $this->filterByRegStatus != null && $this->filterByPayStatus != null) {
+        } else if ($this->filterByPassType == null && $this->filterByRegStatus != null && $this->filterByPayStatus != null) {
             $this->finalListOfRegistrants = collect($this->finalListOfRegistrantsConst)
                 ->filter(function ($item) {
                     return strtolower($item['regStatus'] === ($this->filterByRegStatus)) &&
@@ -156,7 +197,7 @@ class VisitorRegistrantsList extends Component
         } else {
             $this->finalListOfRegistrants = collect($this->finalListOfRegistrantsConst)
                 ->filter(function ($item) {
-                    return strtolower($item['paymentMethod'] === ($this->filterByPaymentMethod)) &&
+                    return strtolower($item['passType'] === ($this->filterByPassType)) &&
                         strtolower($item['regStatus'] === ($this->filterByRegStatus)) &&
                         strtolower($item['payStatus'] === ($this->filterByPayStatus));
                 })->all();
@@ -171,11 +212,12 @@ class VisitorRegistrantsList extends Component
             $this->finalListOfRegistrants = collect($this->finalListOfRegistrantsConst)
                 ->filter(function ($item) {
                     return str_contains(strtolower($item['invoiceNumber']), strtolower($this->searchTerm)) ||
-                        str_contains(strtolower($item['fullName']), strtolower($this->searchTerm)) ||
+                        str_contains(strtolower($item['companyName']), strtolower($this->searchTerm)) ||
                         str_contains(strtolower($item['country']), strtolower($this->searchTerm)) ||
                         str_contains(strtolower($item['city']), strtolower($this->searchTerm)) ||
                         str_contains(strtolower($item['totalAmount']), strtolower($this->searchTerm)) ||
-                        str_contains(strtolower($item['regDateTime']), strtolower($this->searchTerm));
+                        str_contains(strtolower($item['regDateTime']), strtolower($this->searchTerm)) ||
+                        str_contains(strtolower($item['paymentMethod']), strtolower($this->searchTerm));
                 })
                 ->all();
         }

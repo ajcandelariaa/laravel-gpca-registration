@@ -47,7 +47,7 @@
             </div>
 
             <div class="col-span-1 bg-white p-4 flex justify-center items-center">
-                <p>$ {{ number_format($finalUnitPrice, 2, '.', ',') }}</p>
+                <p>$ {{ number_format($visitorInvoiceDetail['totalUnitPrice'], 2, '.', ',') }}</p>
             </div>
 
             <div class="col-span-1 bg-white p-4 flex justify-center items-center">

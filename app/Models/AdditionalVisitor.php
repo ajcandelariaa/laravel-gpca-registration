@@ -11,7 +11,7 @@ class AdditionalVisitor extends Model
 
     protected $fillable = [
         'main_visitor_id',
-
+        
         'salutation',
         'first_name',
         'middle_name',
@@ -19,10 +19,9 @@ class AdditionalVisitor extends Model
         'email_address',
         'mobile_number',
         'nationality',
-        'country',
-        'city',
-        'company_name',
         'job_title',
+        'badge_type',
+        'pcode_used',
 
         'visitor_cancelled',
         'visitor_replaced',

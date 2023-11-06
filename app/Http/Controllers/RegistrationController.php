@@ -979,6 +979,28 @@ class RegistrationController extends Controller
             $eventYear = Event::where('id', $eventId)->value('year');
             $mainVisitor = MainVisitor::where('id', $registrantId)->where('event_id', $eventId)->first();
 
+            $promoCode = PromoCode::where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $mainVisitor->pcode_used)->first();
+
+            if ($promoCode != null) {
+                if ($promoCode->badge_type == $mainVisitor->badge_type) {
+                    $mainDiscount = $promoCode->discount;
+                    $mainDiscountType = $promoCode->discount_type;
+                } else {
+                    $promoCodeAdditionalBadgeType = PromoCodeAddtionalBadgeType::where('event_id', $eventId)->where('promo_code_id', $promoCode->id)->where('badge_type', $mainVisitor->badge_type)->first();
+
+                    if ($promoCodeAdditionalBadgeType != null) {
+                        $mainDiscount = $promoCode->discount;
+                        $mainDiscountType = $promoCode->discount_type;
+                    } else {
+                        $mainDiscount = 0;
+                        $mainDiscountType = null;
+                    }
+                }
+            } else {
+                $mainDiscount = 0;
+                $mainDiscountType = null;
+            }
+
             foreach (config('app.eventCategories') as $eventCategoryC => $code) {
                 if ($eventCategory == $eventCategoryC) {
                     $eventCode = $code;
@@ -1002,6 +1024,35 @@ class RegistrationController extends Controller
                         $countFinalQuantity++;
                     }
 
+                    $subPromoCode = PromoCode::where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $subVisitor->pcode_used)->first();
+
+                    if ($subPromoCode != null) {
+                        if ($subPromoCode->badge_type == $subVisitor->badge_type) {
+                            $subDiscount = $subPromoCode->discount;
+                            $subDiscountType = $subPromoCode->discount_type;
+                        } else {
+                            $subPromoCodeAdditionalBadgeType = PromoCodeAddtionalBadgeType::where('event_id', $eventId)->where('promo_code_id', $subPromoCode->id)->where('badge_type', $subVisitor->badge_type)->first();
+
+                            if ($subPromoCodeAdditionalBadgeType != null) {
+                                $subDiscount = $subPromoCode->discount;
+                                $subDiscountType = $subPromoCode->discount_type;
+                            } else {
+                                $subDiscount = 0;
+                                $subDiscountType = null;
+                            }
+                        }
+                    } else {
+                        $subDiscount = 0;
+                        $subDiscountType = null;
+                    }
+
+
+                    foreach (config('app.eventCategories') as $eventCategoryC => $code) {
+                        if ($eventCategory == $eventCategoryC) {
+                            $eventCode = $code;
+                        }
+                    }
+
                     if ($subVisitor->visitor_replaced_from_id != null) {
                         array_push($subVisitorsReplacementArray, [
                             'subVisitorId' => $subVisitor->id,
@@ -1013,10 +1064,11 @@ class RegistrationController extends Controller
                             'email_address' => $subVisitor->email_address,
                             'mobile_number' => $subVisitor->mobile_number,
                             'nationality' => $subVisitor->nationality,
-                            'country' => $subVisitor->country,
-                            'city' => $subVisitor->city,
-                            'company_name' => $subVisitor->company_name,
                             'job_title' => $subVisitor->job_title,
+                            'badge_type' => $subVisitor->badge_type,
+                            'pcode_used' => $subVisitor->pcode_used,
+                            'discount' => $subDiscount,
+                            'discount_type' => $subDiscountType,
 
                             'visitor_cancelled' => $subVisitor->visitor_cancelled,
                             'visitor_replaced' => $subVisitor->visitor_replaced,
@@ -1042,10 +1094,11 @@ class RegistrationController extends Controller
                             'email_address' => $subVisitor->email_address,
                             'mobile_number' => $subVisitor->mobile_number,
                             'nationality' => $subVisitor->nationality,
-                            'country' => $subVisitor->country,
-                            'city' => $subVisitor->city,
-                            'company_name' => $subVisitor->company_name,
                             'job_title' => $subVisitor->job_title,
+                            'badge_type' => $subVisitor->badge_type,
+                            'pcode_used' => $subVisitor->pcode_used,
+                            'discount' => $subDiscount,
+                            'discount_type' => $subDiscountType,
 
                             'visitor_cancelled' => $subVisitor->visitor_cancelled,
                             'visitor_replaced' => $subVisitor->visitor_replaced,
@@ -1081,10 +1134,11 @@ class RegistrationController extends Controller
                 'email_address' => $mainVisitor->email_address,
                 'mobile_number' => $mainVisitor->mobile_number,
                 'nationality' => $mainVisitor->nationality,
-                'country' => $mainVisitor->country,
-                'city' => $mainVisitor->city,
-                'company_name' => $mainVisitor->company_name,
                 'job_title' => $mainVisitor->job_title,
+                'badge_type' => $mainVisitor->badge_type,
+                'pcode_used' => $mainVisitor->pcode_used,
+                'discount' => $mainDiscount,
+                'discount_type' => $mainDiscountType,
 
                 'is_replacement' => false,
                 'visitor_cancelled' => $mainVisitor->visitor_cancelled,
@@ -1123,10 +1177,11 @@ class RegistrationController extends Controller
                             'email_address' => $subVisitorReplacement['email_address'],
                             'mobile_number' => $subVisitorReplacement['mobile_number'],
                             'nationality' => $subVisitorReplacement['nationality'],
-                            'country' => $subVisitorReplacement['country'],
-                            'city' => $subVisitorReplacement['city'],
-                            'company_name' => $subVisitorReplacement['company_name'],
                             'job_title' => $subVisitorReplacement['job_title'],
+                            'badge_type' => $subVisitorReplacement['badge_type'],
+                            'pcode_used' => $subVisitorReplacement['pcode_used'],
+                            'discount' => $subVisitorReplacement['discount'],
+                            'discount_type' => $subVisitorReplacement['discount_type'],
 
                             'is_replacement' => true,
                             'visitor_cancelled' => $subVisitorReplacement['visitor_cancelled'],
@@ -1171,10 +1226,11 @@ class RegistrationController extends Controller
                     'email_address' => $subVisitor['email_address'],
                     'mobile_number' => $subVisitor['mobile_number'],
                     'nationality' => $subVisitor['nationality'],
-                    'country' => $subVisitor['country'],
-                    'city' => $subVisitor['city'],
-                    'company_name' => $subVisitor['company_name'],
                     'job_title' => $subVisitor['job_title'],
+                    'badge_type' => $subVisitor['badge_type'],
+                    'pcode_used' => $subVisitor['pcode_used'],
+                    'discount' => $subVisitor['discount'],
+                    'discount_type' => $subVisitor['discount_type'],
 
                     'is_replacement' => false,
                     'visitor_cancelled' => $subVisitor['visitor_cancelled'],
@@ -1213,10 +1269,11 @@ class RegistrationController extends Controller
                                 'email_address' => $subVisitorReplacement['email_address'],
                                 'mobile_number' => $subVisitorReplacement['mobile_number'],
                                 'nationality' => $subVisitorReplacement['nationality'],
-                                'country' => $subVisitorReplacement['country'],
-                                'city' => $subVisitorReplacement['city'],
-                                'company_name' => $subVisitorReplacement['company_name'],
                                 'job_title' => $subVisitorReplacement['job_title'],
+                                'badge_type' => $subVisitorReplacement['badge_type'],
+                                'pcode_used' => $subVisitorReplacement['pcode_used'],
+                                'discount' => $subVisitorReplacement['discount'],
+                                'discount_type' => $subVisitorReplacement['discount_type'],
 
                                 'is_replacement' => true,
                                 'visitor_cancelled' => $subVisitorReplacement['visitor_cancelled'],
@@ -1240,12 +1297,24 @@ class RegistrationController extends Controller
 
             $finalData = [
                 'mainVisitorId' => $mainVisitor->id,
+                'pass_type' => $mainVisitor->pass_type,
+                'rate_type' => $mainVisitor->rate_type,
+                'rate_type_string' => $mainVisitor->rate_type_string,
+                'company_name' => $mainVisitor->company_name,
+                'alternative_company_name' => $mainVisitor->alternative_company_name,
+                'company_sector' => $mainVisitor->company_sector,
+                'company_address' => $mainVisitor->company_address,
+                'company_country' => $mainVisitor->company_country,
+                'company_city' => $mainVisitor->company_city,
+                'company_telephone_number' => $mainVisitor->company_telephone_number,
+                'company_mobile_number' => $mainVisitor->company_mobile_number,
+                'assistant_email_address' => $mainVisitor->assistant_email_address,
                 'heard_where' => $mainVisitor->heard_where,
                 'quantity' => $mainVisitor->quantity,
                 'finalQuantity' => $countFinalQuantity,
 
                 'mode_of_payment' => $mainVisitor->mode_of_payment,
-                'registration_status' => $mainVisitor->registration_status,
+                'registration_status' => "$mainVisitor->registration_status",
                 'payment_status' => $mainVisitor->payment_status,
                 'registered_date_time' => Carbon::parse($mainVisitor->registered_date_time)->format('M j, Y g:i A'),
                 'paid_date_time' => ($mainVisitor->paid_date_time == null) ? "N/A" : Carbon::parse($mainVisitor->paid_date_time)->format('M j, Y g:i A'),
@@ -2309,6 +2378,22 @@ class RegistrationController extends Controller
                     $tempTransactionId = "$event->year" . "$getEventcode" . "$lastDigit";
                     $invoiceLink = env('APP_URL') . '/' . $event->category . '/' . $event->id . '/view-invoice/' . $mainDelegateId;
 
+                    $amountPaid = $mainVisitor->unit_price;
+
+                    if ($mainVisitor->pcode_used != null) {
+                        $promoCode = PromoCode::where('event_id', $mainVisitor->event_id)->where('promo_code', $mainVisitor->pcode_used)->first();
+
+                        if ($promoCode != null) {
+                            if ($promoCode->discount_type == "percentage") {
+                                $amountPaid = $mainVisitor->unit_price - ($mainVisitor->unit_price * ($promoCode->discount / 100));
+                            } else if ($promoCode->discount_type == "price") {
+                                $amountPaid = $mainVisitor->unit_price - $promoCode->discount;
+                            } else {
+                                $amountPaid = $promoCode->new_rate;
+                            }
+                        }
+                    }
+
                     $details1 = [
                         'name' => $mainVisitor->salutation . " " . $mainVisitor->first_name . " " . $mainVisitor->middle_name . " " . $mainVisitor->last_name,
                         'eventLink' => $event->link,
@@ -2318,10 +2403,9 @@ class RegistrationController extends Controller
                         'eventCategory' => $event->category,
                         'eventYear' => $event->year,
 
-                        'nationality' => $mainVisitor->nationality,
-                        'country' => $mainVisitor->country,
-                        'city' => $mainVisitor->city,
-                        'amountPaid' => $mainVisitor->unit_price,
+                        'jobTitle' => $mainVisitor->job_title,
+                        'companyName' => $mainVisitor->company_name,
+                        'amountPaid' => $amountPaid,
                         'transactionId' => $tempTransactionId,
                         'invoiceLink' => $invoiceLink,
                         'badgeLink' => env('APP_URL') . "/" . $event->category . "/" . $event->id . "/view-badge" . "/" . "main" . "/" . $mainVisitor->id,
@@ -2340,14 +2424,27 @@ class RegistrationController extends Controller
                         'invoiceLink' => $invoiceLink,
                     ];
 
+                    $ccEmailNotif = config('app.ccEmailNotif.default');
+
                     try {
-                        Mail::to($mainVisitor->email_address)->cc(config('app.ccEmailNotif.default'))->send(new RegistrationPaid($details1));
-                        Mail::to($mainVisitor->email_address)->cc(config('app.ccEmailNotif.default'))->send(new RegistrationPaymentConfirmation($details2));
+                        Mail::to($mainVisitor->email_address)->cc($ccEmailNotif)->send(new RegistrationPaid($details1));
+                        Mail::to($mainVisitor->email_address)->cc($ccEmailNotif)->send(new RegistrationPaymentConfirmation($details2));
                     } catch (\Exception $e) {
                         Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaid($details1));
                         Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaymentConfirmation($details2));
                     }
 
+                    if ($mainVisitor->assistant_email_address != null) {
+                        $details1['amountPaid'] = $mainVisitor->total_amount;
+
+                        try {
+                            Mail::to($mainVisitor->assistant_email_address)->send(new RegistrationPaid($details1));
+                            Mail::to($mainVisitor->assistant_email_address)->send(new RegistrationPaymentConfirmation($details2));
+                        } catch (\Exception $e) {
+                            Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaid($details1));
+                            Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaymentConfirmation($details2));
+                        }
+                    }
 
                     $additionalVisitors = AdditionalVisitor::where('main_visitor_id', $mainDelegateId)->get();
 
@@ -2356,6 +2453,22 @@ class RegistrationController extends Controller
                             $transactionId = VisitorTransaction::where('visitor_id', $additionalVisitor->id)->where('visitor_type', "sub")->value('id');
                             $lastDigit = 1000 + intval($transactionId);
                             $tempTransactionId = "$event->year" . "$getEventcode" . "$lastDigit";
+
+                            $amountPaidSub = $mainVisitor->unit_price;
+
+                            if ($additionalVisitor->pcode_used != null) {
+                                $promoCode = PromoCode::where('event_id', $mainVisitor->event_id)->where('promo_code', $additionalVisitor->pcode_used)->first();
+
+                                if ($promoCode != null) {
+                                    if ($promoCode->discount_type == "percentage") {
+                                        $amountPaidSub = $mainVisitor->unit_price - ($mainVisitor->unit_price * ($promoCode->discount / 100));
+                                    } else if ($promoCode->discount_type == "price") {
+                                        $amountPaidSub = $mainVisitor->unit_price - $promoCode->discount;
+                                    } else {
+                                        $amountPaidSub = $promoCode->new_rate;
+                                    }
+                                }
+                            }
 
                             $details1 = [
                                 'name' => $additionalVisitor->salutation . " " . $additionalVisitor->first_name . " " . $additionalVisitor->middle_name . " " . $additionalVisitor->last_name,
@@ -2366,17 +2479,16 @@ class RegistrationController extends Controller
                                 'eventCategory' => $event->category,
                                 'eventYear' => $event->year,
 
-                                'nationality' => $additionalVisitor->nationality,
-                                'country' => $additionalVisitor->country,
-                                'city' => $additionalVisitor->city,
-                                'amountPaid' => $mainVisitor->unit_price,
+                                'jobTitle' => $additionalVisitor->job_title,
+                                'companyName' => $mainVisitor->company_name,
+                                'amountPaid' => $amountPaidSub,
                                 'transactionId' => $tempTransactionId,
                                 'invoiceLink' => $invoiceLink,
                                 'badgeLink' => env('APP_URL') . "/" . $event->category . "/" . $event->id . "/view-badge" . "/" . "sub" . "/" . $additionalVisitor->id,
                             ];
 
                             try {
-                                Mail::to($additionalVisitor->email_address)->cc(config('app.ccEmailNotif.default'))->send(new RegistrationPaid($details1));
+                                Mail::to($additionalVisitor->email_address)->cc($ccEmailNotif)->send(new RegistrationPaid($details1));
                             } catch (\Exception $e) {
                                 Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaid($details1));
                             }
@@ -2394,11 +2506,7 @@ class RegistrationController extends Controller
                     $event = Event::where('id', $mainVisitor->event_id)->first();
                     $eventFormattedData = Carbon::parse($event->event_start_date)->format('d') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');
 
-                    if ($event->category == "AF") {
-                        $bankDetails = config('app.bankDetails.AF');
-                    } else {
-                        $bankDetails = config('app.bankDetails.DEFAULT');
-                    }
+                    $bankDetails = config('app.bankDetails.AF');
 
                     $invoiceLink = env('APP_URL') . '/' . $event->category . '/' . $event->id . '/view-invoice/' . $mainDelegateId;
 
@@ -2414,10 +2522,20 @@ class RegistrationController extends Controller
                         'eventYear' => $event->year,
                     ];
 
+                    $ccEmailNotif = config('app.ccEmailNotif.default');
+
                     try {
-                        Mail::to($mainVisitor->email_address)->cc(config('app.ccEmailNotif.default'))->send(new RegistrationCardDeclined($details));
+                        Mail::to($mainVisitor->email_address)->cc($ccEmailNotif)->send(new RegistrationCardDeclined($details));
                     } catch (\Exception $e) {
                         Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationCardDeclined($details));
+                    }
+
+                    if ($mainVisitor->assistant_email_address != null) {
+                        try {
+                            Mail::to($mainVisitor->assistant_email_address)->send(new RegistrationCardDeclined($details));
+                        } catch (\Exception $e) {
+                            Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationCardDeclined($details));
+                        }
                     }
 
                     $additionalVisitors = AdditionalVisitor::where('main_visitor_id', $mainDelegateId)->get();
@@ -2437,7 +2555,7 @@ class RegistrationController extends Controller
                             ];
 
                             try {
-                                Mail::to($additionalVisitor->email_address)->cc(config('app.ccEmailNotif.default'))->send(new RegistrationCardDeclined($details));
+                                Mail::to($additionalVisitor->email_address)->cc($ccEmailNotif)->send(new RegistrationCardDeclined($details));
                             } catch (\Exception $e) {
                                 Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationCardDeclined($details));
                             }
@@ -2456,11 +2574,7 @@ class RegistrationController extends Controller
                 $event = Event::where('id', $mainVisitor->event_id)->first();
                 $eventFormattedData = Carbon::parse($event->event_start_date)->format('d') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');
 
-                if ($event->category == "AF") {
-                    $bankDetails = config('app.bankDetails.AF');
-                } else {
-                    $bankDetails = config('app.bankDetails.DEFAULT');
-                }
+                $bankDetails = config('app.bankDetails.AF');
 
                 $invoiceLink = env('APP_URL') . '/' . $event->category . '/' . $event->id . '/view-invoice/' . $mainDelegateId;
 
@@ -2476,10 +2590,20 @@ class RegistrationController extends Controller
                     'eventYear' => $event->year,
                 ];
 
+                $ccEmailNotif = config('app.ccEmailNotif.default');
+
                 try {
-                    Mail::to($mainVisitor->email_address)->cc(config('app.ccEmailNotif.default'))->send(new RegistrationCardDeclined($details));
+                    Mail::to($mainVisitor->email_address)->cc($ccEmailNotif)->send(new RegistrationCardDeclined($details));
                 } catch (\Exception $e) {
                     Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationCardDeclined($details));
+                }
+
+                if ($mainVisitor->assistant_email_address != null) {
+                    try {
+                        Mail::to($mainVisitor->assistant_email_address)->send(new RegistrationCardDeclined($details));
+                    } catch (\Exception $e) {
+                        Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationCardDeclined($details));
+                    }
                 }
 
                 $additionalVisitors = AdditionalVisitor::where('main_visitor_id', $mainDelegateId)->get();
@@ -2499,7 +2623,7 @@ class RegistrationController extends Controller
                         ];
 
                         try {
-                            Mail::to($additionalVisitor->email_address)->cc(config('app.ccEmailNotif.default'))->send(new RegistrationCardDeclined($details));
+                            Mail::to($additionalVisitor->email_address)->cc($ccEmailNotif)->send(new RegistrationCardDeclined($details));
                         } catch (\Exception $e) {
                             Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationCardDeclined($details));
                         }
@@ -2832,11 +2956,7 @@ class RegistrationController extends Controller
         if ($mainVisitor->confirmation_status == "failed" || $mainVisitor->confirmation_date_time == null) {
             $invoiceLink = env('APP_URL') . '/' . $eventCategory . '/' . $eventId . '/view-invoice/' . $mainVisitorId;
 
-            if ($eventCategory == "AF" || $eventCategory == "AFS"  || $eventCategory == "AFV") {
-                $bankDetails = config('app.bankDetails.AF');
-            } else {
-                $bankDetails = config('app.bankDetails.DEFAULT');
-            }
+            $bankDetails = config('app.bankDetails.AF');
 
             if ($mainVisitor->confirmation_date_time == null) {
                 MainVisitor::find($mainVisitorId)->fill([
@@ -2954,11 +3074,7 @@ class RegistrationController extends Controller
         if ($mainVisitor->confirmation_status == "success" || $mainVisitor->confirmation_date_time == null) {
             $invoiceLink = env('APP_URL') . '/' . $eventCategory . '/' . $eventId . '/view-invoice/' . $mainVisitorId;
 
-            if ($eventCategory == "AF" || $eventCategory == "AFS" || $eventCategory == "AFV") {
-                $bankDetails = config('app.bankDetails.AF');
-            } else {
-                $bankDetails = config('app.bankDetails.DEFAULT');
-            }
+            $bankDetails = config('app.bankDetails.AF');
 
             if ($mainVisitor->confirmation_date_time == null) {
                 MainVisitor::find($mainVisitorId)->fill([
@@ -3288,7 +3404,7 @@ class RegistrationController extends Controller
 
             $eventFormattedData = Carbon::parse($event->event_start_date)->format('j') . '-' . Carbon::parse($event->event_end_date)->format('j F Y');
 
-            if($mainDelegate->alternative_company_name == null){
+            if ($mainDelegate->alternative_company_name == null) {
                 $finalCompanyName = $mainDelegate->company_name;
             } else {
                 $finalCompanyName = $mainDelegate->alternative_company_name;
@@ -3438,6 +3554,14 @@ class RegistrationController extends Controller
 
             $mainVisitor = MainVisitor::where('id', $registrantId)->where('event_id', $eventId)->first();
 
+            if ($mainVisitor->pass_type == "fullMember") {
+                $passType = "Full member";
+            } else if ($mainVisitor->pass_type == "member") {
+                $passType = "Member";
+            } else {
+                $passType = "Non-Member";
+            }
+
             $addMainVisitor = true;
             if ($mainVisitor->visitor_cancelled) {
                 if ($mainVisitor->visitor_refunded || $mainVisitor->visitor_replaced) {
@@ -3450,16 +3574,85 @@ class RegistrationController extends Controller
             }
 
             if ($addMainVisitor) {
+                $promoCode = PromoCode::where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $mainVisitor->pcode_used)->first();
+
+                if ($promoCode != null) {
+                    if ($promoCode->badge_type == $mainVisitor->badge_type) {
+                        $promoCodeUsed = $mainVisitor->pcode_used;
+                        $mainDiscount = $promoCode->discount;
+                        $mainDiscountType = $promoCode->discount_type;
+                    } else {
+                        $promoCodeAdditionalBadgeType = PromoCodeAddtionalBadgeType::where('event_id', $eventId)->where('promo_code_id', $promoCode->id)->where('badge_type', $mainVisitor->badge_type)->first();
+
+                        if ($promoCodeAdditionalBadgeType != null) {
+                            $promoCodeUsed = $mainVisitor->pcode_used;
+                            $mainDiscount = $promoCode->discount;
+                            $mainDiscountType = $promoCode->discount_type;
+                        } else {
+                            $promoCodeUsed = null;
+                            $mainDiscount = 0;
+                            $mainDiscountType = null;
+                        }
+                    }
+                } else {
+                    $promoCodeUsed = null;
+                    $mainDiscount = 0;
+                    $mainDiscountType = null;
+                }
+
+                if ($mainVisitor->badge_type == "Leaders of Tomorrow") {
+                    $visitorDescription = "Visitor Registration Fee - Leaders of Tomorrow";
+                } else {
+                    if ($mainDiscountType != null) {
+                        if ($mainDiscountType == "percentage") {
+                            if ($mainDiscount == 100) {
+                                $visitorDescription = "Visitor Registration Fee - Complimentary";
+                            } else if ($mainDiscount > 0 && $mainDiscount < 100) {
+                                $visitorDescription = "Visitor Registration Fee - " . $passType . " discounted rate";
+                            } else {
+                                $visitorDescription = "Visitor Registration Fee - {$mainVisitor->rate_type_string}";
+                            }
+                        } else if ($mainDiscountType == "price") {
+                            $visitorDescription = "Visitor Registration Fee - {$mainVisitor->rate_type_string}";
+                        } else {
+                            $visitorDescription = $promoCode->new_rate_description;
+                        }
+                    } else {
+                        $visitorDescription = "Visitor Registration Fee - {$mainVisitor->rate_type_string}";
+                    }
+                }
+                if ($mainDiscountType != null) {
+                    if ($mainDiscountType == "percentage") {
+                        $tempUnitPrice = $mainVisitor->unit_price;
+                        $tempTotalDiscount = $mainVisitor->unit_price * ($mainDiscount / 100);
+                        $tempTotalAmount = $mainVisitor->unit_price - ($mainVisitor->unit_price * ($mainDiscount / 100));
+                    } else if ($mainDiscountType == "price") {
+                        $tempUnitPrice = $mainVisitor->unit_price;
+                        $tempTotalDiscount = $mainDiscount;
+                        $tempTotalAmount = $mainVisitor->unit_price - $mainDiscount;
+                    } else {
+                        $tempUnitPrice = $promoCode->new_rate;
+                        $tempTotalDiscount = 0;
+                        $tempTotalAmount = $promoCode->new_rate;
+                    }
+                } else {
+                    $tempUnitPrice = $mainVisitor->unit_price;
+                    $tempTotalDiscount = 0;
+                    $tempTotalAmount = $mainVisitor->unit_price;
+                }
+
                 array_push($invoiceDetails, [
-                    'delegateDescription' => "Visitor Registration Fee",
-                    'delegateNames' => [
+                    'visitorDescription' => $visitorDescription,
+                    'visitorNames' => [
                         $mainVisitor->first_name . " " . $mainVisitor->middle_name . " " . $mainVisitor->last_name,
                     ],
-                    'badgeType' => null,
+                    'badgeType' => $mainVisitor->badge_type,
                     'quantity' => 1,
-                    'totalDiscount' => 0,
-                    'totalNetAmount' =>  $mainVisitor->unit_price,
-                    'promoCodeDiscount' => 0,
+                    'totalUnitPrice' => $tempUnitPrice,
+                    'totalDiscount' => $tempTotalDiscount,
+                    'totalNetAmount' =>  $tempTotalAmount,
+                    'promoCodeDiscount' => $mainDiscount,
+                    'promoCodeUsed' => $promoCodeUsed,
                 ]);
             }
 
@@ -3467,6 +3660,7 @@ class RegistrationController extends Controller
             $subVisitors = AdditionalVisitor::where('main_visitor_id', $registrantId)->get();
             if (!$subVisitors->isEmpty()) {
                 foreach ($subVisitors as $subVisitor) {
+
                     if ($subVisitor->visitor_replaced_by_id == null & (!$subVisitor->visitor_refunded)) {
                         $countFinalQuantity++;
                     }
@@ -3479,29 +3673,127 @@ class RegistrationController extends Controller
                     }
 
                     if ($addSubVisitor) {
+                        $subPromoCode = PromoCode::where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $subVisitor->pcode_used)->first();
+
+                        if ($subPromoCode != null) {
+                            if ($subPromoCode->badge_type == $subVisitor->badge_type) {
+                                $subPromoCodeUsed = $subVisitor->pcode_used;
+                                $subDiscount = $subPromoCode->discount;
+                                $subDiscountType = $subPromoCode->discount_type;
+                            } else {
+                                $subPromoCodeAdditionalBadgeType = PromoCodeAddtionalBadgeType::where('event_id', $eventId)->where('promo_code_id', $subPromoCode->id)->where('badge_type', $subVisitor->badge_type)->first();
+
+                                if ($subPromoCodeAdditionalBadgeType != null) {
+                                    $subPromoCodeUsed = $subVisitor->pcode_used;
+                                    $subDiscount = $subPromoCode->discount;
+                                    $subDiscountType = $subPromoCode->discount_type;
+                                } else {
+                                    $subPromoCodeUsed = null;
+                                    $subDiscount = 0;
+                                    $subDiscountType = null;
+                                }
+                            }
+                        } else {
+                            $subPromoCodeUsed = null;
+                            $subDiscount = 0;
+                            $subDiscountType = null;
+                        }
+
+
+                        $checkIfExisting = false;
                         $existingIndex = 0;
 
-                        if (count($invoiceDetails) == 0) {
-                            array_push($invoiceDetails, [
-                                'delegateDescription' => "Visitor Registration Fee",
-                                'delegateNames' => [
-                                    $subVisitor->first_name . " " . $subVisitor->middle_name . " " . $subVisitor->last_name,
-                                ],
-                                'badgeType' => null,
-                                'quantity' => 1,
-                                'totalDiscount' => 0,
-                                'totalNetAmount' =>  $mainVisitor->unit_price,
-                                'promoCodeDiscount' => 0,
-                            ]);
-                        } else {
+                        for ($j = 0; $j < count($invoiceDetails); $j++) {
+                            if ($subVisitor->badge_type == $invoiceDetails[$j]['badgeType'] && $subPromoCodeUsed == $invoiceDetails[$j]['promoCodeUsed']) {
+                                $existingIndex = $j;
+                                $checkIfExisting = true;
+                                break;
+                            }
+                        }
+
+                        if ($checkIfExisting) {
                             array_push(
-                                $invoiceDetails[$existingIndex]['delegateNames'],
+                                $invoiceDetails[$existingIndex]['visitorNames'],
                                 $subVisitor->first_name . " " . $subVisitor->middle_name . " " . $subVisitor->last_name
                             );
 
                             $quantityTemp = $invoiceDetails[$existingIndex]['quantity'] + 1;
+
+                            if ($subDiscountType != null) {
+                                if ($subDiscountType == "percentage") {
+                                    $totalDiscountTemp = ($mainVisitor->unit_price * ($invoiceDetails[$existingIndex]['promoCodeDiscount'] / 100)) * $quantityTemp;
+                                    $totalNetAmountTemp = ($mainVisitor->unit_price * $quantityTemp) - $totalDiscountTemp;
+                                } else if ($subDiscountType == "price") {
+                                    $totalDiscountTemp = $invoiceDetails[$existingIndex]['promoCodeDiscount'] * $quantityTemp;
+                                    $totalNetAmountTemp = ($mainVisitor->unit_price * $quantityTemp) - $totalDiscountTemp;
+                                } else {
+                                    $totalDiscountTemp = 0;
+                                    $totalNetAmountTemp = $subPromoCode->new_rate * $quantityTemp;
+                                }
+                            } else {
+                                $totalDiscountTemp = $invoiceDetails[$existingIndex]['promoCodeDiscount'];
+                                $totalNetAmountTemp = ($mainVisitor->unit_price * $quantityTemp) - $totalDiscountTemp;
+                            }
+
                             $invoiceDetails[$existingIndex]['quantity'] = $quantityTemp;
-                            $invoiceDetails[$existingIndex]['totalNetAmount'] = $mainVisitor->unit_price * $quantityTemp;
+                            $invoiceDetails[$existingIndex]['totalDiscount'] = $totalDiscountTemp;
+                            $invoiceDetails[$existingIndex]['totalNetAmount'] = $totalNetAmountTemp;
+                        } else {
+
+                            if ($subVisitor->badge_type == "Leaders of Tomorrow") {
+                                $subVisitorDescription = "Visitor Registration Fee - Leaders of Tomorrow";
+                            } else {
+                                if ($subDiscountType != null) {
+                                    if ($subDiscountType == "percentage") {
+                                        if ($subDiscount == 100) {
+                                            $subVisitorDescription = "Visitor Registration Fee - Complimentary";
+                                        } else if ($subDiscount > 0 && $subDiscount < 100) {
+                                            $subVisitorDescription = "Visitor Registration Fee - " . $passType . " discounted rate";
+                                        } else {
+                                            $subVisitorDescription = "Visitor Registration Fee - {$mainVisitor->rate_type_string}";
+                                        }
+                                    } else if ($subDiscountType == "price") {
+                                        $subVisitorDescription = "Visitor Registration Fee - {$mainVisitor->rate_type_string}";
+                                    } else {
+                                        $subVisitorDescription = $subPromoCode->new_rate_description;
+                                    }
+                                } else {
+                                    $subVisitorDescription = "Visitor Registration Fee - {$mainVisitor->rate_type_string}";
+                                }
+                            }
+                            if ($subDiscountType != null) {
+                                if ($subDiscountType == "percentage") {
+                                    $tempSubUnitPrice = $mainVisitor->unit_price;
+                                    $tempSubTotalDiscount = $mainVisitor->unit_price * ($subDiscount / 100);
+                                    $tempSubTotalAmount = $mainVisitor->unit_price - ($mainVisitor->unit_price * ($subDiscount / 100));
+                                } else if ($subDiscountType == "price") {
+                                    $tempSubUnitPrice = $mainVisitor->unit_price;
+                                    $tempSubTotalDiscount = $subDiscount;
+                                    $tempSubTotalAmount = $mainVisitor->unit_price - $subDiscount;
+                                } else {
+                                    $tempSubUnitPrice = $subPromoCode->new_rate;
+                                    $tempSubTotalDiscount = 0;
+                                    $tempSubTotalAmount = $subPromoCode->new_rate;
+                                }
+                            } else {
+                                $tempSubUnitPrice = $mainVisitor->unit_price;
+                                $tempSubTotalDiscount = 0;
+                                $tempSubTotalAmount = $mainVisitor->unit_price;
+                            }
+
+                            array_push($invoiceDetails, [
+                                'visitorDescription' => $subVisitorDescription,
+                                'visitorNames' => [
+                                    $subVisitor->first_name . " " . $subVisitor->middle_name . " " . $subVisitor->last_name,
+                                ],
+                                'badgeType' => $subVisitor->badge_type,
+                                'quantity' => 1,
+                                'totalUnitPrice' => $tempSubUnitPrice,
+                                'totalDiscount' => $tempSubTotalDiscount,
+                                'totalNetAmount' =>  $tempSubTotalAmount,
+                                'promoCodeDiscount' => $subDiscount,
+                                'promoCodeUsed' => $subPromoCodeUsed,
+                            ]);
                         }
                     }
                 }
@@ -3520,22 +3812,30 @@ class RegistrationController extends Controller
 
             $tempInvoiceNumber = "$event->category" . "$tempYear" . "/" . "$lastDigit";
             $tempBookReference = "$event->year" . "$getEventcode" . "$lastDigit";
+
             $bankDetails = config('app.bankDetails.AF');
 
             $eventFormattedData = Carbon::parse($event->event_start_date)->format('j') . '-' . Carbon::parse($event->event_end_date)->format('j F Y');
-            $fullname = $mainVisitor->first_name . ' ' . $mainVisitor->middle_name . ' ' . $mainVisitor->last_name;
+
+            if ($mainVisitor->alternative_company_name == null) {
+                $finalCompanyName = $mainVisitor->company_name;
+            } else {
+                $finalCompanyName = $mainVisitor->alternative_company_name;
+            }
+
             $invoiceData = [
                 "finalEventStartDate" => Carbon::parse($event->event_start_date)->format('d M Y'),
                 "finalEventEndDate" => Carbon::parse($event->event_end_date)->format('d M Y'),
                 "eventFormattedData" => $eventFormattedData,
-                "companyName" => $mainVisitor->company_name,
-                "companyAddress" => $mainVisitor->country,
-                "companyCity" => $mainVisitor->city,
-                "companyCountry" => null,
+                "companyName" => $finalCompanyName,
+                "companyAddress" => $mainVisitor->company_address,
+                "companyCity" => $mainVisitor->company_city,
+                "companyCountry" => $mainVisitor->company_country,
                 "invoiceDate" => Carbon::parse($mainVisitor->registered_date_time)->format('d/m/Y'),
                 "invoiceNumber" => $tempInvoiceNumber,
                 "bookRefNumber" => $tempBookReference,
                 "paymentStatus" => $mainVisitor->payment_status,
+                "registrationMethod" => $mainVisitor->registration_method,
                 "eventName" => $event->name,
                 "eventLocation" => $event->location,
                 "eventVat" => $event->event_vat,
@@ -3546,7 +3846,6 @@ class RegistrationController extends Controller
                 'invoiceDetails' => $invoiceDetails,
                 'bankDetails' => $bankDetails,
                 'finalQuantity' => $countFinalQuantity,
-                'registrationMethod' => "online",
                 'total_amount_string' => ucwords($this->numberToWords($mainVisitor->total_amount)),
             ];
 
@@ -3918,7 +4217,7 @@ class RegistrationController extends Controller
                             'pcode_used' => $subDelegate->pcode_used,
 
                             'heard_where' => $mainDelegate->heard_where,
-        
+
                             'attending_plenary' => $mainDelegate->attending_plenary,
                             'attending_symposium' => $mainDelegate->attending_symposium,
                             'attending_solxchange' => $mainDelegate->attending_solxchange,

@@ -1,4 +1,5 @@
 <div class="fixed z-10 inset-0 overflow-y-auto">
+    <form>
     <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
         <div class="fixed inset-0 transition-opacity">
             <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
@@ -7,39 +8,49 @@
         <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
             role="dialog" aria-modal="true" aria-labelledby="modal-headline">
             <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                {{-- SUB VISITOR --}}
                 <div>
                     <div class="text-registrationPrimaryColor italic font-bold text-xl">
-                        Edit visitor
+                        Company Details
                     </div>
 
                     <div class="mt-5 grid grid-cols-2 gap-y-3 gap-x-5">
                         {{-- ROW 1 --}}
                         <div class="space-y-2">
                             <div class="text-registrationPrimaryColor">
-                                Salutation
+                                Pass Type <span class="text-red-500">*</span>
                             </div>
                             <div>
-                                <select wire:model.lazy="subSalutationEdit"
+                                <select wire:model.lazy="visitorPassType"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                                    <option value=""></option>
-                                    @foreach ($salutations as $salutation)
-                                        <option value="{{ $salutation }}"
-                                            {{ $subSalutationEdit == $salutation ? 'selected' : '' }}>
-                                            {{ $salutation }}</option>
-                                    @endforeach
+                                    @if ($event->eb_full_member_rate != null || $event->std_full_member_rate != null)
+                                        <option value="fullMember" {{ $visitorPassType == 'fullMember' ? 'selected' : '' }}>Full Member</option>
+                                    @endif
+                                    <option value="member" {{ $visitorPassType == 'member' ? 'selected' : '' }}>Member</option>
+                                    <option value="nonMember" {{ $visitorPassType == 'nonMember' ? 'selected' : '' }}>Non-Member</option>
                                 </select>
                             </div>
                         </div>
 
                         <div class="space-y-2">
                             <div class="text-registrationPrimaryColor">
-                                First name <span class="text-red-500">*</span>
+                                Company Name <span class="text-red-500">*</span>
                             </div>
                             <div>
-                                <input placeholder="First name" type="text" wire:model.lazy="subFirstNameEdit"
-                                    class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                                @error('subFirstNameEdit')
+                                @if ($visitorPassType == 'member')
+                                    <select wire:model.lazy="companyName"
+                                        class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                                        <option value=""></option>
+                                        @foreach ($members as $member)
+                                            <option value="{{ $member->name }}" {{ $member->name == $companyName ? 'selected' : '' }}>
+                                                {{ $member->name }}</option>
+                                        @endforeach
+                                    </select>
+                                @else
+                                    <input placeholder="Company Name" type="text" wire:model.lazy="companyName"
+                                        class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                                @endif
+
+                                @error('companyName')
                                     <div class="text-red-500 text-xs italic mt-1">
                                         {{ $message }}
                                     </div>
@@ -47,25 +58,47 @@
                             </div>
                         </div>
 
+                        <div class="space-y-2">
+                            <div class="text-registrationPrimaryColor">
+                                Alternative Company Name 
+                            </div>
+                            <div>
+                                <input placeholder="Alternative Company Name" type="text" wire:model.lazy="alternativeCompanyName"
+                                    class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                            </div>
+                        </div>
+
                         {{-- ROW 2 --}}
                         <div class="space-y-2">
                             <div class="text-registrationPrimaryColor">
-                                Middle name
+                                Company Sector <span class="text-red-500">*</span>
                             </div>
                             <div>
-                                <input placeholder="Middle name" type="text" wire:model.lazy="subMiddleNameEdit"
+                                <select wire:model.lazy="companySector"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                                    <option value=""></option>
+                                    @foreach ($companySectors as $companySectorOpt)
+                                        <option value="{{ $companySectorOpt }}" {{ $companySectorOpt == $companySector ? 'selected' : '' }}>
+                                            {{ $companySectorOpt }}</option>
+                                    @endforeach
+                                </select>
+
+                                @error('companySector')
+                                    <div class="text-red-500 text-xs italic mt-1">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
                             </div>
                         </div>
 
                         <div class="space-y-2">
                             <div class="text-registrationPrimaryColor">
-                                Last name <span class="text-red-500">*</span>
+                                Company Address <span class="text-red-500">*</span>
                             </div>
                             <div>
-                                <input placeholder="Last name" type="text" wire:model.lazy="subLastNameEdit"
+                                <input placeholder="Please enter Complete Company Address" type="text" wire:model.lazy="companyAddress"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                                @error('subLastNameEdit')
+                                @error('companyAddress')
                                     <div class="text-red-500 text-xs italic mt-1">
                                         {{ $message }}
                                     </div>
@@ -77,40 +110,35 @@
                         {{-- ROW 3 --}}
                         <div class="space-y-2">
                             <div class="text-registrationPrimaryColor">
-                                Email address <span class="text-red-500">*</span>
+                                Country <span class="text-red-500">*</span>
                             </div>
                             <div>
-                                <input placeholder="Email address" type="text" wire:model.lazy="subEmailAddressEdit"
+                                <select wire:model.lazy="companyCountry"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                                @error('subEmailAddressEdit')
+                                    <option value=""></option>
+                                    @foreach ($countries as $country)
+                                        <option value="{{ $country }}" {{ $country == $companyCountry ? 'selected' : '' }}>
+                                            {{ $country }}</option>
+                                    @endforeach
+                                </select>
+                
+                                @error('companyCountry')
                                     <div class="text-red-500 text-xs italic mt-1">
                                         {{ $message }}
                                     </div>
                                 @enderror
-
-                                
-                                @if ($emailSubExistingError != null)
-                                    <div class="text-red-500 text-xs italic mt-1">
-                                        {{ $emailSubExistingError }}
-                                    </div>
-                                @endif
-
-                                @if ($emailSubAlreadyUsedError != null)
-                                    <div class="text-red-500 text-xs italic mt-1">
-                                        {{ $emailSubAlreadyUsedError }}
-                                    </div>
-                                @endif
                             </div>
                         </div>
 
                         <div class="space-y-2">
                             <div class="text-registrationPrimaryColor">
-                                Mobile number <span class="text-red-500">*</span>
+                                City <span class="text-red-500">*</span>
                             </div>
                             <div>
-                                <input placeholder="xxxxxxx" type="text" wire:model.lazy="subMobileNumberEdit"
+                                <input placeholder="City" type="text" wire:model.lazy="companyCity"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                                @error('subMobileNumberEdit')
+                
+                                @error('companyCity')
                                     <div class="text-red-500 text-xs italic mt-1">
                                         {{ $message }}
                                     </div>
@@ -122,21 +150,13 @@
                         {{-- ROW 4 --}}
                         <div class="space-y-2">
                             <div class="text-registrationPrimaryColor">
-                                Nationality <span class="text-red-500">*</span>
+                                Landline Number
                             </div>
                             <div>
-                                
-                                <select wire:model.lazy="subNationalityEdit"
+                                <input placeholder="xxxxxxx" type="text" wire:model.lazy="companyLandlineNumber"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                                    <option value=""></option>
-                                    @foreach ($countries as $country)
-                                        <option value="{{ $country }}">
-                                            {{ $country }}
-                                        </option>
-                                    @endforeach
-                                </select>
-
-                                @error('subNationalityEdit')
+                
+                                @error('companyLandlineNumber')
                                     <div class="text-red-500 text-xs italic mt-1">
                                         {{ $message }}
                                     </div>
@@ -146,12 +166,12 @@
 
                         <div class="space-y-2">
                             <div class="text-registrationPrimaryColor">
-                                Job title <span class="text-red-500">*</span>
+                                Mobile Number <span class="text-red-500">*</span>
                             </div>
                             <div>
-                                <input placeholder="Job title" type="text" wire:model.lazy="subJobTitleEdit"
+                                <input placeholder="xxxxxxx" type="text" wire:model.lazy="companyMobileNumber"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                                @error('subJobTitleEdit')
+                                @error('companyMobileNumber')
                                     <div class="text-red-500 text-xs italic mt-1">
                                         {{ $message }}
                                     </div>
@@ -160,55 +180,27 @@
                         </div>
 
 
-                        <div class="space-y-2 col-span-2">
+                        <div class="space-y-2">
                             <div class="text-registrationPrimaryColor">
-                                Promo code
+                                Assistant's email address
                             </div>
-
-                            <div class="flex">
-                                @if ($promoCodeSuccessSubEdit != null)
-                                    <input readonly type="text" wire:model.lazy="subPromoCodeEdit"
-                                        class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-none cursor-not-allowed">
-
-                                    <button wire:click.prevent="removePromoCodeSubEdit"
-                                        wire:key="btnRemovePromoCodeSubEdit" type="button"
-                                        class="bg-red-300 px-5 ml-2">Remove</button>
-                                @else
-                                    <input placeholder="Enter your promo code here" type="text"
-                                        wire:model.lazy="subPromoCodeEdit"
-                                        class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-
-                                    <button wire:click.prevent="applyPromoCodeSubEdit"
-                                        wire:key="btnApplyPromoCodeSubEdit" type="button"
-                                        class="bg-registrationPrimaryColor text-white px-5 ml-2 hover:bg-registrationPrimaryColorHover">Apply</button>
-                                @endif
+                            <div>
+                                <input placeholder="Email Address" type="text" wire:model.lazy="assistantEmailAddress"
+                                    class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                             </div>
-
-                            @if ($subPromoCodeEdit != null)
-                                @if ($promoCodeFailSubEdit != null)
-                                    <div class="text-red-500 text-xs italic mt-1">
-                                        {{ $promoCodeFailSubEdit }}
-                                    </div>
-                                @endif
-
-                                @if ($promoCodeSuccessSubEdit != null)
-                                    <div class="text-green-500 text-xs italic mt-1">
-                                        {{ $promoCodeSuccessSubEdit }}
-                                    </div>
-                                @endif
-                            @endif
                         </div>
                     </div>
                 </div>
             </div>
             <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                <button type="button" wire:key="btnUpdateAdditionalVisitor"
+                <button type="button" wire:key="btnUpdateCompany"
                     class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
-                    wire:click.prevent="editAdditionalVisitor('{{ $subIdEdit }}')">Update</button>
-                <button type="button" wire:key="btnCancelEditAddtionalVisitor"
+                    wire:click.prevent="updateCompanyDetails">Update</button>
+                <button type="button" wire:key="btnCancelEditCompany"
                     class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-                    wire:click.prevent="closeEditModal">Cancel</button>
+                    wire:click.prevent="closeEditCompanyDetailsModal">Cancel</button>
             </div>
         </div>
     </div>
+    </form>
 </div>

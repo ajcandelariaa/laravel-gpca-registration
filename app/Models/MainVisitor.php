@@ -15,6 +15,16 @@ class MainVisitor extends Model
         'rate_type',
         'rate_type_string',
 
+        'company_name',
+        'company_sector',
+        'company_address',
+        'company_country',
+        'company_city',
+        'company_telephone_number',
+        'company_mobile_number',
+        'assistant_email_address',
+        'alternative_company_name',
+
         'salutation',
         'first_name',
         'middle_name',
@@ -22,10 +32,9 @@ class MainVisitor extends Model
         'email_address',
         'mobile_number',
         'nationality',
-        'country',
-        'city',
-        'company_name',
         'job_title',
+        'badge_type',
+        'pcode_used',
 
         'heard_where',
 
@@ -35,7 +44,6 @@ class MainVisitor extends Model
         'vat_price',
         'discount_price',
         'total_amount',
-        
         'mode_of_payment',
         'registration_status',
         'payment_status',

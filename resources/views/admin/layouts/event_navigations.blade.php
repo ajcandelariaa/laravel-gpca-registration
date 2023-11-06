@@ -14,14 +14,19 @@
                     class="{{ request()->is('admin/event/*/*/detail*') ? 'underline' : 'hover:underline' }} text-registrationPrimaryColor">Event
                     Detail</a>
 
-                @if ($eventCategory != 'AFS' && $eventCategory != 'AFV' && $eventCategory != 'RCCA')
+                @if ($eventCategory != 'AFS' && $eventCategory != 'RCCA')
                     <a href="{{ route('admin.event.registration-type.view', ['eventCategory' => $eventCategory, 'eventId' => $eventId]) }}"
                         class="{{ request()->is('admin/event/*/*/registration-type*') ? 'underline' : 'hover:underline' }} text-registrationPrimaryColor">Registration
                         Type</a>
-                        
+
                     <a href="{{ route('admin.event.delegate-fees.view', ['eventCategory' => $eventCategory, 'eventId' => $eventId]) }}"
-                        class="{{ request()->is('admin/event/*/*/delegate-fees*') ? 'underline' : 'hover:underline' }} text-registrationPrimaryColor">Delegate
-                        Fees</a>
+                        class="{{ request()->is('admin/event/*/*/delegate-fees*') ? 'underline' : 'hover:underline' }} text-registrationPrimaryColor">
+                        @if ($eventCategory == 'AFV')
+                            Visitor Fees
+                        @else
+                            Delegate Fees
+                        @endif
+                    </a>
 
                     <a href="{{ route('admin.event.promo-codes.view', ['eventCategory' => $eventCategory, 'eventId' => $eventId]) }}"
                         class="{{ request()->is('admin/event/*/*/promo-code*') ? 'underline' : 'hover:underline' }} text-registrationPrimaryColor">Promo
@@ -32,9 +37,15 @@
                 <a href="{{ route('admin.event.registrants.view', ['eventCategory' => $eventCategory, 'eventId' => $eventId]) }}"
                     class="{{ request()->is('admin/event/*/*/registrant*') ? 'underline' : 'hover:underline' }} text-registrationPrimaryColor">Transactions</a>
 
-                @if ($eventCategory != 'AFS' && $eventCategory != 'AFV' && $eventCategory != 'RCCA')
+                @if ($eventCategory != 'AFS' && $eventCategory != 'RCCA')
                     <a href="{{ route('admin.event.delegates.view', ['eventCategory' => $eventCategory, 'eventId' => $eventId]) }}"
-                        class="{{ request()->is('admin/event/*/*/delegate*') ? 'underline' : 'hover:underline' }} text-registrationPrimaryColor">Delegates</a>
+                        class="{{ request()->is('admin/event/*/*/delegate*') ? 'underline' : 'hover:underline' }} text-registrationPrimaryColor">
+                        @if ($eventCategory == 'AFV')
+                            Visitors
+                        @else
+                            Delegates
+                        @endif
+                    </a>
 
                     <a href="{{ route('admin.printed.badge.list.view', ['eventCategory' => $eventCategory, 'eventId' => $eventId]) }}"
                         class="{{ request()->is('admin/event/*/*/printed-badge*') ? 'underline' : 'hover:underline' }} text-registrationPrimaryColor">Printed</a>

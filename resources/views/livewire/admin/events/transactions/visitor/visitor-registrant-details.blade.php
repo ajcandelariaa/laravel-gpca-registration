@@ -12,16 +12,84 @@
 
         <div class="grid grid-cols-12 gap-20 mt-10">
             <div class="col-span-5">
+                <div class="grid grid-cols-2 bg-registrationCardBGColor py-3 px-4 gap-4">
+                    <p>Rate:</p>
+                    <p class="font-bold">{{ $finalData['rate_type_string'] }}</p>
+                </div>
 
-                <div class="bg-registrationInputFieldsBGColor py-1 px-1 ">
-                    <p class="text-xl text-registrationPrimaryColor font-bold italic py-4 px-3 text-center">Additional Details
-                    </p>
+                <div class="mt-3 bg-registrationInputFieldsBGColor py-1 px-1">
+                    <div class="flex items-center gap-3">
+                        <p class="text-xl text-registrationPrimaryColor font-bold italic py-4 px-3">Company Details</p>
+                        <button wire:click="openEditCompanyDetailsModal"
+                            class="cursor-pointer hover:text-yellow-600 text-yellow-500">
+                            <i class="fa-solid fa-pen-to-square"></i> Edit
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-2 bg-white py-3 px-4 gap-4">
+                        <p>Pass Type:</p>
+
+                        @if ($finalData['pass_type'] == 'fullMember')
+                            <p class="font-bold">Full Member</p>
+                        @elseif ($finalData['pass_type'] == 'member')
+                            <p class="font-bold">Member</p>
+                        @else
+                            <p class="font-bold">Non-Member</p>
+                        @endif
+
+                        <p>Name:</p>
+                        <p class="font-bold">{{ $finalData['company_name'] }}</p>
+
+                        <p>Alternative Name:</p>
+                        <p class="font-bold">
+                            @if ($finalData['alternative_company_name'] != null)
+                                {{ $finalData['alternative_company_name'] }}
+                            @else
+                                N/A
+                            @endif
+                        </p>
+
+                        <p>Sector:</p>
+                        <p class="font-bold">{{ $finalData['company_sector'] }}</p>
+
+                        <p>Address:</p>
+                        <p class="font-bold">{{ $finalData['company_address'] }}</p>
+
+                        <p>Country:</p>
+                        <p class="font-bold">{{ $finalData['company_country'] }}</p>
+
+                        <p>City:</p>
+                        <p class="font-bold">{{ $finalData['company_city'] }}</p>
+
+                        <p>Landline Number:</p>
+                        <p class="font-bold">
+                            {{ $finalData['company_telephone_number'] ? $finalData['company_telephone_number'] : 'N/A' }}
+                        </p>
+
+                        <p>Mobile Number:</p>
+                        <p class="font-bold">{{ $finalData['company_mobile_number'] }}</p>
+
+                        <p>Assistant's email address:</p>
+                        <p class="font-bold">
+                            @if ($finalData['assistant_email_address'] != null)
+                                {{ $finalData['assistant_email_address'] }}
+                            @else
+                                N/A
+                            @endif
+                        </p>
+
+                        <p>Where did you hear about us?</p>
+                        <p class="font-bold">
+                            @if ($finalData['heard_where'] != null)
+                                {{ $finalData['heard_where'] }}
+                            @else
+                                N/A
+                            @endif
+                        </p>
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-2 bg-registrationCardBGColor py-3 px-4 gap-4 mt-3">
-                    <p>Where did you hear about us?</p>
-                    <p class="font-bold">{{ $finalData['heard_where'] ?? 'N/A' }}</p>
-
                     <p>Invoice number:</p>
                     <p class="font-bold">
                         {{ $finalData['invoiceNumber'] }}
@@ -76,6 +144,9 @@
 
                     <p>Payment date & time:</p>
                     <p class="font-bold">{{ $finalData['paid_date_time'] }}</p>
+
+                    <p>Last registration confirmation sent:</p>
+                    <p class="font-bold">{{ $finalData['registration_confirmation_sent_datetime'] }}</p>
                 </div>
 
 
@@ -127,8 +198,8 @@
 
                     @if ($finalData['registration_status'] == 'confirmed' || $finalData['registration_status'] == 'pending')
                         <button wire:click="sendEmailRegistrationConfirmationConfirmation"
-                        class="col-span-1 {{ $finalData['registration_confirmation_sent_count'] > 0 ? 'bg-gray-400' : 'bg-yellow-600 hover:bg-yellow-700' }}  text-white py-2 rounded-md text-lg text-center">Send
-                        Registration Confirmation</button>
+                            class="col-span-1 {{ $finalData['registration_confirmation_sent_count'] > 0 ? 'bg-gray-400' : 'bg-yellow-600 hover:bg-yellow-700' }}  text-white py-2 rounded-md text-lg text-center">Send
+                            Registration Confirmation</button>
                     @endif
                 </div>
             </div>
@@ -174,17 +245,38 @@
                                         <p>Nationality:</p>
                                         <p class="font-bold">{{ $innerVisitor['nationality'] }}</p>
 
-                                        <p>Country:</p>
-                                        <p class="font-bold">{{ $innerVisitor['country'] }}</p>
+                                        <p>Job Title:</p>
+                                        <p class="font-bold">{{ $innerVisitor['job_title'] }}</p>
 
-                                        <p>City:</p>
-                                        <p class="font-bold">{{ $innerVisitor['city'] }}</p>
+                                        <p>Badge Type:</p>
+                                        <p class="font-bold">{{ $innerVisitor['badge_type'] }}</p>
 
-                                        <p>Company:</p>
-                                        <p class="font-bold">{{ $innerVisitor['company_name'] == "" ? 'N/A' : $innerVisitor['company_name'] }}</p>
+                                        <p>Promo Code used:</p>
+                                        @if ($innerVisitor['pcode_used'] == null)
+                                            <p class="font-bold">N/A</p>
+                                        @else
+                                            @if ($innerVisitor['discount_type'] == 'percentage')
+                                                <p class="font-bold">{{ $innerVisitor['pcode_used'] }}
+                                                    <span
+                                                        class="text-green-500 text-sm italic ml-2">{{ $innerVisitor['discount'] }}%
+                                                        discount
+                                                    </span>
+                                                </p>
+                                            @elseif ($innerVisitor['discount_type'] == 'price')
+                                                <p class="font-bold">{{ $innerVisitor['pcode_used'] }}
+                                                    <span
+                                                        class="text-green-500 text-sm italic ml-2">${{ $innerVisitor['discount'] }}
+                                                        discount
+                                                    </span>
+                                                </p>
+                                            @else
+                                                <p class="font-bold">{{ $innerVisitor['pcode_used'] }}
+                                                    <span class="text-green-500 text-sm italic ml-2">Fixed rate
+                                                        applied</span>
+                                                </p>
+                                            @endif
+                                        @endif
 
-                                        <p>Job title:</p>
-                                        <p class="font-bold">{{ $innerVisitor['job_title'] == "" ? 'N/A' : $innerVisitor['job_title'] }}</p>
 
                                         @if ($innerVisitor['visitor_cancelled'])
                                             <p>Status: </p>
@@ -244,38 +336,38 @@
                         @php
                             $count = 1;
                         @endphp
-                        @foreach ($finalData['invoiceData']['invoiceDetails'] as $delegatInvoiceDetail)
+                        @foreach ($finalData['invoiceData']['invoiceDetails'] as $visitorInvoiceDetails)
                             <div class="grid grid-cols-6 gap-x-2">
                                 <div class="col-span-2 bg-white p-4">
                                     @if ($count == 1)
                                         <p>{{ $finalData['invoiceData']['eventName'] }} –
                                             {{ $finalData['invoiceData']['eventFormattedData'] }}
                                             at {{ $finalData['invoiceData']['eventLocation'] }}</p>
-                                        <p class="mt-10">{{ $delegatInvoiceDetail['delegateDescription'] }}</p>
+                                        <p class="mt-10">{{ $visitorInvoiceDetails['visitorDescription'] }}</p>
                                     @else
-                                        <p>{{ $delegatInvoiceDetail['delegateDescription'] }}</p>
+                                        <p>{{ $visitorInvoiceDetails['visitorDescription'] }}</p>
                                     @endif
                                     <ul class="mt-2 list-decimal ml-4">
-                                        @foreach ($delegatInvoiceDetail['delegateNames'] as $name)
+                                        @foreach ($visitorInvoiceDetails['visitorNames'] as $name)
                                             <li>{{ $name }}</li>
                                         @endforeach
                                     </ul>
                                 </div>
 
                                 <div class="col-span-1 bg-white p-4 flex justify-center items-center">
-                                    <p>{{ $delegatInvoiceDetail['quantity'] }}</p>
+                                    <p>{{ $visitorInvoiceDetails['quantity'] }}</p>
                                 </div>
 
                                 <div class="col-span-1 bg-white p-4 flex justify-center items-center">
-                                    <p>$ {{ number_format($finalData['invoiceData']['unit_price'], 2, '.', ',') }}</p>
+                                    <p>$ {{ number_format($visitorInvoiceDetails['totalUnitPrice'], 2, '.', ',') }}</p>
                                 </div>
 
                                 <div class="col-span-1 bg-white p-4 flex justify-center items-center">
-                                    <p>$ {{ number_format($delegatInvoiceDetail['totalDiscount'], 2, '.', ',') }}</p>
+                                    <p>$ {{ number_format($visitorInvoiceDetails['totalDiscount'], 2, '.', ',') }}</p>
                                 </div>
 
                                 <div class="col-span-1 bg-white p-4 flex justify-center items-center">
-                                    <p>$ {{ number_format($delegatInvoiceDetail['totalNetAmount'], 2, '.', ',') }}</p>
+                                    <p>$ {{ number_format($visitorInvoiceDetails['totalNetAmount'], 2, '.', ',') }}</p>
                                 </div>
                             </div>
 
@@ -316,6 +408,10 @@
 
         @if ($showVisitorModal)
             @include('livewire.admin.events.transactions.visitor.edit-forms.edit_visitor_form')
+        @endif
+
+        @if ($showCompanyModal)
+            @include('livewire.admin.events.transactions.visitor.edit-forms.edit_company_form')
         @endif
 
         @if ($showTransactionRemarksModal)

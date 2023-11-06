@@ -1134,7 +1134,7 @@ class EventController extends Controller
 
     public function eventRegistrationType($eventCategory, $eventId)
     {
-        if (Event::where('category', $eventCategory)->where('id', $eventId)->exists() && $eventCategory != 'AFS' && $eventCategory != 'AFV' && $eventCategory != 'RCCA') {
+        if (Event::where('category', $eventCategory)->where('id', $eventId)->exists() && $eventCategory != 'AFS' && $eventCategory != 'RCCA') {
             return view('admin.events.registration-type.registration_type', [
                 "pageTitle" => "Event Registration Type",
                 "eventCategory" => $eventCategory,
@@ -1147,7 +1147,7 @@ class EventController extends Controller
 
     public function eventDelegateFeesView($eventCategory, $eventId)
     {
-        if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()  && $eventCategory != 'AFS' && $eventCategory != 'AFV' && $eventCategory != 'RCCA') {
+        if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()  && $eventCategory != 'AFS' && $eventCategory != 'RCCA') {
             return view('admin.events.delegate-fees.delegate_fees', [
                 "pageTitle" => "Event Delegate Fees",
                 "eventCategory" => $eventCategory,
@@ -1160,7 +1160,7 @@ class EventController extends Controller
 
     public function eventPromoCodeView($eventCategory, $eventId)
     {
-        if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()  && $eventCategory != "AFS" && $eventCategory != "AFV" && $eventCategory != 'RCCA') {
+        if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()  && $eventCategory != "AFS" && $eventCategory != 'RCCA') {
             return view('admin.events.promo-codes.promo_codes', [
                 "pageTitle" => "Event Promo Codes",
                 "eventCategory" => $eventCategory,

@@ -12,29 +12,37 @@ use App\Models\MainVisitor as MainVisitors;
 use App\Models\Event as Events;
 use App\Models\AdditionalVisitor as AdditionalVisitors;
 use App\Models\VisitorTransaction as VisitorTransactions;
+use App\Models\Member as Members;
+use App\Models\PromoCode as PromoCodes;
+use App\Models\EventRegistrationType as EventRegistrationTypes;
+use App\Models\PromoCodeAddtionalBadgeType as PromoCodeAddtionalBadgeTypes;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
 use NumberFormatter;
 
 class VisitorRegistrantDetails extends Component
 {
-    public $countries, $salutations;
+    public $countries, $companySectors, $salutations, $registrationTypes;
 
-    public $eventCategory, $eventId, $registrantId, $finalData, $event;
+    public $eventCategory, $eventId, $registrantId, $finalData, $members, $event;
 
-    public $finalUnitPrice;
+    public $rateType, $finalUnitPrice;
 
-    // DELEGATE DETAILS
-    public $mainVisitorId, $visitorId, $salutation, $firstName, $middleName, $lastName, $emailAddress, $mobileNumber, $nationality, $country, $city, $companyName, $jobTitle, $type, $visitorIndex, $visitorInnerIndex;
+    // COMPANY INFO
+    public $visitorPassType, $rateTypeString, $companyName, $alternativeCompanyName, $companySector, $companyAddress, $companyCountry, $companyCity, $companyLandlineNumber, $assistantEmailAddress, $companyMobileNumber;
+
+    // VISITOR DETAILS
+    public $mainVisitorId, $visitorId, $salutation, $firstName, $middleName, $lastName, $emailAddress, $mobileNumber, $nationality, $jobTitle, $badgeType, $promoCode, $promoCodeDiscount, $discountType, $promoCodeSuccess, $promoCodeFail, $type, $visitorIndex, $visitorInnerIndex;
 
     public $transactionRemarks, $visitorCancellationStep = 1, $replaceVisitor, $visitorRefund;
 
-    public $replaceVisitorIndex, $replaceVisitorInnerIndex, $replaceSalutation, $replaceFirstName, $replaceMiddleName, $replaceLastName, $replaceEmailAddress, $replaceMobileNumber, $replaceNationality, $replaceCountry, $replaceCity, $replaceCompanyName, $replaceJobTitle, $replaceEmailAlreadyUsedError;
+    public $replaceVisitorIndex, $replaceVisitorInnerIndex, $replaceSalutation, $replaceFirstName, $replaceMiddleName, $replaceLastName, $replaceEmailAddress, $replaceMobileNumber, $replaceNationality, $replaceJobTitle, $replaceBadgeType, $replacePromoCode, $replaceDiscountType, $replacePromoCodeDiscount, $replacePromoCodeSuccess, $replacePromoCodeFail, $replaceEmailAlreadyUsedError;
 
     public $mapPaymentMethod, $sendInvoice;
 
     // MODALS
-    public $showVisitorModal = false, $showAdditionalDetailsModal = false;
+    public $showVisitorModal = false;
+    public $showCompanyModal = false;
     public $showTransactionRemarksModal = false;
     public $showVisitorCancellationModal = false;
     public $showMarkAsPaidModal = false;
@@ -46,7 +54,10 @@ class VisitorRegistrantDetails extends Component
     public function mount($eventCategory, $eventId, $registrantId, $finalData)
     {
         $this->countries = config('app.countries');
+        $this->companySectors = config('app.companySectors');
         $this->salutations = config('app.salutations');
+        $this->registrationTypes = EventRegistrationTypes::where('event_id', $eventId)->where('event_category', $eventCategory)->where('active', true)->get();
+
         $this->event = Events::where('id', $eventId)->where('category', $eventCategory)->first();
         $this->eventCategory = $eventCategory;
         $this->eventId = $eventId;
@@ -75,21 +86,27 @@ class VisitorRegistrantDetails extends Component
                 'lastName' => 'required',
                 'emailAddress' => 'required|email',
                 'nationality' => 'required',
-                'country' => 'required',
-                'city' => 'required',
                 'mobileNumber' => 'required',
+                'jobTitle' => 'required',
+                'badgeType' => 'required',
             ],
             [
                 'firstName.required' => "First name is required",
                 'lastName.required' => "Last name is required",
                 'emailAddress.required' => "Email address is required",
                 'emailAddress.email' => "Email address must be a valid email",
-                'mobileNumber.required' => "Mobile number is required",
                 'nationality.required' => "Nationality is required",
-                'country.required' => "Country is required",
-                'city.required' => "City is required",
+                'mobileNumber.required' => "Mobile number is required",
+                'jobTitle.required' => "Job title is required",
+                'badgeType.required' => "Registration type is required",
             ]
         );
+
+        if ($this->promoCodeSuccess != null) {
+            PromoCodes::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->where('active', true)->where('promo_code', $this->promoCode)->where('badge_type', $this->badgeType)->increment('total_usage');
+        } else {
+            $this->promoCode = null;
+        }
 
         if ($this->type == "main") {
             MainVisitors::find($this->visitorId)->fill([
@@ -100,10 +117,10 @@ class VisitorRegistrantDetails extends Component
                 'email_address' => $this->emailAddress,
                 'mobile_number' => $this->mobileNumber,
                 'nationality' => $this->nationality,
-                'country' => $this->country,
-                'city' => $this->city,
-                'company_name' => $this->companyName,
                 'job_title' => $this->jobTitle,
+                'badge_type' => $this->badgeType,
+                'pcode_used' => $this->promoCode,
+                'discount' => $this->promoCodeDiscount,
             ])->save();
         } else {
             AdditionalVisitors::find($this->visitorId)->fill([
@@ -114,10 +131,10 @@ class VisitorRegistrantDetails extends Component
                 'email_address' => $this->emailAddress,
                 'mobile_number' => $this->mobileNumber,
                 'nationality' => $this->nationality,
-                'country' => $this->country,
-                'city' => $this->city,
-                'company_name' => $this->companyName,
                 'job_title' => $this->jobTitle,
+                'badge_type' => $this->badgeType,
+                'pcode_used' => $this->promoCode,
+                'discount' => $this->promoCodeDiscount,
             ])->save();
         }
 
@@ -129,10 +146,11 @@ class VisitorRegistrantDetails extends Component
         $this->finalData['allVisitors'][$this->visitorIndex][$this->visitorInnerIndex]['email_address'] = $this->emailAddress;
         $this->finalData['allVisitors'][$this->visitorIndex][$this->visitorInnerIndex]['mobile_number'] = $this->mobileNumber;
         $this->finalData['allVisitors'][$this->visitorIndex][$this->visitorInnerIndex]['nationality'] = $this->nationality;
-        $this->finalData['allVisitors'][$this->visitorIndex][$this->visitorInnerIndex]['country'] = $this->country;
-        $this->finalData['allVisitors'][$this->visitorIndex][$this->visitorInnerIndex]['city'] = $this->city;
-        $this->finalData['allVisitors'][$this->visitorIndex][$this->visitorInnerIndex]['company_name'] = $this->companyName;
         $this->finalData['allVisitors'][$this->visitorIndex][$this->visitorInnerIndex]['job_title'] = $this->jobTitle;
+        $this->finalData['allVisitors'][$this->visitorIndex][$this->visitorInnerIndex]['badge_type'] = $this->badgeType;
+        $this->finalData['allVisitors'][$this->visitorIndex][$this->visitorInnerIndex]['pcode_used'] = $this->promoCode;
+        $this->finalData['allVisitors'][$this->visitorIndex][$this->visitorInnerIndex]['discount'] = $this->promoCodeDiscount;
+        $this->finalData['allVisitors'][$this->visitorIndex][$this->visitorInnerIndex]['discount_type'] = $this->discountType;
 
         $this->calculateTotal();
 
@@ -154,11 +172,22 @@ class VisitorRegistrantDetails extends Component
         $this->emailAddress = $this->finalData['allVisitors'][$index][$innerIndex]['email_address'];
         $this->mobileNumber = $this->finalData['allVisitors'][$index][$innerIndex]['mobile_number'];
         $this->nationality = $this->finalData['allVisitors'][$index][$innerIndex]['nationality'];
-        $this->country = $this->finalData['allVisitors'][$index][$innerIndex]['country'];
-        $this->city = $this->finalData['allVisitors'][$index][$innerIndex]['city'];
-        $this->companyName = $this->finalData['allVisitors'][$index][$innerIndex]['company_name'];
         $this->jobTitle = $this->finalData['allVisitors'][$index][$innerIndex]['job_title'];
+        $this->badgeType = $this->finalData['allVisitors'][$index][$innerIndex]['badge_type'];
+        $this->promoCode = $this->finalData['allVisitors'][$index][$innerIndex]['pcode_used'];
+        $this->promoCodeDiscount = $this->finalData['allVisitors'][$index][$innerIndex]['discount'];
+        $this->discountType = $this->finalData['allVisitors'][$index][$innerIndex]['discount_type'];
         $this->type = $this->finalData['allVisitors'][$index][$innerIndex]['visitorType'];
+
+
+        if ($this->discountType == "fixed") {
+            $this->promoCodeSuccess = "Fixed rate applied";
+        } else {
+            if ($this->promoCode != null) {
+                $this->promoCodeSuccess = $this->promoCodeDiscount;
+            }
+        }
+
         $this->showVisitorModal = true;
     }
 
@@ -167,6 +196,72 @@ class VisitorRegistrantDetails extends Component
         $this->showVisitorModal = false;
         $this->resetEditModalFields();
     }
+
+    public function applyPromoCode()
+    {
+        $this->validate([
+            'badgeType' => 'required',
+            'promoCode' => 'required',
+        ], [
+            'badgeType.required' => 'Please choose your registration type first',
+            'promoCode.required' => 'Promo code is required',
+        ]);
+
+        $promoCode = PromoCodes::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->where('active', true)->where('promo_code', $this->promoCode)->first();
+
+        $promoCodeChecker = true;
+
+        if ($promoCode != null) {
+            if ($promoCode->badge_type == $this->badgeType) {
+                $promoCodeChecker = true;
+            } else {
+                $promoCodeAdditionalBadgeType = PromoCodeAddtionalBadgeTypes::where('event_id', $this->eventId)->where('promo_code_id', $promoCode->id)->where('badge_type', $this->badgeType)->first();
+
+                if ($promoCodeAdditionalBadgeType != null) {
+                    $promoCodeChecker = true;
+                } else {
+                    $promoCodeChecker = false;
+                }
+            }
+        } else {
+            $promoCodeChecker = false;
+        }
+
+        if ($promoCodeChecker) {
+            if ($promoCode->total_usage < $promoCode->number_of_codes) {
+                $validityDateTime = Carbon::parse($promoCode->validity);
+                if (Carbon::now()->lt($validityDateTime)) {
+                    $this->promoCodeFail = null;
+                    $this->discountType = $promoCode->discount_type;
+                    $this->promoCodeDiscount = $promoCode->discount;
+
+                    if ($promoCode->discount_type == "percentage") {
+                        $this->promoCodeSuccess = "$promoCode->discount% discount";
+                    } else if ($promoCode->discount_type == "price") {
+                        $this->promoCodeSuccess = "$$promoCode->discount discount";
+                    } else {
+                        $this->promoCodeSuccess = "Fixed rate applied";
+                    }
+                } else {
+                    $this->promoCodeFail = "Code is expired already";
+                }
+            } else {
+                $this->promoCodeFail = "Code has reached its capacity";
+            }
+        } else {
+            $this->promoCodeFail = "Invalid Code";
+        }
+    }
+
+    public function removePromoCode()
+    {
+        $this->promoCode = null;
+        $this->promoCodeDiscount = null;
+        $this->discountType = null;
+        $this->promoCodeFail = null;
+        $this->promoCodeSuccess = null;
+    }
+
 
     public function resetEditModalFields()
     {
@@ -181,11 +276,121 @@ class VisitorRegistrantDetails extends Component
         $this->emailAddress = null;
         $this->mobileNumber = null;
         $this->nationality = null;
-        $this->country = null;
-        $this->city = null;
-        $this->companyName = null;
         $this->jobTitle = null;
+        $this->badgeType = null;
+        $this->promoCode = null;
+        $this->promoCodeDiscount = null;
+        $this->discountType = null;
+        $this->promoCodeSuccess = null;
+        $this->promoCodeFail = null;
         $this->type = null;
+    }
+
+
+    public function updateCompanyDetails()
+    {
+        $this->validate([
+            'visitorPassType' => 'required',
+            'companyName' => 'required',
+            'companySector' => 'required',
+            'companyAddress' => 'required',
+            'companyCountry' => 'required',
+            'companyCity' => 'required',
+            'companyMobileNumber' => 'required',
+        ]);
+
+        if ($this->finalData['rate_type'] == "standard" || $this->finalData['rate_type'] == "Standard") {
+            if ($this->visitorPassType == "fullMember") {
+                $this->rateTypeString = "Full member standard rate";
+            } else if ($this->visitorPassType == "member") {
+                $this->rateTypeString = "Member standard rate";
+            } else {
+                $this->rateTypeString = "Non-Member standard rate";
+            }
+        } else {
+            if ($this->visitorPassType == "fullMember") {
+                $this->rateTypeString = "Full member early bird rate";
+            } else if ($this->visitorPassType == "member") {
+                $this->rateTypeString = "Member early bird rate";
+            } else {
+                $this->rateTypeString = "Non-Member early bird rate";
+            }
+        }
+
+        if (trim($this->alternativeCompanyName) == ""  || $this->alternativeCompanyName == null) {
+            $this->alternativeCompanyName = null;
+        }
+
+        MainVisitors::find($this->finalData['mainVisitorId'])->fill([
+            'pass_type' => $this->visitorPassType,
+            'rate_type_string' => $this->rateTypeString,
+            'company_name' => $this->companyName,
+            'alternative_company_name' => $this->alternativeCompanyName,
+            'company_sector' => $this->companySector,
+            'company_address' => $this->companyAddress,
+            'company_country' => $this->companyCountry,
+            'company_city' => $this->companyCity,
+            'company_telephone_number' => $this->companyLandlineNumber,
+            'company_mobile_number' => $this->companyMobileNumber,
+            'assistant_email_address' => $this->assistantEmailAddress,
+        ])->save();
+
+        $this->finalData['rate_type_string'] = $this->rateTypeString;
+        $this->finalData['pass_type'] = $this->visitorPassType;
+        $this->finalData['company_name'] = $this->companyName;
+        $this->finalData['alternative_company_name'] = $this->alternativeCompanyName;
+        $this->finalData['company_sector'] = $this->companySector;
+        $this->finalData['company_address'] = $this->companyAddress;
+        $this->finalData['company_country'] = $this->companyCountry;
+        $this->finalData['company_city'] = $this->companyCity;
+        $this->finalData['company_telephone_number'] = $this->companyLandlineNumber;
+        $this->finalData['company_mobile_number'] = $this->companyMobileNumber;
+        $this->finalData['assistant_email_address'] = $this->assistantEmailAddress;
+
+        $this->calculateTotal();
+
+        $this->resetEditCompanyModalFields();
+        $this->showCompanyModal = false;
+    }
+
+    public function openEditCompanyDetailsModal()
+    {
+        // dd($this->finalData);
+        $this->members = Members::where('active', true)->get();
+
+        $this->visitorPassType = $this->finalData['pass_type'];
+        $this->companyName = $this->finalData['company_name'];
+        $this->alternativeCompanyName = $this->finalData['alternative_company_name'];
+        $this->companySector = $this->finalData['company_sector'];
+        $this->companyAddress = $this->finalData['company_address'];
+        $this->companyCountry = $this->finalData['company_country'];
+        $this->companyCity = $this->finalData['company_city'];
+        $this->companyLandlineNumber = $this->finalData['company_telephone_number'];
+        $this->companyMobileNumber = $this->finalData['company_mobile_number'];
+        $this->assistantEmailAddress = $this->finalData['assistant_email_address'];
+
+        $this->showCompanyModal = true;
+    }
+
+    public function closeEditCompanyDetailsModal()
+    {
+        $this->resetEditCompanyModalFields();
+        $this->showCompanyModal = false;
+    }
+
+    public function resetEditCompanyModalFields()
+    {
+        $this->members = null;
+        $this->visitorPassType = null;
+        $this->companyName = null;
+        $this->alternativeCompanyName = null;
+        $this->companySector = null;
+        $this->companyAddress = null;
+        $this->companyCountry = null;
+        $this->companyCity = null;
+        $this->companyLandlineNumber = null;
+        $this->companyMobileNumber = null;
+        $this->assistantEmailAddress = null;
     }
 
 
@@ -219,7 +424,11 @@ class VisitorRegistrantDetails extends Component
 
     public function markAsPaid()
     {
-        $paymentStatus = "paid";
+        if ($this->finalData['invoiceData']['total_amount'] == 0) {
+            $paymentStatus = "free";
+        } else {
+            $paymentStatus = "paid";
+        }
 
         MainVisitors::find($this->finalData['mainVisitorId'])->fill([
             'registration_status' => "confirmed",
@@ -234,10 +443,35 @@ class VisitorRegistrantDetails extends Component
         $eventFormattedData = Carbon::parse($this->event->event_start_date)->format('d') . '-' . Carbon::parse($this->event->event_end_date)->format('d M Y');
         $invoiceLink = env('APP_URL') . '/' . $this->event->category . '/' . $this->event->id . '/view-invoice/' . $this->finalData['mainVisitorId'];
 
+        $assistantDetails1 = [];
+        $assistantDetails2 = [];
+
         foreach ($this->finalData['allVisitors'] as $visitorsIndex => $visitors) {
             foreach ($visitors as $innerVisitor) {
                 if (end($visitors) == $innerVisitor) {
                     if (!$innerVisitor['visitor_cancelled']) {
+
+                        $amountPaid = $this->finalData['invoiceData']['unit_price'];
+
+                        $promoCode = PromoCodes::where('event_id', $this->event->id)->where('promo_code', $innerVisitor['pcode_used'])->first();
+
+                        if ($promoCode != null) {
+                            if ($promoCode->discount_type == "percentage") {
+                                $amountPaid = $this->finalData['invoiceData']['unit_price'] - ($this->finalData['invoiceData']['unit_price'] * ($promoCode->discount / 100));
+                            } else if ($promoCode->discount_type == "price") {
+                                $amountPaid = $this->finalData['invoiceData']['unit_price'] - $promoCode->discount;
+                            } else {
+                                $amountPaid = $promoCode->new_rate;
+                            }
+                        }
+
+                        if ($this->finalData['alternative_company_name'] == null) {
+                            $finalCompanyName = $this->finalData['company_name'];
+                        } else {
+                            $finalCompanyName = $this->finalData['alternative_company_name'];
+                        }
+
+
                         $details1 = [
                             'name' => $innerVisitor['name'],
                             'eventLink' => $this->event->link,
@@ -247,13 +481,11 @@ class VisitorRegistrantDetails extends Component
                             'eventCategory' => $this->event->category,
                             'eventYear' => $this->event->year,
 
-                            'nationality' => $innerVisitor['nationality'],
-                            'country' => $innerVisitor['country'],
-                            'city' => $innerVisitor['city'],
-                            'amountPaid' => $this->finalData['invoiceData']['unit_price'],
+                            'jobTitle' => $innerVisitor['job_title'],
+                            'companyName' => $finalCompanyName,
+                            'amountPaid' => $amountPaid,
                             'transactionId' => $innerVisitor['transactionId'],
                             'invoiceLink' => $invoiceLink,
-
                             'badgeLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-badge" . "/" . $innerVisitor['visitorType'] . "/" . $innerVisitor['visitorId'],
                         ];
 
@@ -270,12 +502,16 @@ class VisitorRegistrantDetails extends Component
                             'invoiceLink' => $invoiceLink,
                         ];
 
-                        try {
-                            Mail::to($innerVisitor['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaid($details1));
-                        } catch (\Exception $e) {
-                            Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaid($details1));
+                        if ($visitorsIndex == 0) {
+                            $assistantDetails1 = $details1;
+                            $assistantDetails2 = $details2;
                         }
 
+                        try {
+                            Mail::to($innerVisitor['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaid($details1, $this->sendInvoice));
+                        } catch (\Exception $e) {
+                            Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaid($details1, $this->sendInvoice));
+                        }
                         if ($this->sendInvoice) {
                             if ($visitorsIndex == 0) {
                                 try {
@@ -286,6 +522,23 @@ class VisitorRegistrantDetails extends Component
                             }
                         }
                     }
+                }
+            }
+        }
+
+        $assistantDetails1['amountPaid'] = $this->finalData['invoiceData']['total_amount'];
+
+        if ($this->finalData['assistant_email_address'] != null) {
+            try {
+                Mail::to($this->finalData['assistant_email_address'])->send(new RegistrationPaid($assistantDetails1, $this->sendInvoice));
+            } catch (\Exception $e) {
+                Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaid($assistantDetails1, $this->sendInvoice));
+            }
+            if ($this->sendInvoice) {
+                try {
+                    Mail::to($this->finalData['assistant_email_address'])->send(new RegistrationPaymentConfirmation($assistantDetails2, $this->sendInvoice));
+                } catch (\Exception $e) {
+                    Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaymentConfirmation($assistantDetails2, $this->sendInvoice));
                 }
             }
         }
@@ -309,7 +562,23 @@ class VisitorRegistrantDetails extends Component
 
     public function checkUnitPrice()
     {
-        return $this->event->std_nmember_rate;
+        if ($this->finalData['rate_type'] == "standard" || $this->finalData['rate_type'] == "Standard") {
+            if ($this->finalData['pass_type'] == "fullMember") {
+                return $this->event->std_full_member_rate;
+            } else if ($this->finalData['pass_type'] == "member") {
+                return $this->event->std_member_rate;
+            } else {
+                return $this->event->std_nmember_rate;
+            }
+        } else {
+            if ($this->finalData['pass_type'] == "fullMember") {
+                return $this->event->eb_full_member_rate;
+            } else if ($this->finalData['pass_type'] == "member") {
+                return $this->event->eb_member_rate;
+            } else {
+                return $this->event->eb_nmember_rate;
+            }
+        }
     }
 
 
@@ -332,18 +601,76 @@ class VisitorRegistrantDetails extends Component
         }
 
         if ($addMainVisitor) {
-            $delegateDescription = "Visitor Registration Fee";
+            $promoCode = PromoCodes::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->where('promo_code', $mainVisitor->pcode_used)->first();
+
+            if ($promoCode != null) {
+                if ($promoCode->badge_type == $mainVisitor->badge_type) {
+                    $promoCodeUsed = $mainVisitor->pcode_used;
+                    $mainDiscount = $promoCode->discount;
+                    $mainDiscountType = $promoCode->discount_type;
+                } else {
+                    $promoCodeAdditionalBadgeType = PromoCodeAddtionalBadgeTypes::where('event_id', $this->eventId)->where('promo_code_id', $promoCode->id)->where('badge_type', $mainVisitor->badge_type)->first();
+
+                    if ($promoCodeAdditionalBadgeType != null) {
+                        $promoCodeUsed = $mainVisitor->pcode_used;
+                        $mainDiscount = $promoCode->discount;
+                        $mainDiscountType = $promoCode->discount_type;
+                    } else {
+                        $promoCodeUsed = null;
+                        $mainDiscount = 0;
+                        $mainDiscountType = null;
+                    }
+                }
+            } else {
+                $promoCodeUsed = null;
+                $mainDiscount = 0;
+                $mainDiscountType = null;
+            }
+
+            if ($mainDiscountType != null) {
+                if ($mainDiscountType == "percentage") {
+
+                    if ($mainDiscount == 100) {
+                        $visitorDescription = "Visitor Registration Fee - Complimentary";
+                    } else if ($mainDiscount > 0 && $mainDiscount < 100) {
+                        $visitorDescription = "Visitor Registration Fee - " . $mainVisitor->rate_type_string . " (" . $mainDiscount . "% discount)";
+                    } else {
+                        $visitorDescription = "Visitor Registration Fee - {$mainVisitor->rate_type_string}";
+                    }
+
+                    $tempTotalUnitPrice = $this->checkUnitPrice();
+                    $tempTotalDiscount = $this->checkUnitPrice() * ($mainDiscount / 100);
+                    $tempTotalNetAmount = $this->checkUnitPrice() - ($this->checkUnitPrice() * ($mainDiscount / 100));
+                } else if ($mainDiscountType == "price") {
+                    $tempTotalUnitPrice = $this->checkUnitPrice();
+                    $tempTotalDiscount = $mainDiscount;
+                    $tempTotalNetAmount = $this->checkUnitPrice() - $mainDiscount;
+                    $visitorDescription = "Visitor Registration Fee - {$mainVisitor->rate_type_string}";
+                } else {
+                    $tempTotalUnitPrice = $promoCode->new_rate;
+                    $tempTotalDiscount = 0;
+                    $tempTotalNetAmount = $promoCode->new_rate;
+                    $visitorDescription = $promoCode->new_rate_description;
+                }
+            } else {
+                $tempTotalUnitPrice = $this->checkUnitPrice();
+                $tempTotalDiscount = 0;
+                $tempTotalNetAmount = $this->checkUnitPrice();
+                $visitorDescription = "Visitor Registration Fee - {$mainVisitor->rate_type_string}";
+            }
 
             array_push($invoiceDetails, [
-                'delegateDescription' => $delegateDescription,
-                'delegateNames' => [
+                'visitorDescription' => $visitorDescription,
+                'visitorNames' => [
                     $mainVisitor->first_name . " " . $mainVisitor->middle_name . " " . $mainVisitor->last_name,
                 ],
-                'badgeType' => null,
+                'badgeType' => $mainVisitor->badge_type,
                 'quantity' => 1,
-                'totalDiscount' => 0,
-                'totalNetAmount' =>  $this->checkUnitPrice(),
-                'promoCodeDiscount' => 0,
+                'totalUnitPrice' => $tempTotalUnitPrice,
+                'totalDiscount' => $tempTotalDiscount,
+                'totalNetAmount' =>  $tempTotalNetAmount,
+                'promoCodeDiscount' => $mainDiscount,
+                'promoCodeUsed' => $promoCodeUsed,
             ]);
         }
 
@@ -365,30 +692,119 @@ class VisitorRegistrantDetails extends Component
 
 
                 if ($addSubVisitor) {
+                    $subPromoCode = PromoCodes::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->where('promo_code', $subVisitor->pcode_used)->first();
+
+                    $checkIfExisting = false;
                     $existingIndex = 0;
-                    if (count($invoiceDetails) == 0) {
-                        array_push($invoiceDetails, [
-                            'delegateDescription' => "Visitor Registration Fee",
-                            'delegateNames' => [
-                                $subVisitor->first_name . " " . $subVisitor->middle_name . " " . $subVisitor->last_name,
-                            ],
-                            'badgeType' => null,
-                            'quantity' => 1,
-                            'totalDiscount' => 0,
-                            'totalNetAmount' =>  $this->checkUnitPrice(),
-                            'promoCodeDiscount' => 0,
-                        ]);
+
+
+                    if ($subPromoCode != null) {
+                        if ($subPromoCode->badge_type == $subVisitor->badge_type) {
+                            $subPromoCodeUsed = $subVisitor->pcode_used;
+                            $subDiscount = $subPromoCode->discount;
+                            $subDiscountType = $subPromoCode->discount_type;
+                        } else {
+                            $subPromoCodeAdditionalBadgeType = PromoCodeAddtionalBadgeTypes::where('event_id', $this->eventId)->where('promo_code_id', $subPromoCode->id)->where('badge_type', $subVisitor->badge_type)->first();
+
+                            if ($subPromoCodeAdditionalBadgeType != null) {
+                                $subPromoCodeUsed = $subVisitor->pcode_used;
+                                $subDiscount = $subPromoCode->discount;
+                                $subDiscountType = $subPromoCode->discount_type;
+                            } else {
+                                $subPromoCodeUsed = null;
+                                $subDiscount = 0;
+                                $subDiscountType = null;
+                            }
+                        }
                     } else {
+                        $subPromoCodeUsed = null;
+                        $subDiscount = 0;
+                        $subDiscountType = null;
+                    }
+
+                    for ($j = 0; $j < count($invoiceDetails); $j++) {
+                        if ($subVisitor->badge_type == $invoiceDetails[$j]['badgeType'] && $subPromoCodeUsed == $invoiceDetails[$j]['promoCodeUsed']) {
+                            $existingIndex = $j;
+                            $checkIfExisting = true;
+                            break;
+                        }
+                    }
+
+                    if ($checkIfExisting) {
                         array_push(
-                            $invoiceDetails[$existingIndex]['delegateNames'],
+                            $invoiceDetails[$existingIndex]['visitorNames'],
                             $subVisitor->first_name . " " . $subVisitor->middle_name . " " . $subVisitor->last_name
                         );
 
                         $quantityTemp = $invoiceDetails[$existingIndex]['quantity'] + 1;
-                        $totalNetAmountTemp = $this->checkUnitPrice() * $quantityTemp;
+
+                        if ($subDiscountType != null) {
+                            if ($subDiscountType == "percentage") {
+                                $totalDiscountTemp = ($this->checkUnitPrice() * ($invoiceDetails[$existingIndex]['promoCodeDiscount'] / 100)) * $quantityTemp;
+                                $totalNetAmountTemp = ($this->checkUnitPrice() * $quantityTemp) - $totalDiscountTemp;
+                            } else if ($subDiscountType == "price") {
+                                $totalDiscountTemp = $invoiceDetails[$existingIndex]['promoCodeDiscount'] * $quantityTemp;
+                                $totalNetAmountTemp = ($this->checkUnitPrice() * $quantityTemp) - $totalDiscountTemp;
+                            } else {
+                                $totalDiscountTemp = 0;
+                                $totalNetAmountTemp = $subPromoCode->new_rate * $quantityTemp;
+                            }
+                        } else {
+                            $totalDiscountTemp = $invoiceDetails[$existingIndex]['promoCodeDiscount'];
+                            $totalNetAmountTemp = ($this->checkUnitPrice() * $quantityTemp) - $totalDiscountTemp;
+                        }
+
 
                         $invoiceDetails[$existingIndex]['quantity'] = $quantityTemp;
+                        $invoiceDetails[$existingIndex]['totalDiscount'] = $totalDiscountTemp;
                         $invoiceDetails[$existingIndex]['totalNetAmount'] = $totalNetAmountTemp;
+                    } else {
+                        if ($subDiscountType != null) {
+                            if ($subDiscountType == "percentage") {
+                                if ($subDiscount == 100) {
+                                    $subVisitorDescription = "Visitor Registration Fee - Complimentary";
+                                } else if ($subDiscount > 0 && $subDiscount < 100) {
+                                    $subVisitorDescription = "Visitor Registration Fee - " . $mainVisitor->rate_type_string . " (" . $subDiscount . "% discount)";
+                                } else {
+                                    $subVisitorDescription = "Visitor Registration Fee - {$mainVisitor->rate_type_string}";
+                                }
+
+                                $tempSubTotalUnitPrice = $this->checkUnitPrice();
+                                $tempSubTotalDiscount = $this->checkUnitPrice() * ($subDiscount / 100);
+                                $tempSubTotalNetAmount = $this->checkUnitPrice() - ($this->checkUnitPrice() * ($subDiscount / 100));
+                            } else if ($subDiscountType == "price") {
+                                $subVisitorDescription = "Visitor Registration Fee - {$mainVisitor->rate_type_string}";
+
+                                $tempSubTotalUnitPrice = $this->checkUnitPrice();
+                                $tempSubTotalDiscount = $subDiscount;
+                                $tempSubTotalNetAmount = $this->checkUnitPrice() - $subDiscount;
+                            } else {
+                                $subVisitorDescription = $subPromoCode->new_rate_description;
+
+                                $tempSubTotalUnitPrice = $subPromoCode->new_rate;
+                                $tempSubTotalDiscount = 0;
+                                $tempSubTotalNetAmount = $subPromoCode->new_rate;
+                            }
+                        } else {
+                            $subVisitorDescription = "Visitor Registration Fee - {$mainVisitor->rate_type_string}";
+                            $tempSubTotalUnitPrice = $this->checkUnitPrice();
+                            $tempSubTotalDiscount = 0;
+                            $tempSubTotalNetAmount = $this->checkUnitPrice();
+                        }
+
+                        array_push($invoiceDetails, [
+                            'visitorDescription' => $subVisitorDescription,
+                            'visitorNames' => [
+                                $subVisitor->first_name . " " . $subVisitor->middle_name . " " . $subVisitor->last_name,
+                            ],
+                            'badgeType' => $subVisitor->badge_type,
+                            'quantity' => 1,
+                            'totalUnitPrice' => $tempSubTotalUnitPrice,
+                            'totalDiscount' => $tempSubTotalDiscount,
+                            'totalNetAmount' =>  $tempSubTotalNetAmount,
+                            'promoCodeDiscount' => $subDiscount,
+                            'promoCodeUsed' => $subPromoCodeUsed,
+                        ]);
                     }
                 }
             }
@@ -469,10 +885,34 @@ class VisitorRegistrantDetails extends Component
             'registration_confirmation_sent_datetime' => Carbon::now(),
         ])->save();
 
+        $assistantDetails1 = [];
+        $assistantDetails2 = [];
+
         foreach ($this->finalData['allVisitors'] as $visitorsIndex => $visitors) {
             foreach ($visitors as $innerVisitor) {
                 if (end($visitors) == $innerVisitor) {
                     if (!$innerVisitor['visitor_cancelled']) {
+
+                        $amountPaid = $this->finalData['invoiceData']['unit_price'];
+
+                        $promoCode = PromoCodes::where('event_id', $this->event->id)->where('promo_code', $innerVisitor['pcode_used'])->first();
+
+                        if ($promoCode != null) {
+                            if ($promoCode->discount_type == "percentage") {
+                                $amountPaid = $this->finalData['invoiceData']['unit_price'] - ($this->finalData['invoiceData']['unit_price'] * ($promoCode->discount / 100));
+                            } else if ($promoCode->discount_type == "price") {
+                                $amountPaid = $this->finalData['invoiceData']['unit_price'] - $promoCode->discount;
+                            } else {
+                                $amountPaid = $promoCode->new_rate;
+                            }
+                        }
+
+                        if ($this->finalData['alternative_company_name'] == null) {
+                            $finalCompanyName = $this->finalData['company_name'];
+                        } else {
+                            $finalCompanyName = $this->finalData['alternative_company_name'];
+                        }
+
                         $details1 = [
                             'name' => $innerVisitor['name'],
                             'eventLink' => $this->event->link,
@@ -482,14 +922,12 @@ class VisitorRegistrantDetails extends Component
                             'eventCategory' => $this->event->category,
                             'eventYear' => $this->event->year,
 
-                            'nationality' => $innerVisitor['nationality'],
-                            'country' => $innerVisitor['country'],
-                            'city' => $innerVisitor['city'],
-                            'amountPaid' => $this->finalData['invoiceData']['unit_price'],
+                            'jobTitle' => $innerVisitor['job_title'],
+                            'companyName' => $finalCompanyName,
+                            'amountPaid' => $amountPaid,
                             'transactionId' => $innerVisitor['transactionId'],
                             'invoiceLink' => $invoiceLink,
                             'earlyBirdValidityDate' => $earlyBirdValidityDate->format('jS F'),
-
                             'badgeLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-badge" . "/" . $innerVisitor['visitorType'] . "/" . $innerVisitor['visitorId'],
                         ];
 
@@ -506,11 +944,25 @@ class VisitorRegistrantDetails extends Component
                             'invoiceLink' => $invoiceLink,
                         ];
 
+
+                        if ($visitorsIndex == 0) {
+                            $assistantDetails1 = $details1;
+                            $assistantDetails2 = $details2;
+                        }
+
                         if ($this->finalData['payment_status'] == "unpaid") {
-                            try {
-                                Mail::to($innerVisitor['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationUnpaid($details1, $this->sendInvoice));
-                            } catch (\Exception $e) {
-                                Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationUnpaid($details1, $this->sendInvoice));
+                            if ($amountPaid == 0) {
+                                try {
+                                    Mail::to($innerVisitor['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationFree($details1, $this->sendInvoice));
+                                } catch (\Exception $e) {
+                                    Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationFree($details1, $this->sendInvoice));
+                                }
+                            } else {
+                                try {
+                                    Mail::to($innerVisitor['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationUnpaid($details1, $this->sendInvoice));
+                                } catch (\Exception $e) {
+                                    Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationUnpaid($details1, $this->sendInvoice));
+                                }
                             }
                         } else if ($this->finalData['payment_status'] == "free" && $this->finalData['registration_status'] == "pending") {
                             try {
@@ -534,6 +986,37 @@ class VisitorRegistrantDetails extends Component
                                 }
                             }
                         }
+                    }
+                }
+            }
+        }
+
+        $assistantDetails1['amountPaid'] = $this->finalData['invoiceData']['total_amount'];
+
+        if ($this->finalData['assistant_email_address'] != null) {
+            if ($this->finalData['payment_status'] == "unpaid") {
+                try {
+                    Mail::to($this->finalData['assistant_email_address'])->send(new RegistrationUnpaid($assistantDetails1, $this->sendInvoice));
+                } catch (\Exception $e) {
+                    Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationUnpaid($assistantDetails1, $this->sendInvoice));
+                }
+            } else if ($this->finalData['payment_status'] == "free" && $this->finalData['registration_status'] == "pending") {
+                try {
+                    Mail::to($this->finalData['assistant_email_address'])->send(new RegistrationFree($assistantDetails1, $this->sendInvoice));
+                } catch (\Exception $e) {
+                    Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationFree($assistantDetails1, $this->sendInvoice));
+                }
+            } else {
+                try {
+                    Mail::to($this->finalData['assistant_email_address'])->send(new RegistrationPaid($assistantDetails1, $this->sendInvoice));
+                } catch (\Exception $e) {
+                    Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaid($assistantDetails1, $this->sendInvoice));
+                }
+                if ($this->sendInvoice) {
+                    try {
+                        Mail::to($this->finalData['assistant_email_address'])->send(new RegistrationPaymentConfirmation($assistantDetails2, $this->sendInvoice));
+                    } catch (\Exception $e) {
+                        Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaymentConfirmation($assistantDetails2, $this->sendInvoice));
                     }
                 }
             }
@@ -564,23 +1047,32 @@ class VisitorRegistrantDetails extends Component
         $invoiceLink = env('APP_URL') . '/' . $this->eventCategory . '/' . $this->eventId . '/view-invoice/' . $this->registrantId;
 
         foreach ($this->finalData['allVisitors'] as $visitors) {
-            foreach ($visitors as $innerDelegate) {
-                if (end($visitors) == $innerDelegate) {
-                    $details = [
-                        'name' => $innerDelegate['name'],
-                        'eventName' => $this->event->name,
-                        'eventLink' => $this->event->link,
-                        'eventCategory' => $this->event->category,
-                        'invoiceLink' => $invoiceLink,
-                        'eventYear' => $this->event->year,
-                    ];
-
-                    try {
-                        Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaymentReminder($details));
-                    } catch (\Exception $e) {
-                        Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaymentReminder($details));
+            foreach ($visitors as $innerVisitor) {
+                if (end($visitors) == $innerVisitor) {
+                    if (!$innerVisitor['visitor_cancelled']) {
+                        $details = [
+                            'name' => $innerVisitor['name'],
+                            'eventName' => $this->event->name,
+                            'eventCategory' => $this->event->category,
+                            'eventLink' => $this->event->link,
+                            'invoiceLink' => $invoiceLink,
+                            'eventYear' => $this->event->year,
+                        ];
+                        try {
+                            Mail::to($innerVisitor['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaymentReminder($details, $this->sendInvoice));
+                        } catch (\Exception $e) {
+                            Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaymentReminder($details, $this->sendInvoice));
+                        }
                     }
                 }
+            }
+        }
+
+        if ($this->finalData['assistant_email_address'] != null) {
+            try {
+                Mail::to($this->finalData['assistant_email_address'])->send(new RegistrationPaymentReminder($details, $this->sendInvoice));
+            } catch (\Exception $e) {
+                Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaymentReminder($details, $this->sendInvoice));
             }
         }
 
@@ -707,8 +1199,8 @@ class VisitorRegistrantDetails extends Component
                         'replaceEmailAddress' => 'required|email',
                         'replaceNationality' => 'required',
                         'replaceMobileNumber' => 'required',
-                        'replaceCountry' => 'required',
-                        'replaceCity' => 'required',
+                        'replaceJobTitle' => 'required',
+                        'replaceBadgeType' => 'required',
                     ],
                     [
                         'replaceFirstName.required' => "First name is required",
@@ -717,8 +1209,8 @@ class VisitorRegistrantDetails extends Component
                         'replaceEmailAddress.email' => "Email address must be a valid email",
                         'replaceNationality.required' => "Nationality is required",
                         'replaceMobileNumber.required' => "Mobile number is required",
-                        'replaceCountry.required' => "Country is required",
-                        'replaceCity.required' => "City is required",
+                        'replaceJobTitle.required' => "Job title is required",
+                        'replaceBadgeType.required' => "Registration type is required",
                     ]
                 );
 
@@ -815,19 +1307,63 @@ class VisitorRegistrantDetails extends Component
 
     public function addReplaceVisitor()
     {
+        if ($this->replacePromoCodeSuccess != null) {
+            PromoCodes::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->where('active', true)->where('promo_code', $this->replacePromoCode)->increment('total_usage');
+
+            $subPromoCode = PromoCodes::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->where('promo_code', $this->replacePromoCode)->where('badge_type', $this->replaceBadgeType)->first();
+
+            if ($subPromoCode != null) {
+                $subChecker = false;
+
+                if($subPromoCode->badge_type == $this->replaceBadgeType){
+                    $subChecker = true;
+                } else {
+                    $promoCodeAdditionalBadgeType = PromoCodeAddtionalBadgeTypes::where('event_id', $this->eventId)->where('promo_code_id', $subPromoCode->id)->where('badge_type', $this->replaceBadgeType)->first();
+
+                    if($promoCodeAdditionalBadgeType != null){
+                        $subChecker = true;
+                    } else {
+                        $subChecker = false;
+                    }
+                }
+
+                if($subChecker){
+                    $subDiscountType = $subPromoCode->discount_type;
+
+                    if($subPromoCode->discount_type == 'percentage'){
+                        $subDiscount = $subPromoCode->discount;
+                    } else if($subPromoCode->discount_type == 'price'){
+                        $subDiscount = $subPromoCode->discount;
+                    } else {
+                        $subDiscount = 0;
+                    }
+                } else {
+                    $subDiscount = 0;
+                    $subDiscountType = null;
+                }
+            } else {
+                $subDiscount = 0;
+                $subDiscountType = null;
+            }
+        } else {
+            $this->replacePromoCode = null;
+            $subDiscount = null;
+            $subDiscountType = null;
+        }
+
+
         $replacedVisitor = AdditionalVisitors::create([
             'main_visitor_id' => $this->finalData['allVisitors'][$this->replaceVisitorIndex][$this->replaceVisitorInnerIndex]['mainVisitorId'],
             'salutation' => $this->replaceSalutation,
             'first_name' => $this->replaceFirstName,
             'middle_name' => $this->replaceMiddleName,
             'last_name' => $this->replaceLastName,
-            'email_address' => $this->replaceEmailAddress,
-            'mobile_number' => $this->replaceMobileNumber,
-            'nationality' => $this->replaceNationality,
-            'country' => $this->replaceCountry,
-            'city' => $this->replaceCity,
-            'company_name' => $this->replaceCompanyName,
             'job_title' => $this->replaceJobTitle,
+            'email_address' => $this->replaceEmailAddress,
+            'nationality' => $this->replaceNationality,
+            'mobile_number' => $this->replaceMobileNumber,
+            'badge_type' => $this->replaceBadgeType,
+            'pcode_used' => $this->replacePromoCode,
 
             'visitor_replaced_type' => $this->finalData['allVisitors'][$this->replaceVisitorIndex][$this->replaceVisitorInnerIndex]['visitor_replaced_type'],
             'visitor_replaced_from_id' => $this->finalData['allVisitors'][$this->replaceVisitorIndex][$this->replaceVisitorInnerIndex]['visitorId'],
@@ -861,13 +1397,14 @@ class VisitorRegistrantDetails extends Component
             'first_name' => $this->replaceFirstName,
             'middle_name' => $this->replaceMiddleName,
             'last_name' => $this->replaceLastName,
-            'email_address' => $this->replaceEmailAddress,
-            'mobile_number' => $this->replaceMobileNumber,
-            'nationality' => $this->replaceNationality,
-            'country' => $this->replaceCountry,
-            'city' => $this->replaceCity,
-            'company_name' => $this->replaceCompanyName,
             'job_title' => $this->replaceJobTitle,
+            'email_address' => $this->replaceEmailAddress,
+            'nationality' => $this->replaceNationality,
+            'mobile_number' => $this->replaceMobileNumber,
+            'badge_type' => $this->replaceBadgeType,
+            'pcode_used' => $this->replacePromoCode,
+            'discount' => $subDiscount,
+            'discount_type' => $subDiscountType,
 
             'is_replacement' => true,
             'visitor_cancelled' => false,
@@ -920,6 +1457,72 @@ class VisitorRegistrantDetails extends Component
     }
 
 
+    public function replaceApplyPromoCode()
+    {
+        $this->validate([
+            'replaceBadgeType' => 'required',
+            'replacePromoCode' => 'required',
+        ], [
+            'replaceBadgeType.required' => 'Please choose your registration type first',
+            'replacePromoCode.required' => 'Promo code is required',
+        ]);
+
+        $promoCode = PromoCodes::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->where('active', true)->where('promo_code', $this->replacePromoCode)->first();
+
+        $promoCodeChecker = true;
+
+        if ($promoCode != null) {
+            if ($promoCode->badge_type == $this->replaceBadgeType) {
+                $promoCodeChecker = true;
+            } else {
+                $promoCodeAdditionalBadgeType = PromoCodeAddtionalBadgeTypes::where('event_id', $this->eventId)->where('promo_code_id', $promoCode->id)->where('badge_type', $this->replaceBadgeType)->first();
+
+                if ($promoCodeAdditionalBadgeType != null) {
+                    $promoCodeChecker = true;
+                } else {
+                    $promoCodeChecker = false;
+                }
+            }
+        } else {
+            $promoCodeChecker = false;
+        }
+
+
+        if ($promoCodeChecker) {
+            if ($promoCode->total_usage < $promoCode->number_of_codes) {
+                $validityDateTime = Carbon::parse($promoCode->validity);
+                if (Carbon::now()->lt($validityDateTime)) {
+                    $this->replacePromoCodeFail = null;
+                    $this->replacePromoCodeDiscount = $promoCode->discount;
+                    $this->replaceDiscountType = $promoCode->discount_type;
+
+                    if ($promoCode->discount_type == "percentage") {
+                        $this->replacePromoCodeSuccess = "$promoCode->discount% discount";
+                    } else if ($promoCode->discount_type == "price") {
+                        $this->replacePromoCodeSuccess = "$$promoCode->discount discount";
+                    } else {
+                        $this->promoCodeSuccess = "Fixed rate applied";
+                    }
+                } else {
+                    $this->replacePromoCodeFail = "Code is expired already";
+                }
+            } else {
+                $this->replacePromoCodeFail = "Code has reached its capacity";
+            }
+        } else {
+            $this->replacePromoCodeFail = "Invalid Code";
+        }
+    }
+
+    public function replaceRemovePromoCode()
+    {
+        $this->replacePromoCode = null;
+        $this->replacePromoCodeDiscount = null;
+        $this->replaceDiscountType = null;
+        $this->replacePromoCodeFail = null;
+        $this->replacePromoCodeSuccess = null;
+    }
+
 
     public function removeReplaceData()
     {
@@ -934,10 +1537,14 @@ class VisitorRegistrantDetails extends Component
         $this->replaceEmailAddress = null;
         $this->replaceMobileNumber = null;
         $this->replaceNationality = null;
-        $this->replaceCountry = null;
-        $this->replaceCity = null;
-        $this->replaceCompanyName = null;
         $this->replaceJobTitle = null;
+        $this->replaceBadgeType = null;
+
+        $this->replacePromoCode = null;
+        $this->replacePromoCodeDiscount = null;
+        $this->replaceDiscountType = null;
+        $this->replacePromoCodeFail = null;
+        $this->replacePromoCodeSuccess = null;
 
         $this->replaceEmailAlreadyUsedError = null;
     }
