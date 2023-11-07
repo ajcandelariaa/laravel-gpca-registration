@@ -10,6 +10,7 @@ use App\Models\EventRegistrationType;
 use App\Models\MainDelegate;
 use App\Models\MainVisitor;
 use App\Models\ScannedDelegate;
+use App\Models\ScannedVisitor;
 use App\Models\Transaction;
 use App\Models\VisitorTransaction;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -304,7 +305,7 @@ class DelegateController extends Controller
     public function scannedDelegateListView($eventCategory, $eventId)
     {
         if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {
-            if($eventCategory == "AFV"){
+            if ($eventCategory == "AFV") {
                 $pageTitle = "Scanned visitors";
             } else {
                 $pageTitle = "Scanned delegates";
@@ -326,49 +327,98 @@ class DelegateController extends Controller
     public function delegateDetailScanBadge($eventCategory, $eventId, $delegateType, $delegateId)
     {
         if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {
-            $tempDelegate = array();
+            if ($eventCategory == "AFV") {
+                $tempVisitor = array();
+                $visitorId = $delegateId;
+                $visitorType = $delegateType;
 
-            if ($delegateType == "main") {
-                $tempDelegate = MainDelegate::where('id', $delegateId)->first();
-            } else {
-                $tempDelegate = AdditionalDelegate::where('id', $delegateId)->first();
-            }
-
-            if ($tempDelegate == null) {
-                return view('admin.events.scanned-delegate.scanned_feedback', [
-                    "pageTitle" => "Scanned delegate",
-                    "eventCategory" => $eventCategory,
-                    "eventId" => $eventId,
-                    "delegateType" => $delegateType,
-                    "delegateId" => $delegateId,
-                    "status" => "Failed",
-                ]);
-            } else {
-                ScannedDelegate::create([
-                    'event_id' => $eventId,
-                    'event_category' => $eventCategory,
-                    'delegate_id' => $delegateId,
-                    'delegate_type' => $delegateType,
-                    'scanned_date_time' => Carbon::now(),
-                ]);
-
-                if ($delegateType == "main") {
-                    $companyName = $tempDelegate->company_name;
+                if ($visitorType == "main") {
+                    $tempVisitor = MainVisitor::where('id', $visitorId)->first();
                 } else {
-                    $companyName = MainDelegate::where('id', $tempDelegate->main_delegate_id)->value('company_name');
+                    $tempVisitor = AdditionalVisitor::where('id', $visitorId)->first();
                 }
 
-                return view('admin.events.scanned-delegate.scanned_feedback', [
-                    "pageTitle" => "Scanned delegate",
-                    "eventCategory" => $eventCategory,
-                    "eventId" => $eventId,
-                    "delegateType" => $delegateType,
-                    "delegateId" => $delegateId,
-                    "status" => "Success",
-                    "name" => $tempDelegate->salutation . ' ' . $tempDelegate->first_name . ' ' . $tempDelegate->middle_name . ' ' . $tempDelegate->last_name,
-                    "jobTitle" => $tempDelegate->job_title,
-                    "companyName" => $companyName,
-                ]);
+                if ($tempVisitor == null) {
+                    return view('admin.events.scanned-delegate.scanned_feedback', [
+                        "pageTitle" => "Scanned Visitor",
+                        "eventCategory" => $eventCategory,
+                        "eventId" => $eventId,
+                        "delegateType" => $visitorType,
+                        "delegateId" => $visitorId,
+                        "status" => "Failed",
+                    ]);
+                } else {
+                    ScannedVisitor::create([
+                        'event_id' => $eventId,
+                        'event_category' => $eventCategory,
+                        'delegate_id' => $visitorId,
+                        'delegate_type' => $visitorType,
+                        'scanned_date_time' => Carbon::now(),
+                    ]);
+
+                    if ($visitorType == "main") {
+                        $companyName = $tempVisitor->company_name;
+                    } else {
+                        $companyName = MainVisitor::where('id', $tempVisitor->main_visitor_id)->value('company_name');
+                    }
+
+                    return view('admin.events.scanned-delegate.scanned_feedback', [
+                        "pageTitle" => "Scanned Visitor",
+                        "eventCategory" => $eventCategory,
+                        "eventId" => $eventId,
+                        "delegateType" => $visitorType,
+                        "delegateId" => $visitorId,
+                        "status" => "Success",
+                        "name" => $tempVisitor->salutation . ' ' . $tempVisitor->first_name . ' ' . $tempVisitor->middle_name . ' ' . $tempVisitor->last_name,
+                        "jobTitle" => $tempVisitor->job_title,
+                        "companyName" => $companyName,
+                    ]);
+                }
+            } else {
+                $tempDelegate = array();
+
+                if ($delegateType == "main") {
+                    $tempDelegate = MainDelegate::where('id', $delegateId)->first();
+                } else {
+                    $tempDelegate = AdditionalDelegate::where('id', $delegateId)->first();
+                }
+
+                if ($tempDelegate == null) {
+                    return view('admin.events.scanned-delegate.scanned_feedback', [
+                        "pageTitle" => "Scanned delegate",
+                        "eventCategory" => $eventCategory,
+                        "eventId" => $eventId,
+                        "delegateType" => $delegateType,
+                        "delegateId" => $delegateId,
+                        "status" => "Failed",
+                    ]);
+                } else {
+                    ScannedDelegate::create([
+                        'event_id' => $eventId,
+                        'event_category' => $eventCategory,
+                        'delegate_id' => $delegateId,
+                        'delegate_type' => $delegateType,
+                        'scanned_date_time' => Carbon::now(),
+                    ]);
+
+                    if ($delegateType == "main") {
+                        $companyName = $tempDelegate->company_name;
+                    } else {
+                        $companyName = MainDelegate::where('id', $tempDelegate->main_delegate_id)->value('company_name');
+                    }
+
+                    return view('admin.events.scanned-delegate.scanned_feedback', [
+                        "pageTitle" => "Scanned delegate",
+                        "eventCategory" => $eventCategory,
+                        "eventId" => $eventId,
+                        "delegateType" => $delegateType,
+                        "delegateId" => $delegateId,
+                        "status" => "Success",
+                        "name" => $tempDelegate->salutation . ' ' . $tempDelegate->first_name . ' ' . $tempDelegate->middle_name . ' ' . $tempDelegate->last_name,
+                        "jobTitle" => $tempDelegate->job_title,
+                        "companyName" => $companyName,
+                    ]);
+                }
             }
         } else {
             abort(404, 'The URL is incorrect');

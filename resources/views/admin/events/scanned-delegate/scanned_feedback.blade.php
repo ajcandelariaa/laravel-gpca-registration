@@ -10,8 +10,7 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css"
         integrity="sha512-SzlrxWUlpfuzQ+pcUCosxcglQRNAq/DZjVsC0lE40xsADsfeQoEypE+enwcOiGjk/bSuGGKHEyjSoQ1zVisanQ=="
-        crossorigin="anonymous"
-        referrerpolicy="no-referrer" />
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 
 <body class="bg-gray-200 flex items-center justify-center min-h-screen">
@@ -39,8 +38,13 @@
 
             <div class="flex justify-center">
                 <a href="{{ route('admin.event.delegates.detail.view', ['eventCategory' => $eventCategory, 'eventId' => $eventId, 'delegateId' => $delegateId, 'delegateType' => $delegateType]) }}"
-                    class="inline-block bg-registrationPrimaryColorHover text-white px-4 py-1 rounded-lg hover:bg-registrationPrimaryColor mt-6">View
-                    Delegate</a>
+                    class="inline-block bg-registrationPrimaryColorHover text-white px-4 py-1 rounded-lg hover:bg-registrationPrimaryColor mt-6">
+                    @if ($eventCategory == 'AFV')
+                        View Visitor
+                    @else
+                        View Delegate
+                    @endif
+                </a>
             </div>
         @else
             <div class="text-center">
@@ -48,7 +52,13 @@
                     <img src="https://img.icons8.com/external-flaticons-flat-flat-icons/64/external-unauthorized-privacy-flaticons-flat-flat-icons-2.png"
                         class="w-16 mx-auto" />
                 </div>
-                <h1 class="text-2xl font-bold text-gray-800">Delegate not found</h1>
+                <h1 class="text-2xl font-bold text-gray-800">
+                    @if ($eventCategory == 'AFV')
+                        Visitor not found
+                    @else
+                        Delegate not found
+                    @endif
+                </h1>
                 <p class="text-gray-600">Invalid QR Code, please user the correct QR code!</p>
             </div>
         @endif
