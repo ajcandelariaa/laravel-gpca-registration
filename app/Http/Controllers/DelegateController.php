@@ -351,8 +351,8 @@ class DelegateController extends Controller
                     ScannedVisitor::create([
                         'event_id' => $eventId,
                         'event_category' => $eventCategory,
-                        'delegate_id' => $visitorId,
-                        'delegate_type' => $visitorType,
+                        'visitor_id' => $visitorId,
+                        'visitor_type' => $visitorType,
                         'scanned_date_time' => Carbon::now(),
                     ]);
 
