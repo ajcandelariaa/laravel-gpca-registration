@@ -774,15 +774,15 @@ class EventController extends Controller
                         $totalDroppedOut++;
                     }
 
-                    if ($this->checkIfCountryExist($mainVisitor->country, $arrayCountryTotal)) {
+                    if ($this->checkIfCountryExist($mainVisitor->company_country, $arrayCountryTotal)) {
                         foreach ($arrayCountryTotal as $index => $country) {
-                            if ($country['name'] == $mainVisitor->country) {
+                            if ($country['name'] == $mainVisitor->company_country) {
                                 $arrayCountryTotal[$index]['total'] = $country['total'] + 1;
                             }
                         }
                     } else {
                         array_push($arrayCountryTotal, [
-                            'name' => $mainVisitor->country,
+                            'name' => $mainVisitor->company_country,
                             'total' => 1,
                         ]);
                     }
@@ -882,15 +882,15 @@ class EventController extends Controller
 
 
 
-                            if ($this->checkIfCountryExist($mainVisitor->country, $arrayCountryTotal)) {
+                            if ($this->checkIfCountryExist($mainVisitor->company_country, $arrayCountryTotal)) {
                                 foreach ($arrayCountryTotal as $index => $country) {
-                                    if ($country['name'] == $mainVisitor->country) {
+                                    if ($country['name'] == $mainVisitor->company_country) {
                                         $arrayCountryTotal[$index]['total'] = $country['total'] + 1;
                                     }
                                 }
                             } else {
                                 array_push($arrayCountryTotal, [
-                                    'name' => $mainVisitor->country,
+                                    'name' => $mainVisitor->company_country,
                                     'total' => 1,
                                 ]);
                             }
