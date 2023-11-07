@@ -291,7 +291,7 @@
         </div>
 
         <div class="text-registrationPrimaryColor italic text-sm mt-2 w-full sm:w-3/5">
-            If you wish to register more than 5 visitors, please contact our sales team at
+            If you wish to register more than 10 visitors, please contact our sales team at
             forumregistration@gpca.org.ae or call +971 4 5106666 ext. 153
         </div>
     </div>
