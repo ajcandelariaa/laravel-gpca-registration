@@ -3,7 +3,12 @@
     <div class="mt-10 grid grid-cols-addDelegateFeeGrid items-end gap-5">
         <div>
             <div class="text-registrationPrimaryColor">
-                Delegate fee: <span class="text-red-500">*</span>
+                @if ($eventCategory == 'AFV')
+                    Visitor fee:
+                @else
+                    Delegate fee:
+                @endif
+                <span class="text-red-500">*</span>
             </div>
             <div>
                 <input type="text" wire:model="delegateFeeEdit"

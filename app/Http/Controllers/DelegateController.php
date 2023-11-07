@@ -4,11 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\AdditionalDelegate;
+use App\Models\AdditionalVisitor;
 use App\Models\Event;
 use App\Models\EventRegistrationType;
 use App\Models\MainDelegate;
+use App\Models\MainVisitor;
 use App\Models\ScannedDelegate;
 use App\Models\Transaction;
+use App\Models\VisitorTransaction;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
@@ -33,8 +36,15 @@ class DelegateController extends Controller
     public function eventDelegateView($eventCategory, $eventId)
     {
         if (Event::where('category', $eventCategory)->where('id', $eventId)->exists() && $eventCategory != "AFS" && $eventCategory != "RCCA") {
+
+            if ($eventCategory == "AFV") {
+                $pageTitle = "Event Visitors";
+            } else {
+                $pageTitle = "Event Delegates";
+            }
+
             return view('admin.events.delegates.delegates', [
-                "pageTitle" => "Event Delegates",
+                "pageTitle" => $pageTitle,
                 "eventCategory" => $eventCategory,
                 "eventId" => $eventId,
             ]);
@@ -46,115 +56,232 @@ class DelegateController extends Controller
     public function delegateDetailView($eventCategory, $eventId, $delegateType, $delegateId)
     {
         if (Event::where('category', $eventCategory)->where('id', $eventId)->exists() && $eventCategory != "AFS" && $eventCategory != "RCCA") {
-            $finalDelegate = array();
-            $tempDelegate = array();
+            if ($eventCategory == "AFV") {
+                $visitorType = $delegateType;
+                $visitorId = $delegateId;
 
-            if ($delegateType == "main") {
-                $tempDelegate = MainDelegate::where('id', $delegateId)->first();
-            } else {
-                $tempDelegate = AdditionalDelegate::where('id', $delegateId)->first();
-            }
+                $finalVisitor = array();
+                $tempVisitor = array();
 
-            if ($tempDelegate != null) {
-                $eventYear = Event::where('id', $eventId)->value('year');
-
-                foreach (config('app.eventCategories') as $eventCategoryC => $code) {
-                    if ($eventCategory == $eventCategoryC) {
-                        $eventCode = $code;
-                    }
-                }
-
-                if ($delegateType  == "main") {
-
-                    $tempYear = Carbon::parse($tempDelegate->registered_date_time)->format('y');
-                    $transactionId = Transaction::where('event_id', $eventId)->where('delegate_id', $delegateId)->where('delegate_type', "main")->value('id');
-                    $lastDigit = 1000 + intval($transactionId);
-
-                    $finalTransactionId = $eventYear . $eventCode . $lastDigit;
-                    $invoiceNumber = $eventCategory . $tempYear . "/" . $lastDigit;
-
-                    $finalDelegate = [
-                        'eventCategory' => $eventCategory,
-                        'eventId' => $eventId,
-                        'delegateType' => $delegateType,
-                        'delegateId' => $delegateId,
-                        'mainDelegateId' => $delegateId,
-
-                        'salutation' => $tempDelegate->salutation,
-                        'first_name' => $tempDelegate->first_name,
-                        'middle_name' => $tempDelegate->middle_name,
-                        'last_name' => $tempDelegate->last_name,
-                        'email_address' => $tempDelegate->email_address,
-                        'mobile_number' => $tempDelegate->mobile_number,
-                        'nationality' => $tempDelegate->nationality,
-                        'job_title' => $tempDelegate->job_title,
-                        'badge_type' => $tempDelegate->badge_type,
-
-                        'pass_type' => $tempDelegate->pass_type,
-                        'company_name' => $tempDelegate->company_name,
-                        'alternative_company_name' => $tempDelegate->alternative_company_name,
-                        'company_sector' => $tempDelegate->company_sector,
-                        'company_address' => $tempDelegate->company_address,
-                        'company_country' => $tempDelegate->company_country,
-                        'company_city' => $tempDelegate->company_city,
-                        'company_telephone_number' => $tempDelegate->company_telephone_number,
-                        'company_mobile_number' => $tempDelegate->company_mobile_number,
-
-                        'finalTransactionId' => $finalTransactionId,
-                        'invoiceNumber' => $invoiceNumber,
-                    ];
+                if ($visitorType == "main") {
+                    $tempVisitor = MainVisitor::where('id', $visitorId)->first();
                 } else {
-                    $mainDelegateInfo = MainDelegate::where('id', $tempDelegate->main_delegate_id)->first();
-
-                    $tempYear = Carbon::parse($mainDelegateInfo->registered_date_time)->format('y');
-                    $transactionId = Transaction::where('event_id', $eventId)->where('delegate_id', $delegateId)->where('delegate_type', "sub")->value('id');
-                    $lastDigit = 1000 + intval($transactionId);
-
-
-                    $transactionId2 = Transaction::where('event_id', $eventId)->where('delegate_id', $mainDelegateInfo->id)->where('delegate_type', "main")->value('id');
-                    $lastDigit2 = 1000 + intval($transactionId2);
-
-                    $finalTransactionId = $eventYear . $eventCode . $lastDigit;
-                    $invoiceNumber = $eventCategory . $tempYear . "/" . $lastDigit2;
-
-                    $finalDelegate = [
-                        'delegateType' => $delegateType,
-                        'delegateId' => $delegateId,
-                        'mainDelegateId' => $mainDelegateInfo->id,
-
-                        'salutation' => $tempDelegate->salutation,
-                        'first_name' => $tempDelegate->first_name,
-                        'middle_name' => $tempDelegate->middle_name,
-                        'last_name' => $tempDelegate->last_name,
-                        'email_address' => $tempDelegate->email_address,
-                        'mobile_number' => $tempDelegate->mobile_number,
-                        'nationality' => $tempDelegate->nationality,
-                        'job_title' => $tempDelegate->job_title,
-                        'badge_type' => $tempDelegate->badge_type,
-
-                        'pass_type' => $mainDelegateInfo->pass_type,
-                        'company_name' => $mainDelegateInfo->company_name,
-                        'alternative_company_name' => $mainDelegateInfo->alternative_company_name,
-                        'company_sector' => $mainDelegateInfo->company_sector,
-                        'company_address' => $mainDelegateInfo->company_address,
-                        'company_country' => $mainDelegateInfo->company_country,
-                        'company_city' => $mainDelegateInfo->company_city,
-                        'company_telephone_number' => $mainDelegateInfo->company_telephone_number,
-                        'company_mobile_number' => $mainDelegateInfo->company_mobile_number,
-
-                        'finalTransactionId' => $finalTransactionId,
-                        'invoiceNumber' => $invoiceNumber,
-                    ];
+                    $tempVisitor = AdditionalVisitor::where('id', $visitorId)->first();
                 }
 
-                return view('admin.events.delegates.delegates_detail', [
-                    "pageTitle" => "Event Delegate",
-                    "eventCategory" => $eventCategory,
-                    "eventId" => $eventId,
-                    "finalDelegate" => $finalDelegate,
-                ]);
+                if ($tempVisitor != null) {
+                    $eventYear = Event::where('id', $eventId)->value('year');
+
+                    foreach (config('app.eventCategories') as $eventCategoryC => $code) {
+                        if ($eventCategory == $eventCategoryC) {
+                            $eventCode = $code;
+                        }
+                    }
+
+                    if ($visitorType  == "main") {
+                        $tempYear = Carbon::parse($tempVisitor->registered_date_time)->format('y');
+                        $transactionId = VisitorTransaction::where('event_id', $eventId)->where('visitor_id', $visitorId)->where('visitor_type', "main")->value('id');
+                        $lastDigit = 1000 + intval($transactionId);
+
+                        $finalTransactionId = $eventYear . $eventCode . $lastDigit;
+                        $invoiceNumber = $eventCategory . $tempYear . "/" . $lastDigit;
+
+                        $finalVisitor = [
+                            'eventCategory' => $eventCategory,
+                            'eventId' => $eventId,
+                            'visitorType' => $visitorType,
+                            'visitorId' => $visitorId,
+                            'mainVisitorId' => $visitorId,
+
+                            'salutation' => $tempVisitor->salutation,
+                            'first_name' => $tempVisitor->first_name,
+                            'middle_name' => $tempVisitor->middle_name,
+                            'last_name' => $tempVisitor->last_name,
+                            'email_address' => $tempVisitor->email_address,
+                            'mobile_number' => $tempVisitor->mobile_number,
+                            'nationality' => $tempVisitor->nationality,
+                            'job_title' => $tempVisitor->job_title,
+                            'badge_type' => $tempVisitor->badge_type,
+
+                            'pass_type' => $tempVisitor->pass_type,
+                            'company_name' => $tempVisitor->company_name,
+                            'alternative_company_name' => $tempVisitor->alternative_company_name,
+                            'company_sector' => $tempVisitor->company_sector,
+                            'company_address' => $tempVisitor->company_address,
+                            'company_country' => $tempVisitor->company_country,
+                            'company_city' => $tempVisitor->company_city,
+                            'company_telephone_number' => $tempVisitor->company_telephone_number,
+                            'company_mobile_number' => $tempVisitor->company_mobile_number,
+
+                            'finalTransactionId' => $finalTransactionId,
+                            'invoiceNumber' => $invoiceNumber,
+                        ];
+                    } else {
+                        $mainVisitorInfo = MainVisitor::where('id', $tempVisitor->main_visitor_id)->first();
+
+                        $tempYear = Carbon::parse($mainVisitorInfo->registered_date_time)->format('y');
+
+                        $transactionId = Transaction::where('event_id', $eventId)->where('visitor_id', $visitorId)->where('visitor_type', "sub")->value('id');
+
+                        $lastDigit = 1000 + intval($transactionId);
+                        $transactionId2 = Transaction::where('event_id', $eventId)->where('visitor_id', $mainVisitorInfo->id)->where('visitor_type', "main")->value('id');
+                        $lastDigit2 = 1000 + intval($transactionId2);
+
+                        $finalTransactionId = $eventYear . $eventCode . $lastDigit;
+                        $invoiceNumber = $eventCategory . $tempYear . "/" . $lastDigit2;
+
+                        $finalVisitor = [
+                            'visitorType' => $visitorType,
+                            'visitorId' => $visitorId,
+                            'mainVisitorId' => $mainVisitorInfo->id,
+
+                            'salutation' => $tempVisitor->salutation,
+                            'first_name' => $tempVisitor->first_name,
+                            'middle_name' => $tempVisitor->middle_name,
+                            'last_name' => $tempVisitor->last_name,
+                            'email_address' => $tempVisitor->email_address,
+                            'mobile_number' => $tempVisitor->mobile_number,
+                            'nationality' => $tempVisitor->nationality,
+                            'job_title' => $tempVisitor->job_title,
+                            'badge_type' => $tempVisitor->badge_type,
+
+                            'pass_type' => $mainVisitorInfo->pass_type,
+                            'company_name' => $mainVisitorInfo->company_name,
+                            'alternative_company_name' => $mainVisitorInfo->alternative_company_name,
+                            'company_sector' => $mainVisitorInfo->company_sector,
+                            'company_address' => $mainVisitorInfo->company_address,
+                            'company_country' => $mainVisitorInfo->company_country,
+                            'company_city' => $mainVisitorInfo->company_city,
+                            'company_telephone_number' => $mainVisitorInfo->company_telephone_number,
+                            'company_mobile_number' => $mainVisitorInfo->company_mobile_number,
+
+                            'finalTransactionId' => $finalTransactionId,
+                            'invoiceNumber' => $invoiceNumber,
+                        ];
+                    }
+
+                    return view('admin.events.delegates.delegates_detail', [
+                        "pageTitle" => "Event Visitor",
+                        "eventCategory" => $eventCategory,
+                        "eventId" => $eventId,
+                        "finalVisitor" => $finalVisitor,
+                    ]);
+                } else {
+                    abort(404, 'The URL is incorrect');
+                }
             } else {
-                abort(404, 'The URL is incorrect');
+                $finalDelegate = array();
+                $tempDelegate = array();
+
+                if ($delegateType == "main") {
+                    $tempDelegate = MainDelegate::where('id', $delegateId)->first();
+                } else {
+                    $tempDelegate = AdditionalDelegate::where('id', $delegateId)->first();
+                }
+
+                if ($tempDelegate != null) {
+                    $eventYear = Event::where('id', $eventId)->value('year');
+
+                    foreach (config('app.eventCategories') as $eventCategoryC => $code) {
+                        if ($eventCategory == $eventCategoryC) {
+                            $eventCode = $code;
+                        }
+                    }
+
+                    if ($delegateType  == "main") {
+
+                        $tempYear = Carbon::parse($tempDelegate->registered_date_time)->format('y');
+
+                        $transactionId = Transaction::where('event_id', $eventId)->where('delegate_id', $delegateId)->where('delegate_type', "main")->value('id');
+
+                        $lastDigit = 1000 + intval($transactionId);
+
+                        $finalTransactionId = $eventYear . $eventCode . $lastDigit;
+                        $invoiceNumber = $eventCategory . $tempYear . "/" . $lastDigit;
+
+                        $finalDelegate = [
+                            'eventCategory' => $eventCategory,
+                            'eventId' => $eventId,
+                            'delegateType' => $delegateType,
+                            'delegateId' => $delegateId,
+                            'mainDelegateId' => $delegateId,
+
+                            'salutation' => $tempDelegate->salutation,
+                            'first_name' => $tempDelegate->first_name,
+                            'middle_name' => $tempDelegate->middle_name,
+                            'last_name' => $tempDelegate->last_name,
+                            'email_address' => $tempDelegate->email_address,
+                            'mobile_number' => $tempDelegate->mobile_number,
+                            'nationality' => $tempDelegate->nationality,
+                            'job_title' => $tempDelegate->job_title,
+                            'badge_type' => $tempDelegate->badge_type,
+
+                            'pass_type' => $tempDelegate->pass_type,
+                            'company_name' => $tempDelegate->company_name,
+                            'alternative_company_name' => $tempDelegate->alternative_company_name,
+                            'company_sector' => $tempDelegate->company_sector,
+                            'company_address' => $tempDelegate->company_address,
+                            'company_country' => $tempDelegate->company_country,
+                            'company_city' => $tempDelegate->company_city,
+                            'company_telephone_number' => $tempDelegate->company_telephone_number,
+                            'company_mobile_number' => $tempDelegate->company_mobile_number,
+
+                            'finalTransactionId' => $finalTransactionId,
+                            'invoiceNumber' => $invoiceNumber,
+                        ];
+                    } else {
+                        $mainDelegateInfo = MainDelegate::where('id', $tempDelegate->main_delegate_id)->first();
+
+                        $tempYear = Carbon::parse($mainDelegateInfo->registered_date_time)->format('y');
+
+                        $transactionId = Transaction::where('event_id', $eventId)->where('delegate_id', $delegateId)->where('delegate_type', "sub")->value('id');
+
+                        $lastDigit = 1000 + intval($transactionId);
+                        $transactionId2 = Transaction::where('event_id', $eventId)->where('delegate_id', $mainDelegateInfo->id)->where('delegate_type', "main")->value('id');
+                        $lastDigit2 = 1000 + intval($transactionId2);
+
+                        $finalTransactionId = $eventYear . $eventCode . $lastDigit;
+                        $invoiceNumber = $eventCategory . $tempYear . "/" . $lastDigit2;
+
+                        $finalDelegate = [
+                            'delegateType' => $delegateType,
+                            'delegateId' => $delegateId,
+                            'mainDelegateId' => $mainDelegateInfo->id,
+
+                            'salutation' => $tempDelegate->salutation,
+                            'first_name' => $tempDelegate->first_name,
+                            'middle_name' => $tempDelegate->middle_name,
+                            'last_name' => $tempDelegate->last_name,
+                            'email_address' => $tempDelegate->email_address,
+                            'mobile_number' => $tempDelegate->mobile_number,
+                            'nationality' => $tempDelegate->nationality,
+                            'job_title' => $tempDelegate->job_title,
+                            'badge_type' => $tempDelegate->badge_type,
+
+                            'pass_type' => $mainDelegateInfo->pass_type,
+                            'company_name' => $mainDelegateInfo->company_name,
+                            'alternative_company_name' => $mainDelegateInfo->alternative_company_name,
+                            'company_sector' => $mainDelegateInfo->company_sector,
+                            'company_address' => $mainDelegateInfo->company_address,
+                            'company_country' => $mainDelegateInfo->company_country,
+                            'company_city' => $mainDelegateInfo->company_city,
+                            'company_telephone_number' => $mainDelegateInfo->company_telephone_number,
+                            'company_mobile_number' => $mainDelegateInfo->company_mobile_number,
+
+                            'finalTransactionId' => $finalTransactionId,
+                            'invoiceNumber' => $invoiceNumber,
+                        ];
+                    }
+
+                    return view('admin.events.delegates.delegates_detail', [
+                        "pageTitle" => "Event Delegate",
+                        "eventCategory" => $eventCategory,
+                        "eventId" => $eventId,
+                        "finalDelegate" => $finalDelegate,
+                    ]);
+                } else {
+                    abort(404, 'The URL is incorrect');
+                }
             }
         } else {
             abort(404, 'The URL is incorrect');
@@ -163,7 +290,6 @@ class DelegateController extends Controller
 
     public function printedBadgeListView($eventCategory, $eventId)
     {
-
         if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {
             return view('admin.events.printed-badge.printed_badge_list', [
                 "pageTitle" => "Printed badges",
@@ -178,8 +304,13 @@ class DelegateController extends Controller
     public function scannedDelegateListView($eventCategory, $eventId)
     {
         if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {
+            if($eventCategory == "AFV"){
+                $pageTitle = "Scanned visitors";
+            } else {
+                $pageTitle = "Scanned delegates";
+            }
             return view('admin.events.scanned-delegate.scanned_delegate_list', [
-                "pageTitle" => "Scanned delegates",
+                "pageTitle" => $pageTitle,
                 "eventCategory" => $eventCategory,
                 "eventId" => $eventId,
             ]);
@@ -221,7 +352,7 @@ class DelegateController extends Controller
                     'scanned_date_time' => Carbon::now(),
                 ]);
 
-                if($delegateType == "main"){
+                if ($delegateType == "main") {
                     $companyName = $tempDelegate->company_name;
                 } else {
                     $companyName = MainDelegate::where('id', $tempDelegate->main_delegate_id)->value('company_name');
@@ -247,16 +378,26 @@ class DelegateController extends Controller
     public function delegateDetailPrintBadge($eventCategory, $eventId, $delegateType, $delegateId)
     {
         if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {
+            $event = Event::where('category', $eventCategory)->where('id', $eventId)->first();
+
             $finalDelegate = array();
             $tempDelegate = array();
 
-            $event = Event::where('category', $eventCategory)->where('id', $eventId)->first();
-
-            if ($delegateType == "main") {
-                $tempDelegate = MainDelegate::where('id', $delegateId)->first();
+            if ($eventCategory == "AFV") {
+                if ($delegateType == "main") {
+                    $tempDelegate = MainVisitor::where('id', $delegateId)->first();
+                } else {
+                    $tempDelegate = AdditionalVisitor::where('id', $delegateId)->first();
+                }
             } else {
-                $tempDelegate = AdditionalDelegate::where('id', $delegateId)->first();
+                if ($delegateType == "main") {
+                    $tempDelegate = MainDelegate::where('id', $delegateId)->first();
+                } else {
+                    $tempDelegate = AdditionalDelegate::where('id', $delegateId)->first();
+                }
             }
+
+
             $frontBanner = public_path(Storage::url($event->badge_front_banner));
             $finalFrontBanner = str_replace('\/', '/', $frontBanner);
 
@@ -267,11 +408,11 @@ class DelegateController extends Controller
                 // $finalHeight = (15.2 / 2.54) * 72;
                 // $finalWidth = (23.3 / 2.54) * 72;
 
-                
+
                 // $finalHeight = (12.5 / 2.54) * 72;
                 // $finalWidth = (17.2 / 2.54) * 72;
 
-                
+
                 $finalHeight = (13.1 / 2.54) * 72;
                 $finalWidth = (18.2 / 2.54) * 72;
             } else {
@@ -327,7 +468,12 @@ class DelegateController extends Controller
                         'scanDelegateUrl' => $scanDelegateUrl,
                     ];
                 } else {
-                    $mainDelegateInfo = MainDelegate::where('id', $tempDelegate->main_delegate_id)->first();
+                    if ($eventCategory == "AFV") {
+                        $mainDelegateInfo = MainVisitor::where('id', $tempDelegate->main_visitor_id)->first();
+                    } else {
+                        $mainDelegateInfo = MainDelegate::where('id', $tempDelegate->main_delegate_id)->first();
+                    }
+
                     if ($tempDelegate->salutation == "Dr." || $tempDelegate->salutation == "Prof.") {
                         $delegateSalutation = $tempDelegate->salutation;
                     } else {
@@ -374,6 +520,7 @@ class DelegateController extends Controller
                         'margin_bottom' => 0,
                         'margin_left' => 0,
                     ]);
+                    $pdf->setPaper('A4', 'portrait');
                 } else {
                     $pdf = Pdf::loadView('admin.events.delegates.delegate_badgev4', $finalDelegate, [
                         'margin_top' => 0,
@@ -381,9 +528,8 @@ class DelegateController extends Controller
                         'margin_bottom' => 0,
                         'margin_left' => 0,
                     ]);
+                    $pdf->setPaper(array(0, 0, $finalWidth, $finalHeight), 'custom');
                 }
-
-                $pdf->setPaper('A4', 'portrait');
 
                 return $pdf->stream('badge.pdf');
             } else {
@@ -398,9 +544,9 @@ class DelegateController extends Controller
     {
         // if (Session::has('userType')) {
         //     if (Session::get('userType') == 'gpcaAdmin') {
-                $decryptedText = Crypt::decryptString($id);
-                $arrayString = explode(",", $decryptedText);
-                return redirect()->route('admin.event.delegates.detail.scanBadge', ['eventCategory' => $arrayString[1], 'eventId' => $arrayString[0], 'delegateId' => $arrayString[2], 'delegateType' => $arrayString[3]]);
+        $decryptedText = Crypt::decryptString($id);
+        $arrayString = explode(",", $decryptedText);
+        return redirect()->route('admin.event.delegates.detail.scanBadge', ['eventCategory' => $arrayString[1], 'eventId' => $arrayString[0], 'delegateId' => $arrayString[2], 'delegateType' => $arrayString[3]]);
         //     }
         // }
         // return view('admin.events.scanned-delegate.unauthorized_scanned');

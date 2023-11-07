@@ -20,8 +20,10 @@ use App\Models\RccAwardsDocument;
 use App\Models\RccAwardsMainParticipant;
 use App\Models\RccAwardsParticipantTransaction;
 use App\Models\ScannedDelegate;
+use App\Models\ScannedVisitor;
 use App\Models\SpouseTransaction;
 use App\Models\Transaction;
+use App\Models\VisitorPrintedBadge;
 use App\Models\VisitorTransaction;
 use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -4753,8 +4755,51 @@ class RegistrationController extends Controller
                 $tempInvoiceNumber = "$event->category" . "$tempYear" . "/" . "$lastDigit";
                 $tempBookReference = "$event->year" . "$getEventcode" . "$lastDigit";
 
+                $promoCodeDiscount = null;
                 $discountPrice = 0.0;
-                $netAMount = $mainVisitor->unit_price;
+                $netAMount = 0.0;
+
+                $promoCode = PromoCode::where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $mainVisitor->pcode_used)->first();
+
+                if ($promoCode  != null) {
+                    $promoCodeDiscount = $promoCode->discount;
+                    $discountType = $promoCode->discount_type;
+
+                    if ($discountType == "percentage") {
+                        $discountPrice = $mainVisitor->unit_price * ($promoCodeDiscount / 100);
+                        $netAMount = $mainVisitor->unit_price - $discountPrice;
+                    } else {
+                        $discountPrice = $promoCodeDiscount;
+                        $netAMount = $mainVisitor->unit_price - $discountPrice;
+                    }
+                } else {
+                    $discountPrice = 0.0;
+                    $netAMount = $mainVisitor->unit_price;
+                }
+
+                $printedBadgeCount = 0;
+                $printedBadgeDateTime = null;
+
+                $printedBadges = VisitorPrintedBadge::where('event_id', $eventId)->where('visitor_id', $mainVisitor->id)->where('visitor_type', 'main')->get();
+
+                if ($printedBadges->isNotEmpty()) {
+                    foreach ($printedBadges as $printedBadge) {
+                        $printedBadgeCount++;
+                        $printedBadgeDateTime = $printedBadge->printed_date_time;
+                    }
+                }
+
+                $scannedBadgeCount = 0;
+                $scannedBadgeDateTime = null;
+
+                $scannedBadges = ScannedVisitor::where('event_id', $eventId)->where('visitor_id', $mainVisitor->id)->where('visitor_type', 'main')->get();
+
+                if ($scannedBadges->isNotEmpty()) {
+                    foreach ($scannedBadges as $scannedBadge) {
+                        $scannedBadgeCount++;
+                        $scannedBadgeDateTime = $scannedBadge->scanned_date_time;
+                    }
+                }
 
                 array_push($finalExcelData, [
                     'transaction_id' => $tempBookReference,
@@ -4762,7 +4807,16 @@ class RegistrationController extends Controller
                     'visitorType' => 'Main',
                     'event' => $eventCategory,
                     'pass_type' => $mainVisitor->pass_type,
-                    'rate_type' => $mainVisitor->rate_type,
+                    'rate_type' => ($netAMount == 0) ? 'Complementary' : $mainVisitor->rate_type,
+
+                    'company_name' => $mainVisitor->company_name,
+                    'company_sector' => $mainVisitor->company_sector,
+                    'company_address' => $mainVisitor->company_address,
+                    'company_city' => $mainVisitor->company_city,
+                    'company_country' => $mainVisitor->company_country,
+                    'company_telephone_number' => $mainVisitor->company_telephone_number,
+                    'company_mobile_number' => $mainVisitor->company_mobile_number,
+                    'assistant_email_address' => $mainVisitor->assistant_email_address,
 
                     'salutation' => $mainVisitor->salutation,
                     'first_name' => $mainVisitor->first_name,
@@ -4770,22 +4824,26 @@ class RegistrationController extends Controller
                     'last_name' => $mainVisitor->last_name,
                     'email_address' => $mainVisitor->email_address,
                     'mobile_number' => $mainVisitor->mobile_number,
-                    'nationality' => $mainVisitor->nationality,
-                    'country' => $mainVisitor->country,
-                    'city' => $mainVisitor->city,
-
-                    'company_name' => $mainVisitor->company_name,
                     'job_title' => $mainVisitor->job_title,
+                    'nationality' => $mainVisitor->nationality,
+                    'badge_type' => $mainVisitor->badge_type,
+                    'pcode_used' => $mainVisitor->pcode_used,
+
+                    'heard_where' => $mainVisitor->heard_where,
 
                     'unit_price' => $mainVisitor->unit_price,
                     'discount_price' => $discountPrice,
                     'net_amount' => $netAMount,
-                    'printed_badge_date' => null,
+                    'printed_badge_count' => $printedBadgeCount,
+                    'printed_badge_date_time' => $printedBadgeDateTime,
+
+                    'scanned_badge_count' => $scannedBadgeCount,
+                    'scanned_badge_date_time' => $scannedBadgeDateTime,
 
                     // PLEASE CONTINUE HERE
                     'total_amount' => $mainVisitor->total_amount,
-                    'payment_status' => $mainVisitor->payment_status,
-                    'registration_status' => $mainVisitor->registration_status,
+                    'payment_status' => $mainVisitor->visitor_refunded ? 'refunded' : $mainVisitor->payment_status,
+                    'registration_status' => $mainVisitor->visitor_cancelled ? 'cancelled' : $mainVisitor->registration_status,
                     'mode_of_payment' => $mainVisitor->mode_of_payment,
                     'invoice_number' => $tempInvoiceNumber,
                     'reference_number' => $tempBookReference,
@@ -4816,11 +4874,54 @@ class RegistrationController extends Controller
                     foreach ($subVisitors as $subVisitor) {
                         $subTransactionId = VisitorTransaction::where('visitor_id', $subVisitor->id)->where('visitor_type', "sub")->value('id');
 
+                        $promoCodeDiscount = null;
                         $discountPrice = 0.0;
-                        $netAMount = $mainVisitor->unit_price;
+                        $netAMount = 0.0;
+
+                        $subPromoCode = PromoCode::where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $subVisitor->pcode_used)->first();
+
+                        if ($subPromoCode  != null) {
+                            $promoCodeDiscount = $subPromoCode->discount;
+                            $discountType = $subPromoCode->discount_type;
+
+                            if ($discountType == "percentage") {
+                                $discountPrice = $mainVisitor->unit_price * ($promoCodeDiscount / 100);
+                                $netAMount = $mainVisitor->unit_price - $discountPrice;
+                            } else {
+                                $discountPrice = $promoCodeDiscount;
+                                $netAMount = $mainVisitor->unit_price - $discountPrice;
+                            }
+                        } else {
+                            $discountPrice = 0.0;
+                            $netAMount = $mainVisitor->unit_price;
+                        }
 
                         $lastDigit = 1000 + intval($subTransactionId);
                         $tempBookReferenceSub = "$event->year" . "$getEventcode" . "$lastDigit";
+
+                        $printedBadgeCount = 0;
+                        $printedBadgeDateTime = null;
+
+                        $printedBadges = VisitorPrintedBadge::where('event_id', $eventId)->where('visitor_id', $subVisitor->id)->where('visitor_type', 'sub')->get();
+
+                        if ($printedBadges->isNotEmpty()) {
+                            foreach ($printedBadges as $printedBadge) {
+                                $printedBadgeCount++;
+                                $printedBadgeDateTime = $printedBadge->printed_date_time;
+                            }
+                        }
+
+                        $scannedBadgeCount = 0;
+                        $scannedBadgeDateTime = null;
+
+                        $scannedBadges = ScannedVisitor::where('event_id', $eventId)->where('visitor_id', $subVisitor->id)->where('visitor_type', 'sub')->get();
+
+                        if ($scannedBadges->isNotEmpty()) {
+                            foreach ($scannedBadges as $scannedBadge) {
+                                $scannedBadgeCount++;
+                                $scannedBadgeDateTime = $scannedBadge->scanned_date_time;
+                            }
+                        }
 
                         array_push($finalExcelData, [
                             'transaction_id' => $tempBookReferenceSub,
@@ -4830,28 +4931,50 @@ class RegistrationController extends Controller
                             'pass_type' => $mainVisitor->pass_type,
                             'rate_type' => $mainVisitor->rate_type,
 
+                            'company_name' => $mainVisitor->company_name,
+                            'company_sector' => $mainVisitor->company_sector,
+                            'company_address' => $mainVisitor->company_address,
+                            'company_city' => $mainVisitor->company_city,
+                            'company_country' => $mainVisitor->company_country,
+                            'company_telephone_number' => $mainVisitor->company_telephone_number,
+                            'company_mobile_number' => $mainVisitor->company_mobile_number,
+                            'assistant_email_address' => $mainVisitor->assistant_email_address,
+
                             'salutation' => $subVisitor->salutation,
                             'first_name' => $subVisitor->first_name,
                             'middle_name' => $subVisitor->middle_name,
                             'last_name' => $subVisitor->last_name,
                             'email_address' => $subVisitor->email_address,
                             'mobile_number' => $subVisitor->mobile_number,
-                            'nationality' => $subVisitor->nationality,
-                            'country' => $subVisitor->country,
-                            'city' => $subVisitor->city,
-
-                            'company_name' => $subVisitor->company_name,
                             'job_title' => $subVisitor->job_title,
+                            'nationality' => $subVisitor->nationality,
+                            'badge_type' => $subVisitor->badge_type,
+                            'pcode_used' => $subVisitor->pcode_used,
+
+                            'heard_where' => $mainVisitor->heard_where,
+
+                            'attending_plenary' => $mainVisitor->attending_plenary,
+                            'attending_symposium' => $mainVisitor->attending_symposium,
+                            'attending_solxchange' => $mainVisitor->attending_solxchange,
+                            'attending_yf' => $mainVisitor->attending_yf,
+                            'attending_networking_dinner' => $mainVisitor->attending_networking_dinner,
+                            'attending_welcome_dinner' => $mainVisitor->attending_welcome_dinner,
+                            'attending_gala_dinner' => $mainVisitor->attending_gala_dinner,
 
                             'unit_price' => $mainVisitor->unit_price,
                             'discount_price' => $discountPrice,
                             'net_amount' => $netAMount,
-                            'printed_badge_date' => null,
+
+                            'printed_badge_count' => $printedBadgeCount,
+                            'printed_badge_date_time' => $printedBadgeDateTime,
+
+                            'scanned_badge_count' => $scannedBadgeCount,
+                            'scanned_badge_date_time' => $scannedBadgeDateTime,
 
                             // PLEASE CONTINUE HERE
                             'total_amount' => $mainVisitor->total_amount,
-                            'payment_status' => $mainVisitor->payment_status,
-                            'registration_status' => $mainVisitor->registration_status,
+                            'payment_status' => $subVisitor->visitor_refunded ? 'refunded' : $mainVisitor->payment_status,
+                            'registration_status' => $subVisitor->visitor_cancelled ? 'cancelled' : $mainVisitor->registration_status,
                             'mode_of_payment' => $mainVisitor->mode_of_payment,
                             'invoice_number' => $tempInvoiceNumber,
                             'reference_number' => $tempBookReference,
@@ -4895,20 +5018,28 @@ class RegistrationController extends Controller
             'ID',
             'Visitor Type',
             'Event',
+            'Pass Type',
             'Rate Type',
 
+            'Promo Code used',
+            'Badge Type',
             'Salutation',
             'First Name',
-            'Middle Name',
             'Last Name',
             'Email Address',
-            'Mobile Number',
+            'Mobile Number 1',
+            'Job Title',
             'Nationality',
-            'Country',
-            'City',
 
-            'Company name',
-            'Job title',
+            'Company Name',
+            'Company Address',
+            'City',
+            'Country',
+            'Telephone Number',
+            'Mobile Number 2',
+            'Assistant Email Address',
+
+            'Middle Name',
 
             'Unit Price',
             'Discount Price',
@@ -4920,7 +5051,13 @@ class RegistrationController extends Controller
             'Reference Number',
             'Registered Date & Time',
             'Paid Date & Time',
-            'Printed badge',
+            'Printed badge count',
+            'Printed badge date time',
+
+            'Scanned badge count',
+            'Scanned badge date time',
+
+            'Company Sector',
 
             'Registration Method',
             'Transaction Remarks',
@@ -4938,6 +5075,7 @@ class RegistrationController extends Controller
             'Visitor Refunded Date & Time',
             'Visitor Replaced Date & Time',
 
+            'Heard Where',
         );
 
         $callback = function () use ($finalExcelData, $columns) {
@@ -4952,20 +5090,29 @@ class RegistrationController extends Controller
                         $data['id'],
                         $data['visitorType'],
                         $data['event'],
+                        $data['pass_type'],
                         $data['rate_type'],
+
+                        $data['pcode_used'],
+                        $data['badge_type'],
 
                         $data['salutation'],
                         $data['first_name'],
-                        $data['middle_name'],
                         $data['last_name'],
                         $data['email_address'],
                         $data['mobile_number'],
+                        $data['job_title'],
                         $data['nationality'],
-                        $data['country'],
-                        $data['city'],
 
                         $data['company_name'],
-                        $data['job_title'],
+                        $data['company_address'],
+                        $data['company_city'],
+                        $data['company_country'],
+                        $data['company_telephone_number'],
+                        $data['company_mobile_number'],
+                        $data['assistant_email_address'],
+
+                        $data['middle_name'],
 
                         $data['unit_price'],
                         $data['discount_price'],
@@ -4977,7 +5124,13 @@ class RegistrationController extends Controller
                         $data['reference_number'],
                         $data['registration_date_time'],
                         $data['paid_date_time'],
-                        $data['printed_badge_date'],
+                        $data['printed_badge_count'],
+                        $data['printed_badge_date_time'],
+
+                        $data['scanned_badge_count'],
+                        $data['scanned_badge_date_time'],
+
+                        $data['company_sector'],
 
                         $data['registration_method'],
                         $data['transaction_remarks'],
@@ -4995,6 +5148,7 @@ class RegistrationController extends Controller
                         $data['visitor_refunded_datetime'],
                         $data['visitor_replaced_datetime'],
 
+                        $data['heard_where'],
                     )
                 );
             }
