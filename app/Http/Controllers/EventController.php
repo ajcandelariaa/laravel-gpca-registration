@@ -17,6 +17,8 @@ use App\Models\PromoCodeAddtionalBadgeType;
 use App\Models\RccAwardsAdditionalParticipant;
 use App\Models\RccAwardsMainParticipant;
 use App\Models\ScannedDelegate;
+use App\Models\ScannedVisitor;
+use App\Models\VisitorPrintedBadge;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -679,9 +681,15 @@ class EventController extends Controller
         $totalConfirmedVisitors = 0;
         $totalVisitors = 0;
         $totalRegisteredToday = 0;
+        $visitorBadgePrinted = 0;
+        $duplicateBadgePrinted = 0;
+        $totalBadgePrinted = 0;
         $totalPaidToday = 0;
         $totalAmountPaidToday = 0;
         $totalAmountPaid = 0;
+        $totalFullMember = 0;
+        $totalMember = 0;
+        $totalNonMember = 0;
         $totalBankTransfer = 0;
         $totalCreditCard = 0;
         $totalPaid = 0;
@@ -696,6 +704,8 @@ class EventController extends Controller
         $totalDroppedOut = 0;
         $totalCancelled = 0;
         $arrayCountryTotal = array();
+        $arrayCompanyTotal = array();
+        $arrayRegistrationTypeTotal = array();
 
         $dateToday = Carbon::now();
         $noRefund = 0;
@@ -716,6 +726,14 @@ class EventController extends Controller
                     }
 
                     $totalVisitors++;
+
+                    if ($mainVisitor->pass_type == "fullMember") {
+                        $totalFullMember++;
+                    } else if ($mainVisitor->pass_type == "member") {
+                        $totalMember++;
+                    } else {
+                        $totalNonMember++;
+                    }
 
                     if ($mainVisitor->mode_of_payment == "creditCard") {
                         $totalCreditCard++;
@@ -768,6 +786,32 @@ class EventController extends Controller
                             'total' => 1,
                         ]);
                     }
+
+                    if ($this->checkIfCompanyExist($mainVisitor->company_name, $arrayCompanyTotal)) {
+                        foreach ($arrayCompanyTotal as $index => $company) {
+                            if ($company['name'] == $mainVisitor->company_name) {
+                                $arrayCompanyTotal[$index]['total'] = $company['total'] + 1;
+                            }
+                        }
+                    } else {
+                        array_push($arrayCompanyTotal, [
+                            'name' => $mainVisitor->company_name,
+                            'total' => 1,
+                        ]);
+                    }
+
+                    if ($this->checkIfRegistrationTypeExist($mainVisitor->badge_type, $arrayRegistrationTypeTotal)) {
+                        foreach ($arrayRegistrationTypeTotal as $index => $registrationType) {
+                            if ($registrationType['name'] == $mainVisitor->badge_type) {
+                                $arrayRegistrationTypeTotal[$index]['total'] = $registrationType['total'] + 1;
+                            }
+                        }
+                    } else {
+                        array_push($arrayRegistrationTypeTotal, [
+                            'name' => $mainVisitor->badge_type,
+                            'total' => 1,
+                        ]);
+                    }
                 } else {
                     if ($mainVisitor->visitor_refunded) {
                         $totalRefunded++;
@@ -787,6 +831,14 @@ class EventController extends Controller
                             }
 
                             $totalVisitors++;
+
+                            if ($mainVisitor->pass_type == "fullMember") {
+                                $totalFullMember++;
+                            } else if ($mainVisitor->pass_type == "member") {
+                                $totalMember++;
+                            } else {
+                                $totalNonMember++;
+                            }
 
                             if ($mainVisitor->mode_of_payment == "creditCard") {
                                 $totalCreditCard++;
@@ -842,6 +894,32 @@ class EventController extends Controller
                                     'total' => 1,
                                 ]);
                             }
+
+                            if ($this->checkIfCompanyExist($mainVisitor->company_name, $arrayCompanyTotal)) {
+                                foreach ($arrayCompanyTotal as $index => $company) {
+                                    if ($company['name'] == $mainVisitor->company_name) {
+                                        $arrayCompanyTotal[$index]['total'] = $company['total'] + 1;
+                                    }
+                                }
+                            } else {
+                                array_push($arrayCompanyTotal, [
+                                    'name' => $mainVisitor->company_name,
+                                    'total' => 1,
+                                ]);
+                            }
+
+                            if ($this->checkIfRegistrationTypeExist($additionalVisitor->badge_type, $arrayRegistrationTypeTotal)) {
+                                foreach ($arrayRegistrationTypeTotal as $index => $registrationType) {
+                                    if ($registrationType['name'] == $additionalVisitor->badge_type) {
+                                        $arrayRegistrationTypeTotal[$index]['total'] = $registrationType['total'] + 1;
+                                    }
+                                }
+                            } else {
+                                array_push($arrayRegistrationTypeTotal, [
+                                    'name' => $additionalVisitor->badge_type,
+                                    'total' => 1,
+                                ]);
+                            }
                         } else {
                             if ($additionalVisitor->visitor_refunded) {
                                 $totalRefunded++;
@@ -865,20 +943,64 @@ class EventController extends Controller
             }
         }
 
+        $printedBadgesArray = array();
+        $printedBadges = VisitorPrintedBadge::where('event_id', $eventId)->get();
+
+        foreach($printedBadges as $printedBadge){
+            $finalString = $printedBadge->visitor_id . $printedBadge->visitor_type;
+            array_push($printedBadgesArray, $finalString);
+        }
+
+        $uniquePrintedBadgesArray = array_unique($printedBadgesArray); 
+        $finalPrintedBadgesArray = array_diff_key( $printedBadgesArray, $uniquePrintedBadgesArray ); 
+
+        $visitorBadgePrinted = count($printedBadges) - count($finalPrintedBadgesArray);
+        $duplicateBadgePrinted = count($finalPrintedBadgesArray);
+        $totalBadgePrinted = count($printedBadges);
+
+
+
+        $scannedVisitorsArray = array();
+        $scannedVisitors = ScannedVisitor::where('event_id', $eventId)->get();
+
+        foreach($scannedVisitors as $scannedVisitor){
+            $finalString = $scannedVisitor->visitor_id . $scannedVisitor->visitor_type;
+            array_push($scannedVisitorsArray, $finalString);
+        }
+
+        $uniqueScannedVisitorArray = array_unique($scannedVisitorsArray); 
+        $finalScannedVisitorArray = array_diff_key( $scannedVisitorsArray, $uniqueScannedVisitorArray ); 
+
+        $visitorBadgeScanned = count($scannedVisitors) - count($finalScannedVisitorArray);
+        $duplicateBadgeScanned = count($finalScannedVisitorArray);
+        $totalBadgeScanned = count($scannedVisitors);
+
         $finalData = [
             'totalConfirmedVisitors' => $totalConfirmedVisitors,
             'totalVisitors' => $totalVisitors,
             'totalRegisteredToday' => $totalRegisteredToday,
+
+            'visitorBadgePrinted' => $visitorBadgePrinted,
+            'duplicateBadgePrinted' => $duplicateBadgePrinted,
+            'totalBadgePrinted' => $totalBadgePrinted,
+
+            'visitorBadgeScanned' => $visitorBadgeScanned,
+            'duplicateBadgeScanned' => $duplicateBadgeScanned,
+            'totalBadgeScanned' => $totalBadgeScanned,
+
             'totalPaidToday' => $totalPaidToday,
             'totalAmountPaidToday' => $totalAmountPaidToday,
             'totalAmountPaid' => $totalAmountPaid,
 
+            'passType' => [$totalFullMember, $totalMember, $totalNonMember],
             'paymentStatus' => [$totalPaid, $totalFree, $totalUnpaid, $totalRefunded],
             'registrationStatus' => [$totalConfirmed, $totalPending, $totalDroppedOut, $totalCancelled],
             'registrationMethod' => [$totalOnline, $totalImported, $totalOnsite],
             'paymentMethod' => [$totalCreditCard, $totalBankTransfer],
 
             'arrayCountryTotal' => $arrayCountryTotal,
+            'arrayCompanyTotal' => $arrayCompanyTotal,
+            'arrayRegistrationTypeTotal' => $arrayRegistrationTypeTotal,
         ];
 
         return $finalData;
