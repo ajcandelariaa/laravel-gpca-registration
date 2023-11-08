@@ -66,8 +66,39 @@ p {
     text-align: left;
 }
 
+p.title{
+    color: #3d4852;
+    font-size: 18px;
+    line-height: 20px;
+    font-weight: bold;
+    margin-top: 0;
+    margin-bottom: 0;
+    text-align: left;
+}
+
+p.subtitle{
+    color: #3d4852;
+    font-size: 14px;
+    font-weight: 600;
+    margin-top: 0;
+    margin-bottom: 0;
+    line-height: 16px;
+    text-align: left;
+}
+
 p.sub {
-    font-size: 12px;
+    font-size: 14px;
+    margin-top: 0;
+    margin-bottom: 0;
+    line-height: 16px;
+    text-align: left;
+}
+span.subtitle{
+    color: #3d4852;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 16px;
+    text-align: left;
 }
 
 img {

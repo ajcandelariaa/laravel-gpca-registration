@@ -1,76 +1,65 @@
 <x-mail::message>
-<p>Dear {{ $details['name'] }},</p>
+<p class="sub">Dear {{ $details['name'] }},</p>
 
-<p>Greetings from GPCA!</p>
+<p class="sub" style="margin-top: 15px;">Warm greetings from GPCA!</p>
 
-<p>Thank you for registering to attend the <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a> which will be held from {{ $details['eventDates'] }} at the {{ $details['eventLocation'] }}.</p>
+<p class="sub" style="margin-top: 15px;">We appreciate your registration for the <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a>, scheduled to take place from {{ $details['eventDates'] }}, at the {{ $details['eventLocation'] }}.</p>
 
-<p style="color: red;">
-    Kindly note that your registration is not yet confirmed. Please settle your payment through bank transfer prior to the event to avoid any inconvenience onsite.
-</p>
+<p class="sub" style="margin-top: 15px; color: red;">Kindly note that your registration is not yet confirmed. Please settle your payment through bank transfer prior to the event to avoid any inconvenience onsite.</p>
 
-<p>To take advantage of the early bird discount, please ensure to settle your invoice on or before {{ $details['earlyBirdValidityDate'] }}. Standard rate will be applied after this day.</p>
+<p class="title" style="margin-top: 20px;">Badge Collection:</p>
+<p class="sub">Delegates can begin collecting their badges on December 3<sup>rd</sup> at the designated registration desk on-site. To ensure a seamless and convenient experience for our esteemed delegates, we have designated the following locations:</p>
 
-<p>Your registration details as follows:</p>
+<p class="sub" style="margin-top: 15px;"><span class="subtitle">Spider Foyer on Level 1:</span> Delegates can collect their badges here.</p>
+<p class="sub"><span class="subtitle">Exhibition Halls 4 to 5 on the Ground Floor:</span> This area is designated for Youth Forum participants, exhibitors, and visitors to pick up their badges.</p>
 
-<span>
-    Delegate Full name: <strong>{{  $details['name'] }}</strong>
-    <br>
-    Job title: <strong>{{  $details['jobTitle'] }}</strong>
-    <br>
-    Company name: <strong>{{  $details['companyName'] }}</strong>
-    @if ($sendInvoice)
-    <br>
-    Amount paid: <strong>$ {{ number_format($details['amountPaid'], 2, '.', ',') }}</strong>
-    @endif
-    <br>
-    Transaction ID: <strong>{{  $details['transactionId'] }}</strong>
-</span>
+<p class="title" style="margin-top: 20px;">Delegate Information:</p>
+<p class="sub">Full name: {{  $details['name'] }}</p>
+<p class="sub">Job title: {{  $details['jobTitle'] }}</p>
+<p class="sub">Company name: {{  $details['companyName'] }}</p>
 @if ($sendInvoice)
-<br><br>
+<p class="sub">Amount paid: $ {{ number_format($details['amountPaid'], 2, '.', ',') }}</p>
+@endif
+<p class="sub">Transaction ID: {{  $details['transactionId'] }}</p>
+
+@if ($sendInvoice)
+<br>
 <x-mail::button :url="$details['invoiceLink']" color="registration">
 Download invoice
 </x-mail::button>
-<span>&nbsp;</span>
+<br>
 @else
-<br><br>
+<br>
 @endif
 
 <x-mail::button :url="'https://www.gpcaforum.com/conference-at-a-glance/'" color="registration">
 Conference at a glance
 </x-mail::button>
-<span>&nbsp;</span>
 
-<p>To request any changes, kindly respond to this email at the earliest to rectify your badge.</p>
+<p class="sub" style="margin-top: 15px;">We look forward to your participation in the event and hope that your experience at the {{ $details['eventName'] }} will be both enriching and insightful.</p>
 
-<h2>GENERAL INFORMATION</h2>
+<p class="sub" style="margin-top: 15px;">Should you have any further inquiries or require additional information, please do not hesitate to reach out to us.</p>
 
-<span>Delegates can start collecting their badges on 3<sup>rd</sup> December at the designed registration desk onsite.</span>
+<p class="sub" style="margin-top: 15px;">Thank you once again for your registration, and we eagerly anticipate your presence at the event.</p>
 
-<span><strong>Qatar Visa</strong></span><br><span><strong>For travellers with passports issued by India, Pakistan, Iran, Thailand, and Ukraine</strong> please reach out to Cozmo Travel for visa assistant if you booked your accommodation through them.</span>
+<p class="title" style="margin-top: 30px;">GENERAL INFORMATION</p>
 
-<span><strong>For other non GCC nationalities</strong> who will apply visa and booked their accommodation through our travel partner, please approach Cozmo Travel to obtain hotel confirmation letter as a requirement for visa application.</span>
+<p class="subtitle" style="margin-top: 15px;">Networking Dinners:</p>
+<p class="sub">Join us and other industry leaders for our formal sit-down dinner receptions celebrating the success of the {{ $details['eventName'] }}. We would like to extend an invitation to all attendees and their spouses to participate in these networking dinners. Kindly RSVP your attendance to jovelyn@gpca.org.ae on or before December 02, 2023.</p>
 
-<span><strong>Nationals of the Gulf Cooperation Council countries (Bahrain, Kuwait, Oman, Saudi Arabia, and United Arab Emirates)</strong> do not require a visa to enter Qatar.</span>
+<p class="subtitle" style="margin-top: 15px;">Welcome Dinner (December 4, 2023):</p>
+<p class="sub">Sponsored by Qatar Energy, our welcome dinner is a standout event crafted to foster meaningful connections.</p>
 
-<span><strong>Hotel Accomodation</strong></span><br><span>Experience a seamless and stress-free event journey with our expert travel partner. For more information on travel and accommodation please contact</span>
-<br><br>
-<span>Uchita Mhatre</span><br>
-<span>+971553079469</span><br>
-<span>umhatre@cozmotravel.com</span>
-<br><br>
-<span>Mohamed Reda Sabbah</span><br>
-<span>+971558236738</span><br>
-<span>r.sabbah@cozmotravel.com</span>
-<br><br>
-<span>Aziz Tinwala</span><br>
-<span>+971547502008</span><br>
-<span>t.aziz@cozmotravel.com</span>
-<br>
-<p>For more information regarding Qatar visa please click the <a href="https://visitqatar.com/intl-en/practical-info/visas/visa-details#countries-list.">link</a>.</p>
-<p>For the latest updates on the event, please visit the event website at <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a>.</p>
+<p class="subtitle" style="margin-top: 15px;">Gala Dinner (December 5, 2023):</p>
+<p class="sub">The {{ $details['eventName'] }}'s gala dinner, sponsored by SABIC, is an exceptional networking evening exclusively reserved for top executives and decision-makers in the petrochemical and chemical industry.</p>
 
-Best regards,
-<br>
-GPCA Team
+<p class="subtitle" style="margin-top: 15px;">Qatar Visa</p>
+<p class="sub">For travellers with passports issued by India, Pakistan, Iran, Thailand, and Ukraine, please reach out to Cozmo Travel <a href="https://www.gpcaforum.com/travel-accomodation/">https://www.gpcaforum.com/travel-accomodation/</a> for visa assistance if you have booked your accommodation through them.</p>
+
+<p class="sub" style="margin-top: 15px;">Other non-GCC nationalities applying for a visa and who have booked their accommodation through our travel partner should approach Cozmo Travel to obtain a hotel confirmation letter, which is a visa application requirement.</p>
+
+<p class="sub" style="margin-top: 15px;">We look forward to welcoming you to this exceptional event!</p>
+
+<p class="sub" style="margin-top: 15px;">Best regards,</p>
+<p class="sub">GPCA Team</p>
 </x-mail::message>
