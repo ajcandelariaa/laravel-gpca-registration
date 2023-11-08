@@ -26,7 +26,6 @@
 <x-mail::button :url="$details['invoiceLink']" color="registration">
 Download invoice
 </x-mail::button>
-<br>
 @endif
 
 <p class="sub" style="margin-top: 15px;">We look forward to your participation in the event and hope that your experience at the {{ $details['eventName'] }} will be both enriching and insightful.</p>
