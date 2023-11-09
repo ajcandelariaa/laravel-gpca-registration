@@ -22,7 +22,7 @@
         @endif
 
         @if ($paymentMethod == 'creditCard')
-            @include('livewire.registration.visitor.step.fourth_credit_card')
+            @include('livewire.registration.visitor.step.fifth_credit_card')
         @endif
     </div>
 
