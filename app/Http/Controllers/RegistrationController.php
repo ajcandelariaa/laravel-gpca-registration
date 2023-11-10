@@ -4012,6 +4012,7 @@ class RegistrationController extends Controller
                 $promoCodeDiscount = null;
                 $discountPrice = 0.0;
                 $netAMount = 0.0;
+                $unitPrice = $mainDelegate->unit_price;
 
                 $promoCode = PromoCode::where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $mainDelegate->pcode_used)->first();
 
@@ -4022,13 +4023,20 @@ class RegistrationController extends Controller
                     if ($discountType == "percentage") {
                         $discountPrice = $mainDelegate->unit_price * ($promoCodeDiscount / 100);
                         $netAMount = $mainDelegate->unit_price - $discountPrice;
-                    } else {
+                        $unitPrice = $mainDelegate->unit_price;
+                    } else if ($discountType == "price") {
                         $discountPrice = $promoCodeDiscount;
                         $netAMount = $mainDelegate->unit_price - $discountPrice;
+                        $unitPrice = $mainDelegate->unit_price;
+                    } else {
+                        $discountPrice = 0.0;
+                        $netAMount = $promoCode->new_rate;
+                        $unitPrice = $promoCode->new_rate;
                     }
                 } else {
                     $discountPrice = 0.0;
                     $netAMount = $mainDelegate->unit_price;
+                    $unitPrice = $mainDelegate->unit_price;
                 }
 
                 $printedBadgeCount = 0;
@@ -4096,7 +4104,7 @@ class RegistrationController extends Controller
                     'attending_welcome_dinner' => $mainDelegate->attending_welcome_dinner,
                     'attending_gala_dinner' => $mainDelegate->attending_gala_dinner,
 
-                    'unit_price' => $mainDelegate->unit_price,
+                    'unit_price' => $unitPrice,
                     'discount_price' => $discountPrice,
                     'net_amount' => $netAMount,
                     'printed_badge_count' => $printedBadgeCount,
@@ -4142,6 +4150,7 @@ class RegistrationController extends Controller
                         $promoCodeDiscount = null;
                         $discountPrice = 0.0;
                         $netAMount = 0.0;
+                        $unitPrice = $mainDelegate->unit_price;
 
                         $subPromoCode = PromoCode::where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $subDelegate->pcode_used)->first();
 
@@ -4153,13 +4162,19 @@ class RegistrationController extends Controller
                             if ($discountType == "percentage") {
                                 $discountPrice = $mainDelegate->unit_price * ($promoCodeDiscount / 100);
                                 $netAMount = $mainDelegate->unit_price - $discountPrice;
-                            } else {
+                            } else if ($discountType == "price") {
                                 $discountPrice = $promoCodeDiscount;
                                 $netAMount = $mainDelegate->unit_price - $discountPrice;
+                                $unitPrice = $mainDelegate->unit_price ;
+                            } else {
+                                $discountPrice = 0.0;
+                                $netAMount = $subPromoCode->new_rate;
+                                $unitPrice = $subPromoCode->new_rate;
                             }
                         } else {
                             $discountPrice = 0.0;
                             $netAMount = $mainDelegate->unit_price;
+                            $unitPrice = $subPromoCode->new_rate;
                         }
 
                         $lastDigit = 1000 + intval($subTransactionId);
@@ -4228,7 +4243,7 @@ class RegistrationController extends Controller
                             'attending_welcome_dinner' => $mainDelegate->attending_welcome_dinner,
                             'attending_gala_dinner' => $mainDelegate->attending_gala_dinner,
 
-                            'unit_price' => $mainDelegate->unit_price,
+                            'unit_price' => $unitPrice,
                             'discount_price' => $discountPrice,
                             'net_amount' => $netAMount,
 
