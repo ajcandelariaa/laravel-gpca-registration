@@ -4174,7 +4174,7 @@ class RegistrationController extends Controller
                         } else {
                             $discountPrice = 0.0;
                             $netAMount = $mainDelegate->unit_price;
-                            $unitPrice = $subPromoCode->new_rate;
+                            $unitPrice = $mainDelegate->unit_price ;
                         }
 
                         $lastDigit = 1000 + intval($subTransactionId);
