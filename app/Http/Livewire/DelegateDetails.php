@@ -21,7 +21,7 @@ class DelegateDetails extends Component
 
     public $printedBadges, $scannedBadges;
 
-    public $scanDelegateUrl;
+    public $scanDelegateUrl, $printBadgeDelegateUrl;
 
     protected $listeners = ['printBadgeConfirmed' => 'printBadge'];
 
@@ -46,10 +46,14 @@ class DelegateDetails extends Component
         $this->badgeViewFFTextColor = $registrationType->badge_footer_front_text_color;
         $this->badgeViewFBTextColor = $registrationType->badge_footer_back_text_color;
 
-        $combinedString = $eventId . ',' . $eventCategory . ',' . $finalDelegate['delegateId'] . ',' . $finalDelegate['delegateType'];
-        $finalCryptString = Crypt::encryptString($combinedString);
+        $combinedStringScan = $eventId . ',' . $eventCategory . ',' . $finalDelegate['delegateId'] . ',' . $finalDelegate['delegateType'] . ',' . 'scan';
+        $finalCryptStringScan = Crypt::encryptString($combinedStringScan);
+        $this->scanDelegateUrl = route('scan.qr', ['id' => $finalCryptStringScan]);
         
-        $this->scanDelegateUrl = route('scan.qr', ['id' => $finalCryptString]);
+
+        $combinedStringPrint = $eventId . ',' . $eventCategory . ',' . $finalDelegate['delegateId'] . ',' . $finalDelegate['delegateType'] . ',' . 'print';
+        $finalCryptStringPrint = Crypt::encryptString($combinedStringPrint);
+        $this->printBadgeDelegateUrl = route('scan.qr', ['id' => $finalCryptStringPrint]);
     }
 
 

@@ -221,7 +221,7 @@
         @endif
 
 
-        <div class="col-span-2 sm:col-span-1 space-y-2">
+        {{-- <div class="col-span-2 sm:col-span-1 space-y-2">
             @if ($event->category == 'AF' && $event->year == '2023')
                 <p>If you are interested with the GPCA spouse program, please click here to <a
                         href="https://www.gpcaforum.com/spouse-program/" target="_blank"
@@ -229,7 +229,7 @@
                         href="https://www.gpcaregistration.com/register/2023/AFS/11" target="_blank"
                         class="text-blue-600 hover:underline font-semibold">register.</a></p>
             @endif
-        </div>
+        </div> --}}
 
         @if ($event->category == 'PC')
             <div class="col-span-2 space-y-2">

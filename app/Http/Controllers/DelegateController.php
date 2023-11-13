@@ -9,9 +9,11 @@ use App\Models\Event;
 use App\Models\EventRegistrationType;
 use App\Models\MainDelegate;
 use App\Models\MainVisitor;
+use App\Models\PrintedBadge;
 use App\Models\ScannedDelegate;
 use App\Models\ScannedVisitor;
 use App\Models\Transaction;
+use App\Models\VisitorPrintedBadge;
 use App\Models\VisitorTransaction;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
@@ -470,7 +472,7 @@ class DelegateController extends Controller
                 $finalWidth = (22.3 / 2.54) * 72;
             }
 
-            $combinedString = $eventId . ',' . $eventCategory . ',' . $delegateId . ',' . $delegateType;
+            $combinedString = $eventId . ',' . $eventCategory . ',' . $delegateId . ',' . $delegateType . ',' . 'scan';
             $finalCryptString = Crypt::encryptString($combinedString);
 
             $scanDelegateUrl = route('scan.qr', ['id' => $finalCryptString]);
@@ -516,6 +518,7 @@ class DelegateController extends Controller
                         'finalHeight' => $finalHeight,
 
                         'scanDelegateUrl' => $scanDelegateUrl,
+                        'badgeName' => $tempDelegate->last_name . '_' . $companyName . '_BADGE',
                     ];
                 } else {
                     if ($eventCategory == "AFV") {
@@ -560,6 +563,7 @@ class DelegateController extends Controller
                         'finalHeight' => $finalHeight,
 
                         'scanDelegateUrl' => $scanDelegateUrl,
+                        'badgeName' => $tempDelegate->last_name . '_' . $companyName . '_BADGE',
                     ];
                 }
 
@@ -581,7 +585,197 @@ class DelegateController extends Controller
                     $pdf->setPaper(array(0, 0, $finalWidth, $finalHeight), 'custom');
                 }
 
-                return $pdf->stream('badge.pdf');
+                // return view('admin.events.delegates.delegate_badgev4', $finalDelegate);
+                return $pdf->stream($finalDelegate['badgeName'] . '.pdf');
+            } else {
+                abort(404, 'The URL is incorrect');
+            }
+        } else {
+            abort(404, 'The URL is incorrect');
+        }
+    }
+
+
+    
+
+    public function delegateDetailPublicPrintBadge($eventCategory, $eventId, $delegateType, $delegateId)
+    {
+        if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {
+            $event = Event::where('category', $eventCategory)->where('id', $eventId)->first();
+
+            $finalDelegate = array();
+            $tempDelegate = array();
+
+            if ($eventCategory == "AFV") {
+                if ($delegateType == "main") {
+                    $tempDelegate = MainVisitor::where('id', $delegateId)->first();
+                } else {
+                    $tempDelegate = AdditionalVisitor::where('id', $delegateId)->first();
+                }
+            } else {
+                if ($delegateType == "main") {
+                    $tempDelegate = MainDelegate::where('id', $delegateId)->first();
+                } else {
+                    $tempDelegate = AdditionalDelegate::where('id', $delegateId)->first();
+                }
+            }
+
+
+            $frontBanner = public_path(Storage::url($event->badge_front_banner));
+            $finalFrontBanner = str_replace('\/', '/', $frontBanner);
+
+            $backtBanner = public_path(Storage::url($event->badge_back_banner));
+            $finalBackBanner = str_replace('\/', '/', $backtBanner);
+
+            if ($eventCategory == "PSW") {
+                // $finalHeight = (15.2 / 2.54) * 72;
+                // $finalWidth = (23.3 / 2.54) * 72;
+
+
+                // $finalHeight = (12.5 / 2.54) * 72;
+                // $finalWidth = (17.2 / 2.54) * 72;
+
+
+                $finalHeight = (13.1 / 2.54) * 72;
+                $finalWidth = (18.2 / 2.54) * 72;
+            } else {
+                $finalHeight = (15.2 / 2.54) * 72;
+                $finalWidth = (22.3 / 2.54) * 72;
+            }
+
+            $combinedString = $eventId . ',' . $eventCategory . ',' . $delegateId . ',' . $delegateType . ',' . 'scan';
+            $finalCryptString = Crypt::encryptString($combinedString);
+
+            $scanDelegateUrl = route('scan.qr', ['id' => $finalCryptString]);
+
+            if ($tempDelegate != null) {
+                $registrationType = EventRegistrationType::where('event_id', $eventId)->where('event_category', $eventCategory)->where('registration_type', $tempDelegate->badge_type)->first();
+
+                if ($delegateType  == "main") {
+                    if ($tempDelegate->salutation == "Dr." || $tempDelegate->salutation == "Prof.") {
+                        $delegateSalutation = $tempDelegate->salutation;
+                    } else {
+                        $delegateSalutation = null;
+                    }
+
+
+                    if ($tempDelegate->alternative_company_name != null) {
+                        $companyName = $tempDelegate->alternative_company_name;
+                    } else {
+                        $companyName = $tempDelegate->company_name;
+                    }
+
+                    $finalDelegate = [
+                        'salutation' => $delegateSalutation,
+                        'first_name' => $tempDelegate->first_name,
+                        'middle_name' => $tempDelegate->middle_name,
+                        'last_name' => $tempDelegate->last_name,
+                        'job_title' => $tempDelegate->job_title,
+                        'badge_type' => $tempDelegate->badge_type,
+                        'companyName' => $companyName,
+                        'frontBanner' =>  $finalFrontBanner,
+                        'backBanner' =>  $finalBackBanner,
+                        'textColor' => $event->badge_footer_link_color,
+                        'bgColor' => $event->badge_footer_bg_color,
+                        'link' => $event->badge_footer_link,
+
+                        'frontText' => $registrationType->badge_footer_front_name,
+                        'frontTextColor' => $registrationType->badge_footer_front_text_color,
+                        'frontTextBGColor' => $registrationType->badge_footer_front_bg_color,
+                        'backText' => $registrationType->badge_footer_back_name,
+                        'backTextColor' => $registrationType->badge_footer_back_text_color,
+                        'backTextBGColor' => $registrationType->badge_footer_back_bg_color,
+                        'finalWidth' => $finalWidth,
+                        'finalHeight' => $finalHeight,
+
+                        'scanDelegateUrl' => $scanDelegateUrl,
+                        'badgeName' => $tempDelegate->last_name . '_' . $companyName . '_BADGE',
+                    ];
+                } else {
+                    if ($eventCategory == "AFV") {
+                        $mainDelegateInfo = MainVisitor::where('id', $tempDelegate->main_visitor_id)->first();
+                    } else {
+                        $mainDelegateInfo = MainDelegate::where('id', $tempDelegate->main_delegate_id)->first();
+                    }
+
+                    if ($tempDelegate->salutation == "Dr." || $tempDelegate->salutation == "Prof.") {
+                        $delegateSalutation = $tempDelegate->salutation;
+                    } else {
+                        $delegateSalutation = null;
+                    }
+
+                    if ($mainDelegateInfo->alternative_company_name != null) {
+                        $companyName = $mainDelegateInfo->alternative_company_name;
+                    } else {
+                        $companyName = $mainDelegateInfo->company_name;
+                    }
+
+                    $finalDelegate = [
+                        'salutation' => $delegateSalutation,
+                        'first_name' => $tempDelegate->first_name,
+                        'middle_name' => $tempDelegate->middle_name,
+                        'last_name' => $tempDelegate->last_name,
+                        'job_title' => $tempDelegate->job_title,
+                        'badge_type' => $tempDelegate->badge_type,
+                        'companyName' => $companyName,
+                        'frontBanner' =>  $finalFrontBanner,
+                        'backBanner' =>  $finalBackBanner,
+                        'textColor' => $event->badge_footer_link_color,
+                        'bgColor' => $event->badge_footer_bg_color,
+                        'link' => $event->badge_footer_link,
+
+                        'frontText' => $registrationType->badge_footer_front_name,
+                        'frontTextColor' => $registrationType->badge_footer_front_text_color,
+                        'frontTextBGColor' => $registrationType->badge_footer_front_bg_color,
+                        'backText' => $registrationType->badge_footer_back_name,
+                        'backTextColor' => $registrationType->badge_footer_back_text_color,
+                        'backTextBGColor' => $registrationType->badge_footer_back_bg_color,
+                        'finalWidth' => $finalWidth,
+                        'finalHeight' => $finalHeight,
+
+                        'scanDelegateUrl' => $scanDelegateUrl,
+                        'badgeName' => $tempDelegate->last_name . '_' . $companyName . '_BADGE',
+                    ];
+                }
+
+                if ($eventCategory == "PSW") {
+                    $pdf = Pdf::loadView('admin.events.delegates.delegate_badgev6', $finalDelegate, [
+                        'margin_top' => 0,
+                        'margin_right' => 0,
+                        'margin_bottom' => 0,
+                        'margin_left' => 0,
+                    ]);
+                    $pdf->setPaper('A4', 'portrait');
+                } else {
+                    $pdf = Pdf::loadView('admin.events.delegates.delegate_badgev4', $finalDelegate, [
+                        'margin_top' => 0,
+                        'margin_right' => 0,
+                        'margin_bottom' => 0,
+                        'margin_left' => 0,
+                    ]);
+                    $pdf->setPaper(array(0, 0, $finalWidth, $finalHeight), 'custom');
+                }
+
+                if($eventCategory == "AFV"){
+                    VisitorPrintedBadge::create([
+                        'event_id' => $eventId,
+                        'event_category' => $eventCategory,
+                        'visitor_id' => $delegateId,
+                        'visitor_type' => $delegateType,
+                        'printed_date_time' => Carbon::now(),
+                    ]);
+                } else {
+                    PrintedBadge::create([
+                        'event_id' => $eventId,
+                        'event_category' => $eventCategory,
+                        'delegate_id' => $delegateId,
+                        'delegate_type' => $delegateType,
+                        'printed_date_time' => Carbon::now(),
+                    ]);
+                }
+
+                // return view('admin.events.delegates.delegate_badgev4', $finalDelegate);
+                return $pdf->stream($finalDelegate['badgeName'] . '.pdf');
             } else {
                 abort(404, 'The URL is incorrect');
             }
@@ -596,7 +790,12 @@ class DelegateController extends Controller
         //     if (Session::get('userType') == 'gpcaAdmin') {
         $decryptedText = Crypt::decryptString($id);
         $arrayString = explode(",", $decryptedText);
-        return redirect()->route('admin.event.delegates.detail.scanBadge', ['eventCategory' => $arrayString[1], 'eventId' => $arrayString[0], 'delegateId' => $arrayString[2], 'delegateType' => $arrayString[3]]);
+
+        if($arrayString[4] == "print"){
+            return redirect()->route('generate-public-badge', ['eventCategory' => $arrayString[1], 'eventId' => $arrayString[0], 'delegateId' => $arrayString[2], 'delegateType' => $arrayString[3]]);
+        } else {
+            return redirect()->route('admin.event.delegates.detail.scanBadge', ['eventCategory' => $arrayString[1], 'eventId' => $arrayString[0], 'delegateId' => $arrayString[2], 'delegateType' => $arrayString[3]]);
+        }
         //     }
         // }
         // return view('admin.events.scanned-delegate.unauthorized_scanned');

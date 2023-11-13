@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Delegate Badge Type</title>
+    <title>{{ $badgeName }}</title>
 
     <style type="text/css">
         body {
@@ -77,6 +77,7 @@
                 <p class="company-name">{{ $companyName }}</p>
             </div>
         </div>
+        
 
         <div class="back middle">
             <div class="container">
@@ -86,6 +87,8 @@
             </div>
         </div>
     </div>
+    <script type="text/javascript">
+        window.print();
+    </script>
 </body>
-
 </html>
