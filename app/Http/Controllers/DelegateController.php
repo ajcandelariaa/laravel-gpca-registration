@@ -586,7 +586,7 @@ class DelegateController extends Controller
                 }
 
                 // return view('admin.events.delegates.delegate_badgev4', $finalDelegate);
-                return $pdf->stream($finalDelegate['badgeName'] . '.pdf');
+                return $pdf->stream($finalDelegate['badgeName'] . '.pdf',  array('Attachment'=> 0) );
             } else {
                 abort(404, 'The URL is incorrect');
             }
@@ -775,7 +775,7 @@ class DelegateController extends Controller
                 }
 
                 // return view('admin.events.delegates.delegate_badgev4', $finalDelegate);
-                return $pdf->stream($finalDelegate['badgeName'] . '.pdf');
+                return $pdf->stream($finalDelegate['badgeName'] . '.pdf',  array('Attachment'=> 0) );
             } else {
                 abort(404, 'The URL is incorrect');
             }

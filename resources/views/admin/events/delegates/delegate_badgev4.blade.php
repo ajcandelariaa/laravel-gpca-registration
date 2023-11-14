@@ -54,12 +54,13 @@
         .middle {
             width: 270px;
             margin-top: 310px;
-            height: 150px; /** exact px height of the delegate details **/
+            height: 150px;
+            /** exact px height of the delegate details **/
             /* border: 1px solid black; */
             position: absolute;
         }
 
-        .container{
+        .container {
             position: relative;
             top: 38%;
             left: 50%;
@@ -77,7 +78,6 @@
                 <p class="company-name">{{ $companyName }}</p>
             </div>
         </div>
-        
 
         <div class="back middle">
             <div class="container">
@@ -87,8 +87,7 @@
             </div>
         </div>
     </div>
-    <script type="text/javascript">
-        window.print();
-    </script>
+    <script type="text/javascript"> try { this.print(); } catch (e) { window.onload = window.print; } </script>
 </body>
+
 </html>
