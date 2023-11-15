@@ -15,7 +15,7 @@
             </div>
             <div class="flex items-center gap-2">
                 <div class="relative">
-                    <input type="text" wire:model.lazy="searchTerm"
+                    <input type="text" wire:model.lazy="searchTerm" wire:keydown.enter="search"
                         class="border border-gray-300 bg-white rounded-md py-2 pl-10 pr-4 block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5"
                         placeholder="Search...">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -71,7 +71,7 @@
         </div>
 
         <div class="shadow-lg my-5 pt-5 bg-white rounded-md">
-            <h1 class="text-center text-2xl bg-registrationPrimaryColor text-white py-4">Transactions</h1>
+            <h1 class="text-center text-2xl bg-registrationPrimaryColor text-white py-4">Transactions ({{ count($finalListOfRegistrants) }})</h1>
 
             <div class="grid grid-cols-12 gap-5 p-4 text-center items-center bg-blue-600 text-white ">
                 <div class="col-span-1 break-words">Invoice Number</div>

@@ -1,3 +1,46 @@
+
+// BROADCAST EMAIL NOTIFICATION
+window.addEventListener("swal:broadcast-email-success", (event) => {
+    let registrationLloadingScreen = document.getElementById('registration-loading-screen');
+    registrationLloadingScreen.classList.add('hidden');
+    swal({
+        title: event.detail.message,
+        text: event.detail.text,
+        icon: event.detail.type,
+    });
+});
+
+window.addEventListener("swal:broadcast-email-confirmation", (event) => {
+    swal({
+        title: event.detail.message,
+        text: event.detail.text,
+        icon: event.detail.type,
+        buttons: {
+            confirm: {
+                text: "Yes, send it!",
+                value: true,
+                visible: true,
+                closeModal: true,
+            },
+            cancel: {
+                text: "Cancel",
+                value: null,
+                visible: true,
+                closeModal: true,
+            },
+        }
+      }).then((result) => {
+        console.log(result);
+        if (result) {
+            let registrationLloadingScreen = document.getElementById('registration-loading-screen');
+            registrationLloadingScreen.classList.remove('hidden');
+            Livewire.emit('broadcastEmailConfirmed')
+        }
+      });
+});
+
+
+
 //PRINT BADGE
 window.addEventListener("swal:print-badge-confirmed", (event) => {
     swal({

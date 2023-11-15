@@ -25,7 +25,7 @@ class EventDelegatesList extends Component
 
     public $name, $company, $jobTitle, $registrationType, $badgeViewFFText, $badgeViewFBText, $badgeViewFFBGColor, $badgeViewFBBGColor, $badgeViewFFTextColor, $badgeViewFBTextColor;
 
-    protected $listeners = ['printBadgeConfirmed' => 'printBadge'];
+    protected $listeners = ['printBadgeConfirmed' => 'printBadge', 'broadcastEmailConfirmed' => 'sendBroadcastEmail'];
 
     public function mount($eventId, $eventCategory)
     {
@@ -152,11 +152,15 @@ class EventDelegatesList extends Component
                 }
             }
         }
-        // dd($this->finalListsOfDelegatesTemp);
+        $this->finalListsOfDelegates = $this->finalListsOfDelegatesTemp;
     }
 
     public function render()
     {
+        return view('livewire.admin.events.delegates.event-delegates-list');
+    }
+
+    public function search(){
         if (empty($this->searchTerm)) {
             $this->finalListsOfDelegates = $this->finalListsOfDelegatesTemp;
         } else {
@@ -175,9 +179,7 @@ class EventDelegatesList extends Component
                 })
                 ->all();
         }
-        return view('livewire.admin.events.delegates.event-delegates-list');
     }
-
 
     public function printBadgeClicked($delegateType, $delegateId, $arrayIndex)
     {
@@ -263,5 +265,23 @@ class EventDelegatesList extends Component
         $this->badgeViewFBTextColor = null;
 
         $this->badgeView = false;
+    }
+
+
+    public function sendBroadcastEmailShow(){
+        $this->dispatchBrowserEvent('swal:broadcast-email-confirmation', [
+            'type' => 'warning',
+            'message' => 'Are you sure?',
+            'text' => "",
+        ]);
+    }    
+
+    public function sendBroadcastEmail(){
+        $this->dispatchBrowserEvent('swal:broadcast-email-success', [
+            'type' => 'success',
+            'message' => 'Broadcast Email Notification Sent!',
+            'text' => "",
+        ]);
+        dd($this->finalListsOfDelegates);
     }
 }
