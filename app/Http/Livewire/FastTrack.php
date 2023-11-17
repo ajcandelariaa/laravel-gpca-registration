@@ -135,7 +135,7 @@ class FastTrack extends Component
 
 
 
-    
+
     public function getAFConfirmedDelegates()
     {
         $eventCategory = "AF";
@@ -314,7 +314,7 @@ class FastTrack extends Component
 
                             $registrationType = EventRegistrationTypes::where('event_id', $event->id)->where('event_category', $eventCategory)->where('registration_type', $subVisitor->badge_type)->first();
 
-                            $transactionId = Transactions::where('visitor_id', $subVisitor->id)->where('visitor_type', "sub")->value('id');
+                            $transactionId = VisitorTransactions::where('visitor_id', $subVisitor->id)->where('visitor_type', "sub")->value('id');
                             $lastDigit = 1000 + intval($transactionId);
                             $finalTransactionId = $event->year . $eventCode . $lastDigit;
 
