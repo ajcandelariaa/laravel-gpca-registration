@@ -88,11 +88,15 @@ Route::prefix('register/{eventYear}/{eventCategory}/{eventId}')->group(function 
 Route::post('capturePayment', [RegistrationController::class, 'capturePayment'])->name('register.capture.payment');
 
 Route::get('/{eventCategory}/{eventId}/view-invoice/{registrantId}', [RegistrationController::class, 'generatePublicInvoice'])->name('generate-public-invoice');
-Route::get('/{eventCategory}/{eventId}/view-badge/{delegateType}/{delegateId}', [DelegateController::class, 'delegateDetailPublicPrintBadge'])->name('generate-public-badge');
+Route::get('/{eventCategory}/{eventId}/print-badge/{delegateType}/{delegateId}', [DelegateController::class, 'delegateDetailPublicPrintBadge'])->name('public-print-badge');
 
 Route::get('/download-file/{documentId}', [RegistrationController::class, 'downloadFile'])->name('download-file');
 
 Route::get('/scan-qr/{id}', [DelegateController::class, 'scanQr'])->name('scan.qr');
+
+Route::get('/fast-track', function (){
+    return view('home.fast_track');
+})->name('fast-track');
 
 // Route::get('/phpinfo', function () {
 //     phpinfo();

@@ -32,6 +32,9 @@ module.exports = {
       marginLeft: {
         '360': '360px',
       },
+      fontFamily: {
+          'montserrat': ['Montserrat'],
+      }
     },
   },
   plugins: [],

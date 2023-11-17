@@ -794,7 +794,7 @@ class DelegateController extends Controller
         $arrayString = explode(",", $decryptedText);
 
         if($arrayString[4] == "print"){
-            return redirect()->route('generate-public-badge', ['eventCategory' => $arrayString[1], 'eventId' => $arrayString[0], 'delegateId' => $arrayString[2], 'delegateType' => $arrayString[3]]);
+            return redirect()->route('public-print-badge', ['eventCategory' => $arrayString[1], 'eventId' => $arrayString[0], 'delegateId' => $arrayString[2], 'delegateType' => $arrayString[3]]);
         } else {
             return redirect()->route('admin.event.delegates.detail.scanBadge', ['eventCategory' => $arrayString[1], 'eventId' => $arrayString[0], 'delegateId' => $arrayString[2], 'delegateType' => $arrayString[3]]);
         }
