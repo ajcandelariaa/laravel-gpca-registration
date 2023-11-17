@@ -4,22 +4,29 @@
             wire:click.prevent="returnToHome">Return to Home</button>
 
         <div class="flex flex-row gap-2 items-start">
-            <div class="relative">
-                <input type="text" wire:model.debounce.300ms="searchTerm" @keydown.escape="suggestions = array()"
-                    class="bg-registrationInputFieldsBGColor py-3 px-3 outline-registrationPrimaryColor w-96 text-center"
-                    placeholder="Transaction ID or Full Name">
+            @if ($state == 'qrCodeScanned')
+                <div class="flex flex-row gap-5 text-registrationPrimaryColor text-2xl">
+                    <p>Transaction ID:</p>
+                    <p class="font-semibold">{{ $searchTerm }}</p>
+                </div>
+            @else
+                <div class="relative">
+                    <input type="text" wire:model.debounce.300ms="searchTerm" @keydown.escape="suggestions = array()"
+                        class="bg-registrationInputFieldsBGColor py-3 px-3 outline-registrationPrimaryColor w-96 text-center"
+                        placeholder="Transaction ID or Full Name">
 
-                <ul class="bg-registrationPrimaryColorHover w-full absolute top-10">
-                    @foreach ($suggestions as $suggestion)
-                        <li wire:click="selectSuggestion('{{ $suggestion['transactionId'] }}')"
-                            class="cursor-pointer text-center text-white hover:bg-registrationPrimaryColor">
-                            {{ $suggestion['transactionId'] }} - {{ $suggestion['fullName'] }}</li>
-                        <hr>
-                    @endforeach
-                </ul>
-            </div>
-            <button class="bg-registrationPrimaryColor text-lg text-white py-2 px-5 rounded-md"
-                wire:click.prevent="searchClicked">Search</button>
+                    <ul class="bg-registrationPrimaryColorHover w-full absolute top-10">
+                        @foreach ($suggestions as $suggestion)
+                            <li wire:click="selectSuggestion('{{ $suggestion['transactionId'] }}')"
+                                class="cursor-pointer text-center text-white hover:bg-registrationPrimaryColor">
+                                {{ $suggestion['transactionId'] }} - {{ $suggestion['fullName'] }}</li>
+                            <hr>
+                        @endforeach
+                    </ul>
+                </div>
+                <button class="bg-registrationPrimaryColor text-lg text-white py-2 px-5 rounded-md"
+                    wire:click.prevent="searchClicked">Search</button>
+            @endif
         </div>
     </div>
 
@@ -47,8 +54,8 @@
                     <div>
                         @if ($delegateDetail != null)
                             <p class="text-center py-4 font-bold uppercase"
-                            style="color: {{ $delegateDetail['frontTextColor'] }}; background-color: {{ $delegateDetail['frontTextBGColor'] }}">
-                            {{ $delegateDetail['frontText'] }}</p>
+                                style="color: {{ $delegateDetail['frontTextColor'] }}; background-color: {{ $delegateDetail['frontTextBGColor'] }}">
+                                {{ $delegateDetail['frontText'] }}</p>
                         @else
                             <p class="text-center py-4 font-bold uppercase text-white bg-black">Badge type</p>
                         @endif
@@ -81,8 +88,8 @@
                     <div>
                         @if ($delegateDetail != null)
                             <p class="text-center py-4 font-bold uppercase"
-                            style="color: {{ $delegateDetail['frontTextColor'] }}; background-color: {{ $delegateDetail['frontTextBGColor'] }}">
-                            {{ $delegateDetail['frontText'] }}</p>
+                                style="color: {{ $delegateDetail['frontTextColor'] }}; background-color: {{ $delegateDetail['frontTextBGColor'] }}">
+                                {{ $delegateDetail['frontText'] }}</p>
                         @else
                             <p class="text-center py-4 font-bold uppercase text-white bg-black">Badge type</p>
                         @endif

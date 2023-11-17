@@ -10,8 +10,9 @@ use App\Models\MainVisitor as MainVisitors;
 use App\Models\AdditionalVisitor as AdditionalVisitors;
 use App\Models\EventRegistrationType as EventRegistrationTypes;
 use App\Models\VisitorTransaction as VisitorTransactions;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\Crypt;
 use Livewire\Component;
+use PDO;
 
 class FastTrack extends Component
 {
@@ -23,8 +24,7 @@ class FastTrack extends Component
     public $delegatesDetails = array();
     public $delegateDetail;
 
-    protected $listeners = ['transactionIdLoadingDone' => 'transactionIDClickedSuccess'];
-
+    protected $listeners = ['transactionIdLoadingDone' => 'transactionIDClickedSuccess', 'scannedSuccess' => 'scannedQRContent', 'scannerStoppedSuccess' => 'scannerStopped'];
 
     public function mount()
     {
@@ -45,12 +45,10 @@ class FastTrack extends Component
         $this->state = "qrcode";
     }
 
-    public function closeScannerClicked()
+    public function scannerStopped()
     {
-        return redirect()->route('fast-track');
+        $this->state = null;
     }
-
-
 
     public function returnToHome()
     {
@@ -85,11 +83,8 @@ class FastTrack extends Component
             $this->suggestions = collect($this->delegatesDetails)
                 ->filter(function ($item) {
                     return str_contains(strtolower($item['transactionId']), strtolower($this->searchTerm)) ||
-                        str_contains(strtolower($item['fullName']), strtolower($this->searchTerm)) ||
-                        str_contains(strtolower($item['companyName']), strtolower($this->searchTerm));
-                })->all();
-                
-            $this->suggestions = array_slice($this->suggestions, 0, 10);
+                        str_contains(strtolower($item['fullName']), strtolower($this->searchTerm));
+                })->take(10)->all();
         }
     }
 
@@ -130,7 +125,87 @@ class FastTrack extends Component
 
 
 
+    public function scannedQRContent($content)
+    {
+        $decryptedText = Crypt::decryptString($content);
+        $arrayString = explode(",", $decryptedText);
 
+        if (count($arrayString) < 5) {
+            $this->dispatchBrowserEvent('remove-loading-screen');
+            $this->dispatchBrowserEvent('invalid-qr', [
+                'type' => 'error',
+                'message' => 'Invalid QR Code',
+                'text' => "Please inform one of our admin to assist you",
+            ]);
+            $this->state = null;
+        } else {
+            if ($arrayString[0] != "gpca@reg") {
+                $this->dispatchBrowserEvent('remove-loading-screen');
+                $this->dispatchBrowserEvent('invalid-qr', [
+                    'type' => 'error',
+                    'message' => 'Invalid QR Code',
+                    'text' => "Please inform one of our admin to assist you",
+                ]);
+                $this->state = null;
+            } else {
+                $eventId = $arrayString[1];
+                $eventCategory = $arrayString[2];
+                $delegateId = $arrayString[3];
+                $delegateType = $arrayString[4];
+
+
+                foreach (config('app.eventCategories') as $eventCategoryC => $code) {
+                    if ($eventCategory == $eventCategoryC) {
+                        $eventCode = $code;
+                    }
+                }
+
+                $eventYear = Events::where('id', $eventId)->value('year');
+
+                if ($eventCategory == "AF" || $eventCategory == "AFV") {
+                    if ($eventCategory == "AF") {
+                        $transactionId = Transactions::where('event_id', $eventId)->where('delegate_id', $delegateId)->where('delegate_type', $delegateType)->value('id');
+
+                        $lastDigit = 1000 + intval($transactionId);
+                        $this->searchTerm = $eventYear . $eventCode . $lastDigit;
+                    } else {
+                        $transactionId = VisitorTransactions::where('event_id', $eventId)->where('visitor_id', $delegateId)->where('visitor_type', $delegateType)->value('id');
+
+                        $lastDigit = 1000 + intval($transactionId);
+                        $this->searchTerm = $eventYear . $eventCode . $lastDigit;
+                    }
+
+                    $this->state = "qrCodeScanned";
+                    $matchedTransaction = null;
+                    $this->getAFConfirmedDelegates();
+                    $this->getAFVConfirmedVisitors();
+
+                    foreach ($this->delegatesDetails as $delegateDetails) {
+                        if ($delegateDetails['transactionId'] == $this->searchTerm) {
+                            $matchedTransaction = $delegateDetails;
+                            break;
+                        }
+                    }
+
+                    if ($matchedTransaction != null) {
+                        $this->delegateDetail = $matchedTransaction;
+                    } else {
+                        $this->delegateDetail = null;
+                    }
+
+                    $this->dispatchBrowserEvent('remove-loading-screen');
+                } else {
+                    $this->dispatchBrowserEvent('remove-loading-screen');
+                    $this->dispatchBrowserEvent('invalid-qr', [
+                        'type' => 'error',
+                        'message' => 'Invalid QR Code',
+                        'text' => "Please inform one of our admin to assist you",
+                    ]);
+                    $this->state = null;
+                }
+            }
+        }
+    }
 
 
 

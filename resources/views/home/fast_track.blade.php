@@ -64,10 +64,19 @@
 
     @livewireScripts()
 
-    {{-- <script src="{{ asset('js/qr-scanner.js') }}"></script> --}}
     <script>
+        window.addEventListener("invalid-qr", (event) => {
+            swal({
+                title: event.detail.message,
+                text: event.detail.text,
+                icon: event.detail.type,
+            });
+        });
+
+
         window.addEventListener("scanStarted", () => {
             let videoTag = document.getElementById('preview');
+            let closeScanner = document.getElementById('closeScannerBtn');
 
             var scanner = new Instascan.Scanner({
                 continues: true,
@@ -76,11 +85,19 @@
                 captureImage: false,
                 backgroundScan: false,
                 refractoryPeriod: 10000,
-                scanPeriod: 1,
+                scanPeriod: 5,
             });
 
             scanner.addListener('scan', function(content) {
-                window.location.href = content;
+                let registrationLloadingScreen = document.getElementById('registration-loading-screen');
+                registrationLloadingScreen.classList.remove('hidden');
+                Livewire.emit("scannedSuccess", content);
+                scanner.stop();
+            });
+
+            closeScanner.addEventListener('click', function() {
+                Livewire.emit("scannerStoppedSuccess");
+                scanner.stop();
             });
 
             Instascan.Camera.getCameras().then(function(cameras) {

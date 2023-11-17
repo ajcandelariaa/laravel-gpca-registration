@@ -51,9 +51,9 @@ class DelegateDetails extends Component
         $this->scanDelegateUrl = route('scan.qr', ['id' => $finalCryptStringScan]);
         
 
-        $combinedStringPrint = $eventId . ',' . $eventCategory . ',' . $finalDelegate['delegateId'] . ',' . $finalDelegate['delegateType'] . ',' . 'print';
+        $combinedStringPrint = "gpca@reg" . ',' . $eventId . ',' . $eventCategory . ',' . $finalDelegate['delegateId'] . ',' . $finalDelegate['delegateType'] ;
         $finalCryptStringPrint = Crypt::encryptString($combinedStringPrint);
-        $this->printBadgeDelegateUrl = route('scan.qr', ['id' => $finalCryptStringPrint]);
+        $this->printBadgeDelegateUrl = $finalCryptStringPrint;
     }
 
 
