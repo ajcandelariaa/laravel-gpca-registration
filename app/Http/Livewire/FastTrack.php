@@ -52,11 +52,12 @@ class FastTrack extends Component
 
     public function returnToHome()
     {
-        $this->state = null;
-        $this->searchTerm = '';
-        $this->suggestions = array();
-        $this->delegatesDetails = array();
-        $this->delegateDetail = null;
+        // $this->state = null;
+        // $this->searchTerm = '';
+        // $this->suggestions = array();
+        // $this->delegatesDetails = array();
+        // $this->delegateDetail = null;
+        return redirect()->route('fast-track');
     }
 
 
