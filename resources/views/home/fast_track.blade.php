@@ -113,7 +113,7 @@
         });
 
         window.addEventListener("print-badge", (event) => {
-            window.open(event.detail.printUrl);
+            window.location.replace(event.detail.printUrl)
             Livewire.emit('print-success');
         });
 
