@@ -53,6 +53,21 @@
             margin: 0px auto;
             border-radius: 10px;
             padding: 10px;
+            transition: 1s
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
         }
 
         @keyframes scan {
@@ -99,6 +114,7 @@
         window.addEventListener("scanStarted", () => {
             let videoTag = document.getElementById('preview');
             let closeScanner = document.getElementById('closeScannerBtn');
+                let scannAnimation = document.getElementById('scan-animation');
 
             var scanner = new Instascan.Scanner({
                 continues: true,
@@ -123,8 +139,11 @@
             });
 
             Instascan.Camera.getCameras().then(function(cameras) {
+
                 if (cameras.length > 0) {
-                    scanner.start(cameras[0]);
+                    scanner.start(cameras[0]).then(function () {
+                        scannAnimation.classList.remove('hidden');
+                    });
                 } else {
                     console.error('No cameras found.');
                     alert('No cameras found.');
