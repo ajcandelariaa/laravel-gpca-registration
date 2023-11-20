@@ -49,9 +49,31 @@
         #preview {
             width: 500px;
             height: 500px;
+            object-fit: cover;
             margin: 0px auto;
-            border: 2px solid #646464;
+            border-radius: 10px;
             padding: 10px;
+        }
+
+        @keyframes scan {
+            0% {
+                transform: scaleX(0);
+                opacity: 0.3;
+            }
+
+            50% {
+                transform: scaleX(1);
+                opacity: 0.6;
+            }
+
+            100% {
+                transform: scaleX(0);
+                opacity: 0.3;
+            }
+        }
+
+        .animate-scan {
+            animation: scan 2s infinite;
         }
     </style>
     <script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
