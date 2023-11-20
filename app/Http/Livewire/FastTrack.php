@@ -24,7 +24,7 @@ class FastTrack extends Component
     public $delegatesDetails = array();
     public $delegateDetail;
 
-    protected $listeners = ['transactionIdLoadingDone' => 'transactionIDClickedSuccess', 'scannedSuccess' => 'scannedQRContent', 'scannerStoppedSuccess' => 'scannerStopped'];
+    protected $listeners = ['transactionIdLoadingDone' => 'transactionIDClickedSuccess', 'scannedSuccess' => 'scannedQRContent', 'scannerStoppedSuccess' => 'scannerStopped', 'print-success' => 'printSuccess'];
 
     public function mount()
     {
@@ -52,11 +52,6 @@ class FastTrack extends Component
 
     public function returnToHome()
     {
-        // $this->state = null;
-        // $this->searchTerm = '';
-        // $this->suggestions = array();
-        // $this->delegatesDetails = array();
-        // $this->delegateDetail = null;
         return redirect()->route('fast-track');
     }
 
@@ -120,9 +115,19 @@ class FastTrack extends Component
 
     public function printClicked()
     {
-        return redirect($this->delegateDetail['printUrl']);
+        $this->dispatchBrowserEvent('print-badge', [
+            'printUrl' => $this->delegateDetail['printUrl'],
+        ]);
     }
 
+    public function printSuccess(){
+        $this->dispatchBrowserEvent('print-badge-success', [
+            'redirectUrl' => route('fast-track'),
+            'type' => 'success',
+            'message' => 'Success',
+            'text' => "",
+        ]);
+    }
 
 
 

@@ -102,6 +102,21 @@
     @livewireScripts()
 
     <script>
+        window.addEventListener("print-badge-success", (event) => {
+            swal({
+                title: event.detail.message,
+                text: event.detail.text,
+                icon: event.detail.type,
+            }).then(function() {
+                window.location.replace(event.detail.redirectUrl)
+            });
+        });
+
+        window.addEventListener("print-badge", (event) => {
+            window.open(event.detail.printUrl);
+            Livewire.emit('print-success');
+        });
+
         window.addEventListener("invalid-qr", (event) => {
             swal({
                 title: event.detail.message,
@@ -114,7 +129,7 @@
         window.addEventListener("scanStarted", () => {
             let videoTag = document.getElementById('preview');
             let closeScanner = document.getElementById('closeScannerBtn');
-                let scannAnimation = document.getElementById('scan-animation');
+            let scannAnimation = document.getElementById('scan-animation');
 
             var scanner = new Instascan.Scanner({
                 continues: true,
@@ -141,7 +156,7 @@
             Instascan.Camera.getCameras().then(function(cameras) {
 
                 if (cameras.length > 0) {
-                    scanner.start(cameras[0]).then(function () {
+                    scanner.start(cameras[0]).then(function() {
                         scannAnimation.classList.remove('hidden');
                     });
                 } else {
