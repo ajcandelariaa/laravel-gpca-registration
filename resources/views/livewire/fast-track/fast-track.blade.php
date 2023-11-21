@@ -1,9 +1,9 @@
-<div>
-    <header>
+<div class="h-screen flex flex-col">
+    <header class="flex-shrink-0 ">
         <img src="{{ Storage::url($eventBanner) }}" class="w-full">
     </header>
 
-    <main class="container mx-auto mt-10 mb-20">
+    <main class="container mx-auto my-10 flex-1">
         @if ($state == null)
             <p class="text-registrationPrimaryColor text-7xl font-semibold text-center mt-20">Welcome to FAST TRACK</p>
             <div class="flex flex-col justify-center items-center gap-10 mt-20">
@@ -21,7 +21,7 @@
         @endif
     </main>
 
-    {{-- <footer class="bg-registrationPrimaryColor w-full py-5 text-center text-white mt-auto">
+    <footer class="bg-registrationPrimaryColor w-full py-5 text-center text-white mt-auto">
         <p>Copyright © 2023 GPCA Registration</p>
-    </footer> --}}
+    </footer>
 </div>

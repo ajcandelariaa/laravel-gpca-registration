@@ -30,7 +30,7 @@
         </div>
     </div>
 
-    <div class="mt-10 mb-30">
+    <div class="mt-10">
         <p class="text-registrationPrimaryColor text-2xl font-semibold text-center">Badge Preview</p>
         <div class="col-span-1 grid grid-cols-2 gap-5">
             <div>
