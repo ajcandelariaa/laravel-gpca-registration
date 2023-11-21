@@ -24,12 +24,18 @@ class FastTrack extends Component
     public $delegatesDetails = array();
     public $delegateDetail;
 
-    protected $listeners = ['transactionIdLoadingDone' => 'transactionIDClickedSuccess', 'scannedSuccess' => 'scannedQRContent', 'scannerStoppedSuccess' => 'scannerStopped', 'print-success' => 'printSuccess'];
+
+    public $day, $date, $time;
+
+    protected $listeners = ['updateTime' => 'updateDateTime', 'transactionIdLoadingDone' => 'transactionIDClickedSuccess', 'scannedSuccess' => 'scannedQRContent', 'scannerStoppedSuccess' => 'scannerStopped', 'print-success' => 'printSuccess'];
 
     public function mount()
     {
         $this->eventBanner = Events::where('category', 'AF')->value('banner');
         $this->state = null;
+        $this->date = now()->format('F j, Y');
+        $this->day = now()->format('l');
+        $this->time = now()->format('H:i:s'); 
     }
 
     public function render()
@@ -37,7 +43,10 @@ class FastTrack extends Component
         return view('livewire.fast-track.fast-track');
     }
 
-
+    public function updateDateTime()
+    {
+        $this->time = now()->format('H:i:s'); 
+    }
 
     public function qrCodeScannerClicked()
     {
