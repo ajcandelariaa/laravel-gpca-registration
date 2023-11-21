@@ -102,11 +102,11 @@
     @livewireScripts()
 
     <script>
-        document.addEventListener('livewire:load', function() {
-            setInterval(function() {
-                Livewire.emit('updateTime');
-            }, 1000);
-        });
+        // document.addEventListener('livewire:load', function() {
+        //     setInterval(function() {
+        //         Livewire.emit('updateTime');
+        //     }, 1000);
+        // });
 
         window.addEventListener("print-badge-success", (event) => {
             swal({
