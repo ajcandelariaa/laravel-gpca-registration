@@ -178,7 +178,7 @@
                 <div>
                     <div class="flex items-center gap-2">
                         <input type="checkbox" wire:model.lazy="attendingTo" value="1" id="1">
-                        <label for="1">17<sup>th</sup> Annual GPCA Forum Main Plenary | 3-6 December 2023</label>
+                        <label for="1">17<sup>th</sup> Annual GPCA Forum Main Plenary | 4-6 December 2023</label>
                     </div>
 
                     <div class="flex items-center gap-2">
