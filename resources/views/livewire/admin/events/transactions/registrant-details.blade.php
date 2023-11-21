@@ -122,7 +122,7 @@
                         )
                             <ul class="list-disc ml-10">
                                 @if ($finalData['attending_plenary'])
-                                    <li>17<sup>th</sup> Annual GPCA Forum Main Plenary | 4-6 December 2023</li>
+                                    <li>17<sup>th</sup> Annual GPCA Forum Main Plenary | 3-6 December 2023</li>
                                 @endif
 
                                 @if ($finalData['attending_symposium'])
