@@ -25,9 +25,9 @@ class FastTrack extends Component
     public $delegateDetail;
 
 
-    public $day, $date, $time;
+    public $day, $date;
 
-    protected $listeners = ['updateTime' => 'updateDateTime', 'transactionIdLoadingDone' => 'transactionIDClickedSuccess', 'scannedSuccess' => 'scannedQRContent', 'scannerStoppedSuccess' => 'scannerStopped', 'print-success' => 'printSuccess'];
+    protected $listeners = ['transactionIdLoadingDone' => 'transactionIDClickedSuccess', 'scannedSuccess' => 'scannedQRContent', 'scannerStoppedSuccess' => 'scannerStopped', 'print-success' => 'printSuccess'];
 
     public function mount()
     {
@@ -35,17 +35,11 @@ class FastTrack extends Component
         $this->state = null;
         $this->date = now()->format('F j, Y');
         $this->day = now()->format('l');
-        $this->time = now()->format('H:i:s'); 
     }
 
     public function render()
     {
         return view('livewire.fast-track.fast-track');
-    }
-
-    public function updateDateTime()
-    {
-        $this->time = now()->format('H:i:s'); 
     }
 
     public function qrCodeScannerClicked()

@@ -102,11 +102,16 @@
     @livewireScripts()
 
     <script>
-        // document.addEventListener('livewire:load', function() {
-        //     setInterval(function() {
-        //         Livewire.emit('updateTime');
-        //     }, 1000);
-        // });
+        let currentTimeElement = document.getElementById('current-time');
+
+        function updateTime() {
+            const currentTime = new Date().toLocaleTimeString();
+            currentTimeElement.textContent = currentTime;
+        }
+
+        setInterval(function() {
+            updateTime();
+        }, 1000);
 
         window.addEventListener("print-badge-success", (event) => {
             swal({

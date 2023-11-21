@@ -28,7 +28,7 @@
     <footer>
         <div class="flex flex-col">
             <p>Date: {{ $date }} ({{ $day }})</p>
-            <p>Time: <span id="current-time">{{ $time }}</span></p>
+            <p>Time: <span id="current-time"></span></p>
         </div>
         <div class="bg-registrationPrimaryColor w-full py-5 text-center text-white">
             <p>Copyright © 2023 GPCA Registration</p>
