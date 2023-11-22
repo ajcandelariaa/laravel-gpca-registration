@@ -146,8 +146,10 @@ class FastTrack extends Component
             ]);
             $this->state = null;
         } else {
-            $firstFourContent = $content[0] . $content[1] . $content[2] . $content[3];
-            if ($firstFourContent != "gpca") {
+            $firstTwoContent = substr($content, 0, 2);
+            $lastTwoContent = substr($content, -2);
+            $combinedContent = $lastTwoContent . $firstTwoContent;
+            if ($combinedContent != "gpca") {
                 $this->dispatchBrowserEvent('remove-loading-screen');
                 $this->dispatchBrowserEvent('invalid-qr', [
                     'type' => 'error',
@@ -156,8 +158,8 @@ class FastTrack extends Component
                 ]);
                 $this->state = null;
             } else {
-                $explodedContent = explode(",", $content);
-                $decryptedText = Crypt::decryptString($explodedContent[1]);
+                $encrypTextTextContent = substr($content, 2, -2);
+                $decryptedText = Crypt::decryptString($encrypTextTextContent);
                 $arrayDecryptedText = explode(",", $decryptedText);
                 if (count($arrayDecryptedText) < 5) {
                     $this->dispatchBrowserEvent('remove-loading-screen');
