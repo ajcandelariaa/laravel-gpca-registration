@@ -256,7 +256,7 @@ class RegistrationForm extends Component
                             $totalNetAmountTemp = ($this->finalUnitPrice * $quantityTemp) - $totalDiscountTemp;
                         } else {
                             $totalDiscountTemp = 0;
-                            $totalNetAmountTemp = $this->delegatInvoiceDetails[$existingIndex]['totalNetAmount'] * $quantityTemp;
+                            $totalNetAmountTemp = $this->delegatInvoiceDetails[$existingIndex]['totalUnitPrice'] * $quantityTemp;
                         }
                     } else {
                         $totalDiscountTemp = 0;
