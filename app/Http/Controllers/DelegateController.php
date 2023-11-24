@@ -468,8 +468,16 @@ class DelegateController extends Controller
                 $finalHeight = (13.1 / 2.54) * 72;
                 $finalWidth = (18.2 / 2.54) * 72;
             } else {
-                $finalHeight = (15.2 / 2.54) * 72;
-                $finalWidth = (22.3 / 2.54) * 72;
+                // $finalHeight = (15.2 / 2.54) * 72;
+                // $finalWidth = (22.3 / 2.54) * 72;
+
+                
+                // $finalHeight = (15.6 / 2.54) * 72;
+                // $finalWidth = (25.8 / 2.54) * 72;
+
+                
+                $finalHeight = (12.9 / 2.54) * 72;
+                $finalWidth = (20.6 / 2.54) * 72;
             }
 
             $combinedString = $eventId . ',' . $eventCategory . ',' . $delegateId . ',' . $delegateType . ',' . 'scan';
@@ -576,7 +584,7 @@ class DelegateController extends Controller
                     ]);
                     $pdf->setPaper('A4', 'portrait');
                 } else {
-                    $pdf = Pdf::loadView('admin.events.delegates.delegate_badgev4', $finalDelegate, [
+                    $pdf = Pdf::loadView('admin.events.delegates.delegate_badgev7', $finalDelegate, [
                         'margin_top' => 0,
                         'margin_right' => 0,
                         'margin_bottom' => 0,
@@ -586,8 +594,8 @@ class DelegateController extends Controller
                 }
 
                 // return view('admin.events.delegates.delegate_badgev4', $finalDelegate);
-                // return $pdf->stream($finalDelegate['badgeName'] . '.pdf',  array('Attachment'=> 0) );
-                return $pdf->download($finalDelegate['badgeName'] . '.pdf');
+                return $pdf->stream($finalDelegate['badgeName'] . '.pdf',  array('Attachment'=> 0) );
+                // return $pdf->download($finalDelegate['badgeName'] . '.pdf');
             } else {
                 abort(404, 'The URL is incorrect');
             }
@@ -640,8 +648,16 @@ class DelegateController extends Controller
                 $finalHeight = (13.1 / 2.54) * 72;
                 $finalWidth = (18.2 / 2.54) * 72;
             } else {
-                $finalHeight = (15.2 / 2.54) * 72;
-                $finalWidth = (22.3 / 2.54) * 72;
+                // $finalHeight = (15.2 / 2.54) * 72;
+                // $finalWidth = (22.3 / 2.54) * 72;
+
+                
+                // $finalHeight = (15.6 / 2.54) * 72;
+                // $finalWidth = (25.8 / 2.54) * 72;
+
+                
+                $finalHeight = (12.9 / 2.54) * 72;
+                $finalWidth = (20.6 / 2.54) * 72;
             }
 
             $combinedString = $eventId . ',' . $eventCategory . ',' . $delegateId . ',' . $delegateType . ',' . 'scan';
@@ -748,7 +764,7 @@ class DelegateController extends Controller
                     ]);
                     $pdf->setPaper('A4', 'portrait');
                 } else {
-                    $pdf = Pdf::loadView('admin.events.delegates.delegate_badgev4', $finalDelegate, [
+                    $pdf = Pdf::loadView('admin.events.delegates.delegate_badgev7', $finalDelegate, [
                         'margin_top' => 0,
                         'margin_right' => 0,
                         'margin_bottom' => 0,
