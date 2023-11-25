@@ -105,7 +105,39 @@
                             target="_blank"
                             class="text-blue-700 font-semibold hover:underline">{{ $finalDelegate['invoiceNumber'] }}</a>
                     </span>
-                    
+
+                    <p class="font-bold">Seat Number:</p>
+                    @if ($showEditSeatNumber)
+                        <div class="flex gap-3 items-start">
+                            <input type="text" wire:model="seatNumber"
+                                class="bg-registrationInputFieldsBGColor text-md px-3 border border-registrationPrimaryColor outline-registrationPrimaryColor'">
+
+                            <button wire:click="updateSeatNumber"
+                                class="cursor-pointer hover:text-green-600 text-green-500">
+                                Save
+                            </button>
+
+                            <button wire:click="closeEditSeatNumber"
+                                class="cursor-pointer hover:text-red-600 text-red-500">
+                                Cancel
+                            </button>
+                        </div>
+                    @else
+                        <div class="flex gap-3">
+                            <p>
+                                @if ($finalDelegate['seat_number'] == '' || $finalDelegate['seat_number'] == null)
+                                    N/A
+                                @else
+                                    {{ $finalDelegate['seat_number'] }}
+                                @endif
+                            </p>
+                            <button wire:click="openEditSeatNumber"
+                                class="cursor-pointer hover:text-yellow-600 text-yellow-500">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                                Edit
+                            </button>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
@@ -120,7 +152,8 @@
                         <div>
                             <p class="text-center text-lg">
                                 @if ($finalDelegate['salutation'] == 'Dr.' || $finalDelegate['salutation'] == 'Prof.')
-                                    {{ $finalDelegate['salutation'] }} {{ $finalDelegate['first_name'] }} {{ $finalDelegate['middle_name'] }}
+                                    {{ $finalDelegate['salutation'] }} {{ $finalDelegate['first_name'] }}
+                                    {{ $finalDelegate['middle_name'] }}
                                     {{ $finalDelegate['last_name'] }}
                                 @else
                                     {{ $finalDelegate['first_name'] }} {{ $finalDelegate['middle_name'] }}
@@ -150,7 +183,8 @@
                         <div>
                             <p class="text-center text-lg">
                                 @if ($finalDelegate['salutation'] == 'Dr.' || $finalDelegate['salutation'] == 'Prof.')
-                                    {{ $finalDelegate['salutation'] }} {{ $finalDelegate['first_name'] }} {{ $finalDelegate['middle_name'] }}
+                                    {{ $finalDelegate['salutation'] }} {{ $finalDelegate['first_name'] }}
+                                    {{ $finalDelegate['middle_name'] }}
                                     {{ $finalDelegate['last_name'] }}
                                 @else
                                     {{ $finalDelegate['first_name'] }} {{ $finalDelegate['middle_name'] }}
@@ -174,15 +208,16 @@
             </div>
 
             <div class="shadow-lg my-5 pt-5 bg-white rounded-md col-span-1">
-                <div class="grid grid-cols-2 gap-5 py-2 px-4 text-center items-center bg-registrationPrimaryColor text-white ">
+                <div
+                    class="grid grid-cols-2 gap-5 py-2 px-4 text-center items-center bg-registrationPrimaryColor text-white ">
                     <div class="col-span-1 break-words">No.</div>
                     <div class="col-span-1 break-words">Printed Badge Date Time</div>
                 </div>
 
                 @if ($printedBadges->isEmpty())
-                <div class="bg-red-400 text-white text-center py-2 mt-1 rounded-md">
-                    There are no printed badges yet.
-                </div>
+                    <div class="bg-red-400 text-white text-center py-2 mt-1 rounded-md">
+                        There are no printed badges yet.
+                    </div>
                 @else
                     @foreach ($printedBadges as $printedBadgesIndex => $printedBadges)
                         <div class="grid grid-cols-2 gap-5 py-2 px-4 text-center items-center bg-gray-300">
@@ -192,7 +227,8 @@
                     @endforeach
                 @endif
 
-                <div class="grid grid-cols-2 gap-5 py-2 px-4 text-center items-center bg-registrationPrimaryColor text-white mt-10 ">
+                <div
+                    class="grid grid-cols-2 gap-5 py-2 px-4 text-center items-center bg-registrationPrimaryColor text-white mt-10 ">
                     <div class="col-span-1 break-words">No.</div>
                     <div class="col-span-1 break-words">Scanned Delegate Date Time</div>
                 </div>

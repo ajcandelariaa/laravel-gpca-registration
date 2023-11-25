@@ -5,6 +5,8 @@ namespace App\Http\Livewire;
 use Livewire\Component;
 use App\Models\EventRegistrationType as EventRegistrationTypes;
 use App\Models\Event as Events;
+use App\Models\MainDelegate as MainDelegates;
+use App\Models\AdditionalDelegate as AdditionalDelegates;
 use App\Models\PrintedBadge as PrintedBadges;
 use App\Models\ScannedDelegate as ScannedDelegates;
 use Carbon\Carbon;
@@ -23,6 +25,8 @@ class DelegateDetails extends Component
 
     public $scanDelegateUrl, $printBadgeDelegateUrl;
 
+    public $seatNumber, $showEditSeatNumber;
+
     protected $listeners = ['printBadgeConfirmed' => 'printBadge'];
 
     public function mount($eventCategory, $eventId, $finalDelegate)
@@ -32,7 +36,7 @@ class DelegateDetails extends Component
 
         $this->printedBadges = PrintedBadges::where('event_id', $eventId)->where('delegate_id', $finalDelegate['delegateId'])->where('delegate_type', $finalDelegate['delegateType'])->get();
 
-        
+
         $this->scannedBadges = ScannedDelegates::where('event_id', $eventId)->where('delegate_id', $finalDelegate['delegateId'])->where('delegate_type', $finalDelegate['delegateType'])->get();
 
         $registrationType = EventRegistrationTypes::where('event_id', $eventId)->where('registration_type', $finalDelegate['badge_type'])->first();
@@ -49,11 +53,13 @@ class DelegateDetails extends Component
         $combinedStringScan = $eventId . ',' . $eventCategory . ',' . $finalDelegate['delegateId'] . ',' . $finalDelegate['delegateType'] . ',' . 'scan';
         $finalCryptStringScan = Crypt::encryptString($combinedStringScan);
         $this->scanDelegateUrl = route('scan.qr', ['id' => $finalCryptStringScan]);
-        
 
-        $combinedStringPrint = "gpca@reg" . ',' . $eventId . ',' . $eventCategory . ',' . $finalDelegate['delegateId'] . ',' . $finalDelegate['delegateType'] ;
+
+        $combinedStringPrint = "gpca@reg" . ',' . $eventId . ',' . $eventCategory . ',' . $finalDelegate['delegateId'] . ',' . $finalDelegate['delegateType'];
         $finalCryptStringPrint = Crypt::encryptString($combinedStringPrint);
-        $this->printBadgeDelegateUrl = 'ca'.$finalCryptStringPrint.'gp';
+        $this->printBadgeDelegateUrl = 'ca' . $finalCryptStringPrint . 'gp';
+
+        $this->showEditSeatNumber = false;
     }
 
 
@@ -86,7 +92,7 @@ class DelegateDetails extends Component
 
         $this->dispatchBrowserEvent('swal:print-badge-confirmed', [
             'url' => route('admin.event.delegates.detail.printBadge', ['eventCategory' => $this->event->category, 'eventId' => $this->event->id, 'delegateId' => $this->printDelegateId, 'delegateType' => $this->printDelegateType]),
-            
+
             'type' => 'success',
             'message' => 'Badge Printed Successfully!',
             'text' => ''
@@ -94,5 +100,40 @@ class DelegateDetails extends Component
 
         $this->printDelegateType = null;
         $this->printDelegateId = null;
+    }
+
+
+    public function openEditSeatNumber()
+    {
+        $this->seatNumber = $this->finalDelegate['seat_number'];
+        $this->showEditSeatNumber = true;
+    }
+
+    public function closeEditSeatNumber()
+    {
+        $this->showEditSeatNumber = false;
+        $this->seatNumber = null;
+    }
+
+    public function updateSeatNumber()
+    {
+        if($this->seatNumber == null || trim($this->seatNumber) == ""){
+            $this->seatNumber = null;
+        }
+
+        if ($this->finalDelegate['delegateType'] == "main") {
+            MainDelegates::find($this->finalDelegate['delegateId'])->fill([
+                'seat_number' => $this->seatNumber,
+            ])->save();
+        } else {
+            AdditionalDelegates::find($this->finalDelegate['delegateId'])->fill([
+                'seat_number' => $this->seatNumber,
+            ])->save();
+        }
+
+        $this->finalDelegate['seat_number'] = $this->seatNumber;
+
+        $this->showEditSeatNumber = false;
+        $this->seatNumber = null;
     }
 }

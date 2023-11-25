@@ -219,6 +219,8 @@ class DelegateController extends Controller
                             'job_title' => $tempDelegate->job_title,
                             'badge_type' => $tempDelegate->badge_type,
 
+                            'seat_number' => $tempDelegate->seat_number,
+
                             'pass_type' => $tempDelegate->pass_type,
                             'company_name' => $tempDelegate->company_name,
                             'alternative_company_name' => $tempDelegate->alternative_company_name,
@@ -502,6 +504,13 @@ class DelegateController extends Controller
                         $companyName = $tempDelegate->company_name;
                     }
 
+                    $seatNumber = null;
+                    if($eventCategory == "AF"){
+                        if($tempDelegate->seat_number != null){
+                            $seatNumber = $tempDelegate->seat_number;
+                        }
+                    }
+
                     $finalDelegate = [
                         'salutation' => $delegateSalutation,
                         'first_name' => $tempDelegate->first_name,
@@ -524,6 +533,8 @@ class DelegateController extends Controller
                         'backTextBGColor' => $registrationType->badge_footer_back_bg_color,
                         'finalWidth' => $finalWidth,
                         'finalHeight' => $finalHeight,
+
+                        'seatNumber' => $seatNumber,
 
                         'scanDelegateUrl' => $scanDelegateUrl,
                         'badgeName' => $tempDelegate->last_name . '_' . $companyName . '_BADGE',
@@ -547,6 +558,13 @@ class DelegateController extends Controller
                         $companyName = $mainDelegateInfo->company_name;
                     }
 
+                    $seatNumber = null;
+                    if($eventCategory == "AF"){
+                        if($tempDelegate->seat_number != null){
+                            $seatNumber = $tempDelegate->seat_number;
+                        }
+                    }
+
                     $finalDelegate = [
                         'salutation' => $delegateSalutation,
                         'first_name' => $tempDelegate->first_name,
@@ -569,6 +587,8 @@ class DelegateController extends Controller
                         'backTextBGColor' => $registrationType->badge_footer_back_bg_color,
                         'finalWidth' => $finalWidth,
                         'finalHeight' => $finalHeight,
+
+                        'seatNumber' => $seatNumber,
 
                         'scanDelegateUrl' => $scanDelegateUrl,
                         'badgeName' => $tempDelegate->last_name . '_' . $companyName . '_BADGE',
@@ -682,6 +702,13 @@ class DelegateController extends Controller
                         $companyName = $tempDelegate->company_name;
                     }
 
+                    $seatNumber = null;
+                    if($eventCategory == "AF"){
+                        if($tempDelegate->seat_number != null){
+                            $seatNumber = $tempDelegate->seat_number;
+                        }
+                    }
+
                     $finalDelegate = [
                         'salutation' => $delegateSalutation,
                         'first_name' => $tempDelegate->first_name,
@@ -704,6 +731,8 @@ class DelegateController extends Controller
                         'backTextBGColor' => $registrationType->badge_footer_back_bg_color,
                         'finalWidth' => $finalWidth,
                         'finalHeight' => $finalHeight,
+
+                        'seatNumber' => $seatNumber,
 
                         'scanDelegateUrl' => $scanDelegateUrl,
                         'badgeName' => $tempDelegate->last_name . '_' . $companyName . '_BADGE',
@@ -727,6 +756,13 @@ class DelegateController extends Controller
                         $companyName = $mainDelegateInfo->company_name;
                     }
 
+                    $seatNumber = null;
+                    if($eventCategory == "AF"){
+                        if($tempDelegate->seat_number != null){
+                            $seatNumber = $tempDelegate->seat_number;
+                        }
+                    }
+
                     $finalDelegate = [
                         'salutation' => $delegateSalutation,
                         'first_name' => $tempDelegate->first_name,
@@ -749,6 +785,8 @@ class DelegateController extends Controller
                         'backTextBGColor' => $registrationType->badge_footer_back_bg_color,
                         'finalWidth' => $finalWidth,
                         'finalHeight' => $finalHeight,
+
+                        'seatNumber' => $seatNumber,
 
                         'scanDelegateUrl' => $scanDelegateUrl,
                         'badgeName' => $tempDelegate->last_name . '_' . $companyName . '_BADGE',

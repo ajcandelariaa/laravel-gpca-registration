@@ -62,15 +62,26 @@
             padding: 5px;
         }
 
-        .badge-type {
+        /* .badge-type {
             position: absolute;
             bottom: 5%;
             left: 0%;
             padding: 5px 10px;
-        }
+        } */
 
         .back {
             float: right;
+        }
+
+        .seat-number {
+            position: absolute;
+            top: 60%;
+            left: 18%;
+        }
+
+        .seat-number p{
+            font-weight: bold;
+            font-size: 12pt;
         }
     </style>
 </head>
@@ -90,9 +101,14 @@
                 ) !!} ">
             </div>
 
-            <div class="badge-type" style="background-color:{{ $frontTextBGColor }}">
+            @if ($seatNumber != null)
+                <div class="seat-number">
+                    <p>{{ $seatNumber }}</p>
+                </div>
+            @endif
+            {{-- <div class="badge-type" style="background-color:{{ $frontTextBGColor }}">
                 <span style="color: {{ $frontTextColor }}">{{ $frontText }}</span>
-            </div>
+            </div> --}}
         </div>
 
         <div class="back"style="width: {{ $finalWidth / 2 }}; height: {{ $finalHeight }}"></div>

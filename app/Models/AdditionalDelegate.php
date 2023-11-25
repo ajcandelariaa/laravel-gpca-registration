@@ -22,6 +22,8 @@ class AdditionalDelegate extends Model
         'badge_type',
         'pcode_used',
 
+        'seat_number',
+
         'delegate_cancelled',
         'delegate_replaced',
         'delegate_refunded',
