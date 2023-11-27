@@ -215,6 +215,30 @@ img {
 
 /* Tables */
 
+
+.af-table{
+    -premailer-cellpadding: 0;
+    -premailer-cellspacing: 0;
+    -premailer-width: 100%;
+    margin: 0px;
+    padding: 0px;;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+
+.af-table td {
+    font-size: 12px;
+    margin: 0px;
+    line-height: 12px;
+    text-align: left;
+}
+
+.af-table tr{
+    vertical-align: top;
+    padding-top: 10px;
+}
+
 .table table {
     -premailer-cellpadding: 0;
     -premailer-cellspacing: 0;
