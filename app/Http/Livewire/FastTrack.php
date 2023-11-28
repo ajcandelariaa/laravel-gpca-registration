@@ -291,7 +291,7 @@ class FastTrack extends Component
                     array_push($this->delegatesDetails, [
                         'transactionId' => $finalTransactionId,
                         'fullName' => $fullName,
-                        'jobTitle' => $companyName,
+                        'jobTitle' => $mainDelegate->job_title,
                         'companyName' => $companyName,
                         'badgeType' => $mainDelegate->badge_type,
 
@@ -334,7 +334,7 @@ class FastTrack extends Component
                             array_push($this->delegatesDetails, [
                                 'transactionId' => $finalTransactionId,
                                 'fullName' => $fullName,
-                                'jobTitle' => $companyName,
+                                'jobTitle' => $subDelegate->job_title,
                                 'companyName' => $companyName,
                                 'badgeType' => $subDelegate->badge_type,
 
@@ -398,7 +398,7 @@ class FastTrack extends Component
                     array_push($this->delegatesDetails, [
                         'transactionId' => $finalTransactionId,
                         'fullName' => $fullName,
-                        'jobTitle' => $companyName,
+                        'jobTitle' => $mainVisitor->job_title,
                         'companyName' => $companyName,
                         'badgeType' => $mainVisitor->badge_type,
 
@@ -441,7 +441,7 @@ class FastTrack extends Component
                             array_push($this->delegatesDetails, [
                                 'transactionId' => $finalTransactionId,
                                 'fullName' => $fullName,
-                                'jobTitle' => $companyName,
+                                'jobTitle' => $subVisitor->job_title,
                                 'companyName' => $companyName,
                                 'badgeType' => $subVisitor->badge_type,
 
