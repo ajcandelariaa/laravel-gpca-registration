@@ -15,7 +15,7 @@
                         class="bg-registrationInputFieldsBGColor py-3 px-3 outline-registrationPrimaryColor w-96 text-center"
                         placeholder="Transaction ID or Full Name">
 
-                    <ul class="bg-registrationPrimaryColorHover w-full absolute top-10">
+                    <ul class="bg-registrationPrimaryColorHover w-full absolute top-10 z-50">
                         @foreach ($suggestions as $suggestion)
                             <li wire:click="selectSuggestion('{{ $suggestion['transactionId'] }}')"
                                 class="cursor-pointer text-center text-white hover:bg-registrationPrimaryColor">
@@ -34,71 +34,50 @@
         <p class="text-registrationPrimaryColor text-2xl font-semibold text-center">Badge Preview</p>
         <div class="col-span-1 grid grid-cols-2 gap-5">
             <div>
-                <div class="border border-black mt-10 flex flex-col justify-between">
-                    <div>
-                        <img src="{{ Storage::url($eventBanner) }}">
-                    </div>
-                    <div class="my-32">
-                        @if ($delegateDetail != null)
-                            <p class="text-center text-lg">
-                                {{ $delegateDetail['fullName'] }}
-                            </p>
-                            <p class="text-center">{{ $delegateDetail['jobTitle'] }}</p>
-                            <p class="text-center font-bold">{{ $delegateDetail['companyName'] }}</p>
-                        @else
-                            <p class="text-center text-lg">Name</p>
-                            <p class="text-center">Job Title</p>
-                            <p class="text-center font-bold">Company Name</p>
-                        @endif
-                    </div>
-                    <div>
-                        @if ($delegateDetail != null)
-                            <p class="text-center py-4 font-bold uppercase"
-                                style="color: {{ $delegateDetail['frontTextColor'] }}; background-color: {{ $delegateDetail['frontTextBGColor'] }}">
-                                {{ $delegateDetail['frontText'] }}</p>
-                        @else
-                            <p class="text-center py-4 font-bold uppercase text-white bg-black">Badge type</p>
-                        @endif
+                <div class="mt-10 flex flex-col justify-between">
+                    <div class="relative">
+                        <img src="https://www.gpcaforum.com/wp-content/uploads/2023/11/front.png"
+                            class="border border-black" style="width: 400px;">
+                        <div
+                            style="position: absolute; top:24%; height: 150px; width: 100%; padding: 0px 20px;">
+                            <div class="flex flex-col justify-center" style="height: 150px;">
+                                <div class="font-semibold text-registrationPrimaryColor" >
+                                    @if ($delegateDetail != null)
+                                        <p>{{ $delegateDetail['fullName'] }}</p>
+                                        <p>{{ $delegateDetail['jobTitle'] }}</p>
+                                        <p>{{ $delegateDetail['companyName'] }}</p>
+                                    @else
+                                        <p>Name</p>
+                                        <p>Job Title</p>
+                                        <p>Company Name</p>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="position: absolute; bottom: 10%; left: 5%;">
+                            <div>
+                                @if ($delegateDetail != null)
+                                    <p class="text-sm text-center py-2 px-4 font-bold uppercase text-white bg-black">
+                                        {{ $delegateDetail['frontText'] }}</p>
+                                @else
+                                    <p class="text-sm text-center py-2 px-4 font-bold uppercase text-white bg-black">Badge type</p>
+                                @endif
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="text-center mt-3">
-                    <p>Front</p>
-                </div>
+                <p class="text-center mt-3">Front</p>
             </div>
 
             <div>
-                <div class="border border-black mt-10 flex flex-col justify-between">
-                    <div>
-                        <img src="{{ Storage::url($eventBanner) }}">
-                    </div>
-                    <div class="my-32">
-                        @if ($delegateDetail != null)
-                            <p class="text-center text-lg">
-                                {{ $delegateDetail['fullName'] }}
-                            </p>
-                            <p class="text-center">{{ $delegateDetail['jobTitle'] }}</p>
-                            <p class="text-center font-bold">{{ $delegateDetail['companyName'] }}</p>
-                        @else
-                            <p class="text-center text-lg">Name</p>
-                            <p class="text-center">Job Title</p>
-                            <p class="text-center font-bold">Company Name</p>
-                        @endif
-                    </div>
-                    <div>
-                        @if ($delegateDetail != null)
-                            <p class="text-center py-4 font-bold uppercase"
-                                style="color: {{ $delegateDetail['frontTextColor'] }}; background-color: {{ $delegateDetail['frontTextBGColor'] }}">
-                                {{ $delegateDetail['frontText'] }}</p>
-                        @else
-                            <p class="text-center py-4 font-bold uppercase text-white bg-black">Badge type</p>
-                        @endif
-                    </div>
+                <div class="mt-10 flex flex-col justify-between">
+                    <img src="https://www.gpcaforum.com/wp-content/uploads/2023/11/back.png" class="border border-black"
+                        style="width: 400px;">
                 </div>
 
-                <div class="text-center mt-3">
-                    <p>Back</p>
-                </div>
+                <p class="text-center mt-3">Back</p>
             </div>
         </div>
     </div>
