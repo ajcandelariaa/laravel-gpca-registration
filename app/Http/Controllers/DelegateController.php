@@ -683,8 +683,6 @@ class DelegateController extends Controller
             $finalCryptString = base64_encode($combinedString);
             $scanDelegateUrl = 'gpca'.$finalCryptString;
 
-            $scanDelegateUrl = route('scan.qr', ['id' => $finalCryptString]);
-
             if ($tempDelegate != null) {
                 $registrationType = EventRegistrationType::where('event_id', $eventId)->where('event_category', $eventCategory)->where('registration_type', $tempDelegate->badge_type)->first();
 
