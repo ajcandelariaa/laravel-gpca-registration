@@ -6,7 +6,7 @@
     <main class="container mx-auto my-10 flex-1 flex items-center justify-center">
         @if ($state == null)
             <div class="flex flex-col justify-center items-center">
-                <button type="button" class="bg-registrationPrimaryColor text-white rounded-xl text-4xl w-96 h-20"
+                <button type="button" class="bg-registrationPrimaryColor text-white text-lg rounded-xl py-5 px-32"
                     wire:click.prevent="qrCodeScannerClicked">Scan QR Code</button>
             </div>
         @else
