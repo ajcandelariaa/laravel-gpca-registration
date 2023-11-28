@@ -27,28 +27,9 @@
     @livewireStyles()
 
     <style>
-        .swal-button--confirm {
-            background-color: #034889;
-            color: #fff;
-        }
-
-        .swal-button--cancel {
-            background-color: #dd3333;
-            color: #fff;
-        }
-
-
-        .swal-button--confirm:hover {
-            background-color: #033e75 !important;
-        }
-
-        .swal-button--cancel:hover {
-            background-color: #cb2e2e !important;
-        }
-
         #preview {
-            width: 500px;
-            height: 500px;
+            width: 300px;
+            height: 300px;
             object-fit: cover;
             margin: 0px auto;
             border-radius: 10px;
