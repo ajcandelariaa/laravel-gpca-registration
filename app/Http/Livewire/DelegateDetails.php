@@ -50,9 +50,9 @@ class DelegateDetails extends Component
         $this->badgeViewFFTextColor = $registrationType->badge_footer_front_text_color;
         $this->badgeViewFBTextColor = $registrationType->badge_footer_back_text_color;
 
-        $combinedStringScan = $eventId . ',' . $eventCategory . ',' . $finalDelegate['delegateId'] . ',' . $finalDelegate['delegateType'] . ',' . 'scan';
-        $finalCryptStringScan = Crypt::encryptString($combinedStringScan);
-        $this->scanDelegateUrl = route('scan.qr', ['id' => $finalCryptStringScan]);
+        $combinedStringScan =  "gpca@reg" . ',' . $eventId . ',' . $eventCategory . ',' . $finalDelegate['delegateId'] . ',' . $finalDelegate['delegateType'];
+        $finalCryptStringScan = base64_encode($combinedStringScan);
+        $this->scanDelegateUrl = 'gpca'.$finalCryptStringScan;
 
 
         $combinedStringPrint = "gpca@reg" . ',' . $eventId . ',' . $eventCategory . ',' . $finalDelegate['delegateId'] . ',' . $finalDelegate['delegateType'];

@@ -478,14 +478,13 @@ class DelegateController extends Controller
                 // $finalWidth = (25.8 / 2.54) * 72;
 
                 
-                $finalHeight = (12.9 / 2.54) * 72;
-                $finalWidth = (20.6 / 2.54) * 72;
+                $finalHeight = (13.1 / 2.54) * 72;
+                $finalWidth = (20.7 / 2.54) * 72;
             }
 
-            $combinedString = $eventId . ',' . $eventCategory . ',' . $delegateId . ',' . $delegateType . ',' . 'scan';
-            $finalCryptString = Crypt::encryptString($combinedString);
-
-            $scanDelegateUrl = route('scan.qr', ['id' => $finalCryptString]);
+            $combinedString = "gpca@reg" . ',' . $eventId . ',' . $eventCategory . ',' . $delegateId . ',' . $delegateType;
+            $finalCryptString = base64_encode($combinedString);
+            $scanDelegateUrl = 'gpca'.$finalCryptString;
 
             if ($tempDelegate != null) {
                 $registrationType = EventRegistrationType::where('event_id', $eventId)->where('event_category', $eventCategory)->where('registration_type', $tempDelegate->badge_type)->first();
@@ -676,7 +675,7 @@ class DelegateController extends Controller
                 // $finalWidth = (25.8 / 2.54) * 72;
 
                 
-                $finalHeight = (12.9 / 2.54) * 72;
+                $finalHeight = (13.0 / 2.54) * 72;
                 $finalWidth = (20.6 / 2.54) * 72;
             }
 
@@ -838,22 +837,5 @@ class DelegateController extends Controller
         } else {
             abort(404, 'The URL is incorrect');
         }
-    }
-
-    public function scanQr($id)
-    {
-        // if (Session::has('userType')) {
-        //     if (Session::get('userType') == 'gpcaAdmin') {
-        $decryptedText = Crypt::decryptString($id);
-        $arrayString = explode(",", $decryptedText);
-
-        if($arrayString[4] == "print"){
-            return redirect()->route('public-print-badge', ['eventCategory' => $arrayString[1], 'eventId' => $arrayString[0], 'delegateId' => $arrayString[2], 'delegateType' => $arrayString[3]]);
-        } else {
-            return redirect()->route('admin.event.delegates.detail.scanBadge', ['eventCategory' => $arrayString[1], 'eventId' => $arrayString[0], 'delegateId' => $arrayString[2], 'delegateType' => $arrayString[3]]);
-        }
-        //     }
-        // }
-        // return view('admin.events.scanned-delegate.unauthorized_scanned');
     }
 }

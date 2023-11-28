@@ -34,9 +34,17 @@
         }
 
         .details {
+            padding-left: 20px;
+            padding-right: 20px;
+            margin-top: 130px;
+            height: 178px;
             position: absolute;
-            top: 30%;
-            left: 0%;
+        }
+
+        .container{
+            position: relative;
+            top: 50%;
+            transform: translateY(-50%);
         }
 
         .name {
@@ -54,12 +62,25 @@
             font-size: 16pt;
         }
 
-        .qr-code {
+        .qr-code-container {
             position: absolute;
-            top: 60%;
-            left: 33%;
-            background-color: #ffffff;
-            padding: 5px;
+            width: 95px;
+            height: 95px;
+            top: 67%;
+            left: 48%;
+            transform: translateX(-50%);
+        }
+
+        .qr-code-details{
+            position: relative;
+            margin-top: 2px;
+        }
+        
+        .qr-code-details img{
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
 
         /* .badge-type {
@@ -75,8 +96,8 @@
 
         .seat-number {
             position: absolute;
-            top: 60%;
-            left: 18%;
+            top: 68%;
+            left: 19%;
         }
 
         .seat-number p{
@@ -90,15 +111,19 @@
     <div class="badge">
         <div class="front" style="width: {{ $finalWidth / 2 }}; height: {{ $finalHeight }};">
             <div class="details">
-                <p class="name">{{ $salutation }} {{ $first_name }} {{ $middle_name }} {{ $last_name }}</p>
-                <p class="job-title">{{ $job_title }}</p>
-                <p class="company-name">{{ $companyName }}</p>
+                <div class="container">
+                    <p class="name">{{ $salutation }} {{ $first_name }} {{ $middle_name }} {{ $last_name }}</p>
+                    <p class="job-title">{{ $job_title }}</p>
+                    <p class="company-name">{{ $companyName }}</p>
+                </div>
             </div>
 
-            <div class="qr-code">
-                <img src="data:image/png;base64, {!! base64_encode(
-                    QrCode::format('png')->size(80)->generate($scanDelegateUrl),
-                ) !!} ">
+            <div class="qr-code-container">
+                <div class="qr-code-details">
+                    <img src="data:image/png;base64, {!! base64_encode(
+                        QrCode::format('png')->size(91)->generate($scanDelegateUrl),
+                    ) !!} ">
+                </div>
             </div>
 
             @if ($seatNumber != null)
