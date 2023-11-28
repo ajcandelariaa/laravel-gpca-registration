@@ -675,12 +675,13 @@ class DelegateController extends Controller
                 // $finalWidth = (25.8 / 2.54) * 72;
 
                 
-                $finalHeight = (13.0 / 2.54) * 72;
+                $finalHeight = (13.1 / 2.54) * 72;
                 $finalWidth = (20.6 / 2.54) * 72;
             }
 
-            $combinedString = $eventId . ',' . $eventCategory . ',' . $delegateId . ',' . $delegateType . ',' . 'scan';
-            $finalCryptString = Crypt::encryptString($combinedString);
+            $combinedString = "gpca@reg" . ',' . $eventId . ',' . $eventCategory . ',' . $delegateId . ',' . $delegateType;
+            $finalCryptString = base64_encode($combinedString);
+            $scanDelegateUrl = 'gpca'.$finalCryptString;
 
             $scanDelegateUrl = route('scan.qr', ['id' => $finalCryptString]);
 
