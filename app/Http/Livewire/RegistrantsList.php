@@ -44,6 +44,8 @@ class RegistrantsList extends Component
 
     public $getEventCode;
 
+    public $allDelegatesForImport;
+
     protected $listeners = ['importDelegateConfirmed' => 'submitImportRegistrants'];
 
     public function mount($eventId, $eventCategory)
@@ -352,14 +354,13 @@ class RegistrantsList extends Component
                         if ($i == 0) {
                             continue;
                         } else {
-                            $allDelegates = Transactions::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->get();
                             $mainDelegate = null;
                             $subDelegate = null;
 
                             $tempEmail = $rows[$i][18];
                             $lineNumber = $i + 1;
 
-                            foreach ($allDelegates as $delegate) {
+                            foreach ($this->allDelegatesForImport as $delegate) {
                                 if ($delegate->delegate_type == "main") {
                                     $mainDelegate = MainDelegates::where('id', $delegate->delegate_id)->where('email_address', $tempEmail)->first();
 
@@ -457,6 +458,7 @@ class RegistrantsList extends Component
 
     public function openImportModal()
     {
+        $this->allDelegatesForImport = Transactions::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->get();
         $this->showImportModal = true;
     }
 
