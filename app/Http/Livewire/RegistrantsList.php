@@ -44,7 +44,7 @@ class RegistrantsList extends Component
 
     public $getEventCode;
 
-    public $allDelegatesForImport;
+    public $allEmailAddressForImport;
 
     protected $listeners = ['importDelegateConfirmed' => 'submitImportRegistrants'];
 
@@ -354,26 +354,11 @@ class RegistrantsList extends Component
                         if ($i == 0) {
                             continue;
                         } else {
-                            $mainDelegate = null;
-                            $subDelegate = null;
-
                             $tempEmail = $rows[$i][18];
                             $lineNumber = $i + 1;
 
-                            foreach ($this->allDelegatesForImport as $delegate) {
-                                if ($delegate->delegate_type == "main") {
-                                    $mainDelegate = MainDelegates::where('id', $delegate->delegate_id)->where('email_address', $tempEmail)->first();
-
-                                    if ($mainDelegate) {
-                                        array_push($this->emailAlreadyExisting, "Line $lineNumber email address is already registered!");
-                                    }
-                                } else {
-                                    $subDelegate = AdditionalDelegates::where('id', $delegate->delegate_id)->where('email_address', $tempEmail)->first();
-
-                                    if ($subDelegate) {
-                                        array_push($this->emailAlreadyExisting, "Line $lineNumber email address is already registered!");
-                                    }
-                                }
+                            if (in_array($tempEmail, $this->allEmailAddressForImport)) {
+                                array_push($this->emailAlreadyExisting, "Line $lineNumber email address is already registered!");
                             }
                         }
                     }
@@ -458,7 +443,21 @@ class RegistrantsList extends Component
 
     public function openImportModal()
     {
-        $this->allDelegatesForImport = Transactions::where('event_id', $this->eventId)->where('event_category', $this->eventCategory)->get();
+        $temp = [];
+        $mainDelegates = MainDelegates::where('event_id', $this->eventId)->get();
+
+        foreach($mainDelegates as $mainDelegate){
+            $additionalDelegates = AdditionalDelegates::where('main_delegate_id', $mainDelegate->id)->get();
+            $temp[] = $mainDelegate->email_address;
+
+            if($additionalDelegates->isNotEmpty()){
+                foreach($additionalDelegates as $additionalDelegate){
+                    $temp[] = $additionalDelegate->email_address;
+                }
+            }
+        }
+
+        $this->allEmailAddressForImport = $temp;
         $this->showImportModal = true;
     }
 
@@ -476,7 +475,7 @@ class RegistrantsList extends Component
         $this->emailYouAlreadyUsed = array();
         $this->emailAlreadyExisting = array();
         $this->promoCodeErrors = array();
-        $this->allDelegatesForImport = null;
+        $this->allEmailAddressForImport = null;
     }
 
     public function submitImportRegistrants()
