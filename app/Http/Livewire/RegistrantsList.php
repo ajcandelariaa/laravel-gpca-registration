@@ -476,6 +476,7 @@ class RegistrantsList extends Component
         $this->emailYouAlreadyUsed = array();
         $this->emailAlreadyExisting = array();
         $this->promoCodeErrors = array();
+        $this->allDelegatesForImport = null;
     }
 
     public function submitImportRegistrants()
