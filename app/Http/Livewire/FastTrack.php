@@ -228,6 +228,7 @@ class FastTrack extends Component
                                     'message' => 'Invalid QR Code',
                                     'text' => "Please inform one of our admin to assist you",
                                 ]);
+                                $this->searchTerm = null;
                                 $this->state = null;
                             }
 
