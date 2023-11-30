@@ -140,7 +140,7 @@ class EmailBroadcast extends Component
 
         $this->dispatchBrowserEvent('swal:broadcast-email-success', [
             'type' => 'success',
-            'message' => 'Email sent to ' . ($this->endPoint - 1) . ' delegates',
+            'message' => 'Email sent successfully!',
             'text' => "",
         ]);
 

@@ -206,7 +206,6 @@ class FastTrack extends Component
                                 $this->searchTerm = $eventYear . $eventCode . $lastDigit;
                             }
 
-                            $this->state = "qrCodeScanned";
                             $matchedTransaction = null;
                             $this->getAFConfirmedDelegates();
                             $this->getAFVConfirmedVisitors();
@@ -220,11 +219,18 @@ class FastTrack extends Component
 
                             if ($matchedTransaction != null) {
                                 $this->delegateDetail = $matchedTransaction;
+                                $this->state = "qrCodeScanned";
+                                $this->dispatchBrowserEvent('remove-loading-screen');
                             } else {
-                                $this->delegateDetail = null;
+                                $this->dispatchBrowserEvent('remove-loading-screen');
+                                $this->dispatchBrowserEvent('invalid-qr', [
+                                    'type' => 'error',
+                                    'message' => 'Invalid QR Code',
+                                    'text' => "Please inform one of our admin to assist you",
+                                ]);
+                                $this->state = null;
                             }
 
-                            $this->dispatchBrowserEvent('remove-loading-screen');
                         } else {
                             $this->dispatchBrowserEvent('remove-loading-screen');
                             $this->dispatchBrowserEvent('invalid-qr', [
