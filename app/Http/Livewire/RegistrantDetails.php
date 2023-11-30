@@ -1072,9 +1072,9 @@ class RegistrantDetails extends Component
                             'eventYear' => $this->event->year,
                         ];
                         try {
-                            Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->queue(new RegistrationPaymentReminder($details, $this->sendInvoice));
+                            Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaymentReminder($details, $this->sendInvoice));
                         } catch (\Exception $e) {
-                            Mail::to(config('app.ccEmailNotif.error'))->queue(new RegistrationPaymentReminder($details, $this->sendInvoice));
+                            Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaymentReminder($details, $this->sendInvoice));
                         }
                     }
                 }
@@ -1083,9 +1083,9 @@ class RegistrantDetails extends Component
 
         if ($this->finalData['assistant_email_address'] != null) {
             try {
-                Mail::to($this->finalData['assistant_email_address'])->queue(new RegistrationPaymentReminder($details, $this->sendInvoice));
+                Mail::to($this->finalData['assistant_email_address'])->send(new RegistrationPaymentReminder($details, $this->sendInvoice));
             } catch (\Exception $e) {
-                Mail::to(config('app.ccEmailNotif.error'))->queue(new RegistrationPaymentReminder($details, $this->sendInvoice));
+                Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaymentReminder($details, $this->sendInvoice));
             }
         }
 

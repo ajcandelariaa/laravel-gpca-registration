@@ -66,5 +66,8 @@ class MainVisitor extends Model
         
         'registration_confirmation_sent_count',
         'registration_confirmation_sent_datetime',
+
+        'email_broadcast_sent_count',
+        'email_broadcast_sent_datetime',
     ];
 }

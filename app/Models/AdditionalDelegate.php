@@ -36,5 +36,8 @@ class AdditionalDelegate extends Model
         'delegate_cancelled_datetime',
         'delegate_refunded_datetime',
         'delegate_replaced_datetime',
+
+        'email_broadcast_sent_count',
+        'email_broadcast_sent_datetime',
     ];
 }

@@ -357,3 +357,18 @@ img {
 .break-all {
     word-break: break-all;
 }
+
+
+
+.event-list {
+    margin-top: 0px;
+    padding-top: 0px;
+}
+
+.event-list li{
+    font-size: 14px;
+    margin-top: 0;
+    margin-bottom: 0;
+    line-height: 16px;
+    text-align: left;
+}

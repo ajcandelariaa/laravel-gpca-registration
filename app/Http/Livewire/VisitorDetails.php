@@ -20,7 +20,7 @@ class VisitorDetails extends Component
 
     public $printedBadges, $scannedBadges;
 
-    public $scanVisitorUrl;
+    public $scanVisitorUrl, $printBadgeVisitorUrl;
 
     protected $listeners = ['printBadgeConfirmed' => 'printBadge'];
 
@@ -43,10 +43,14 @@ class VisitorDetails extends Component
         $this->badgeViewFFTextColor = $registrationType->badge_footer_front_text_color;
         $this->badgeViewFBTextColor = $registrationType->badge_footer_back_text_color;
 
-        $combinedString = $eventId . ',' . $eventCategory . ',' . $finalVisitor['visitorId'] . ',' . $finalVisitor['visitorType'];
-        $finalCryptString = Crypt::encryptString($combinedString);
-        
-        $this->scanVisitorUrl = route('scan.qr', ['id' => $finalCryptString]);
+        $combinedStringScan =  "gpca@reg" . ',' . $eventId . ',' . $eventCategory . ',' . $finalVisitor['visitorId'] . ',' . $finalVisitor['visitorType'];
+        $finalCryptStringScan = base64_encode($combinedStringScan);
+        $this->scanVisitorUrl = 'gpca'.$finalCryptStringScan;
+
+
+        $combinedStringPrint = "gpca@reg" . ',' . $eventId . ',' . $eventCategory . ',' . $finalVisitor['visitorId'] . ',' . $finalVisitor['visitorType'];
+        $finalCryptStringPrint = Crypt::encryptString($combinedStringPrint);
+        $this->printBadgeVisitorUrl = 'ca' . $finalCryptStringPrint . 'gp';
     }
     public function render()
     {

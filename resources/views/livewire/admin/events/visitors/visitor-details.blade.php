@@ -15,6 +15,14 @@
                         class="bg-blue-800 hover:bg-blue-900 text-white py-2 px-2 rounded-md  text-center w-full">
                         Print Badge
                     </button>
+
+                    <div class="text-center my-2">
+                        <p>or scan the below QR to print</p>
+                    </div>
+
+                    <div class="mt-2 flex justify-center">
+                        {!! QrCode::size(300)->generate($printBadgeVisitorUrl) !!}
+                    </div>
                 </div>
             </div>
 

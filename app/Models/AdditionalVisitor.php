@@ -35,5 +35,8 @@ class AdditionalVisitor extends Model
         'visitor_cancelled_datetime',
         'visitor_refunded_datetime',
         'visitor_replaced_datetime',
+
+        'email_broadcast_sent_count',
+        'email_broadcast_sent_datetime',
     ];
 }
