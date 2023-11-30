@@ -262,6 +262,8 @@ class DelegateController extends Controller
                             'nationality' => $tempDelegate->nationality,
                             'job_title' => $tempDelegate->job_title,
                             'badge_type' => $tempDelegate->badge_type,
+                            
+                            'seat_number' => $tempDelegate->seat_number,
 
                             'pass_type' => $mainDelegateInfo->pass_type,
                             'company_name' => $mainDelegateInfo->company_name,
@@ -316,6 +318,20 @@ class DelegateController extends Controller
             }
             return view('admin.events.scanned-delegate.scanned_delegate_list', [
                 "pageTitle" => $pageTitle,
+                "eventCategory" => $eventCategory,
+                "eventId" => $eventId,
+            ]);
+        } else {
+            abort(404, 'The URL is incorrect');
+        }
+    }
+
+
+    public function eventEmailBroadcastView($eventCategory, $eventId)
+    {
+        if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {
+            return view('admin.events.broadcast.email_broadcast', [
+                "pageTitle" => "Email broadcast",
                 "eventCategory" => $eventCategory,
                 "eventId" => $eventId,
             ]);
@@ -473,18 +489,18 @@ class DelegateController extends Controller
                 // $finalHeight = (15.2 / 2.54) * 72;
                 // $finalWidth = (22.3 / 2.54) * 72;
 
-                
+
                 // $finalHeight = (15.6 / 2.54) * 72;
                 // $finalWidth = (25.8 / 2.54) * 72;
 
-                
+
                 $finalHeight = (13.1 / 2.54) * 72;
                 $finalWidth = (20.7 / 2.54) * 72;
             }
 
             $combinedString = "gpca@reg" . ',' . $eventId . ',' . $eventCategory . ',' . $delegateId . ',' . $delegateType;
             $finalCryptString = base64_encode($combinedString);
-            $scanDelegateUrl = 'gpca'.$finalCryptString;
+            $scanDelegateUrl = 'gpca' . $finalCryptString;
 
             if ($tempDelegate != null) {
                 $registrationType = EventRegistrationType::where('event_id', $eventId)->where('event_category', $eventCategory)->where('registration_type', $tempDelegate->badge_type)->first();
@@ -504,8 +520,8 @@ class DelegateController extends Controller
                     }
 
                     $seatNumber = null;
-                    if($eventCategory == "AF"){
-                        if($tempDelegate->seat_number != null){
+                    if ($eventCategory == "AF") {
+                        if ($tempDelegate->seat_number != null) {
                             $seatNumber = $tempDelegate->seat_number;
                         }
                     }
@@ -558,8 +574,8 @@ class DelegateController extends Controller
                     }
 
                     $seatNumber = null;
-                    if($eventCategory == "AF"){
-                        if($tempDelegate->seat_number != null){
+                    if ($eventCategory == "AF") {
+                        if ($tempDelegate->seat_number != null) {
                             $seatNumber = $tempDelegate->seat_number;
                         }
                     }
@@ -613,7 +629,7 @@ class DelegateController extends Controller
                 }
 
                 // return view('admin.events.delegates.delegate_badgev4', $finalDelegate);
-                return $pdf->stream($finalDelegate['badgeName'] . '.pdf',  array('Attachment'=> 0) );
+                return $pdf->stream($finalDelegate['badgeName'] . '.pdf',  array('Attachment' => 0));
                 // return $pdf->download($finalDelegate['badgeName'] . '.pdf');
             } else {
                 abort(404, 'The URL is incorrect');
@@ -624,7 +640,7 @@ class DelegateController extends Controller
     }
 
 
-    
+
 
     public function delegateDetailPublicPrintBadge($eventCategory, $eventId, $delegateType, $delegateId)
     {
@@ -670,18 +686,18 @@ class DelegateController extends Controller
                 // $finalHeight = (15.2 / 2.54) * 72;
                 // $finalWidth = (22.3 / 2.54) * 72;
 
-                
+
                 // $finalHeight = (15.6 / 2.54) * 72;
                 // $finalWidth = (25.8 / 2.54) * 72;
 
-                
+
                 $finalHeight = (13.1 / 2.54) * 72;
                 $finalWidth = (20.6 / 2.54) * 72;
             }
 
             $combinedString = "gpca@reg" . ',' . $eventId . ',' . $eventCategory . ',' . $delegateId . ',' . $delegateType;
             $finalCryptString = base64_encode($combinedString);
-            $scanDelegateUrl = 'gpca'.$finalCryptString;
+            $scanDelegateUrl = 'gpca' . $finalCryptString;
 
             if ($tempDelegate != null) {
                 $registrationType = EventRegistrationType::where('event_id', $eventId)->where('event_category', $eventCategory)->where('registration_type', $tempDelegate->badge_type)->first();
@@ -701,8 +717,8 @@ class DelegateController extends Controller
                     }
 
                     $seatNumber = null;
-                    if($eventCategory == "AF"){
-                        if($tempDelegate->seat_number != null){
+                    if ($eventCategory == "AF") {
+                        if ($tempDelegate->seat_number != null) {
                             $seatNumber = $tempDelegate->seat_number;
                         }
                     }
@@ -755,8 +771,8 @@ class DelegateController extends Controller
                     }
 
                     $seatNumber = null;
-                    if($eventCategory == "AF"){
-                        if($tempDelegate->seat_number != null){
+                    if ($eventCategory == "AF") {
+                        if ($tempDelegate->seat_number != null) {
                             $seatNumber = $tempDelegate->seat_number;
                         }
                     }
@@ -809,7 +825,7 @@ class DelegateController extends Controller
                     $pdf->setPaper(array(0, 0, $finalWidth, $finalHeight), 'custom');
                 }
 
-                if($eventCategory == "AFV"){
+                if ($eventCategory == "AFV") {
                     VisitorPrintedBadge::create([
                         'event_id' => $eventId,
                         'event_category' => $eventCategory,
