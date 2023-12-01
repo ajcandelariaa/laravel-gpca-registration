@@ -38,10 +38,9 @@
                     <div class="relative">
                         <img src="https://www.gpcaforum.com/wp-content/uploads/2023/11/front.png"
                             class="border border-black" style="width: 400px;">
-                        <div
-                            style="position: absolute; top:24%; height: 150px; width: 100%; padding: 0px 20px;">
+                        <div style="position: absolute; top:24%; height: 150px; width: 100%; padding: 0px 20px;">
                             <div class="flex flex-col justify-center" style="height: 150px;">
-                                <div class="font-semibold text-registrationPrimaryColor" >
+                                <div class="font-semibold text-registrationPrimaryColor">
                                     @if ($delegateDetail != null)
                                         <p>{{ $delegateDetail['fullName'] }}</p>
                                         <p>{{ $delegateDetail['jobTitle'] }}</p>
@@ -55,13 +54,24 @@
                             </div>
                         </div>
 
+                        @if ($delegateDetail != null)
+                            @if ($delegateDetail['seatNumber'] != null || $delegateDetail['seatNumber'] != '')
+                                <div style="position: absolute; left: 23%; top: 60%;">
+                                    <div class="font-semibold text-registrationPrimaryColor">
+                                        <p>{{ $delegateDetail['seatNumber'] }}</p>
+                                    </div>
+                                </div>
+                            @endif
+                        @endif
+
                         <div style="position: absolute; bottom: 10%; left: 5%;">
                             <div>
                                 @if ($delegateDetail != null)
                                     <p class="text-sm text-center py-2 px-4 font-bold uppercase text-white bg-black">
                                         {{ $delegateDetail['frontText'] }}</p>
                                 @else
-                                    <p class="text-sm text-center py-2 px-4 font-bold uppercase text-white bg-black">Badge type</p>
+                                    <p class="text-sm text-center py-2 px-4 font-bold uppercase text-white bg-black">
+                                        Badge type</p>
                                 @endif
                             </div>
                         </div>

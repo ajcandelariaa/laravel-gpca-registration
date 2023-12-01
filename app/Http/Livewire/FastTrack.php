@@ -305,7 +305,6 @@ class FastTrack extends Component
                     $fullName = $delegateSalutation . ' ' . $mainDelegate->first_name . ' ' . $mainDelegate->middle_name . ' ' . $mainDelegate->last_name;
 
                     $printUrl = route('public-print-badge', ['eventCategory' => $event->category, 'eventId' => $event->id, 'delegateId' => $mainDelegate->id, 'delegateType' => 'main']);
-
                     array_push($this->delegatesDetails, [
                         'transactionId' => $finalTransactionId,
                         'fullName' => $fullName,
@@ -318,6 +317,7 @@ class FastTrack extends Component
                         'frontTextBGColor' => $registrationType->badge_footer_front_bg_color,
 
                         'printUrl' => $printUrl,
+                        'seatNumber' => $mainDelegate->seat_number,
                     ]);
                 }
             }
@@ -361,6 +361,7 @@ class FastTrack extends Component
                                 'frontTextBGColor' => $registrationType->badge_footer_front_bg_color,
 
                                 'printUrl' => $printUrl,
+                                'seatNumber' => $subDelegate->seat_number,
                             ]);
                         }
                     }
@@ -425,6 +426,7 @@ class FastTrack extends Component
                         'frontTextBGColor' => $registrationType->badge_footer_front_bg_color,
 
                         'printUrl' => $printUrl,
+                        'seatNumber' => null,
                     ]);
                 }
             }
@@ -468,6 +470,7 @@ class FastTrack extends Component
                                 'frontTextBGColor' => $registrationType->badge_footer_front_bg_color,
 
                                 'printUrl' => $printUrl,
+                                'seatNumber' => null,
                             ]);
                         }
                     }
