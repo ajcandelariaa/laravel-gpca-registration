@@ -495,7 +495,7 @@ class DelegateController extends Controller
 
 
                 $finalHeight = (13.1 / 2.54) * 72;
-                $finalWidth = (20.7 / 2.54) * 72;
+                $finalWidth = (21.0 / 2.54) * 72;
             }
 
             $combinedString = "gpca@reg" . ',' . $eventId . ',' . $eventCategory . ',' . $delegateId . ',' . $delegateType;
@@ -692,7 +692,7 @@ class DelegateController extends Controller
 
 
                 $finalHeight = (13.1 / 2.54) * 72;
-                $finalWidth = (20.6 / 2.54) * 72;
+                $finalWidth = (21.0 / 2.54) * 72;
             }
 
             $combinedString = "gpca@reg" . ',' . $eventId . ',' . $eventCategory . ',' . $delegateId . ',' . $delegateType;

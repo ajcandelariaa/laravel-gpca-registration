@@ -67,13 +67,14 @@
             width: 95px;
             height: 95px;
             top: 67%;
-            left: 48%;
+            left: 49%;
             transform: translateX(-50%);
         }
 
         .qr-code-details{
             position: relative;
-            margin-top: 2px;
+            margin-top: 3px;
+            margin-left: 1px;
         }
         
         .qr-code-details img{
@@ -97,7 +98,7 @@
         .seat-number {
             position: absolute;
             top: 68%;
-            left: 19%;
+            left: 24%;
         }
 
         .seat-number p{
@@ -121,7 +122,7 @@
             <div class="qr-code-container">
                 <div class="qr-code-details">
                     <img src="data:image/png;base64, {!! base64_encode(
-                        QrCode::format('png')->size(91)->generate($scanDelegateUrl),
+                        QrCode::format('png')->size(88)->generate($scanDelegateUrl),
                     ) !!} ">
                 </div>
             </div>
