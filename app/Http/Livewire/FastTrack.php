@@ -125,12 +125,23 @@ class FastTrack extends Component
 
     public function printSuccess()
     {
-        $this->dispatchBrowserEvent('print-badge-success', [
-            'redirectUrl' => route('fast-track'),
+        $this->state = "transactionid";
+        $this->searchTerm = null;
+        $this->suggestions = array();
+        $this->delegateDetail = array();
+
+        $this->dispatchBrowserEvent('print-badge-success-2', [
             'type' => 'success',
             'message' => 'Success',
             'text' => "",
         ]);
+
+        // $this->dispatchBrowserEvent('print-badge-success', [
+        //     'redirectUrl' => route('fast-track'),
+        //     'type' => 'success',
+        //     'message' => 'Success',
+        //     'text' => "",
+        // ]);
     }
 
 

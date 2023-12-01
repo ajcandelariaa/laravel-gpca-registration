@@ -113,6 +113,14 @@
             updateTime();
         }, 1000);
 
+        window.addEventListener("print-badge-success-2", (event) => {
+            swal({
+                title: event.detail.message,
+                text: event.detail.text,
+                icon: event.detail.type,
+            });
+        });
+
         window.addEventListener("print-badge-success", (event) => {
             swal({
                 title: event.detail.message,
