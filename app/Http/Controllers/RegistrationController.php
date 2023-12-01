@@ -4096,6 +4096,8 @@ class RegistrationController extends Controller
 
                     'heard_where' => $mainDelegate->heard_where,
 
+                    'seat_number' => $mainDelegate->seat_number,
+
                     'attending_plenary' => $mainDelegate->attending_plenary,
                     'attending_symposium' => $mainDelegate->attending_symposium,
                     'attending_solxchange' => $mainDelegate->attending_solxchange,
@@ -4235,6 +4237,8 @@ class RegistrationController extends Controller
 
                             'heard_where' => $mainDelegate->heard_where,
 
+                            'seat_number' => $subDelegate->seat_number,
+
                             'attending_plenary' => $mainDelegate->attending_plenary,
                             'attending_symposium' => $mainDelegate->attending_symposium,
                             'attending_solxchange' => $mainDelegate->attending_solxchange,
@@ -4358,6 +4362,8 @@ class RegistrationController extends Controller
 
             'Heard Where',
 
+            'Seat Number',
+
             'Attending to Plenary',
             'Attending to Symposium',
             'Attending to Solutions XChange',
@@ -4438,6 +4444,8 @@ class RegistrationController extends Controller
                         $data['delegate_replaced_datetime'],
 
                         $data['heard_where'],
+
+                        $data['seat_number'],
 
                         $data['attending_plenary'],
                         $data['attending_symposium'],
