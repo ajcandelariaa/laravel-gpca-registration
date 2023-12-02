@@ -1,6 +1,6 @@
 <div>
     <div class="flex flex-row items-start justify-between gap-5 w-full">
-        <button type="button" class="bg-red-600 text-white rounded-md text-lg py-2 w-52"
+        <button type="button" class="bg-red-500 hover:bg-red-600 text-white rounded-md text-lg py-2 w-52"
             wire:click.prevent="returnToHome">Return to Home</button>
 
         <div class="flex flex-row gap-2 items-start">
@@ -23,8 +23,17 @@
                             <hr>
                         @endforeach
                     </ul>
+
+
+                    @if ($delegateDetail == null && $searchTerm != null && count($suggestions) == 0)
+                        <div class="w-full absolute top-10 z-50">
+                            <p class="bg-red-500 cursor-pointer text-center text-white">
+                                No user found
+                            </p>
+                        </div>
+                    @endif
                 </div>
-                <button class="bg-registrationPrimaryColor text-lg text-white py-2 px-5 rounded-md"
+                <button class="bg-registrationPrimaryColorHover hover:bg-registrationPrimaryColor text-lg text-white py-2 px-5 rounded-md"
                     wire:click.prevent="searchClicked">Search</button>
             @endif
         </div>
@@ -95,7 +104,7 @@
 
     @if ($delegateDetail != null)
         <div class="flex justify-center mt-10">
-            <button type="button" class="bg-green-600 text-white rounded-md text-lg py-2 w-52"
+            <button type="button" class="bg-green-500 hover:bg-green-600 text-white rounded-md text-lg py-2 w-52"
                 wire:click.prevent="printClicked">Print</button>
         </div>
     @endif

@@ -12,18 +12,15 @@ use App\Models\EventRegistrationType as EventRegistrationTypes;
 use App\Models\VisitorTransaction as VisitorTransactions;
 use Illuminate\Support\Facades\Crypt;
 use Livewire\Component;
-use PDO;
 
 class FastTrack extends Component
 {
-    public $eventBanner;
-    public $state;
+    public $eventBanner, $state;
 
     public $searchTerm = '';
     public $suggestions = array();
     public $delegatesDetails = array();
     public $delegateDetail;
-
 
     public $day, $date;
 
@@ -35,6 +32,8 @@ class FastTrack extends Component
         $this->state = null;
         $this->date = now()->format('F j, Y');
         $this->day = now()->format('l');
+        $this->getAFConfirmedDelegates();
+        $this->getAFVConfirmedVisitors();
     }
 
     public function render()
@@ -55,7 +54,10 @@ class FastTrack extends Component
 
     public function returnToHome()
     {
-        return redirect()->route('fast-track');
+        $this->state = null;
+        $this->searchTerm = null;
+        $this->suggestions = array();
+        $this->delegateDetail = null;
     }
 
 
@@ -68,8 +70,6 @@ class FastTrack extends Component
 
     public function transactionIDClickedSuccess()
     {
-        $this->getAFConfirmedDelegates();
-        $this->getAFVConfirmedVisitors();
         $this->state = "transactionid";
         $this->dispatchBrowserEvent('remove-loading-screen');
     }
@@ -91,6 +91,13 @@ class FastTrack extends Component
     {
         $this->searchTerm = $suggestion;
         $this->suggestions = array();
+
+        foreach ($this->delegatesDetails as $delegateDetails) {
+            if ($delegateDetails['transactionId'] == $this->searchTerm) {
+                $this->delegateDetail = $delegateDetails;
+                break;
+            }
+        }
     }
 
     public function searchClicked()
@@ -130,18 +137,11 @@ class FastTrack extends Component
         $this->suggestions = array();
         $this->delegateDetail = array();
 
-        $this->dispatchBrowserEvent('print-badge-success-2', [
+        $this->dispatchBrowserEvent('print-badge-success', [
             'type' => 'success',
             'message' => 'Success',
             'text' => "",
         ]);
-
-        // $this->dispatchBrowserEvent('print-badge-success', [
-        //     'redirectUrl' => route('fast-track'),
-        //     'type' => 'success',
-        //     'message' => 'Success',
-        //     'text' => "",
-        // ]);
     }
 
 
@@ -218,8 +218,6 @@ class FastTrack extends Component
                             }
 
                             $matchedTransaction = null;
-                            $this->getAFConfirmedDelegates();
-                            $this->getAFVConfirmedVisitors();
 
                             foreach ($this->delegatesDetails as $delegateDetails) {
                                 if ($delegateDetails['transactionId'] == $this->searchTerm) {
@@ -266,7 +264,7 @@ class FastTrack extends Component
     {
         $eventCategory = "AF";
 
-        $event = Events::where('category', $eventCategory)->first();
+        $event = Events::where('category', $eventCategory)->select('id', 'category', 'year')->first();
         $mainDelegates = MainDelegates::where('event_id', $event->id)->get();
 
 
@@ -313,8 +311,6 @@ class FastTrack extends Component
                         'badgeType' => $mainDelegate->badge_type,
 
                         'frontText' => $registrationType->badge_footer_front_name,
-                        'frontTextColor' => $registrationType->badge_footer_front_text_color,
-                        'frontTextBGColor' => $registrationType->badge_footer_front_bg_color,
 
                         'printUrl' => $printUrl,
                         'seatNumber' => $mainDelegate->seat_number,
@@ -357,8 +353,6 @@ class FastTrack extends Component
                                 'badgeType' => $subDelegate->badge_type,
 
                                 'frontText' => $registrationType->badge_footer_front_name,
-                                'frontTextColor' => $registrationType->badge_footer_front_text_color,
-                                'frontTextBGColor' => $registrationType->badge_footer_front_bg_color,
 
                                 'printUrl' => $printUrl,
                                 'seatNumber' => $subDelegate->seat_number,
@@ -422,8 +416,6 @@ class FastTrack extends Component
                         'badgeType' => $mainVisitor->badge_type,
 
                         'frontText' => $registrationType->badge_footer_front_name,
-                        'frontTextColor' => $registrationType->badge_footer_front_text_color,
-                        'frontTextBGColor' => $registrationType->badge_footer_front_bg_color,
 
                         'printUrl' => $printUrl,
                         'seatNumber' => null,
@@ -466,8 +458,6 @@ class FastTrack extends Component
                                 'badgeType' => $subVisitor->badge_type,
 
                                 'frontText' => $registrationType->badge_footer_front_name,
-                                'frontTextColor' => $registrationType->badge_footer_front_text_color,
-                                'frontTextBGColor' => $registrationType->badge_footer_front_bg_color,
 
                                 'printUrl' => $printUrl,
                                 'seatNumber' => null,

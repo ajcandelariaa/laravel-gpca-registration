@@ -113,26 +113,20 @@
             updateTime();
         }, 1000);
 
-        window.addEventListener("print-badge-success-2", (event) => {
-            swal({
-                title: event.detail.message,
-                text: event.detail.text,
-                icon: event.detail.type,
-            });
-        });
-
         window.addEventListener("print-badge-success", (event) => {
+            let registrationLloadingScreen = document.getElementById('registration-loading-screen');
+            registrationLloadingScreen.classList.add('hidden');
             swal({
                 title: event.detail.message,
                 text: event.detail.text,
                 icon: event.detail.type,
-            }).then(function() {
-                window.location.replace(event.detail.redirectUrl)
             });
         });
 
         window.addEventListener("print-badge", (event) => {
             window.location.replace(event.detail.printUrl)
+            let registrationLloadingScreen = document.getElementById('registration-loading-screen');
+            registrationLloadingScreen.classList.remove('hidden');
             Livewire.emit('print-success');
         });
 

@@ -9,10 +9,10 @@
                 <p class="text-registrationPrimaryColor text-7xl font-semibold text-center">Welcome to FAST TRACK
                 </p>
                 <div class="flex flex-col justify-center items-center gap-10 mt-20">
-                    <button type="button" class="bg-registrationPrimaryColor text-white rounded-xl text-4xl w-96 h-20"
+                    <button type="button" class="bg-registrationPrimaryColorHover hover:bg-registrationPrimaryColor text-white rounded-xl text-4xl w-96 h-20"
                         wire:click.prevent="qrCodeScannerClicked">Scan QR Code</button>
                     <button type="button"
-                        class="bg-registrationSecondaryColor text-white rounded-xl text-4xl w-96 h-20"
+                        class="bg-registrationSecondaryColor hover:bg-registrationSecondaryColorHover  text-white rounded-xl text-4xl w-96 h-20"
                         wire:click.prevent="transactionIdClicked">Enter your details</button>
                 </div>
             </div>

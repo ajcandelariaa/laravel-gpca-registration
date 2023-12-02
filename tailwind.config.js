@@ -12,6 +12,7 @@ module.exports = {
         registrationPrimaryColorHover: '#0358a8',
         registrationInputFieldsBGColor: '#F5F5F5',
         registrationSecondaryColor: '#D9A125',
+        registrationSecondaryColorHover: '#ab8020',
         registrationCardBGColor: '#E3EDF6',
         dashboardNavItemHoverColor: '#F9BC35',
         adminEventDetailNavigationBGColor: '#E3EDF7',
