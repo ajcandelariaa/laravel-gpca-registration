@@ -124,10 +124,10 @@ class DelegateController extends Controller
 
                         $tempYear = Carbon::parse($mainVisitorInfo->registered_date_time)->format('y');
 
-                        $transactionId = Transaction::where('event_id', $eventId)->where('visitor_id', $visitorId)->where('visitor_type', "sub")->value('id');
+                        $transactionId = VisitorTransaction::where('event_id', $eventId)->where('visitor_id', $visitorId)->where('visitor_type', "sub")->value('id');
 
                         $lastDigit = 1000 + intval($transactionId);
-                        $transactionId2 = Transaction::where('event_id', $eventId)->where('visitor_id', $mainVisitorInfo->id)->where('visitor_type', "main")->value('id');
+                        $transactionId2 = VisitorTransaction::where('event_id', $eventId)->where('visitor_id', $mainVisitorInfo->id)->where('visitor_type', "main")->value('id');
                         $lastDigit2 = 1000 + intval($transactionId2);
 
                         $finalTransactionId = $eventYear . $eventCode . $lastDigit;
