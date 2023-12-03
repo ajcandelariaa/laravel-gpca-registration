@@ -32,10 +32,11 @@
                     class="{{ $paymentMethod == 'bankTransfer' ? 'bg-registrationSecondaryColor text-white' : 'hover:bg-registrationSecondaryColor hover:text-white border-registrationSecondaryColor border-2 bg-white text-registrationSecondaryColor' }} font-bold w-52 rounded-md py-5 ">
                     <i class="fa-solid fa-building-columns mr-2"></i> Bank transfer</button>
             @else
-                {{-- <button wire:click.prevent="btClicked" type="button"
-                    class="{{ $paymentMethod == 'bankTransfer' ? 'bg-registrationSecondaryColor text-white' : 'hover:bg-registrationSecondaryColor hover:text-white border-registrationSecondaryColor border-2 bg-white text-registrationSecondaryColor' }} font-bold w-52 rounded-md py-5 ">
-                    <i class="fa-solid fa-building-columns mr-2"></i> Bank transfer</button> --}}
                 <div class="flex flex-col">
+                    <button wire:click.prevent="btClicked" type="button"
+                        class="{{ $paymentMethod == 'bankTransfer' ? 'bg-registrationSecondaryColor text-white' : 'hover:bg-registrationSecondaryColor hover:text-white border-registrationSecondaryColor border-2 bg-white text-registrationSecondaryColor' }} font-bold w-52 rounded-md py-5 ">
+                        <i class="fa-solid fa-building-columns mr-2"></i> Bank transfer</button>
+                        
                     <button wire:click.prevent="ccClicked" type="button"
                         class="{{ $paymentMethod == 'creditCard' ? 'bg-registrationSecondaryColor text-white' : 'hover:bg-registrationSecondaryColor hover:text-white border-registrationSecondaryColor border-2 bg-white text-registrationSecondaryColor' }} font-bold w-52 rounded-md py-5 ">
                         <i class="fa-solid fa-credit-card mr-2"></i> Credit card</button>
