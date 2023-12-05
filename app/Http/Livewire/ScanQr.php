@@ -99,7 +99,7 @@ class ScanQr extends Component
                         if ($eventCategory == "AF" || $eventCategory == "AFV") {
                             if ($eventCategory == "AF") {
                                 if ($delegateType == "main") {
-                                    $delegateDetails = MainDelegates::where('event_id', $eventId)->where('id', $delegateId)->first();
+                                    $delegateDetails = MainDelegates::where('id', $delegateId)->first();
 
                                     if ($delegateDetails->alternative_company_name != null) {
                                         $companyName = $delegateDetails->alternative_company_name;
@@ -119,7 +119,7 @@ class ScanQr extends Component
                                     $this->companyName = $companyName;
                                     $this->badgeType = $delegateDetails->badge_type;
                                 } else {
-                                    $delegateDetails = AdditionalDelegates::where('event_id', $eventId)->where('id', $delegateId)->first();
+                                    $delegateDetails = AdditionalDelegates::where('id', $delegateId)->first();
                                     $mainDelegate = MainDelegates::where('id', $delegateDetails->main_delegate_id)->first();
 
 
@@ -152,7 +152,7 @@ class ScanQr extends Component
                                 ]);
                             } else {
                                 if ($delegateType == "main") {
-                                    $delegateDetails = MainVisitors::where('event_id', $eventId)->where('id', $delegateId)->first();
+                                    $delegateDetails = MainVisitors::where('id', $delegateId)->first();
 
                                     if ($delegateDetails->alternative_company_name != null) {
                                         $companyName = $delegateDetails->alternative_company_name;
@@ -172,7 +172,7 @@ class ScanQr extends Component
                                     $this->companyName = $companyName;
                                     $this->badgeType = $delegateDetails->badge_type;
                                 } else {
-                                    $delegateDetails = AdditionalVisitors::where('event_id', $eventId)->where('id', $delegateId)->first();
+                                    $delegateDetails = AdditionalVisitors::where('id', $delegateId)->first();
                                     $mainVisitor = MainVisitors::where('id', $delegateDetails->main_delegate_id)->first();
 
                                     if ($mainVisitor->alternative_company_name != null) {
