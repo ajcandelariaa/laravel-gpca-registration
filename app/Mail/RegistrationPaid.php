@@ -110,6 +110,16 @@ class RegistrationPaid extends Mailable
                     markdown: 'emails.registration-paid',
                 );
             }
+        } else if ($this->details['eventYear'] == '2024') {
+            if($this->details['eventCategory'] == "GLF"){
+                return new Content(
+                    markdown: 'emails.2024.glf.registration-paid',
+                );
+            } else {
+                return new Content(
+                    markdown: 'emails.registration-paid',
+                );
+            }
         } else {
             return new Content(
                 markdown: 'emails.registration-paid',

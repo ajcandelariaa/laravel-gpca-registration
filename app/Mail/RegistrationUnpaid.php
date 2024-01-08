@@ -111,7 +111,17 @@ class RegistrationUnpaid extends Mailable
                     markdown: 'emails.registration-unpaid',
                 );
             }
-        } else {
+        } else if ($this->details['eventYear'] == '2024') {
+            if($this->details['eventCategory'] == "GLF"){
+                return new Content(
+                    markdown: 'emails.2024.glf.registration-unpaid',
+                );
+            } else {
+                return new Content(
+                    markdown: 'emails.registration-unpaid',
+                );
+            }
+        }  else {
             return new Content(
                 markdown: 'emails.registration-unpaid',
             );

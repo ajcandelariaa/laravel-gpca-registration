@@ -51,30 +51,32 @@ class RegistrationController extends Controller
 
         if (!$events->isEmpty()) {
             foreach ($events as $event) {
-                $eventLink = env('APP_URL') . '/register/' . $event->year . '/' . $event->category . '/' . $event->id;
-                $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('d M Y') . ' - ' . Carbon::parse($event->event_end_date)->format('d M Y');
-
-                $eventEndDate = Carbon::parse($event->event_end_date);
-
-                if (Carbon::now()->lt($eventEndDate->addDay()) && $event->active) {
-                    array_push($finalUpcomingEvents, [
-                        'eventLogo' => $event->logo,
-                        'eventName' => $event->name,
-                        'eventCategory' => $event->category,
-                        'eventDate' => $eventFormattedDate,
-                        'eventLocation' => $event->location,
-                        'eventDescription' => $event->description,
-                        'eventLink' => $eventLink,
-                    ]);
-                } else {
-                    array_push($finalPastEvents, [
-                        'eventLogo' => $event->logo,
-                        'eventName' => $event->name,
-                        'eventCategory' => $event->category,
-                        'eventDate' => $eventFormattedDate,
-                        'eventLocation' => $event->location,
-                        'eventDescription' => $event->description,
-                    ]);
+                if($event->category != "GLF"){
+                    $eventLink = env('APP_URL') . '/register/' . $event->year . '/' . $event->category . '/' . $event->id;
+                    $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('d M Y') . ' - ' . Carbon::parse($event->event_end_date)->format('d M Y');
+    
+                    $eventEndDate = Carbon::parse($event->event_end_date);
+    
+                    if (Carbon::now()->lt($eventEndDate->addDay()) && $event->active) {
+                        array_push($finalUpcomingEvents, [
+                            'eventLogo' => $event->logo,
+                            'eventName' => $event->name,
+                            'eventCategory' => $event->category,
+                            'eventDate' => $eventFormattedDate,
+                            'eventLocation' => $event->location,
+                            'eventDescription' => $event->description,
+                            'eventLink' => $eventLink,
+                        ]);
+                    } else {
+                        array_push($finalPastEvents, [
+                            'eventLogo' => $event->logo,
+                            'eventName' => $event->name,
+                            'eventCategory' => $event->category,
+                            'eventDate' => $eventFormattedDate,
+                            'eventLocation' => $event->location,
+                            'eventDescription' => $event->description,
+                        ]);
+                    }
                 }
             }
         }
@@ -100,7 +102,11 @@ class RegistrationController extends Controller
                 $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('j F Y');
             } else {
                 $finalData = $this->registrationFailedViewEvents($eventCategory, $eventId, $mainDelegateId);
-                $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('d') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');
+                if($eventCategory == "GLF"){
+                    $eventFormattedDate =  Carbon::parse($event->event_end_date)->format('d M Y');
+                } else {
+                    $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('d') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');
+                }
             }
 
             return view('registration.success-messages.registration_failed_message', [
@@ -132,7 +138,11 @@ class RegistrationController extends Controller
                 $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('j F Y');
             } else {
                 $finalData = $this->registrationSuccessViewEvents($eventCategory, $eventId, $mainDelegateId);
-                $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('d') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');
+                if($eventCategory == "GLF"){
+                    $eventFormattedDate =  Carbon::parse($event->event_end_date)->format('d M Y');
+                } else {
+                    $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('d') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');
+                }
             }
 
             return view('registration.success-messages.registration_success_message', [
@@ -3404,7 +3414,11 @@ class RegistrationController extends Controller
                 $bankDetails = config('app.bankDetails.DEFAULT');
             }
 
-            $eventFormattedData = Carbon::parse($event->event_start_date)->format('j') . '-' . Carbon::parse($event->event_end_date)->format('j F Y');
+            if($eventCategory == "GLF"){
+                $eventFormattedData = Carbon::parse($event->event_end_date)->format('j F Y');
+            } else {
+                $eventFormattedData = Carbon::parse($event->event_start_date)->format('j') . '-' . Carbon::parse($event->event_end_date)->format('j F Y');
+            }
 
             if ($mainDelegate->alternative_company_name == null) {
                 $finalCompanyName = $mainDelegate->company_name;
