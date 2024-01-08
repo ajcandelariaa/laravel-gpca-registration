@@ -262,7 +262,7 @@ class FastTrack extends Component
 
     public function getGLFConfirmedDelegates()
     {
-        $eventCategory = "ANC";
+        $eventCategory = "GLF";
 
         $event = Events::where('category', $eventCategory)->select('id', 'category', 'year')->first();
         $mainDelegates = MainDelegates::where('event_id', $event->id)->get();
