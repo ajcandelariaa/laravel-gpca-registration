@@ -32,8 +32,9 @@ class FastTrack extends Component
         $this->state = null;
         $this->date = now()->format('F j, Y');
         $this->day = now()->format('l');
-        $this->getAFConfirmedDelegates();
-        $this->getAFVConfirmedVisitors();
+        $this->getGLFConfirmedDelegates();
+        // $this->getAFConfirmedDelegates();
+        // $this->getAFVConfirmedVisitors();
     }
 
     public function render()
@@ -258,6 +259,110 @@ class FastTrack extends Component
 
 
 
+
+    public function getGLFConfirmedDelegates()
+    {
+        $eventCategory = "GLF";
+
+        $event = Events::where('category', $eventCategory)->select('id', 'category', 'year')->first();
+        $mainDelegates = MainDelegates::where('event_id', $event->id)->get();
+
+
+        foreach (config('app.eventCategories') as $eventCategoryC => $code) {
+            if ($eventCategory == $eventCategoryC) {
+                $eventCode = $code;
+            }
+        }
+
+        foreach ($mainDelegates as $mainDelegate) {
+            $companyName = "";
+
+            if ($mainDelegate->delegate_replaced_by_id == null && (!$mainDelegate->delegate_refunded)) {
+                if ($mainDelegate->registration_status == "confirmed") {
+
+                    $registrationType = EventRegistrationTypes::where('event_id', $event->id)->where('event_category', $eventCategory)->where('registration_type', $mainDelegate->badge_type)->first();
+
+                    $transactionId = Transactions::where('event_id', $event->id)->where('delegate_id', $mainDelegate->id)->where('delegate_type', "main")->value('id');
+                    $lastDigit = 1000 + intval($transactionId);
+
+                    $finalTransactionId = $event->year . $eventCode . $lastDigit;
+
+                    if ($mainDelegate->alternative_company_name != null) {
+                        $companyName = $mainDelegate->alternative_company_name;
+                    } else {
+                        $companyName = $mainDelegate->company_name;
+                    }
+
+
+                    if ($mainDelegate->salutation == "Dr." || $mainDelegate->salutation == "Prof.") {
+                        $delegateSalutation = $mainDelegate->salutation;
+                    } else {
+                        $delegateSalutation = null;
+                    }
+
+                    $fullName = $delegateSalutation . ' ' . $mainDelegate->first_name . ' ' . $mainDelegate->middle_name . ' ' . $mainDelegate->last_name;
+
+                    $printUrl = route('public-print-badge', ['eventCategory' => $event->category, 'eventId' => $event->id, 'delegateId' => $mainDelegate->id, 'delegateType' => 'main']);
+                    array_push($this->delegatesDetails, [
+                        'transactionId' => $finalTransactionId,
+                        'fullName' => $fullName,
+                        'jobTitle' => $mainDelegate->job_title,
+                        'companyName' => $companyName,
+                        'badgeType' => $mainDelegate->badge_type,
+
+                        'frontText' => $registrationType->badge_footer_front_name,
+
+                        'printUrl' => $printUrl,
+                        'seatNumber' => $mainDelegate->seat_number,
+                    ]);
+                }
+            }
+
+
+            $subDelegates = AdditionalDelegates::where('main_delegate_id', $mainDelegate->id)->get();
+
+            if (!$subDelegates->isEmpty()) {
+                foreach ($subDelegates as $subDelegate) {
+
+                    if ($subDelegate->delegate_replaced_by_id == null && (!$subDelegate->delegate_refunded)) {
+                        if ($mainDelegate->registration_status == "confirmed") {
+
+                            $registrationType = EventRegistrationTypes::where('event_id', $event->id)->where('event_category', $eventCategory)->where('registration_type', $subDelegate->badge_type)->first();
+
+                            $transactionId = Transactions::where('delegate_id', $subDelegate->id)->where('delegate_type', "sub")->value('id');
+                            $lastDigit = 1000 + intval($transactionId);
+                            $finalTransactionId = $event->year . $eventCode . $lastDigit;
+
+
+                            if ($subDelegate->salutation == "Dr." || $subDelegate->salutation == "Prof.") {
+                                $delegateSalutation = $subDelegate->salutation;
+                            } else {
+                                $delegateSalutation = null;
+                            }
+
+                            $fullName = $delegateSalutation . ' ' . $subDelegate->first_name . ' ' . $subDelegate->middle_name . ' ' . $subDelegate->last_name;
+
+
+                            $printUrl = route('public-print-badge', ['eventCategory' => $event->category, 'eventId' => $event->id, 'delegateId' => $subDelegate->id, 'delegateType' => 'sub']);
+
+                            array_push($this->delegatesDetails, [
+                                'transactionId' => $finalTransactionId,
+                                'fullName' => $fullName,
+                                'jobTitle' => $subDelegate->job_title,
+                                'companyName' => $companyName,
+                                'badgeType' => $subDelegate->badge_type,
+
+                                'frontText' => $registrationType->badge_footer_front_name,
+
+                                'printUrl' => $printUrl,
+                                'seatNumber' => $subDelegate->seat_number,
+                            ]);
+                        }
+                    }
+                }
+            }
+        }
+    }
 
 
     public function getAFConfirmedDelegates()
