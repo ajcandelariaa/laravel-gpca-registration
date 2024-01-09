@@ -467,7 +467,7 @@ class RegistrantDetails extends Component
                             }
                         }
 
-                        if($this->finalData['alternative_company_name'] == null){
+                        if ($this->finalData['alternative_company_name'] == null) {
                             $finalCompanyName = $this->finalData['company_name'];
                         } else {
                             $finalCompanyName = $this->finalData['alternative_company_name'];
@@ -514,12 +514,14 @@ class RegistrantDetails extends Component
                         } catch (\Exception $e) {
                             Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaid($details1, $this->sendInvoice));
                         }
-                        if ($this->sendInvoice) {
-                            if ($delegatesIndex == 0) {
-                                try {
-                                    Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
-                                } catch (\Exception $e) {
-                                    Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+                        if ($this->event->category != "GLF") {
+                            if ($this->sendInvoice) {
+                                if ($delegatesIndex == 0) {
+                                    try {
+                                        Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+                                    } catch (\Exception $e) {
+                                        Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+                                    }
                                 }
                             }
                         }
@@ -536,11 +538,13 @@ class RegistrantDetails extends Component
             } catch (\Exception $e) {
                 Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaid($assistantDetails1, $this->sendInvoice));
             }
-            if ($this->sendInvoice) {
-                try {
-                    Mail::to($this->finalData['assistant_email_address'])->send(new RegistrationPaymentConfirmation($assistantDetails2, $this->sendInvoice));
-                } catch (\Exception $e) {
-                    Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaymentConfirmation($assistantDetails2, $this->sendInvoice));
+            if ($this->event->category != "GLF") {
+                if ($this->sendInvoice) {
+                    try {
+                        Mail::to($this->finalData['assistant_email_address'])->send(new RegistrationPaymentConfirmation($assistantDetails2, $this->sendInvoice));
+                    } catch (\Exception $e) {
+                        Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaymentConfirmation($assistantDetails2, $this->sendInvoice));
+                    }
                 }
             }
         }
@@ -915,7 +919,7 @@ class RegistrantDetails extends Component
                             }
                         }
 
-                        if($this->finalData['alternative_company_name'] == null){
+                        if ($this->finalData['alternative_company_name'] == null) {
                             $finalCompanyName = $this->finalData['company_name'];
                         } else {
                             $finalCompanyName = $this->finalData['alternative_company_name'];
@@ -958,7 +962,7 @@ class RegistrantDetails extends Component
                         }
 
                         if ($this->finalData['payment_status'] == "unpaid") {
-                            if($amountPaid == 0){
+                            if ($amountPaid == 0) {
                                 try {
                                     Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationFree($details1, $this->sendInvoice));
                                 } catch (\Exception $e) {
@@ -983,12 +987,14 @@ class RegistrantDetails extends Component
                             } catch (\Exception $e) {
                                 Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaid($details1, $this->sendInvoice));
                             }
-                            if ($this->sendInvoice) {
-                                if ($delegatesIndex == 0) {
-                                    try {
-                                        Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
-                                    } catch (\Exception $e) {
-                                        Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+                            if ($this->event->category != "GLF") {
+                                if ($this->sendInvoice) {
+                                    if ($delegatesIndex == 0) {
+                                        try {
+                                            Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+                                        } catch (\Exception $e) {
+                                            Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+                                        }
                                     }
                                 }
                             }
@@ -1019,11 +1025,13 @@ class RegistrantDetails extends Component
                 } catch (\Exception $e) {
                     Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaid($assistantDetails1, $this->sendInvoice));
                 }
-                if ($this->sendInvoice) {
-                    try {
-                        Mail::to($this->finalData['assistant_email_address'])->send(new RegistrationPaymentConfirmation($assistantDetails2, $this->sendInvoice));
-                    } catch (\Exception $e) {
-                        Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaymentConfirmation($assistantDetails2, $this->sendInvoice));
+                if ($this->event->category != "GLF") {
+                    if ($this->sendInvoice) {
+                        try {
+                            Mail::to($this->finalData['assistant_email_address'])->send(new RegistrationPaymentConfirmation($assistantDetails2, $this->sendInvoice));
+                        } catch (\Exception $e) {
+                            Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaymentConfirmation($assistantDetails2, $this->sendInvoice));
+                        }
                     }
                 }
             }
@@ -1323,24 +1331,24 @@ class RegistrantDetails extends Component
             if ($subPromoCode != null) {
                 $subChecker = false;
 
-                if($subPromoCode->badge_type == $this->replaceBadgeType){
+                if ($subPromoCode->badge_type == $this->replaceBadgeType) {
                     $subChecker = true;
                 } else {
                     $promoCodeAdditionalBadgeType = PromoCodeAddtionalBadgeTypes::where('event_id', $this->eventId)->where('promo_code_id', $subPromoCode->id)->where('badge_type', $this->replaceBadgeType)->first();
 
-                    if($promoCodeAdditionalBadgeType != null){
+                    if ($promoCodeAdditionalBadgeType != null) {
                         $subChecker = true;
                     } else {
                         $subChecker = false;
                     }
                 }
 
-                if($subChecker){
+                if ($subChecker) {
                     $subDiscountType = $subPromoCode->discount_type;
 
-                    if($subPromoCode->discount_type == 'percentage'){
+                    if ($subPromoCode->discount_type == 'percentage') {
                         $subDiscount = $subPromoCode->discount;
-                    } else if($subPromoCode->discount_type == 'price'){
+                    } else if ($subPromoCode->discount_type == 'price') {
                         $subDiscount = $subPromoCode->discount;
                     } else {
                         $subDiscount = 0;

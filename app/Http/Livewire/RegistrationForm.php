@@ -430,11 +430,19 @@ class RegistrationForm extends Component
                         'text' => "",
                     ]);
                 } else {
-                    $this->dispatchBrowserEvent('swal:registration-confirmation', [
-                        'type' => 'warning',
-                        'message' => 'Are you sure you want to pay via Bank transfer?',
-                        'text' => "",
-                    ]);
+                    if($this->event->category == "GLF"){
+                        $this->dispatchBrowserEvent('swal:registration-confirmation', [
+                            'type' => 'warning',
+                            'message' => 'Are you sure all the details are correct?',
+                            'text' => "",
+                        ]);
+                    } else {
+                        $this->dispatchBrowserEvent('swal:registration-confirmation', [
+                            'type' => 'warning',
+                            'message' => 'Are you sure you want to pay via Bank transfer?',
+                            'text' => "",
+                        ]);
+                    }
                 }
             }
         }
@@ -454,6 +462,9 @@ class RegistrationForm extends Component
                 $this->checkUnitPrice();
                 $this->calculateAmount();
                 $this->currentStep += 1;
+                if($this->event->category == "GLF"){
+                    $this->paymentMethod = 'bankTransfer';
+                }
             }
         }
 
@@ -599,11 +610,15 @@ class RegistrationForm extends Component
         if ($this->paymentMethod == "creditCard") {
             $this->setSessionCC();
             $this->orderId = $tempOrderId;
+            $this->currentStep += 1;
         } else {
             $this->dispatchBrowserEvent('swal:remove-registration-loading-screen');
+            if($this->event->category == "GLF"){
+                $this->submitBankTransfer();
+            } else {
+                $this->currentStep += 1;
+            }
         }
-
-        $this->currentStep += 1;
     }
 
     public function decreaseStep()

@@ -21,16 +21,20 @@
                 Email address: <span class="text-black">{{ $emailAddress }}</span>
             </div>
 
-            <div class="text-registrationPrimaryColor col-span-2">
-                Payment method:
-            </div>
+            @if ($event->category != 'GLF')
+                <div class="text-registrationPrimaryColor col-span-2">
+                    Payment method:
+                </div>
+            @endif
         </div>
 
         <div class="mt-5 flex gap-5 items-start">
             @if ($finalTotal == 0)
-                <button wire:click.prevent="btClicked" type="button"
-                    class="{{ $paymentMethod == 'bankTransfer' ? 'bg-registrationSecondaryColor text-white' : 'hover:bg-registrationSecondaryColor hover:text-white border-registrationSecondaryColor border-2 bg-white text-registrationSecondaryColor' }} font-bold w-52 rounded-md py-5 ">
-                    <i class="fa-solid fa-building-columns mr-2"></i> Bank transfer</button>
+                @if ($event->category != 'GLF')
+                    <button wire:click.prevent="btClicked" type="button"
+                        class="{{ $paymentMethod == 'bankTransfer' ? 'bg-registrationSecondaryColor text-white' : 'hover:bg-registrationSecondaryColor hover:text-white border-registrationSecondaryColor border-2 bg-white text-registrationSecondaryColor' }} font-bold w-52 rounded-md py-5 ">
+                        <i class="fa-solid fa-building-columns mr-2"></i> Bank transfer</button>
+                @endif
             @else
                 <button wire:click.prevent="btClicked" type="button"
                     class="{{ $paymentMethod == 'bankTransfer' ? 'bg-registrationSecondaryColor text-white' : 'hover:bg-registrationSecondaryColor hover:text-white border-registrationSecondaryColor border-2 bg-white text-registrationSecondaryColor' }} font-bold w-52 rounded-md py-5 ">
@@ -41,7 +45,8 @@
                         class="{{ $paymentMethod == 'creditCard' ? 'bg-registrationSecondaryColor text-white' : 'hover:bg-registrationSecondaryColor hover:text-white border-registrationSecondaryColor border-2 bg-white text-registrationSecondaryColor' }} font-bold w-52 rounded-md py-5 ">
                         <i class="fa-solid fa-credit-card mr-2"></i> Credit card</button>
 
-                    <span class="text-registrationPrimaryColor italic text-sm text-center mt-1">for Visa and MasterCard only</span>
+                    <span class="text-registrationPrimaryColor italic text-sm text-center mt-1">for Visa and MasterCard
+                        only</span>
                 </div>
             @endif
         </div>
@@ -66,10 +71,17 @@
             class="hover:bg-registrationPrimaryColor hover:text-white font-bold border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor w-52 rounded-md py-2"
             wire:click.prevent="decreaseStep">PREVIOUS</button>
 
-        <button type="button" wire:key="btnIncreaseStep"
-            class="hover:bg-registrationPrimaryColor hover:text-white font-bold border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor w-52 rounded-md py-2"
-            wire:click.prevent="increaseStep" wire:loading.attr="disabled"
-            wire:loading.class="cursor-not-allowed">NEXT</button>
+        @if ($event->category == 'GLF')
+            <button type="button" wire:key="btnIncreaseStep"
+                class="hover:bg-registrationPrimaryColorHover hover:text-white font-bold border-registrationPrimaryColor border-2 bg-registrationPrimaryColor text-white w-52 rounded-md py-2"
+                wire:click.prevent="increaseStep" wire:loading.attr="disabled"
+                wire:loading.class="cursor-not-allowed">SUBMIT</button>
+        @else
+            <button type="button" wire:key="btnIncreaseStep"
+                class="hover:bg-registrationPrimaryColor hover:text-white font-bold border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor w-52 rounded-md py-2"
+                wire:click.prevent="increaseStep" wire:loading.attr="disabled"
+                wire:loading.class="cursor-not-allowed">NEXT</button>
+        @endif
     </div>
 
     <div class="mt-10">

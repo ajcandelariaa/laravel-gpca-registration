@@ -61,17 +61,19 @@
 
 
     {{-- STEP 5 --}}
-    <div style="width: 60px;" class="flex justify-center">
-        <div style="width: 2px;" class="h-12 bg-registrationPrimaryColor"></div>
-    </div>
-    <div class="flex items-center gap-6">
-        <div class="{{ $currentStep >= 5 ? 'bg-registrationPrimaryColor text-white' : 'text-registrationPrimaryColor bg-white border-solid border-registrationPrimaryColor border-2' }} font-bold rounded-full flex items-center justify-center"
-            style="height: 55px; width: 55px; font-size: 18px;">
-            5
+    @if ($event->category != 'GLF')
+        <div style="width: 60px;" class="flex justify-center">
+            <div style="width: 2px;" class="h-12 bg-registrationPrimaryColor"></div>
         </div>
+        <div class="flex items-center gap-6">
+            <div class="{{ $currentStep >= 5 ? 'bg-registrationPrimaryColor text-white' : 'text-registrationPrimaryColor bg-white border-solid border-registrationPrimaryColor border-2' }} font-bold rounded-full flex items-center justify-center"
+                style="height: 55px; width: 55px; font-size: 18px;">
+                5
+            </div>
 
-        <div class="text-registrationPrimaryColor font-bold text-xl">
-            Payment details
+            <div class="text-registrationPrimaryColor font-bold text-xl">
+                Payment details
+            </div>
         </div>
-    </div>
+    @endif
 </div>
