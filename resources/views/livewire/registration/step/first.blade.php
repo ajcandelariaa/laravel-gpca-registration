@@ -1,92 +1,95 @@
 <div class="mx-5">
-    <table class="w-full bg-registrationPrimaryColor text-white text-center" cellspacing="1" cellpadding="2">
-        <thead>
-            <tr>
-                <td class="py-4 font-bold text-lg">Pass category</td>
-                @if ($finalEbEndDate != null)
-                    <td class="py-4 font-bold text-lg">
-                        <span>Early bird rate <br> <span class="font-normal text-base">(valid until
-                                {{ $finalEbEndDate }})</span></span>
-                    </td>
-                @endif
-                <td class="py-4 font-bold text-lg">
+    @if ($event->category != 'GLF')
+        <table class="w-full bg-registrationPrimaryColor text-white text-center" cellspacing="1" cellpadding="2">
+            <thead>
+                <tr>
+                    <td class="py-4 font-bold text-lg">Pass category</td>
                     @if ($finalEbEndDate != null)
-                        <span>Standard rate <br> <span class="font-normal text-base">(starting
-                                {{ $finalStdStartDate }})</span></span>
-                    @else
-                        <span>Standard rate</span>
+                        <td class="py-4 font-bold text-lg">
+                            <span>Early bird rate <br> <span class="font-normal text-base">(valid until
+                                    {{ $finalEbEndDate }})</span></span>
+                        </td>
                     @endif
-                </td>
-            </tr>
-        </thead>
-        <tbody>
-            @if ($event->eb_full_member_rate != null || $event->std_full_member_rate != null)
+                    <td class="py-4 font-bold text-lg">
+                        @if ($finalEbEndDate != null)
+                            <span>Standard rate <br> <span class="font-normal text-base">(starting
+                                    {{ $finalStdStartDate }})</span></span>
+                        @else
+                            <span>Standard rate</span>
+                        @endif
+                    </td>
+                </tr>
+            </thead>
+            <tbody>
+                @if ($event->eb_full_member_rate != null || $event->std_full_member_rate != null)
+                    <tr>
+                        <td class="text-black">
+                            <div class="bg-white py-4 font-bold ml-1">
+                                Full member
+                            </div>
+                        </td>
+                        @if ($finalEbEndDate != null)
+                            <td class="text-black">
+                                <div class="bg-white py-4">
+                                    $ {{ number_format($event->eb_full_member_rate, 2, '.', ',') }}
+                                    {{ $event->event_vat == 0 ? '' : '+ ' . $event->event_vat . '%' }}
+                                </div>
+                            </td>
+                        @endif
+                        <td class="text-black">
+                            <div class="bg-white py-4 mr-1">
+                                $ {{ number_format($event->std_full_member_rate, 2, '.', ',') }}
+                                {{ $event->event_vat == 0 ? '' : '+ ' . $event->event_vat . '%' }}
+                            </div>
+                        </td>
+                    </tr>
+                @endif
                 <tr>
                     <td class="text-black">
                         <div class="bg-white py-4 font-bold ml-1">
-                            Full member
+                            Member
                         </div>
                     </td>
                     @if ($finalEbEndDate != null)
                         <td class="text-black">
                             <div class="bg-white py-4">
-                                $ {{ number_format($event->eb_full_member_rate, 2, '.', ',') }}
+                                $ {{ number_format($event->eb_member_rate, 2, '.', ',') }}
                                 {{ $event->event_vat == 0 ? '' : '+ ' . $event->event_vat . '%' }}
                             </div>
                         </td>
                     @endif
                     <td class="text-black">
                         <div class="bg-white py-4 mr-1">
-                            $ {{ number_format($event->std_full_member_rate, 2, '.', ',') }}
+                            $ {{ number_format($event->std_member_rate, 2, '.', ',') }}
                             {{ $event->event_vat == 0 ? '' : '+ ' . $event->event_vat . '%' }}
                         </div>
                     </td>
                 </tr>
-            @endif
-            <tr>
-                <td class="text-black">
-                    <div class="bg-white py-4 font-bold ml-1">
-                        Member
-                    </div>
-                </td>
-                @if ($finalEbEndDate != null)
+                <tr>
                     <td class="text-black">
-                        <div class="bg-white py-4">
-                            $ {{ number_format($event->eb_member_rate, 2, '.', ',') }}
+                        <div class="bg-white py-4 font-bold mb-1 ml-1">
+                            Non-member
+                        </div>
+                    </td>
+                    @if ($finalEbEndDate != null)
+                        <td class="text-black">
+                            <div class="bg-white py-4 mb-1">
+                                $ {{ number_format($event->eb_nmember_rate, 2, '.', ',') }}
+                                {{ $event->event_vat == 0 ? '' : '+ ' . $event->event_vat . '%' }}
+                            </div>
+                        </td>
+                    @endif
+                    <td class="text-black">
+                        <div class="bg-white py-4 mb-1 mr-1">
+                            $ {{ number_format($event->std_nmember_rate, 2, '.', ',') }}
                             {{ $event->event_vat == 0 ? '' : '+ ' . $event->event_vat . '%' }}
                         </div>
                     </td>
-                @endif
-                <td class="text-black">
-                    <div class="bg-white py-4 mr-1">
-                        $ {{ number_format($event->std_member_rate, 2, '.', ',') }}
-                        {{ $event->event_vat == 0 ? '' : '+ ' . $event->event_vat . '%' }}
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <td class="text-black">
-                    <div class="bg-white py-4 font-bold mb-1 ml-1">
-                        Non-member
-                    </div>
-                </td>
-                @if ($finalEbEndDate != null)
-                    <td class="text-black">
-                        <div class="bg-white py-4 mb-1">
-                            $ {{ number_format($event->eb_nmember_rate, 2, '.', ',') }}
-                            {{ $event->event_vat == 0 ? '' : '+ ' . $event->event_vat . '%' }}
-                        </div>
-                    </td>
-                @endif
-                <td class="text-black">
-                    <div class="bg-white py-4 mb-1 mr-1">
-                        $ {{ number_format($event->std_nmember_rate, 2, '.', ',') }}
-                        {{ $event->event_vat == 0 ? '' : '+ ' . $event->event_vat . '%' }}
-                    </div>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+                </tr>
+            </tbody>
+        </table>
+    @endif
+
 
     <div class="grid grid-cols-2 gap-5 mt-10">
         @if ($delegateFees->isNotEmpty())
@@ -102,7 +105,7 @@
                         </ul>
                     </div>
                 </div>
-                {{-- @if (($event->category == 'AF') && ($event->year == '2023'))
+                {{-- @if ($event->category == 'AF' && $event->year == '2023')
                     <p class="mt-5">If you are interested with the GPCA spouse program, please click here to <a
                             href="https://www.gpcaforum.com/spouse-program/" target="_blank"
                             class="text-blue-600 hover:underline font-semibold">learn more</a> and <a
@@ -114,15 +117,19 @@
 
         <div
             class="col-span-2 {{ $delegateFees->isNotEmpty() ? 'lg:col-span-1' : 'lg:col-span-2' }} lg:col-span-1 flex flex-col gap-5">
-            <div class="bg-gray-200 py-4 px-2">
-                <h1 class="text-2xl text-registrationPrimaryColor font-bold text-center">DO YOU WISH TO BECOME A MEMBER?
-                </h1>
-                <div class="bg-white mx-1 mt-5 p-5 space-y-5">
-                    <p>Do you wish to become a member and avail preferred rates and other benefit?</p>
-                    <p>If <strong>YES</strong>, please contact our sales team: members@gpca.org.ae</p>
-                    <p>If <strong>NO</strong>, please proceed with the registration</p>
+
+            @if ($event->category != 'GLF')
+                <div class="bg-gray-200 py-4 px-2">
+                    <h1 class="text-2xl text-registrationPrimaryColor font-bold text-center">DO YOU WISH TO BECOME A
+                        MEMBER?
+                    </h1>
+                    <div class="bg-white mx-1 mt-5 p-5 space-y-5">
+                        <p>Do you wish to become a member and avail preferred rates and other benefit?</p>
+                        <p>If <strong>YES</strong>, please contact our sales team: members@gpca.org.ae</p>
+                        <p>If <strong>NO</strong>, please proceed with the registration</p>
+                    </div>
                 </div>
-            </div>
+            @endif
             <div class="bg-gray-200 py-4 px-2">
                 <h1 class="text-2xl text-registrationPrimaryColor font-bold text-center">DELEGATE PASS TYPE</h1>
                 <div class="bg-white mx-1 mt-5 p-5">

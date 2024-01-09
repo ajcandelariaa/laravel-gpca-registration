@@ -84,8 +84,10 @@
         @endif
     </div>
 
-    <div class="mt-10">
-        @include('livewire.registration.package_summary.package_rows')
-        @include('livewire.registration.package_summary.package_cols')
-    </div>
+    @if ($event->category != 'GLF')
+        <div class="mt-10">
+            @include('livewire.registration.package_summary.package_rows')
+            @include('livewire.registration.package_summary.package_cols')
+        </div>
+    @endif
 </div>

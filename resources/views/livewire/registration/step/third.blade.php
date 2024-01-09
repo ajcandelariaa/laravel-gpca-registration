@@ -161,45 +161,48 @@
                     </div>
                 </div>
 
-                <div class="col-span-3 sm:col-span-1">
-                    <div class="text-registrationPrimaryColor">
-                        Promo code
-                    </div>
-                    <div class="flex">
+                @if ($event->category != 'GLF')
+                    <div class="col-span-3 sm:col-span-1">
+                        <div class="text-registrationPrimaryColor">
+                            Promo code
+                        </div>
+                        <div class="flex">
+
+                            @if ($promoCodeSuccessMain != null)
+                                <input readonly type="text" wire:model.lazy="promoCode"
+                                    class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-none cursor-not-allowed">
+
+                                <button wire:click.prevent="removePromoCodeMain" wire:key="btnRemovePromoCodeMain"
+                                    type="button" class="bg-red-300 px-5 ml-2">Remove</button>
+                            @else
+                                <input placeholder="Enter your promo code here" type="text"
+                                    wire:model.lazy="promoCode"
+                                    class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+
+                                <button wire:click.prevent="applyPromoCodeMain" wire:key="btnApplyPromoCodeMain"
+                                    type="button"
+                                    class="bg-registrationPrimaryColor text-white px-5 ml-2 hover:bg-registrationPrimaryColorHover">Apply</button>
+                            @endif
+                        </div>
+
+                        @if ($promoCodeFailMain != null)
+                            <div class="text-red-500 text-xs italic mt-1">
+                                {{ $promoCodeFailMain }}
+                            </div>
+                        @endif
 
                         @if ($promoCodeSuccessMain != null)
-                            <input readonly type="text" wire:model.lazy="promoCode"
-                                class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-none cursor-not-allowed">
-
-                            <button wire:click.prevent="removePromoCodeMain" wire:key="btnRemovePromoCodeMain"
-                                type="button" class="bg-red-300 px-5 ml-2">Remove</button>
-                        @else
-                            <input placeholder="Enter your promo code here" type="text" wire:model.lazy="promoCode"
-                                class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-
-                            <button wire:click.prevent="applyPromoCodeMain" wire:key="btnApplyPromoCodeMain"
-                                type="button"
-                                class="bg-registrationPrimaryColor text-white px-5 ml-2 hover:bg-registrationPrimaryColorHover">Apply</button>
+                            <div class="text-green-500 text-xs italic mt-1">
+                                {{ $promoCodeSuccessMain }}
+                            </div>
                         @endif
                     </div>
-
-                    @if ($promoCodeFailMain != null)
-                        <div class="text-red-500 text-xs italic mt-1">
-                            {{ $promoCodeFailMain }}
-                        </div>
-                    @endif
-
-                    @if ($promoCodeSuccessMain != null)
-                        <div class="text-green-500 text-xs italic mt-1">
-                            {{ $promoCodeSuccessMain }}
-                        </div>
-                    @endif
-                </div>
+                @endif
             </div>
         </div>
     </div>
 
-    {{-- @if (($event->category == 'AF') && ($event->year == '2023'))
+    {{-- @if ($event->category == 'AF' && $event->year == '2023')
         <p class="mt-5">If you are interested with the GPCA spouse program, please click here to <a
                 href="https://www.gpcaforum.com/spouse-program/" target="_blank"
                 class="text-blue-600 hover:underline font-semibold">learn more</a> and <a
@@ -208,100 +211,105 @@
     @endif --}}
 </div>
 
-@if (!empty($additionalDelegates))
-    <div class="mt-10 mx-5">
-        <div class="text-registrationPrimaryColor italic font-bold text-xl">
-            Additional delegate(s)
+@if ($event->category != 'GLF')
+    @if (!empty($additionalDelegates))
+        <div class="mt-10 mx-5">
+            <div class="text-registrationPrimaryColor italic font-bold text-xl">
+                Additional delegate(s)
+            </div>
+
+            <div class="mt-5">
+                @php $count = 2; @endphp
+                @foreach ($additionalDelegates as $additionalDelegate)
+                    <div class="bg-registrationCardBGColor px-5 py-2 mt-5 flex justify-between rounded-md">
+                        <div>
+                            <div class="font-bold text-2xl flex items-center gap-2 mt-1">
+                                <p>{{ $additionalDelegate['subSalutation'] }}
+                                    {{ $additionalDelegate['subFirstName'] }}
+                                    {{ $additionalDelegate['subMiddleName'] }}
+                                    {{ $additionalDelegate['subLastName'] }}
+                                </p>
+                                <p
+                                    class="border-2 border-registrationPrimaryColor rounded-full text-registrationPrimaryColor py-1 px-3 text-sm">
+                                    {{ $additionalDelegate['subBadgeType'] }}</p>
+                            </div>
+                            <p class="mt-2"> {{ $additionalDelegate['subEmailAddress'] }},
+                                {{ $additionalDelegate['subMobileNumber'] }}, {{ $additionalDelegate['subJobTitle'] }}
+                            </p>
+                            <p>Nationality: {{ $additionalDelegate['subNationality'] }}</p>
+                            @if ($additionalDelegate['subPromoCode'] == null)
+                                <p>Promo code used: None</p>
+                            @else
+                                <p>Promo code used: <span
+                                        class="font-bold">{{ $additionalDelegate['subPromoCode'] }}</span>
+                                    <span
+                                        class="text-green-500 text-xs italic mt-1">({{ $additionalDelegate['promoCodeSuccessSub'] }})</span>
+                                </p>
+                            @endif
+                        </div>
+                        <div class="flex flex-col justify-between items-end">
+                            <p class="text-registrationPrimaryColor font-bold">Delegate {{ $count }}</p>
+                            <div class="flex gap-3">
+                                <div wire:click.prevent="openEditModal('{{ $additionalDelegate['subDelegateId'] }}')"
+                                    class="cursor-pointer hover:text-yellow-600 text-yellow-500">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                    Edit
+                                </div>
+
+                                <div wire:click.prevent="removeAdditionalDelegate('{{ $additionalDelegate['subDelegateId'] }}')"
+                                    class="cursor-pointer hover:text-red-600 text-red-500">
+                                    <i class="fa-solid fa-trash"></i>
+                                    Remove
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @php $count++; @endphp
+                @endforeach
+            </div>
+        </div>
+    @endif
+
+    <div class="mt-10 flex flex-col sm:flex-row gap-10 mx-5">
+        <div class="col-span-1">
+
+            @if ($showAddDelegateModal)
+                @include('livewire.registration.modal.add_delegate_modal')
+            @endif
+
+            @if ($showEditDelegateModal)
+                @include('livewire.registration.modal.edit_delegate_modal')
+            @endif
+
+            @if (
+                $firstName != null &&
+                    $lastName != null &&
+                    $emailAddress != null &&
+                    $mobileNumber != null &&
+                    $nationality != null &&
+                    $jobTitle != null &&
+                    $badgeType != null &&
+                    count($additionalDelegates) < 4)
+                <button wire:click.prevent="openAddModal" type="button" wire:key="btnOpenAddModal"
+                    class="cursor-pointer hover:bg-registrationPrimaryColor hover:text-white font-bold border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor rounded-md py-4 px-10">+
+                    Add delegate</button>
+            @else
+                <button disabled type="button"
+                    class="cursor-not-allowed font-bold border-gray-600 border-2 bg-white text-gray-600  rounded-md py-4 px-10">+
+                    Add delegate</button>
+            @endif
         </div>
 
-        <div class="mt-5">
-            @php $count = 2; @endphp
-            @foreach ($additionalDelegates as $additionalDelegate)
-                <div class="bg-registrationCardBGColor px-5 py-2 mt-5 flex justify-between rounded-md">
-                    <div>
-                        <div class="font-bold text-2xl flex items-center gap-2 mt-1">
-                            <p>{{ $additionalDelegate['subSalutation'] }} {{ $additionalDelegate['subFirstName'] }}
-                                {{ $additionalDelegate['subMiddleName'] }} {{ $additionalDelegate['subLastName'] }}
-                            </p>
-                            <p
-                                class="border-2 border-registrationPrimaryColor rounded-full text-registrationPrimaryColor py-1 px-3 text-sm">
-                                {{ $additionalDelegate['subBadgeType'] }}</p>
-                        </div>
-                        <p class="mt-2"> {{ $additionalDelegate['subEmailAddress'] }},
-                            {{ $additionalDelegate['subMobileNumber'] }}, {{ $additionalDelegate['subJobTitle'] }}</p>
-                        <p>Nationality: {{ $additionalDelegate['subNationality'] }}</p>
-                        @if ($additionalDelegate['subPromoCode'] == null)
-                            <p>Promo code used: None</p>
-                        @else
-                            <p>Promo code used: <span
-                                    class="font-bold">{{ $additionalDelegate['subPromoCode'] }}</span>
-                                <span
-                                    class="text-green-500 text-xs italic mt-1">({{ $additionalDelegate['promoCodeSuccessSub'] }})</span>
-                            </p>
-                        @endif
-                    </div>
-                    <div class="flex flex-col justify-between items-end">
-                        <p class="text-registrationPrimaryColor font-bold">Delegate {{ $count }}</p>
-                        <div class="flex gap-3">
-                            <div wire:click.prevent="openEditModal('{{ $additionalDelegate['subDelegateId'] }}')"
-                                class="cursor-pointer hover:text-yellow-600 text-yellow-500">
-                                <i class="fa-solid fa-pen-to-square"></i>
-                                Edit
-                            </div>
+        <div class="col-span-1">
+            <div class="text-registrationPrimaryColor italic font-bold text-xl">
+                Do you wish to invite more delegates?
+            </div>
 
-                            <div wire:click.prevent="removeAdditionalDelegate('{{ $additionalDelegate['subDelegateId'] }}')"
-                                class="cursor-pointer hover:text-red-600 text-red-500">
-                                <i class="fa-solid fa-trash"></i>
-                                Remove
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                @php $count++; @endphp
-            @endforeach
+            <div class="text-registrationPrimaryColor italic text-sm mt-2 w-full sm:w-3/5">
+                If you wish to register more than 5 delegates, please contact our sales team at
+                forumregistration@gpca.org.ae or call +971 4 5106666 ext. 153
+            </div>
         </div>
     </div>
 @endif
-
-<div class="mt-10 flex flex-col sm:flex-row gap-10 mx-5">
-    <div class="col-span-1">
-
-        @if ($showAddDelegateModal)
-            @include('livewire.registration.modal.add_delegate_modal')
-        @endif
-
-        @if ($showEditDelegateModal)
-            @include('livewire.registration.modal.edit_delegate_modal')
-        @endif
-
-        @if (
-            $firstName != null &&
-                $lastName != null &&
-                $emailAddress != null &&
-                $mobileNumber != null &&
-                $nationality != null &&
-                $jobTitle != null &&
-                $badgeType != null &&
-                count($additionalDelegates) < 4)
-            <button wire:click.prevent="openAddModal" type="button" wire:key="btnOpenAddModal"
-                class="cursor-pointer hover:bg-registrationPrimaryColor hover:text-white font-bold border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor rounded-md py-4 px-10">+
-                Add delegate</button>
-        @else
-            <button disabled type="button"
-                class="cursor-not-allowed font-bold border-gray-600 border-2 bg-white text-gray-600  rounded-md py-4 px-10">+
-                Add delegate</button>
-        @endif
-    </div>
-
-    <div class="col-span-1">
-        <div class="text-registrationPrimaryColor italic font-bold text-xl">
-            Do you wish to invite more delegates?
-        </div>
-
-        <div class="text-registrationPrimaryColor italic text-sm mt-2 w-full sm:w-3/5">
-            If you wish to register more than 5 delegates, please contact our sales team at
-            forumregistration@gpca.org.ae or call +971 4 5106666 ext. 153
-        </div>
-    </div>
-</div>
