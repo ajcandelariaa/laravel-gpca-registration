@@ -430,7 +430,7 @@ class RegistrationForm extends Component
                         'text' => "",
                     ]);
                 } else {
-                    if($this->event->category == "GLF"){
+                    if ($this->event->category == "GLF") {
                         $this->dispatchBrowserEvent('swal:registration-confirmation', [
                             'type' => 'warning',
                             'message' => 'Are you sure all the details are correct?',
@@ -462,7 +462,7 @@ class RegistrationForm extends Component
                 $this->checkUnitPrice();
                 $this->calculateAmount();
                 $this->currentStep += 1;
-                if($this->event->category == "GLF"){
+                if ($this->event->category == "GLF") {
                     $this->paymentMethod = 'bankTransfer';
                 }
             }
@@ -613,7 +613,7 @@ class RegistrationForm extends Component
             $this->currentStep += 1;
         } else {
             $this->dispatchBrowserEvent('swal:remove-registration-loading-screen');
-            if($this->event->category == "GLF"){
+            if ($this->event->category == "GLF") {
                 $this->submitBankTransfer();
             } else {
                 $this->currentStep += 1;
@@ -701,95 +701,97 @@ class RegistrationForm extends Component
             'badgeLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-badge" . "/" . "main" . "/" . $this->currentMainDelegateId,
         ];
 
-        if ($this->isMainFree) {
-            try {
-                Mail::to($this->emailAddress)->cc($this->ccEmailNotif)->send(new RegistrationFree($details1));
-            } catch (\Exception $e) {
-                Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationFree($details1));
-            }
-        } else {
-            try {
-                Mail::to($this->emailAddress)->cc($this->ccEmailNotif)->send(new RegistrationUnpaid($details1));
-            } catch (\Exception $e) {
-                Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationUnpaid($details1));
-            }
-        }
-
-        if ($this->assistantEmailAddress != null) {
+        if ($this->event->category != "GLF") {
             if ($this->isMainFree) {
                 try {
-                    Mail::to($this->assistantEmailAddress)->send(new RegistrationFree($details1));
+                    Mail::to($this->emailAddress)->cc($this->ccEmailNotif)->send(new RegistrationFree($details1));
                 } catch (\Exception $e) {
                     Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationFree($details1));
                 }
             } else {
                 try {
-                    Mail::to($this->assistantEmailAddress)->send(new RegistrationUnpaid($details1));
+                    Mail::to($this->emailAddress)->cc($this->ccEmailNotif)->send(new RegistrationUnpaid($details1));
                 } catch (\Exception $e) {
                     Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationUnpaid($details1));
                 }
             }
-        }
 
-        $addtionalDelegates = AdditionalDelegates::where('main_delegate_id', $this->currentMainDelegateId)->get();
-        if (!empty($addtionalDelegates)) {
-            foreach ($addtionalDelegates as $additionalDelegate) {
-
-                $transaction = Transactions::where('delegate_id', $additionalDelegate->id)->where('delegate_type', "sub")->first();
-
-                $lastDigit = 1000 + intval($transaction->id);
-                $tempTransactionId = $this->event->year . "$getEventcode" . "$lastDigit";
-
-                $details1 = [
-                    'name' => $additionalDelegate->salutation . " " . $additionalDelegate->first_name . " " . $additionalDelegate->middle_name . " " . $additionalDelegate->last_name,
-                    'eventLink' => $this->event->link,
-                    'eventName' => $this->event->name,
-                    'eventDates' => $eventFormattedData,
-                    'eventLocation' => $this->event->location,
-                    'eventCategory' => $this->event->category,
-                    'eventYear' => $this->event->year,
-
-                    'jobTitle' => $additionalDelegate->job_title,
-                    'companyName' => $this->companyName,
-                    'amountPaid' => 0,
-                    'transactionId' => $tempTransactionId,
-                    'invoiceLink' => $invoiceLink,
-                    'earlyBirdValidityDate' => $earlyBirdValidityDate->format('jS F'),
-                    'badgeLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-badge" . "/" . "sub" . "/" . $additionalDelegate->id,
-                ];
-
-                $isSubFree = false;
-
-                $promoCode = PromoCodes::where('event_id', $this->event->id)->where('promo_code', $additionalDelegate->pcode_used)->first();
-
-                if ($promoCode != null) {
-                    if ($promoCode->discount_type == "percentage") {
-                        $tempTotalNetAmount = $this->finalUnitPrice - ($this->finalUnitPrice * ($promoCode->discount / 100));
-                    } else if ($promoCode->discount_type == "price") {
-                        $tempTotalNetAmount = $this->finalUnitPrice - $promoCode->discount;
-                    } else {
-                        $tempTotalNetAmount = $promoCode->new_rate;
-                    }
-
-                    if ($tempTotalNetAmount == 0) {
-                        $isSubFree = true;
-                    }
-                } else {
-                    $isSubFree = false;
-                }
-
-
-                if ($isSubFree) {
+            if ($this->assistantEmailAddress != null) {
+                if ($this->isMainFree) {
                     try {
-                        Mail::to($additionalDelegate->email_address)->cc($this->ccEmailNotif)->send(new RegistrationFree($details1));
+                        Mail::to($this->assistantEmailAddress)->send(new RegistrationFree($details1));
                     } catch (\Exception $e) {
                         Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationFree($details1));
                     }
                 } else {
                     try {
-                        Mail::to($additionalDelegate->email_address)->cc($this->ccEmailNotif)->send(new RegistrationUnpaid($details1));
+                        Mail::to($this->assistantEmailAddress)->send(new RegistrationUnpaid($details1));
                     } catch (\Exception $e) {
                         Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationUnpaid($details1));
+                    }
+                }
+            }
+
+            $addtionalDelegates = AdditionalDelegates::where('main_delegate_id', $this->currentMainDelegateId)->get();
+            if (!empty($addtionalDelegates)) {
+                foreach ($addtionalDelegates as $additionalDelegate) {
+
+                    $transaction = Transactions::where('delegate_id', $additionalDelegate->id)->where('delegate_type', "sub")->first();
+
+                    $lastDigit = 1000 + intval($transaction->id);
+                    $tempTransactionId = $this->event->year . "$getEventcode" . "$lastDigit";
+
+                    $details1 = [
+                        'name' => $additionalDelegate->salutation . " " . $additionalDelegate->first_name . " " . $additionalDelegate->middle_name . " " . $additionalDelegate->last_name,
+                        'eventLink' => $this->event->link,
+                        'eventName' => $this->event->name,
+                        'eventDates' => $eventFormattedData,
+                        'eventLocation' => $this->event->location,
+                        'eventCategory' => $this->event->category,
+                        'eventYear' => $this->event->year,
+
+                        'jobTitle' => $additionalDelegate->job_title,
+                        'companyName' => $this->companyName,
+                        'amountPaid' => 0,
+                        'transactionId' => $tempTransactionId,
+                        'invoiceLink' => $invoiceLink,
+                        'earlyBirdValidityDate' => $earlyBirdValidityDate->format('jS F'),
+                        'badgeLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-badge" . "/" . "sub" . "/" . $additionalDelegate->id,
+                    ];
+
+                    $isSubFree = false;
+
+                    $promoCode = PromoCodes::where('event_id', $this->event->id)->where('promo_code', $additionalDelegate->pcode_used)->first();
+
+                    if ($promoCode != null) {
+                        if ($promoCode->discount_type == "percentage") {
+                            $tempTotalNetAmount = $this->finalUnitPrice - ($this->finalUnitPrice * ($promoCode->discount / 100));
+                        } else if ($promoCode->discount_type == "price") {
+                            $tempTotalNetAmount = $this->finalUnitPrice - $promoCode->discount;
+                        } else {
+                            $tempTotalNetAmount = $promoCode->new_rate;
+                        }
+
+                        if ($tempTotalNetAmount == 0) {
+                            $isSubFree = true;
+                        }
+                    } else {
+                        $isSubFree = false;
+                    }
+
+
+                    if ($isSubFree) {
+                        try {
+                            Mail::to($additionalDelegate->email_address)->cc($this->ccEmailNotif)->send(new RegistrationFree($details1));
+                        } catch (\Exception $e) {
+                            Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationFree($details1));
+                        }
+                    } else {
+                        try {
+                            Mail::to($additionalDelegate->email_address)->cc($this->ccEmailNotif)->send(new RegistrationUnpaid($details1));
+                        } catch (\Exception $e) {
+                            Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationUnpaid($details1));
+                        }
                     }
                 }
             }
