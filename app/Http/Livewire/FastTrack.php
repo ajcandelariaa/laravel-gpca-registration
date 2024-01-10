@@ -32,9 +32,9 @@ class FastTrack extends Component
         $this->state = null;
         $this->date = now()->format('F j, Y');
         $this->day = now()->format('l');
-        $this->getGLFConfirmedDelegates();
-        // $this->getAFConfirmedDelegates();
-        // $this->getAFVConfirmedVisitors();
+        // $this->getGLFConfirmedDelegates();
+        $this->getAFConfirmedDelegates();
+        $this->getAFVConfirmedVisitors();
     }
 
     public function render()
