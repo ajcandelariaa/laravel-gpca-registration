@@ -43,6 +43,12 @@ class RegistrationPaid extends Mailable
             } else {
                 $subject = 'Registration confirmation for the ' . $this->details['eventName'];
             }
+        } else if ($this->details['eventYear'] == '2024') {
+            if ($this->details['eventCategory'] == "GLF") {
+                $subject = 'Confirmation of your registration for the ' . $this->details['eventName'];
+            } else {
+                $subject = 'Registration confirmation for the ' . $this->details['eventName'];
+            }
         } else {
             $subject = 'Registration confirmation for the ' . $this->details['eventName'];
         }
