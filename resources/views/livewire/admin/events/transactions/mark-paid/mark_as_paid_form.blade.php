@@ -26,7 +26,26 @@
                                 </select>
                                 @error($mapPaymentMethod)
                                     <div class="text-red-500 text-xs italic mt-1">
-                                        {{ $message }}
+                                        Payment method is required
+                                    </div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="mt-5 grid grid-cols-2 gap-y-3 gap-x-5">
+                            <div class="text-registrationPrimaryColor">
+                                Send email notification: <span class="text-red-500">*</span>
+                            </div>
+                            <div>
+                                <select wire:model.lazy="mapSendEmailNotif"
+                                    class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                                    <option value=""></option>
+                                    <option value="yes">Yes</option>
+                                    <option value="no">No</option>
+                                </select>
+                                @error($mapSendEmailNotif)
+                                    <div class="text-red-500 text-xs italic mt-1">
+                                        Send Email notification is required
                                     </div>
                                 @enderror
                             </div>

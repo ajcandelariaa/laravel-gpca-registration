@@ -38,7 +38,7 @@ class RegistrantDetails extends Component
 
     public $replaceDelegateIndex, $replaceDelegateInnerIndex, $replaceSalutation, $replaceFirstName, $replaceMiddleName, $replaceLastName, $replaceEmailAddress, $replaceMobileNumber, $replaceNationality, $replaceJobTitle, $replaceBadgeType, $replacePromoCode, $replaceDiscountType, $replacePromoCodeDiscount, $replacePromoCodeSuccess, $replacePromoCodeFail, $replaceEmailAlreadyUsedError;
 
-    public $mapPaymentMethod, $sendInvoice;
+    public $mapPaymentMethod, $mapSendEmailNotif, $sendInvoice;
 
     // MODALS
     public $showDelegateModal = false;
@@ -126,7 +126,6 @@ class RegistrantDetails extends Component
                 'job_title' => $this->jobTitle,
                 'badge_type' => $this->badgeType,
                 'pcode_used' => $this->promoCode,
-                'discount' => $this->promoCodeDiscount,
             ])->save();
         } else {
             AdditionalDelegates::find($this->delegateId)->fill([
@@ -140,7 +139,6 @@ class RegistrantDetails extends Component
                 'job_title' => $this->jobTitle,
                 'badge_type' => $this->badgeType,
                 'pcode_used' => $this->promoCode,
-                'discount' => $this->promoCodeDiscount,
             ])->save();
         }
 
@@ -407,20 +405,28 @@ class RegistrantDetails extends Component
     {
         $this->showMarkAsPaidModal = false;
         $this->mapPaymentMethod = null;
+        $this->mapSendEmailNotif = null;
     }
 
     public function markAsPaidConfirmation()
     {
         $this->validate([
             'mapPaymentMethod' => 'required',
-        ], [
-            'mapPaymentMethod.required' => "Payment method is required",
+            'mapSendEmailNotif' => 'required',
         ]);
+
+        $messageText = "";
+
+        if ($this->mapSendEmailNotif == "yes") {
+            $messageText = "Please note that they will receive email notification";
+        } else {
+            $messageText = "Please note that they will not receive any email notification";
+        }
 
         $this->dispatchBrowserEvent('swal:mark-as-paid-confirmation', [
             'type' => 'warning',
             'message' => 'Are you sure you want to mark this as paid?',
-            'text' => "",
+            'text' => $messageText,
         ]);
     }
 
@@ -433,15 +439,24 @@ class RegistrantDetails extends Component
             $paymentStatus = "paid";
         }
 
-        MainDelegates::find($this->finalData['mainDelegateId'])->fill([
-            'registration_status' => "confirmed",
-            'payment_status' => $paymentStatus,
-            'mode_of_payment' => $this->mapPaymentMethod,
-            'paid_date_time' => Carbon::now(),
+        if ($this->mapSendEmailNotif == "yes") {
+            MainDelegates::find($this->finalData['mainDelegateId'])->fill([
+                'registration_status' => "confirmed",
+                'payment_status' => $paymentStatus,
+                'mode_of_payment' => $this->mapPaymentMethod,
+                'paid_date_time' => Carbon::now(),
 
-            'registration_confirmation_sent_count' => $this->finalData['registration_confirmation_sent_count'] + 1,
-            'registration_confirmation_sent_datetime' => Carbon::now(),
-        ])->save();
+                'registration_confirmation_sent_count' => $this->finalData['registration_confirmation_sent_count'] + 1,
+                'registration_confirmation_sent_datetime' => Carbon::now(),
+            ])->save();
+        } else {
+            MainDelegates::find($this->finalData['mainDelegateId'])->fill([
+                'registration_status' => "confirmed",
+                'payment_status' => $paymentStatus,
+                'mode_of_payment' => $this->mapPaymentMethod,
+                'paid_date_time' => Carbon::now(),
+            ])->save();
+        }
 
         $eventFormattedData = Carbon::parse($this->event->event_start_date)->format('d') . '-' . Carbon::parse($this->event->event_end_date)->format('d M Y');
         $invoiceLink = env('APP_URL') . '/' . $this->event->category . '/' . $this->event->id . '/view-invoice/' . $this->finalData['mainDelegateId'];
@@ -449,78 +464,88 @@ class RegistrantDetails extends Component
         $assistantDetails1 = [];
         $assistantDetails2 = [];
 
-        foreach ($this->finalData['allDelegates'] as $delegatesIndex => $delegates) {
-            foreach ($delegates as $innerDelegate) {
-                if (end($delegates) == $innerDelegate) {
-                    if (!$innerDelegate['delegate_cancelled']) {
-                        $amountPaid = $this->finalData['invoiceData']['unit_price'];
+        if ($this->mapSendEmailNotif == "yes") {
+            foreach ($this->finalData['allDelegates'] as $delegatesIndex => $delegates) {
+                foreach ($delegates as $innerDelegate) {
+                    if (end($delegates) == $innerDelegate) {
+                        if (!$innerDelegate['delegate_cancelled']) {
 
-                        $promoCode = PromoCodes::where('event_id', $this->event->id)->where('promo_code', $innerDelegate['pcode_used'])->first();
+                            $delegateVatPrice = $this->finalData['invoiceData']['unit_price'] * ($this->event->event_vat / 100);
+                            $amountPaid = $this->finalData['invoiceData']['unit_price'] + $delegateVatPrice;
 
-                        if ($promoCode != null) {
-                            if ($promoCode->discount_type == "percentage") {
-                                $amountPaid = $this->finalData['invoiceData']['unit_price'] - ($this->finalData['invoiceData']['unit_price'] * ($promoCode->discount / 100));
-                            } else if ($promoCode->discount_type == "price") {
-                                $amountPaid = $this->finalData['invoiceData']['unit_price'] - $promoCode->discount;
-                            } else {
-                                $amountPaid = $promoCode->new_rate;
+                            $promoCode = PromoCodes::where('event_id', $this->event->id)->where('promo_code', $innerDelegate['pcode_used'])->first();
+
+                            if ($promoCode != null) {
+                                if ($promoCode->discount_type == "percentage") {
+                                    $delegateDiscountPrice = $this->finalData['invoiceData']['unit_price'] * ($promoCode->discount / 100);
+                                    $delegateDiscountedPrice = $this->finalData['invoiceData']['unit_price'] - $delegateDiscountPrice;
+                                    $delegateVatPrice = $delegateDiscountedPrice * ($this->event->event_vat / 100);
+                                    $amountPaid = $delegateDiscountedPrice + $delegateVatPrice;
+                                } else if ($promoCode->discount_type == "price") {
+                                    $delegateDiscountedPrice = $this->finalData['invoiceData']['unit_price'] - $promoCode->discount;
+                                    $delegateVatPrice = $delegateDiscountedPrice * ($this->event->event_vat / 100);
+                                    $amountPaid = $delegateDiscountedPrice + $delegateVatPrice;
+                                } else {
+                                    $delegateVatPrice = $promoCode->new_rate * ($this->event->event_vat / 100);
+                                    $amountPaid = $promoCode->new_rate + $delegateVatPrice;
+                                }
                             }
-                        }
 
-                        if ($this->finalData['alternative_company_name'] == null) {
-                            $finalCompanyName = $this->finalData['company_name'];
-                        } else {
-                            $finalCompanyName = $this->finalData['alternative_company_name'];
-                        }
+                            if ($this->finalData['alternative_company_name'] == null) {
+                                $finalCompanyName = $this->finalData['company_name'];
+                            } else {
+                                $finalCompanyName = $this->finalData['alternative_company_name'];
+                            }
 
-                        $details1 = [
-                            'name' => $innerDelegate['name'],
-                            'eventLink' => $this->event->link,
-                            'eventName' => $this->event->name,
-                            'eventDates' => $eventFormattedData,
-                            'eventLocation' => $this->event->location,
-                            'eventCategory' => $this->event->category,
-                            'eventYear' => $this->event->year,
+                            $details1 = [
+                                'name' => $innerDelegate['name'],
+                                'eventLink' => $this->event->link,
+                                'eventName' => $this->event->name,
+                                'eventDates' => $eventFormattedData,
+                                'eventLocation' => $this->event->location,
+                                'eventCategory' => $this->event->category,
+                                'eventYear' => $this->event->year,
 
-                            'jobTitle' => $innerDelegate['job_title'],
-                            'companyName' => $finalCompanyName,
-                            'amountPaid' => $amountPaid,
-                            'transactionId' => $innerDelegate['transactionId'],
-                            'invoiceLink' => $invoiceLink,
-                            'badgeLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-badge" . "/" . $innerDelegate['delegateType'] . "/" . $innerDelegate['delegateId'],
-                        ];
+                                'jobTitle' => $innerDelegate['job_title'],
+                                'companyName' => $finalCompanyName,
+                                'amountPaid' => $amountPaid,
+                                'transactionId' => $innerDelegate['transactionId'],
+                                'invoiceLink' => $invoiceLink,
+                                'badgeLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-badge" . "/" . $innerDelegate['delegateType'] . "/" . $innerDelegate['delegateId'],
+                            ];
 
 
-                        $details2 = [
-                            'name' => $innerDelegate['name'],
-                            'eventLink' => $this->event->link,
-                            'eventName' => $this->event->name,
-                            'eventCategory' => $this->event->category,
-                            'eventYear' => $this->event->year,
+                            $details2 = [
+                                'name' => $innerDelegate['name'],
+                                'eventLink' => $this->event->link,
+                                'eventName' => $this->event->name,
+                                'eventCategory' => $this->event->category,
+                                'eventYear' => $this->event->year,
 
-                            'invoiceAmount' => $this->finalData['invoiceData']['total_amount'],
-                            'amountPaid' => $this->finalData['invoiceData']['total_amount'],
-                            'balance' => 0,
-                            'invoiceLink' => $invoiceLink,
-                        ];
+                                'invoiceAmount' => $this->finalData['invoiceData']['total_amount'],
+                                'amountPaid' => $this->finalData['invoiceData']['total_amount'],
+                                'balance' => 0,
+                                'invoiceLink' => $invoiceLink,
+                            ];
 
-                        if ($delegatesIndex == 0) {
-                            $assistantDetails1 = $details1;
-                            $assistantDetails2 = $details2;
-                        }
+                            if ($delegatesIndex == 0) {
+                                $assistantDetails1 = $details1;
+                                $assistantDetails2 = $details2;
+                            }
 
-                        try {
-                            Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaid($details1, $this->sendInvoice));
-                        } catch (\Exception $e) {
-                            Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaid($details1, $this->sendInvoice));
-                        }
-                        if ($this->event->category != "GLF") {
-                            if ($this->sendInvoice) {
-                                if ($delegatesIndex == 0) {
-                                    try {
-                                        Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
-                                    } catch (\Exception $e) {
-                                        Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+                            try {
+                                Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaid($details1, $this->sendInvoice));
+                            } catch (\Exception $e) {
+                                Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaid($details1, $this->sendInvoice));
+                            }
+                            if ($this->event->category != "GLF") {
+                                if ($this->sendInvoice) {
+                                    if ($delegatesIndex == 0) {
+                                        try {
+                                            Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+                                        } catch (\Exception $e) {
+                                            Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+                                        }
                                     }
                                 }
                             }
@@ -530,20 +555,22 @@ class RegistrantDetails extends Component
             }
         }
 
-        $assistantDetails1['amountPaid'] = $this->finalData['invoiceData']['total_amount'];
+        if ($this->mapSendEmailNotif == "yes") {
+            $assistantDetails1['amountPaid'] = $this->finalData['invoiceData']['total_amount'];
 
-        if ($this->finalData['assistant_email_address'] != null) {
-            try {
-                Mail::to($this->finalData['assistant_email_address'])->send(new RegistrationPaid($assistantDetails1, $this->sendInvoice));
-            } catch (\Exception $e) {
-                Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaid($assistantDetails1, $this->sendInvoice));
-            }
-            if ($this->event->category != "GLF") {
-                if ($this->sendInvoice) {
-                    try {
-                        Mail::to($this->finalData['assistant_email_address'])->send(new RegistrationPaymentConfirmation($assistantDetails2, $this->sendInvoice));
-                    } catch (\Exception $e) {
-                        Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaymentConfirmation($assistantDetails2, $this->sendInvoice));
+            if ($this->finalData['assistant_email_address'] != null) {
+                try {
+                    Mail::to($this->finalData['assistant_email_address'])->send(new RegistrationPaid($assistantDetails1, $this->sendInvoice));
+                } catch (\Exception $e) {
+                    Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaid($assistantDetails1, $this->sendInvoice));
+                }
+                if ($this->event->category != "GLF") {
+                    if ($this->sendInvoice) {
+                        try {
+                            Mail::to($this->finalData['assistant_email_address'])->send(new RegistrationPaymentConfirmation($assistantDetails2, $this->sendInvoice));
+                        } catch (\Exception $e) {
+                            Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaymentConfirmation($assistantDetails2, $this->sendInvoice));
+                        }
                     }
                 }
             }
@@ -554,11 +581,14 @@ class RegistrantDetails extends Component
         $this->finalData['mode_of_payment'] = $this->mapPaymentMethod;
         $this->finalData['paid_date_time'] = Carbon::parse(Carbon::now())->format('M j, Y g:i A');
 
-        $this->finalData['registration_confirmation_sent_count'] = $this->finalData['registration_confirmation_sent_count'] + 1;
-        $this->finalData['registration_confirmation_sent_datetime'] = Carbon::parse(Carbon::now())->format('M j, Y g:i A');
+        if ($this->mapSendEmailNotif == "yes") {
+            $this->finalData['registration_confirmation_sent_count'] = $this->finalData['registration_confirmation_sent_count'] + 1;
+            $this->finalData['registration_confirmation_sent_datetime'] = Carbon::parse(Carbon::now())->format('M j, Y g:i A');
+        }
 
         $this->showMarkAsPaidModal = false;
         $this->mapPaymentMethod = null;
+        $this->mapSendEmailNotif = null;
         $this->dispatchBrowserEvent('swal:mark-as-paid-success', [
             'type' => 'success',
             'message' => 'Marked paid successfully!',
@@ -905,17 +935,25 @@ class RegistrantDetails extends Component
             foreach ($delegates as $innerDelegate) {
                 if (end($delegates) == $innerDelegate) {
                     if (!$innerDelegate['delegate_cancelled']) {
-                        $amountPaid = $this->finalData['invoiceData']['unit_price'];
+
+                        $delegateVatPrice = $this->finalData['invoiceData']['unit_price'] * ($this->event->event_vat / 100);
+                        $amountPaid = $this->finalData['invoiceData']['unit_price'] + $delegateVatPrice;
 
                         $promoCode = PromoCodes::where('event_id', $this->event->id)->where('promo_code', $innerDelegate['pcode_used'])->first();
 
                         if ($promoCode != null) {
                             if ($promoCode->discount_type == "percentage") {
-                                $amountPaid = $this->finalData['invoiceData']['unit_price'] - ($this->finalData['invoiceData']['unit_price'] * ($promoCode->discount / 100));
+                                $delegateDiscountPrice = $this->finalData['invoiceData']['unit_price'] * ($promoCode->discount / 100);
+                                $delegateDiscountedPrice = $this->finalData['invoiceData']['unit_price'] - $delegateDiscountPrice;
+                                $delegateVatPrice = $delegateDiscountedPrice * ($this->event->event_vat / 100);
+                                $amountPaid = $delegateDiscountedPrice + $delegateVatPrice;
                             } else if ($promoCode->discount_type == "price") {
-                                $amountPaid = $this->finalData['invoiceData']['unit_price'] - $promoCode->discount;
+                                $delegateDiscountedPrice = $this->finalData['invoiceData']['unit_price'] - $promoCode->discount;
+                                $delegateVatPrice = $delegateDiscountedPrice * ($this->event->event_vat / 100);
+                                $amountPaid = $delegateDiscountedPrice + $delegateVatPrice;
                             } else {
-                                $amountPaid = $promoCode->new_rate;
+                                $delegateVatPrice = $promoCode->new_rate * ($this->event->event_vat / 100);
+                                $amountPaid = $promoCode->new_rate + $delegateVatPrice;
                             }
                         }
 

@@ -1763,18 +1763,25 @@ class RegistrationController extends Controller
                     $tempTransactionId = "$event->year" . "$getEventcode" . "$lastDigit";
                     $invoiceLink = env('APP_URL') . '/' . $event->category . '/' . $event->id . '/view-invoice/' . $mainDelegateId;
 
-                    $amountPaid = $mainDelegate->unit_price;
+                    $mainDelegateVatPrice = $mainDelegate->unit_price * ($event->event_vat / 100);
+                    $amountPaid = $mainDelegate->unit_price + $mainDelegateVatPrice;
 
                     if ($mainDelegate->pcode_used != null) {
                         $promoCode = PromoCode::where('event_id', $mainDelegate->event_id)->where('promo_code', $mainDelegate->pcode_used)->first();
 
                         if ($promoCode != null) {
                             if ($promoCode->discount_type == "percentage") {
-                                $amountPaid = $mainDelegate->unit_price - ($mainDelegate->unit_price * ($promoCode->discount / 100));
+                                $mainDelegateDiscountPrice = $mainDelegate->unit_price * ($promoCode->discount / 100);
+                                $mainDelegateDiscountedPrice = $mainDelegate->unit_price - $mainDelegateDiscountPrice;
+                                $mainDelegateVatPrice = $mainDelegateDiscountedPrice * ($event->event_vat / 100);
+                                $amountPaid = $mainDelegateDiscountedPrice + $mainDelegateVatPrice;
                             } else if ($promoCode->discount_type == "price") {
-                                $amountPaid = $mainDelegate->unit_price - $promoCode->discount;
+                                $mainDelegateDiscountedPrice = $mainDelegate->unit_price - $promoCode->discount;
+                                $mainDelegateVatPrice = $mainDelegateDiscountedPrice * ($event->event_vat / 100); 
+                                $amountPaid = $mainDelegateDiscountedPrice + $mainDelegateVatPrice;
                             } else {
-                                $amountPaid = $promoCode->new_rate;
+                                $mainDelegateVatPrice = $promoCode->new_rate * ($event->event_vat / 100);
+                                $amountPaid = $promoCode->new_rate + $mainDelegateVatPrice;
                             }
                         }
                     }
@@ -1843,18 +1850,25 @@ class RegistrationController extends Controller
                             $lastDigit = 1000 + intval($transactionId);
                             $tempTransactionId = "$event->year" . "$getEventcode" . "$lastDigit";
 
-                            $amountPaidSub = $mainDelegate->unit_price;
+                            $subDelegateVatPrice = $mainDelegate->unit_price * ($event->event_vat / 100);
+                            $amountPaidSub = $mainDelegate->unit_price + $subDelegateVatPrice;
 
                             if ($additionalDelegate->pcode_used != null) {
                                 $promoCode = PromoCode::where('event_id', $mainDelegate->event_id)->where('promo_code', $additionalDelegate->pcode_used)->first();
 
                                 if ($promoCode != null) {
                                     if ($promoCode->discount_type == "percentage") {
-                                        $amountPaidSub = $mainDelegate->unit_price - ($mainDelegate->unit_price * ($promoCode->discount / 100));
+                                        $subDelegateDiscountPrice = $mainDelegate->unit_price * ($promoCode->discount / 100);
+                                        $subDelegateDiscountedPrice = $mainDelegate->unit_price - $subDelegateDiscountPrice;
+                                        $subDelegateVatPrice = $subDelegateDiscountedPrice * ($event->event_vat / 100);
+                                        $amountPaidSub = $subDelegateDiscountedPrice + $subDelegateVatPrice;
                                     } else if ($promoCode->discount_type == "price") {
-                                        $amountPaidSub = $mainDelegate->unit_price - $promoCode->discount;
+                                        $subDelegateDiscountedPrice = $mainDelegate->unit_price - $promoCode->discount;
+                                        $subDelegateVatPrice = $subDelegateDiscountedPrice * ($event->event_vat / 100); 
+                                        $amountPaidSub = $subDelegateDiscountedPrice + $subDelegateVatPrice;
                                     } else {
-                                        $amountPaidSub = $promoCode->new_rate;
+                                        $subDelegateVatPrice = $promoCode->new_rate * ($event->event_vat / 100);
+                                        $amountPaidSub = $promoCode->new_rate + $subDelegateVatPrice;
                                     }
                                 }
                             }
@@ -4024,10 +4038,12 @@ class RegistrationController extends Controller
                 $tempBookReference = "$event->year" . "$getEventcode" . "$lastDigit";
 
                 $promoCodeDiscount = null;
-                $discountPrice = 0.0;
-                $netAMount = 0.0;
-                $unitPrice = $mainDelegate->unit_price;
 
+                $unitPrice = $mainDelegate->unit_price;
+                $discountPrice = 0.0;
+                $netAMount = $unitPrice - $discountPrice;
+                $vatPrice = $netAMount * ($event->event_vat / 100);
+                $totalAmount = $netAMount + $vatPrice;
                 $promoCode = PromoCode::where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $mainDelegate->pcode_used)->first();
 
                 if ($promoCode  != null) {
@@ -4035,22 +4051,30 @@ class RegistrationController extends Controller
                     $discountType = $promoCode->discount_type;
 
                     if ($discountType == "percentage") {
-                        $discountPrice = $mainDelegate->unit_price * ($promoCodeDiscount / 100);
-                        $netAMount = $mainDelegate->unit_price - $discountPrice;
                         $unitPrice = $mainDelegate->unit_price;
+                        $discountPrice = $unitPrice * ($promoCodeDiscount / 100);
+                        $netAMount = $unitPrice - $discountPrice;
+                        $vatPrice = $netAMount * ($event->event_vat / 100);
+                        $totalAmount = $netAMount + $vatPrice;
                     } else if ($discountType == "price") {
-                        $discountPrice = $promoCodeDiscount;
-                        $netAMount = $mainDelegate->unit_price - $discountPrice;
                         $unitPrice = $mainDelegate->unit_price;
+                        $discountPrice = $promoCodeDiscount;
+                        $netAMount = $unitPrice - $discountPrice;
+                        $vatPrice = $netAMount * ($event->event_vat / 100);
+                        $totalAmount = $netAMount + $vatPrice;
                     } else {
-                        $discountPrice = 0.0;
-                        $netAMount = $promoCode->new_rate;
                         $unitPrice = $promoCode->new_rate;
+                        $discountPrice = 0.0;
+                        $netAMount = $unitPrice - $discountPrice;
+                        $vatPrice = $netAMount * ($event->event_vat / 100);
+                        $totalAmount = $netAMount + $vatPrice;
                     }
                 } else {
-                    $discountPrice = 0.0;
-                    $netAMount = $mainDelegate->unit_price;
                     $unitPrice = $mainDelegate->unit_price;
+                    $discountPrice = 0.0;
+                    $netAMount = $unitPrice - $discountPrice;
+                    $vatPrice = $netAMount * ($event->event_vat / 100);
+                    $totalAmount = $netAMount + $vatPrice;
                 }
 
                 $printedBadgeCount = 0;
@@ -4123,6 +4147,8 @@ class RegistrationController extends Controller
                     'unit_price' => $unitPrice,
                     'discount_price' => $discountPrice,
                     'net_amount' => $netAMount,
+                    'vat_price' => $vatPrice,
+                    'total_amount' => $totalAmount,
                     'printed_badge_count' => $printedBadgeCount,
                     'printed_badge_date_time' => $printedBadgeDateTime,
 
@@ -4130,7 +4156,6 @@ class RegistrationController extends Controller
                     'scanned_badge_date_time' => $scannedBadgeDateTime,
 
                     // PLEASE CONTINUE HERE
-                    'total_amount' => $mainDelegate->total_amount,
                     'payment_status' => $mainDelegate->delegate_refunded ? 'refunded' : $mainDelegate->payment_status,
                     'registration_status' => $mainDelegate->delegate_cancelled ? 'cancelled' : $mainDelegate->registration_status,
                     'mode_of_payment' => $mainDelegate->mode_of_payment,
@@ -4164,9 +4189,12 @@ class RegistrationController extends Controller
                         $subTransactionId = Transaction::where('delegate_id', $subDelegate->id)->where('delegate_type', "sub")->value('id');
 
                         $promoCodeDiscount = null;
-                        $discountPrice = 0.0;
-                        $netAMount = 0.0;
+
                         $unitPrice = $mainDelegate->unit_price;
+                        $discountPrice = 0.0;
+                        $netAMount = $unitPrice - $discountPrice;
+                        $vatPrice = $netAMount * ($event->event_vat / 100);
+                        $totalAmount = $netAMount + $vatPrice;
 
                         $subPromoCode = PromoCode::where('event_id', $eventId)->where('event_category', $eventCategory)->where('promo_code', $subDelegate->pcode_used)->first();
 
@@ -4176,21 +4204,30 @@ class RegistrationController extends Controller
                             $discountType = $subPromoCode->discount_type;
 
                             if ($discountType == "percentage") {
-                                $discountPrice = $mainDelegate->unit_price * ($promoCodeDiscount / 100);
-                                $netAMount = $mainDelegate->unit_price - $discountPrice;
+                                $unitPrice = $mainDelegate->unit_price;
+                                $discountPrice = $unitPrice * ($promoCodeDiscount / 100);
+                                $netAMount = $unitPrice - $discountPrice;
+                                $vatPrice = $netAMount * ($event->event_vat / 100);
+                                $totalAmount = $netAMount + $vatPrice;
                             } else if ($discountType == "price") {
+                                $unitPrice = $mainDelegate->unit_price;
                                 $discountPrice = $promoCodeDiscount;
-                                $netAMount = $mainDelegate->unit_price - $discountPrice;
-                                $unitPrice = $mainDelegate->unit_price ;
+                                $netAMount = $unitPrice - $discountPrice;
+                                $vatPrice = $netAMount * ($event->event_vat / 100);
+                                $totalAmount = $netAMount + $vatPrice;
                             } else {
-                                $discountPrice = 0.0;
-                                $netAMount = $subPromoCode->new_rate;
                                 $unitPrice = $subPromoCode->new_rate;
+                                $discountPrice = 0.0;
+                                $netAMount = $unitPrice - $discountPrice;
+                                $vatPrice = $netAMount * ($event->event_vat / 100);
+                                $totalAmount = $netAMount + $vatPrice;
                             }
                         } else {
+                            $unitPrice = $mainDelegate->unit_price;
                             $discountPrice = 0.0;
-                            $netAMount = $mainDelegate->unit_price;
-                            $unitPrice = $mainDelegate->unit_price ;
+                            $netAMount = $unitPrice - $discountPrice;
+                            $vatPrice = $netAMount * ($event->event_vat / 100);
+                            $totalAmount = $netAMount + $vatPrice;
                         }
 
                         $lastDigit = 1000 + intval($subTransactionId);
@@ -4264,6 +4301,8 @@ class RegistrationController extends Controller
                             'unit_price' => $unitPrice,
                             'discount_price' => $discountPrice,
                             'net_amount' => $netAMount,
+                            'vat_price' => $vatPrice,
+                            'total_amount' => $totalAmount,
 
                             'printed_badge_count' => $printedBadgeCount,
                             'printed_badge_date_time' => $printedBadgeDateTime,
@@ -4272,7 +4311,6 @@ class RegistrationController extends Controller
                             'scanned_badge_date_time' => $scannedBadgeDateTime,
 
                             // PLEASE CONTINUE HERE
-                            'total_amount' => $mainDelegate->total_amount,
                             'payment_status' => $subDelegate->delegate_refunded ? 'refunded' : $mainDelegate->payment_status,
                             'registration_status' => $subDelegate->delegate_cancelled ? 'cancelled' : $mainDelegate->registration_status,
                             'mode_of_payment' => $mainDelegate->mode_of_payment,
@@ -4342,6 +4380,8 @@ class RegistrationController extends Controller
 
             'Unit Price',
             'Discount Price',
+            'Net Amount',
+            'Vat Price',
             'Total Amount',
             'Payment Status',
             'Registration Status',
@@ -4426,6 +4466,8 @@ class RegistrationController extends Controller
                         $data['unit_price'],
                         $data['discount_price'],
                         $data['net_amount'],
+                        $data['vat_price'],
+                        $data['total_amount'],
                         $data['payment_status'],
                         $data['registration_status'],
                         $data['mode_of_payment'],

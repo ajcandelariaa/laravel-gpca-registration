@@ -120,7 +120,6 @@ class VisitorRegistrantDetails extends Component
                 'job_title' => $this->jobTitle,
                 'badge_type' => $this->badgeType,
                 'pcode_used' => $this->promoCode,
-                'discount' => $this->promoCodeDiscount,
             ])->save();
         } else {
             AdditionalVisitors::find($this->visitorId)->fill([
@@ -134,7 +133,6 @@ class VisitorRegistrantDetails extends Component
                 'job_title' => $this->jobTitle,
                 'badge_type' => $this->badgeType,
                 'pcode_used' => $this->promoCode,
-                'discount' => $this->promoCodeDiscount,
             ])->save();
         }
 
