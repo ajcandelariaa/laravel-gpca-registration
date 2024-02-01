@@ -231,7 +231,7 @@
             @endif
         </div> --}}
 
-        @if ($event->category == 'PC')
+        @if ($event->category == 'PC' && $event->year == '2023')
             <div class="col-span-2 space-y-2">
                 <div class="text-registrationPrimaryColor">
                     Would you be attending the Networking Gala Dinner and Plastics Circul-A-Thon Awards 14<sup>th</sup>
@@ -246,7 +246,7 @@
                     </select>
                 </div>
             </div>
-        @elseif ($event->category == 'SCC')
+        @elseif ($event->category == 'SCC' && $event->year == '2023')
             <div class="col-span-2 space-y-2">
                 <div class="text-registrationPrimaryColor">
                     Would you be attending the Networking Gala Dinner and SC Excellence Awards on 16<sup>th</sup> May
