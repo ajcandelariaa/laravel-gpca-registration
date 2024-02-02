@@ -124,6 +124,10 @@ class RegistrationUnpaid extends Mailable
                 return new Content(
                     markdown: 'emails.2024.pc.registration-unpaid',
                 );
+            } else if ($this->details['eventCategory'] == "SCC") {
+                return new Content(
+                    markdown: 'emails.2024.scc.registration-unpaid',
+                );
             } else {
                 return new Content(
                     markdown: 'emails.registration-unpaid',
