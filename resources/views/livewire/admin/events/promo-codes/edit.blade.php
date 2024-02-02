@@ -106,7 +106,7 @@
                                         New rate: <span class="text-red-500">*</span>
                                     </div>
                                     <div>
-                                        <input type="number" wire:model.lazy="editNewRate" step="1" min="0"
+                                        <input type="number" wire:model.lazy="editNewRate" min="0"
                                             placeholder="0"
                                             class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
 
