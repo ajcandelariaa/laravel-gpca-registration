@@ -1,9 +1,14 @@
 <x-mail::message>
 <p class="sub">Dear {{ $details['name'] }},</p>
 
-<p class="sub" style="margin-top: 15px;">Thank you for your registration to attend the <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a>, taking place from {{ $details['eventDates'] }} at the {{ $details['eventLocation'] }}</p>
+<p class="sub" style="margin-top: 15px;">Thank you for registering to attend the <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a>, taking place from {{ $details['eventDates'] }} at the {{ $details['eventLocation'] }}</p>
 
 <p class="sub" style="margin-top: 15px;">Your registration has been confirmed. Please find below the summary of your booking confirmation.</p>
+
+<p class="sub" style="margin-top: 20px;"><strong>Collection of badges</strong></p>
+<p class="sub" style="margin-top: 5px;">Upon your arrival, kindly make your way to the registration desk to collect your event badge located at the Foyer and present your ID or email confirmation. </p>
+
+<p class="sub" style="margin-top: 15px;">Your registration details as follows:</p>
 
 <p class="title" style="margin-top: 20px;">Delegate Information:</p>
 <p class="sub">Full name: {{  $details['name'] }}</p>
@@ -21,7 +26,7 @@ Download invoice
 </x-mail::button>
 @endif
 
-<p class="sub" style="margin-top: 15px;">To collect your badge, please proceed to the dedicated registration counter onsite located at the Foyer and present your ID or email confirmation. </p>
+<p class="sub" style="margin-top: 15px;">To request any updates on your registration details, kindly contact <a href="mailto:forumregistration@gpca.org.ae">forumregistration@gpca.org.ae</a> before 30 April to rectify your badge. </p>
 
 <p class="sub" style="margin-top: 15px;">For any event related queries, please feel free to reach out to the following team members:</p>
 

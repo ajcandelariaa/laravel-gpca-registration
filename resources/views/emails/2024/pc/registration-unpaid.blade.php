@@ -3,9 +3,7 @@
 
 <p class="sub" style="margin-top: 15px;">Thank you for registering to attend the <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a>, taking place from {{ $details['eventDates'] }} at the {{ $details['eventLocation'] }}</p>
 
-<p class="sub" style="margin-top: 15px; color: red;">Please note that your registration is not yet confirmed. Kindly settle your payment through bank transfer prior to the event to avoid any inconvenience onsite. </p>
-
-<p class="sub" style="margin-top: 15px;">To take advantage of the early bird discount, please ensure to settle your invoice on or before 11 April 2024. Standard rate will be applied after this day.</p>
+<p class="sub" style="margin-top: 15px; color: red;">Please note that your registration is not yet confirmed. Kindly settle your payment through bank transfer prior to the event to avoid any inconvenience onsite. <span style="text-decoration: underline"><strong><em>NO BADGE</em></strong></span> will be issued unless payment has been settled and confirmed.</p>
 
 <p class="sub" style="margin-top: 15px;">Your registration details as follows:</p>
 
