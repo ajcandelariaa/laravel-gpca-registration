@@ -101,6 +101,6 @@ Route::get('/scan-qr', function (){
     return view('home.scan_qr');
 })->name('scan.qr');
 
-// Route::get('/phpinfo', function () {
-//     phpinfo();
-// });
+Route::get('/phpinfo', function () {
+    phpinfo();
+});
