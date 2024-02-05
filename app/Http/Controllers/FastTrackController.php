@@ -7,8 +7,6 @@ use App\Models\Event;
 use App\Models\EventRegistrationType;
 use App\Models\MainDelegate;
 use App\Models\Transaction;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class FastTrackController extends Controller
 {
@@ -71,17 +69,29 @@ class FastTrackController extends Controller
                         $delegateSalutation = null;
                     }
 
-                    $fullName = $delegateSalutation . ' ' . $mainDelegate->first_name . ' ' . $mainDelegate->middle_name . ' ' . $mainDelegate->last_name;
-
+                    $fullName = $delegateSalutation;
+                    
+                    if (!empty($mainDelegate->first_name)) {
+                        $fullName .= ' ' . $mainDelegate->first_name;
+                    }
+                    
+                    if (!empty($mainDelegate->middle_name)) {
+                        $fullName .= ' ' . $mainDelegate->middle_name;
+                    }
+                    
+                    if (!empty($mainDelegate->last_name)) {
+                        $fullName .= ' ' . $mainDelegate->last_name;
+                    }
+                    
                     // $printUrl = route('public-print-badge', ['eventCategory' => $eventCategory, 'eventId' => $eventId, 'delegateId' => $mainDelegate->id, 'delegateType' => 'main']);
                     array_push($confirmedDelegates, [
                         'transactionId' => $finalTransactionId,
                         'id' => $mainDelegate->id,
                         'delegateType' => "main",
                         'fullName' => trim($fullName),
-                        'salutation' => $mainDelegate->salutation,
+                        'salutation' => (empty($mainDelegate->salutation)) ? null : $mainDelegate->salutation,
                         'fname' => $mainDelegate->first_name,
-                        'mname' => $mainDelegate->middle_name,
+                        'mname' => (empty($mainDelegate->middle_name)) ? null : $mainDelegate->middle_name,
                         'lname' => $mainDelegate->last_name,
                         'jobTitle' => trim($mainDelegate->job_title),
                         'companyName' => trim($companyName),
@@ -118,8 +128,19 @@ class FastTrackController extends Controller
                                 $delegateSalutation = null;
                             }
 
-                            $fullName = $delegateSalutation . ' ' . $subDelegate->first_name . ' ' . $subDelegate->middle_name . ' ' . $subDelegate->last_name;
-
+                            $fullName = $delegateSalutation;
+                            
+                            if (!empty($subDelegate->first_name)) {
+                                $fullName .= ' ' . $subDelegate->first_name;
+                            }
+                            
+                            if (!empty($subDelegate->middle_name)) {
+                                $fullName .= ' ' . $subDelegate->middle_name;
+                            }
+                            
+                            if (!empty($subDelegate->last_name)) {
+                                $fullName .= ' ' . $subDelegate->last_name;
+                            }
 
                             // $printUrl = route('public-print-badge', ['eventCategory' => $eventCategory, 'eventId' => $eventId, 'delegateId' => $subDelegate->id, 'delegateType' => 'sub']);
 
@@ -128,9 +149,9 @@ class FastTrackController extends Controller
                                 'id' => $subDelegate->id,
                                 'delegateType' => "sub",
                                 'fullName' => trim($fullName),
-                                'salutation' => $subDelegate->salutation,
+                                'salutation' => (empty($subDelegate->salutation)) ? null : $subDelegate->salutation,
                                 'fname' => $subDelegate->first_name,
-                                'mname' => $subDelegate->middle_name,
+                                'mname' => (empty($subDelegate->middle_name)) ? null : $subDelegate->middle_name,
                                 'lname' => $subDelegate->last_name,
                                 'jobTitle' => trim($subDelegate->job_title),
                                 'companyName' => trim($companyName),
