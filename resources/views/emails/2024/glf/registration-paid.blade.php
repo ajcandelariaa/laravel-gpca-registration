@@ -16,7 +16,7 @@
 <li style="margin-top: 15px;"><strong>Networking opportunities</strong><br>Maximize the networking sessions to establish connections with fellow C-level executives, exchange ideas, and explore potential collaborations.</li>
 </ul>
 
-<p class="sub" style="margin-top: 20px;"><strong>Key information you shouldn’t miss:</strong></p>
+<p class="sub" style="margin-top: 20px;"><strong>Hotel booking:</strong></p>
 <p class="sub" style="margin-top: 5px;">For bookings at Kempinski Central Avenue kindly email the booking request/details to below addresses and mention the promo code: <span style="font-weight: bold; text-decoration: underline;">“GPCA”</span> to avail the discounted room offer.</p>
 
 <p class="sub" style="margin-top: 15px;">Reservation Email Address: <a href="mailto:Reservations.DXB11@adnhmc.com">Reservations.DXB11@adnhmc.com</a> Copy: <a href="mailto:marie.domingo@adnhmc.com">marie.domingo@adnhmc.com</a></p>
