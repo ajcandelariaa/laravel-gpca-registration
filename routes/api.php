@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\FastTrackController;
 use App\Http\Controllers\MemberController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -21,4 +22,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::get('/event/{eventCategory}/{year}', [EventController::class, 'getRegistrationTypes']);
+Route::get('/fast-track/{eventCategory}/{eventId}', [FastTrackController::class, 'getFastTrackDetails']);
 Route::get('/members', [MemberController::class, 'getListOfMembers']);
