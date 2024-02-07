@@ -98,7 +98,7 @@ class FastTrackController extends Controller
                         'frontText' => $registrationType->badge_footer_front_name,
                         'frontTextColor' => $registrationType->badge_footer_front_text_color,
                         'frontTextBGColor' => $registrationType->badge_footer_front_bg_color,
-                        'seatNumber' => $mainDelegate->seat_number,
+                        'seatNumber' => $mainDelegate->seat_number ? $mainDelegate->seat_number : "N/A",
                         // 'printUrl' => $printUrl,
                     ]);
                 }
@@ -165,7 +165,7 @@ class FastTrackController extends Controller
                                 'frontText' => $registrationType->badge_footer_front_name,
                                 'frontTextColor' => $registrationType->badge_footer_front_text_color,
                                 'frontTextBGColor' => $registrationType->badge_footer_front_bg_color,
-                                'seatNumber' => $subDelegate->seat_number,
+                                'seatNumber' => $subDelegate->seat_number ? $subDelegate->seat_number : "N/A",
                                 // 'printUrl' => $printUrl,
                             ]);
                         }
