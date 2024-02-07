@@ -44,8 +44,6 @@ class FastTrackController extends Controller
 
         
         foreach ($mainDelegates as $mainDelegate) {
-            $companyName = "";
-
             if ($mainDelegate->delegate_replaced_by_id == null && (!$mainDelegate->delegate_refunded)) {
                 if ($mainDelegate->registration_status == "confirmed") {
 
@@ -121,6 +119,13 @@ class FastTrackController extends Controller
                             $lastDigit = 1000 + intval($transactionId);
                             $finalTransactionId = $eventYear . $eventCode . $lastDigit;
 
+                            $mainDelegate = MainDelegate::where('id', $subDelegate->main_delegate_id)->value('alternative_company_name', 'company_name');
+
+                            if ($mainDelegate->alternative_company_name != null) {
+                                $companyName = $mainDelegate->alternative_company_name;
+                            } else {
+                                $companyName = $mainDelegate->company_name;
+                            }
 
                             if ($subDelegate->salutation == "Dr." || $subDelegate->salutation == "Prof.") {
                                 $delegateSalutation = $subDelegate->salutation;
