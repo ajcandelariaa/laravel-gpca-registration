@@ -119,7 +119,7 @@ class FastTrackController extends Controller
                             $lastDigit = 1000 + intval($transactionId);
                             $finalTransactionId = $eventYear . $eventCode . $lastDigit;
 
-                            $mainDelegate = MainDelegate::where('id', $subDelegate->main_delegate_id)->value('alternative_company_name', 'company_name');
+                            $mainDelegate = MainDelegate::select('alternative_company_name', 'company_name')->where('id', $subDelegate->main_delegate_id)->first();
 
                             if ($mainDelegate->alternative_company_name != null) {
                                 $companyName = $mainDelegate->alternative_company_name;
