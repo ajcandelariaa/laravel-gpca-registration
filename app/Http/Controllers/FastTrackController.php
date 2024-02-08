@@ -22,7 +22,7 @@ class FastTrackController extends Controller
                 // 'eventName' => $event->name,
                 // 'eventLogo' => asset(Storage::url($event->logo)),
                 // 'eventBanner' => asset(Storage::url($event->banner)),
-                'confirmedDelegates' => $this->getConfirmedDelegates($event->id, $eventCategory, $eventYear),
+                'confirmedAttendees' => $this->getConfirmedDelegates($event->id, $eventCategory, $eventYear),
             ], 200);
         } else {
             return response()->json([
