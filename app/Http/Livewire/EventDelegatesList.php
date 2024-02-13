@@ -62,7 +62,6 @@ class EventDelegatesList extends Component
                         }
 
                         $scannedBadge = ScannedDelegates::where('event_id', $eventId)->where('delegate_id', $mainDelegate->id)->where('delegate_type', "main")->first();
-
                         if ($scannedBadge != null) {
                             $delegateScanned = "Yes";
                         } else {
@@ -157,6 +156,7 @@ class EventDelegatesList extends Component
 
     public function render()
     {
+        dd($this->finalListsOfDelegates);
         return view('livewire.admin.events.delegates.event-delegates-list');
     }
 
