@@ -134,7 +134,7 @@ class EventDelegatesList extends Component
                                     'delegateTransactionId' => $finalTransactionId,
                                     'delegateInvoiceNumber' => $invoiceNumber,
                                     'delegatePrinted' => $delegatePrinted,
-                                    'delegateScanned' => $delegatePrinted,
+                                    'delegateScanned' => $delegateScanned,
                                     'delegateType' => "sub",
                                     'delegateCompany' => $companyName,
                                     'delegateJobTitle' => $subDelegate->job_title,
@@ -156,7 +156,6 @@ class EventDelegatesList extends Component
 
     public function render()
     {
-        dd($this->finalListsOfDelegates);
         return view('livewire.admin.events.delegates.event-delegates-list');
     }
 
