@@ -22,5 +22,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::get('/event/{eventCategory}/{year}', [EventController::class, 'getRegistrationTypes']);
-Route::get('/fast-track/{eventCategory}/{eventId}', [FastTrackController::class, 'getFastTrackDetails']);
 Route::get('/members', [MemberController::class, 'getListOfMembers']);
+
+Route::get('/fast-track/{eventCategory}/{eventYear}', [FastTrackController::class, 'getFastTrackDetails']);
+Route::get('/fast-track/{eventCategory}/{eventYear}/printBadge/{delegateId}/{delegateType}', [FastTrackController::class, 'printBadge']);

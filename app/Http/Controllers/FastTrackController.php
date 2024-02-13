@@ -6,7 +6,9 @@ use App\Models\AdditionalDelegate;
 use App\Models\Event;
 use App\Models\EventRegistrationType;
 use App\Models\MainDelegate;
+use App\Models\PrintedBadge;
 use App\Models\Transaction;
+use Carbon\Carbon;
 
 class FastTrackController extends Controller
 {
@@ -173,7 +175,49 @@ class FastTrackController extends Controller
                 }
             }
         }
-
         return $confirmedDelegates;
+    }
+
+    
+    public function printBadge($eventCategory, $eventYear, $delegateId, $delegateType)
+    {
+        $eventId = Event::where('category', $eventCategory)->where('year', $eventYear)->value('id');
+
+        if($eventId != null){
+            $checker = 0;
+            if($delegateType == "main"){
+                $delegate = MainDelegate::where("id", $delegateId)->first();
+                if($delegate == null){
+                    $checker++;
+                }
+            } else {
+                $delegate = AdditionalDelegate::where("id", $delegateId)->first();
+                if($delegate == null){
+                    $checker++;
+                }
+            }
+
+            if($checker == 0){
+                PrintedBadge::create([
+                    'event_id' => $eventId,
+                    'event_category' => $eventCategory,
+                    'delegate_id' => $delegateId,
+                    'delegate_type' => $delegateType,
+                    'printed_date_time' => Carbon::now(),
+                ]);
+    
+                return response()->json([
+                    'message' => "success",
+                ]);
+            } else {
+                return response()->json([
+                    'message' => "Attendee doesn't exist",
+                ]);
+            }
+        } else {
+            return response()->json([
+                'message' => "Event doesn't exist",
+            ]);
+        }
     }
 }
