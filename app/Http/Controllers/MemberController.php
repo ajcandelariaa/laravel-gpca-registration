@@ -50,7 +50,7 @@ class MemberController extends Controller
 
         foreach($members as  $member){
             array_push($finalExcelData, [
-                'name' => mb_convert_encoding($member->name, 'UTF-8', 'auto'),
+                'name' => iconv(mb_detect_encoding($member->name), 'UTF-8//IGNORE', $member->name),
                 'type' => $member->type,
                 'status' => $member->active ? 'Active' : 'Inactive',
             ]);
