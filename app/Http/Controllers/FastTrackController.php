@@ -181,27 +181,16 @@ class FastTrackController extends Controller
             $eventId = Event::where('category', $eventCategory)->where('year', $eventYear)->value('id');
 
             if($eventId != null){
-                $checker = 0;
+                $delegate = null;
+
                 if($delegateType == "main"){
-                    $delegate = MainDelegate::where("id", $delegateId)->first();
-                    if($delegate == null){
-                        $checker++;
-                    }
+                    $delegate = MainDelegate::find($delegateId);
                 } else {
-                    $delegate = AdditionalDelegate::where("id", $delegateId)->first();
-                    if($delegate == null){
-                        $checker++;
-                    }
+                    $delegate = AdditionalDelegate::find($delegateId);
                 }
 
-                if($checker == 0){
-                    PrintedBadge::create([
-                        'event_id' => $eventId,
-                        'event_category' => $eventCategory,
-                        'delegate_id' => $delegateId,
-                        'delegate_type' => $delegateType,
-                        'printed_date_time' => Carbon::now(),
-                    ]);
+                if(!$delegate){
+                    // UPDATE DATABASE
         
                     return response()->json([
                         'message' => "success",
@@ -211,6 +200,24 @@ class FastTrackController extends Controller
                         'message' => "Attendee doesn't exist",
                     ]);
                 }
+
+                // if($checker == 0){
+                //     PrintedBadge::create([
+                //         'event_id' => $eventId,
+                //         'event_category' => $eventCategory,
+                //         'delegate_id' => $delegateId,
+                //         'delegate_type' => $delegateType,
+                //         'printed_date_time' => Carbon::now(),
+                //     ]);
+        
+                //     return response()->json([
+                //         'message' => "success",
+                //     ]);
+                // } else {
+                //     return response()->json([
+                //         'message' => "Attendee doesn't exist",
+                //     ]);
+                // }
             } else {
                 return response()->json([
                     'message' => "Event doesn't exist",
@@ -223,26 +230,25 @@ class FastTrackController extends Controller
         }
     }
 
-    public function editDetails($code, $eventCategory, $eventYear, $delegateId, $delegateType){
+    public function updateDetails($code, $eventCategory, $eventYear, $delegateId, $delegateType){
         if($code == env("API_CODE")){
             $eventId = Event::where('category', $eventCategory)->where('year', $eventYear)->value('id');
             if($eventId != null){
                 $checker = 0;
+
                 if($delegateType == "main"){
-                    $delegate = MainDelegate::where("id", $delegateId)->first();
+                    $delegate = MainDelegate::find($delegateId);
                     if($delegate == null){
                         $checker++;
                     }
                 } else {
-                    $delegate = AdditionalDelegate::where("id", $delegateId)->first();
+                    $delegate = AdditionalDelegate::find($delegateId);
                     if($delegate == null){
                         $checker++;
                     }
                 }
 
                 if($checker == 0){
-                    // UPDATE DATABASE
-        
                     return response()->json([
                         'message' => "success",
                     ]);
@@ -261,6 +267,5 @@ class FastTrackController extends Controller
                 'message' => "Unauthorized!",
             ]);
         }
-        
     }
 }

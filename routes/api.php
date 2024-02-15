@@ -26,3 +26,4 @@ Route::get('/members', [MemberController::class, 'getListOfMembers']);
 
 Route::get('/fast-track/{code}/{eventCategory}/{eventYear}', [FastTrackController::class, 'getFastTrackDetails']);
 Route::get('/fast-track/{code}/{eventCategory}/{eventYear}/printBadge/{delegateId}/{delegateType}', [FastTrackController::class, 'printBadge']);
+Route::post('/fast-track/{code}/{eventCategory}/{eventYear}/update-details/{delegateId}/{delegateType}', [FastTrackController::class, 'updateDetails']);
