@@ -213,9 +213,6 @@ class FastTrackController extends Controller
     }
 
     public function updateDetails(Request $request, $eventCategory, $eventYear){
-        return response()->json([
-            'message' => $request,
-        ]);
         if($request->code == env("API_CODE")){
             $eventId = Event::where('category', $eventCategory)->where('year', $eventYear)->value('id');
             if($eventId != null){
