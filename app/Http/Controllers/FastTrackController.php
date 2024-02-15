@@ -9,6 +9,7 @@ use App\Models\MainDelegate;
 use App\Models\PrintedBadge;
 use App\Models\Transaction;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 
 class FastTrackController extends Controller
 {
@@ -218,32 +219,34 @@ class FastTrackController extends Controller
         }
     }
 
-    public function updateDetails($code, $eventCategory, $eventYear, $delegateId, $delegateType){
+    public function updateDetails(Request $request, $code){
         if($code == env("API_CODE")){
-            $eventId = Event::where('category', $eventCategory)->where('year', $eventYear)->value('id');
+            $eventId = Event::where('category', $request->eventCategory)->where('year', $request->eventYear)->value('id');
             if($eventId != null){
-                $checker = 0;
+                if($request->delegateType == "main"){
+                    $delegate = MainDelegate::find($request->delegateId);
 
-                if($delegateType == "main"){
-                    $delegate = MainDelegate::find($delegateId);
                     if($delegate == null){
-                        $checker++;
+                        return response()->json([
+                            'message' => "Success",
+                        ]);
+                    } else {
+                        return response()->json([
+                            'message' => "Attendee doesn't exist",
+                        ]);
                     }
                 } else {
-                    $delegate = AdditionalDelegate::find($delegateId);
+                    $delegate = AdditionalDelegate::find($request->delegateId);
+                    
                     if($delegate == null){
-                        $checker++;
+                        return response()->json([
+                            'message' => "Success",
+                        ]);
+                    } else {
+                        return response()->json([
+                            'message' => "Attendee doesn't exist",
+                        ]);
                     }
-                }
-
-                if($checker == 0){
-                    return response()->json([
-                        'message' => "success",
-                    ]);
-                } else {
-                    return response()->json([
-                        'message' => "Attendee doesn't exist",
-                    ]);
                 }
             } else {
                 return response()->json([
