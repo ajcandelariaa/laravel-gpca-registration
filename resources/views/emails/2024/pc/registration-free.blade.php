@@ -28,7 +28,28 @@ Download invoice
 
 <p class="sub" style="margin-top: 15px;">To request any updates on your registration details, kindly contact <a href="mailto:forumregistration@gpca.org.ae">forumregistration@gpca.org.ae</a> before 30 April to rectify your badge. </p>
 
-<p class="sub" style="margin-top: 15px;">For any event related queries, please feel free to reach out to the following team members:</p>
+<p class="sub" style="margin-top: 20px; text-decoration: underline;"><strong>HOTEL BOOKING</strong></p>
+
+<p class="sub" style="margin-top: 5px;">For the hotel accommodation, please click the booking link <a href="https://reservations.travelclick.com/108317?RatePlanId=6362987" target="_blank"><strong>GPCA EVENT 2024</strong></a> and use the discount code: <strong>GPCA</strong>.</p>
+
+<p class="sub" style="margin-top: 15px;">Note: Upon clicking Add Code, choose DISCOUNT CODE and enter the GPCA code.</p>
+
+<p class="sub" style="margin-top: 20px; text-decoration: underline;"><strong>Terms & Conditions:</strong></p>
+
+<p class="sub">Booking Dates: May 12 – 17 2024</p>
+
+<p class="sub">15% Discount off (Best available rates) – <strong>Early Bird Offer</strong>, valid from February 12 to March 31, 2024.</p>
+
+<p class="sub">10% Discount off (Best available rates) – <strong>Special Offer</strong>, valid from April 1 to May 17, 2024.</p>
+
+<ul class="event-list">
+    <li style="margin-top: 5px;">Minimum length of stay for 2 nights, required for all bookings.</li>
+    <li>Cancellation policy: 30 days prior to arrival (after this date full cancellation charges will apply)</li>
+    <li>Full Payment required, 30 days prior to arrival date.</li>
+    <li>Rooms will be subject to availability upon confirmation.</li>
+</ul>
+
+<p class="sub" style="margin-top: 20px;">For any event related queries, please feel free to reach out to the following team members:</p>
 
 <p class="sub" style="margin-top: 15px;"><strong>For sponsorship, exhibition and membership inquiries please contact:</strong></p>
 <p class="sub" style="margin-top: 5px;"><strong>Sales Team</strong></p>
