@@ -226,19 +226,19 @@ class FastTrackController extends Controller
                 if($request->delegateType == "main"){
                     $delegate = MainDelegate::find($request->delegateId);
 
-                    if($delegate == null){
+                    if(!$delegate){
                         return response()->json([
                             'message' => "Success",
                         ]);
                     } else {
                         return response()->json([
-                            'message' => "Attendee doesn't exist",
+                            'message' => "Attendee doesn't exist ",
                         ]);
                     }
                 } else {
                     $delegate = AdditionalDelegate::find($request->delegateId);
                     
-                    if($delegate == null){
+                    if(!$delegate){
                         return response()->json([
                             'message' => "Success",
                         ]);
