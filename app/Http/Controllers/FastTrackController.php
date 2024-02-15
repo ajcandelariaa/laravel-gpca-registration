@@ -10,6 +10,7 @@ use App\Models\PrintedBadge;
 use App\Models\Transaction;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class FastTrackController extends Controller
 {
@@ -212,44 +213,58 @@ class FastTrackController extends Controller
         }
     }
 
-    public function updateDetails(Request $request, $eventCategory, $eventYear){
+    public function updateDetails(Request $request, $eventCategory, $eventYear)
+    {
+        $validator = Validator::make($request->all(), [
+            'code' => 'required|string',
+            'delegateId' => 'required|numeric',
+            'delegateType' => 'required|string',
+            'firstName' => 'required|string',
+            'lastName' => 'required|string',
+            'jobTitle' => 'required|string',
+        ]);
+    
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+        
         if($request->code == env("API_CODE")){
             $eventId = Event::where('category', $eventCategory)->where('year', $eventYear)->value('id');
             if($eventId != null){
-                if($request->delegateType == "main"){
-                    $delegate = MainDelegate::find($request->delegateId);
+                $delegateType = $request->delegateType;
+                $delegateId = $request->delegateId;
 
-                    if($delegate != null){
-                        return response()->json([
-                            'message' => "Success",
-                        ]);
-                    } else {
-                        return response()->json([
-                            'message' => "Attendee doesn't exist ",
-                        ]);
-                    }
+                $delegate = ($delegateType == "main") ? MainDelegate::find($delegateId) : AdditionalDelegate::find($delegateId);
+                
+                if ($delegate != null) {
+                    $delegate->update([
+                        'salutation' => $request->salutation,
+                        'first_name' => $request->firstName,
+                        'middle_name' => $request->middleName,
+                        'last_name' => $request->lastName,
+                        'job_title' => $request->jobTitle,
+                    ]);
+                
+                    return response()->json([
+                        'message' => 'Success',
+                    ], 200);
                 } else {
-                    $delegate = AdditionalDelegate::find($request->delegateId);
-                    
-                    if($delegate != null){
-                        return response()->json([
-                            'message' => "Success",
-                        ]);
-                    } else {
-                        return response()->json([
-                            'message' => "Attendee doesn't exist",
-                        ]);
-                    }
+                    return response()->json([
+                        'message' => "Attendee doesn't exist",
+                    ], 404);
                 }
             } else {
                 return response()->json([
                     'message' => "Event doesn't exist",
-                ]);
+                ], 404);
             }
         } else {
             return response()->json([
                 'message' => "Unauthorized!",
-            ]);
+            ], 401);
         }
     }
 }
