@@ -12,25 +12,26 @@ use Carbon\Carbon;
 
 class FastTrackController extends Controller
 {
-    public function getFastTrackDetails($eventCategory, $eventYear){
-        $eventCategory = $eventCategory;
-        $eventYear = $eventYear;
-        
-        if(Event::where('category', $eventCategory)->where('year', $eventYear)->exists()){
-            $event = Event::where('category', $eventCategory)->where('year', $eventYear)->first();
-
-            return response()->json([
-                // 'eventId' => $event->id,
-                // 'eventName' => $event->name,
-                // 'eventLogo' => asset(Storage::url($event->logo)),
-                // 'eventBanner' => asset(Storage::url($event->banner)),
-                'confirmedAttendees' => $this->getConfirmedDelegates($event->id, $eventCategory, $eventYear),
-            ], 200);
+    public function getFastTrackDetails($code, $eventCategory, $eventYear){
+        if($code == env("API_CODE")){
+            $eventCategory = $eventCategory;
+            $eventYear = $eventYear;
+            
+            if(Event::where('category', $eventCategory)->where('year', $eventYear)->exists()){
+                $event = Event::where('category', $eventCategory)->where('year', $eventYear)->first();
+    
+                return response()->json([
+                    'confirmedAttendees' => $this->getConfirmedDelegates($event->id, $eventCategory, $eventYear),
+                ]);
+            } else {
+                return response()->json([
+                    'message' => "Event not found",
+                ]);
+            }
         } else {
             return response()->json([
-                'status' => '404',
-                'message' => "Event not found",
-            ], 404);
+                'message' => "Unauthorized",
+            ]);
         }
     }
 
@@ -83,7 +84,6 @@ class FastTrackController extends Controller
                         $fullName .= ' ' . $mainDelegate->last_name;
                     }
                     
-                    // $printUrl = route('public-print-badge', ['eventCategory' => $eventCategory, 'eventId' => $eventId, 'delegateId' => $mainDelegate->id, 'delegateType' => 'main']);
                     array_push($confirmedDelegates, [
                         'transactionId' => $finalTransactionId,
                         'id' => $mainDelegate->id,
@@ -101,7 +101,6 @@ class FastTrackController extends Controller
                         'frontTextColor' => $registrationType->badge_footer_front_text_color,
                         'frontTextBGColor' => $registrationType->badge_footer_front_bg_color,
                         'seatNumber' => $mainDelegate->seat_number ? $mainDelegate->seat_number : "N/A",
-                        // 'printUrl' => $printUrl,
                     ]);
                 }
             }
@@ -149,8 +148,6 @@ class FastTrackController extends Controller
                                 $fullName .= ' ' . $subDelegate->last_name;
                             }
 
-                            // $printUrl = route('public-print-badge', ['eventCategory' => $eventCategory, 'eventId' => $eventId, 'delegateId' => $subDelegate->id, 'delegateType' => 'sub']);
-
                             array_push($confirmedDelegates, [
                                 'transactionId' => $finalTransactionId,
                                 'id' => $subDelegate->id,
@@ -168,7 +165,6 @@ class FastTrackController extends Controller
                                 'frontTextColor' => $registrationType->badge_footer_front_text_color,
                                 'frontTextBGColor' => $registrationType->badge_footer_front_bg_color,
                                 'seatNumber' => $subDelegate->seat_number ? $subDelegate->seat_number : "N/A",
-                                // 'printUrl' => $printUrl,
                             ]);
                         }
                     }
@@ -179,45 +175,92 @@ class FastTrackController extends Controller
     }
 
     
-    public function printBadge($eventCategory, $eventYear, $delegateId, $delegateType)
+    public function printBadge($code, $eventCategory, $eventYear, $delegateId, $delegateType)
     {
-        $eventId = Event::where('category', $eventCategory)->where('year', $eventYear)->value('id');
+        if($code == env("API_CODE")){
+            $eventId = Event::where('category', $eventCategory)->where('year', $eventYear)->value('id');
 
-        if($eventId != null){
-            $checker = 0;
-            if($delegateType == "main"){
-                $delegate = MainDelegate::where("id", $delegateId)->first();
-                if($delegate == null){
-                    $checker++;
+            if($eventId != null){
+                $checker = 0;
+                if($delegateType == "main"){
+                    $delegate = MainDelegate::where("id", $delegateId)->first();
+                    if($delegate == null){
+                        $checker++;
+                    }
+                } else {
+                    $delegate = AdditionalDelegate::where("id", $delegateId)->first();
+                    if($delegate == null){
+                        $checker++;
+                    }
+                }
+
+                if($checker == 0){
+                    PrintedBadge::create([
+                        'event_id' => $eventId,
+                        'event_category' => $eventCategory,
+                        'delegate_id' => $delegateId,
+                        'delegate_type' => $delegateType,
+                        'printed_date_time' => Carbon::now(),
+                    ]);
+        
+                    return response()->json([
+                        'message' => "success",
+                    ]);
+                } else {
+                    return response()->json([
+                        'message' => "Attendee doesn't exist",
+                    ]);
                 }
             } else {
-                $delegate = AdditionalDelegate::where("id", $delegateId)->first();
-                if($delegate == null){
-                    $checker++;
-                }
-            }
-
-            if($checker == 0){
-                PrintedBadge::create([
-                    'event_id' => $eventId,
-                    'event_category' => $eventCategory,
-                    'delegate_id' => $delegateId,
-                    'delegate_type' => $delegateType,
-                    'printed_date_time' => Carbon::now(),
-                ]);
-    
                 return response()->json([
-                    'message' => "success",
-                ]);
-            } else {
-                return response()->json([
-                    'message' => "Attendee doesn't exist",
+                    'message' => "Event doesn't exist",
                 ]);
             }
         } else {
             return response()->json([
-                'message' => "Event doesn't exist",
+                'message' => "Unauthorized!",
             ]);
         }
+    }
+
+    public function editDetails($code, $eventCategory, $eventYear, $delegateId, $delegateType){
+        if($code == env("API_CODE")){
+            $eventId = Event::where('category', $eventCategory)->where('year', $eventYear)->value('id');
+            if($eventId != null){
+                $checker = 0;
+                if($delegateType == "main"){
+                    $delegate = MainDelegate::where("id", $delegateId)->first();
+                    if($delegate == null){
+                        $checker++;
+                    }
+                } else {
+                    $delegate = AdditionalDelegate::where("id", $delegateId)->first();
+                    if($delegate == null){
+                        $checker++;
+                    }
+                }
+
+                if($checker == 0){
+                    // UPDATE DATABASE
+        
+                    return response()->json([
+                        'message' => "success",
+                    ]);
+                } else {
+                    return response()->json([
+                        'message' => "Attendee doesn't exist",
+                    ]);
+                }
+            } else {
+                return response()->json([
+                    'message' => "Event doesn't exist",
+                ]);
+            }
+        } else {
+            return response()->json([
+                'message' => "Unauthorized!",
+            ]);
+        }
+        
     }
 }
