@@ -190,7 +190,13 @@ class FastTrackController extends Controller
                 }
 
                 if(!$delegate){
-                    // UPDATE DATABASE
+                    PrintedBadge::create([
+                        'event_id' => $eventId,
+                        'event_category' => $eventCategory,
+                        'delegate_id' => $delegateId,
+                        'delegate_type' => $delegateType,
+                        'printed_date_time' => Carbon::now(),
+                    ]);
         
                     return response()->json([
                         'message' => "success",
@@ -200,24 +206,6 @@ class FastTrackController extends Controller
                         'message' => "Attendee doesn't exist",
                     ]);
                 }
-
-                // if($checker == 0){
-                //     PrintedBadge::create([
-                //         'event_id' => $eventId,
-                //         'event_category' => $eventCategory,
-                //         'delegate_id' => $delegateId,
-                //         'delegate_type' => $delegateType,
-                //         'printed_date_time' => Carbon::now(),
-                //     ]);
-        
-                //     return response()->json([
-                //         'message' => "success",
-                //     ]);
-                // } else {
-                //     return response()->json([
-                //         'message' => "Attendee doesn't exist",
-                //     ]);
-                // }
             } else {
                 return response()->json([
                     'message' => "Event doesn't exist",
