@@ -190,7 +190,7 @@ class FastTrackController extends Controller
                     $delegate = AdditionalDelegate::find($delegateId);
                 }
 
-                if(!$delegate){
+                if($delegate != null){
                     PrintedBadge::create([
                         'event_id' => $eventId,
                         'event_category' => $eventCategory,
@@ -226,7 +226,7 @@ class FastTrackController extends Controller
                 if($request->delegateType == "main"){
                     $delegate = MainDelegate::find($request->delegateId);
 
-                    if(!$delegate){
+                    if($delegate != null){
                         return response()->json([
                             'message' => "Success",
                         ]);
@@ -238,7 +238,7 @@ class FastTrackController extends Controller
                 } else {
                     $delegate = AdditionalDelegate::find($request->delegateId);
                     
-                    if(!$delegate){
+                    if($delegate != null){
                         return response()->json([
                             'message' => "Success",
                         ]);
