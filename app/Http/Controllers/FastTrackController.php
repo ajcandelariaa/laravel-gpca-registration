@@ -13,25 +13,18 @@ use Illuminate\Http\Request;
 
 class FastTrackController extends Controller
 {
-    public function getFastTrackDetails($code, $eventCategory, $eventYear){
-        if($code == env("API_CODE")){
-            $eventCategory = $eventCategory;
-            $eventYear = $eventYear;
-            
-            if(Event::where('category', $eventCategory)->where('year', $eventYear)->exists()){
-                $event = Event::where('category', $eventCategory)->where('year', $eventYear)->first();
-    
-                return response()->json([
-                    'confirmedAttendees' => $this->getConfirmedDelegates($event->id, $eventCategory, $eventYear),
-                ]);
-            } else {
-                return response()->json([
-                    'message' => "Event not found",
-                ]);
-            }
+    public function getFastTrackDetails($eventCategory, $eventYear){
+        $eventCategory = $eventCategory;
+        $eventYear = $eventYear;
+        
+        $event = Event::where('category', $eventCategory)->where('year', $eventYear)->first();
+        if($event != null){
+            return response()->json([
+                'confirmedAttendees' => $this->getConfirmedDelegates($event->id, $eventCategory, $eventYear),
+            ]);
         } else {
             return response()->json([
-                'message' => "Unauthorized",
+                'message' => "Event not found",
             ]);
         }
     }
@@ -176,26 +169,26 @@ class FastTrackController extends Controller
     }
 
     
-    public function printBadge($code, $eventCategory, $eventYear, $delegateId, $delegateType)
+    public function printBadge(Request $request, $eventCategory, $eventYear)
     {
-        if($code == env("API_CODE")){
+        if($request->code == env("API_CODE")){
             $eventId = Event::where('category', $eventCategory)->where('year', $eventYear)->value('id');
 
             if($eventId != null){
                 $delegate = null;
 
-                if($delegateType == "main"){
-                    $delegate = MainDelegate::find($delegateId);
+                if($request->delegateType == "main"){
+                    $delegate = MainDelegate::find($request->delegateId);
                 } else {
-                    $delegate = AdditionalDelegate::find($delegateId);
+                    $delegate = AdditionalDelegate::find($request->delegateId);
                 }
 
                 if($delegate != null){
                     PrintedBadge::create([
                         'event_id' => $eventId,
                         'event_category' => $eventCategory,
-                        'delegate_id' => $delegateId,
-                        'delegate_type' => $delegateType,
+                        'delegate_id' => $request->delegateId,
+                        'delegate_type' => $request->delegateType,
                         'printed_date_time' => Carbon::now(),
                     ]);
         
@@ -219,9 +212,9 @@ class FastTrackController extends Controller
         }
     }
 
-    public function updateDetails(Request $request, $code){
-        if($code == env("API_CODE")){
-            $eventId = Event::where('category', $request->eventCategory)->where('year', $request->eventYear)->value('id');
+    public function updateDetails(Request $request, $eventCategory, $eventYear){
+        if($request->code == env("API_CODE")){
+            $eventId = Event::where('category', $eventCategory)->where('year', $eventYear)->value('id');
             if($eventId != null){
                 if($request->delegateType == "main"){
                     $delegate = MainDelegate::find($request->delegateId);
