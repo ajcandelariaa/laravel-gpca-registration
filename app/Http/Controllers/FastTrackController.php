@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\AdditionalDelegate;
+use App\Models\DelegateDetailsUpdateLog;
 use App\Models\Event;
 use App\Models\EventRegistrationType;
 use App\Models\MainDelegate;
@@ -172,6 +173,21 @@ class FastTrackController extends Controller
     
     public function printBadge(Request $request, $eventCategory, $eventYear)
     {
+        $validator = Validator::make($request->all(), [
+            'code' => 'required|string',
+            'delegateId' => 'required|numeric',
+            'delegateType' => 'required|string',
+            'pcName' => 'required|string',
+            'pcNumber' => 'required|string',
+        ]);
+    
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+        
         if($request->code == env("API_CODE")){
             $eventId = Event::where('category', $eventCategory)->where('year', $eventYear)->value('id');
 
@@ -190,26 +206,28 @@ class FastTrackController extends Controller
                         'event_category' => $eventCategory,
                         'delegate_id' => $request->delegateId,
                         'delegate_type' => $request->delegateType,
+                        'printed_by_name' => $request->pcName,
+                        'printed_by_pc_number' => $request->pcNumber,
                         'printed_date_time' => Carbon::now(),
                     ]);
         
                     return response()->json([
-                        'message' => "success",
-                    ]);
+                        'message' => 'Success',
+                    ], 200);
                 } else {
                     return response()->json([
                         'message' => "Attendee doesn't exist",
-                    ]);
+                    ], 404);
                 }
             } else {
                 return response()->json([
                     'message' => "Event doesn't exist",
-                ]);
+                ], 404);
             }
         } else {
             return response()->json([
                 'message' => "Unauthorized!",
-            ]);
+            ], 401);
         }
     }
 
@@ -222,6 +240,9 @@ class FastTrackController extends Controller
             'firstName' => 'required|string',
             'lastName' => 'required|string',
             'jobTitle' => 'required|string',
+            'pcName' => 'required|string',
+            'pcNumber' => 'required|string',
+            'description' => 'required|string',
         ]);
     
         if ($validator->fails()) {
@@ -246,6 +267,17 @@ class FastTrackController extends Controller
                         'middle_name' => $request->middleName,
                         'last_name' => $request->lastName,
                         'job_title' => $request->jobTitle,
+                    ]);
+
+                    DelegateDetailsUpdateLog::create([
+                        'event_id' => $eventId,
+                        'event_category' => $eventCategory,
+                        'delegate_id' => $delegateId,
+                        'delegate_type' => $delegateType,
+                        'updated_by_name' => $request->pcName,
+                        'updated_by_pc_number' => $request->pcNumber,
+                        'description' => $request->description,
+                        'updated_date_time' => Carbon::now(),
                     ]);
                 
                     return response()->json([

@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class PrintedBadge extends Model
+class DelegateDetailsUpdateLog extends Model
 {
     use HasFactory;
     
@@ -14,8 +14,9 @@ class PrintedBadge extends Model
         'event_category',
         'delegate_id',
         'delegate_type',
-        'printed_by_name',
-        'printed_by_pc_number',
-        'printed_date_time',
+        'updated_by_name',
+        'updated_by_pc_number',
+        'description',
+        'updated_date_time',
     ];
 }
