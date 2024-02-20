@@ -72,6 +72,15 @@
                     <p class="font-bold">Mobile number:</p>
                     <p>{{ $finalDelegate['mobile_number'] }}</p>
 
+                    <p class="font-bold">Country:</p>
+                    <p>
+                        @if ($finalDelegate['country'] == "" || $finalDelegate['country'] == null)
+                            N/A
+                        @else
+                            {{ $finalDelegate['country'] }}
+                        @endif
+                    </p>
+
                     <p class="font-bold">Nationality:</p>
                     <p>{{ $finalDelegate['nationality'] }}</p>
 

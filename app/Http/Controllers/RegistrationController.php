@@ -403,6 +403,7 @@ class RegistrationController extends Controller
                             'pcode_used' => $subDelegate->pcode_used,
                             'discount' => $subDiscount,
                             'discount_type' => $subDiscountType,
+                            'country' => $subDelegate->country,
 
                             'delegate_cancelled' => $subDelegate->delegate_cancelled,
                             'delegate_replaced' => $subDelegate->delegate_replaced,
@@ -433,6 +434,7 @@ class RegistrationController extends Controller
                             'pcode_used' => $subDelegate->pcode_used,
                             'discount' => $subDiscount,
                             'discount_type' => $subDiscountType,
+                            'country' => $subDelegate->country,
 
                             'delegate_cancelled' => $subDelegate->delegate_cancelled,
                             'delegate_replaced' => $subDelegate->delegate_replaced,
@@ -473,6 +475,7 @@ class RegistrationController extends Controller
                 'pcode_used' => $mainDelegate->pcode_used,
                 'discount' => $mainDiscount,
                 'discount_type' => $mainDiscountType,
+                'country' => $mainDelegate->country,
 
                 'is_replacement' => false,
                 'delegate_cancelled' => $mainDelegate->delegate_cancelled,
@@ -516,6 +519,7 @@ class RegistrationController extends Controller
                             'pcode_used' => $subDelegateReplacement['pcode_used'],
                             'discount' => $subDelegateReplacement['discount'],
                             'discount_type' => $subDelegateReplacement['discount_type'],
+                            'country' => $subDelegateReplacement['country'],
 
                             'is_replacement' => true,
                             'delegate_cancelled' => $subDelegateReplacement['delegate_cancelled'],
@@ -565,6 +569,7 @@ class RegistrationController extends Controller
                     'pcode_used' => $subDelegate['pcode_used'],
                     'discount' => $subDelegate['discount'],
                     'discount_type' => $subDelegate['discount_type'],
+                    'country' => $subDelegate['country'],
 
                     'is_replacement' => false,
                     'delegate_cancelled' => $subDelegate['delegate_cancelled'],
@@ -608,6 +613,7 @@ class RegistrationController extends Controller
                                 'pcode_used' => $subDelegateReplacement['pcode_used'],
                                 'discount' => $subDelegateReplacement['discount'],
                                 'discount_type' => $subDelegateReplacement['discount_type'],
+                                'country' => $subDelegateReplacement['country'],
 
                                 'is_replacement' => true,
                                 'delegate_cancelled' => $subDelegateReplacement['delegate_cancelled'],
@@ -4131,6 +4137,7 @@ class RegistrationController extends Controller
                     'nationality' => $mainDelegate->nationality,
                     'badge_type' => $mainDelegate->badge_type,
                     'pcode_used' => $mainDelegate->pcode_used,
+                    'country' => $mainDelegate->country,
 
                     'heard_where' => $mainDelegate->heard_where,
 
@@ -4285,6 +4292,7 @@ class RegistrationController extends Controller
                             'nationality' => $subDelegate->nationality,
                             'badge_type' => $subDelegate->badge_type,
                             'pcode_used' => $subDelegate->pcode_used,
+                            'country' => $subDelegate->country,
 
                             'heard_where' => $mainDelegate->heard_where,
 
@@ -4364,16 +4372,17 @@ class RegistrationController extends Controller
             'First Name',
             'Last Name',
             'Email Address',
-            'Mobile Number 1',
+            'Mobile Number',
+            'Country',
             'Job Title',
             'Nationality',
 
             'Company Name',
             'Company Address',
-            'City',
-            'Country',
+            'Company City',
+            'Company Country',
             'Telephone Number',
-            'Mobile Number 2',
+            'Company Mobile Number',
             'Assistant Email Address',
 
             'Middle Name',
@@ -4450,6 +4459,7 @@ class RegistrationController extends Controller
                         $data['last_name'],
                         $data['email_address'],
                         $data['mobile_number'],
+                        $data['country'],
                         $data['job_title'],
                         $data['nationality'],
 

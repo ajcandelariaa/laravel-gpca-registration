@@ -130,14 +130,38 @@
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                                     <option value=""></option>
                                     <option value="N/A">N/A</option>
-                                    @foreach ($countries as $country)
-                                        <option value="{{ $country }}">
-                                            {{ $country }}
+                                    @foreach ($countries as $countryChoice)
+                                        <option value="{{ $countryChoice }}">
+                                            {{ $countryChoice }}
                                         </option>
                                     @endforeach
                                 </select>
 
                                 @error('subNationalityEdit')
+                                    <div class="text-red-500 text-xs italic mt-1">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        {{-- ROW 4 --}}
+                        <div class="space-y-2">
+                            <div class="text-registrationPrimaryColor">
+                                Country <span class="text-red-500">*</span>
+                            </div>
+                            <div>
+                                <select wire:model.lazy="subCountryEdit"
+                                    class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                                    <option value=""></option>
+                                    @foreach ($countries as $countryChoice)
+                                        <option value="{{ $countryChoice }}">
+                                            {{ $countryChoice }}
+                                        </option>
+                                    @endforeach
+                                </select>
+
+                                @error('subCountryEdit')
                                     <div class="text-red-500 text-xs italic mt-1">
                                         {{ $message }}
                                     </div>
@@ -161,7 +185,7 @@
                         </div>
 
 
-                        <div class="space-y-2 col-span-2">
+                        <div class="space-y-2">
                             <div class="text-registrationPrimaryColor">
                                 Promo code
                             </div>

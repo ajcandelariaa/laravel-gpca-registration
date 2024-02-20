@@ -218,6 +218,7 @@ class DelegateController extends Controller
                             'nationality' => $tempDelegate->nationality,
                             'job_title' => $tempDelegate->job_title,
                             'badge_type' => $tempDelegate->badge_type,
+                            'country' => $tempDelegate->country,
 
                             'seat_number' => $tempDelegate->seat_number,
 
@@ -262,6 +263,7 @@ class DelegateController extends Controller
                             'nationality' => $tempDelegate->nationality,
                             'job_title' => $tempDelegate->job_title,
                             'badge_type' => $tempDelegate->badge_type,
+                            'country' => $tempDelegate->country,
                             
                             'seat_number' => $tempDelegate->seat_number,
 

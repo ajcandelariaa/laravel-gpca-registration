@@ -21,6 +21,7 @@ class AdditionalDelegate extends Model
         'job_title',
         'badge_type',
         'pcode_used',
+        'country',
 
         'seat_number',
 

@@ -261,7 +261,7 @@ class RegistrantsList extends Component
         $checkIfCorrectFormat = true;
         for ($i = 0; $i < count($rows); $i++) {
             if ($i == 0) {
-                if (count($rows[$i]) == 22) {
+                if (count($rows[$i]) == 23) {
                     if (
                         $rows[$i][0] != "Rate type" ||
                         $rows[$i][1] != "Pass type" ||
@@ -269,7 +269,7 @@ class RegistrantsList extends Component
                         $rows[$i][3] != "Alternative Company Name" ||
                         $rows[$i][4] != "Company Sector" ||
                         $rows[$i][5] != "Company Address" ||
-                        $rows[$i][6] != "Country" ||
+                        $rows[$i][6] != "Company Country" ||
                         $rows[$i][7] != "City" ||
                         $rows[$i][8] != "Landline Number" ||
                         $rows[$i][9] != "Mobile Number" ||
@@ -283,8 +283,9 @@ class RegistrantsList extends Component
                         $rows[$i][17] != "Last Name" ||
                         $rows[$i][18] != "Email Address" ||
                         $rows[$i][19] != "Mobile Number" ||
-                        $rows[$i][20] != "Nationality" ||
-                        $rows[$i][21] != "Job Title"
+                        $rows[$i][20] != "Country" ||
+                        $rows[$i][21] != "Nationality" ||
+                        $rows[$i][22] != "Job Title"
                     ) {
                         $checkIfCorrectFormat = false;
                     }
@@ -317,7 +318,8 @@ class RegistrantsList extends Component
                         empty($rows[$i][18]) ||
                         empty($rows[$i][19]) ||
                         empty($rows[$i][20]) ||
-                        empty($rows[$i][21])
+                        empty($rows[$i][21]) ||
+                        empty($rows[$i][22])
                     ) {
                         $lineNumber = $i + 1;
                         array_push($this->incompleDetails, "Line $lineNumber have missing details!");
@@ -746,8 +748,9 @@ class RegistrantsList extends Component
                     'last_name' => $rows[$i][17],
                     'email_address' => $rows[$i][18],
                     'mobile_number' => $rows[$i][19],
-                    'nationality' => $rows[$i][20],
-                    'job_title' => $rows[$i][21],
+                    'country' => $rows[$i][20],
+                    'nationality' => $rows[$i][21],
+                    'job_title' => $rows[$i][22],
                 ];
 
                 array_push($arrayData[$arrayDataIndex]['delegates'], $delegate);
@@ -762,8 +765,9 @@ class RegistrantsList extends Component
                     'last_name' => $rows[$i][17],
                     'email_address' => $rows[$i][18],
                     'mobile_number' => $rows[$i][19],
-                    'nationality' => $rows[$i][20],
-                    'job_title' => $rows[$i][21],
+                    'country' => $rows[$i][20],
+                    'nationality' => $rows[$i][21],
+                    'job_title' => $rows[$i][22],
                 ];
 
                 array_push($arrayData, [
@@ -794,8 +798,9 @@ class RegistrantsList extends Component
                 'last_name' => $rows[$i][17],
                 'email_address' => $rows[$i][18],
                 'mobile_number' => $rows[$i][19],
-                'nationality' => $rows[$i][20],
-                'job_title' => $rows[$i][21],
+                'country' => $rows[$i][20],
+                'nationality' => $rows[$i][21],
+                'job_title' => $rows[$i][22],
             ];
 
             array_push($arrayData, [

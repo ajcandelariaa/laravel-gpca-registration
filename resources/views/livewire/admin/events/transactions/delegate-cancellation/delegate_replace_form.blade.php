@@ -94,6 +94,29 @@
         </div>
     </div>
 
+    
+    <div class="space-y-2 col-span-2">
+        <div class="text-registrationPrimaryColor">
+            Country <span class="text-red-500">*</span>
+        </div>
+        <div>
+            <select wire:model.lazy="replaceCountry"
+                class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                <option value=""></option>
+                @foreach ($countries as $countryChoice)
+                    <option value="{{ $countryChoice }}">
+                        {{ $countryChoice }}</option>
+                @endforeach
+            </select>
+
+            @error('replaceCountry')
+                <div class="text-red-500 text-xs italic mt-1">
+                    {{ $message }}
+                </div>
+            @enderror
+        </div>
+    </div>
+
 
     {{-- ROW 4 --}}
     <div class="space-y-2">

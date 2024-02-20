@@ -32,11 +32,11 @@ class RegistrantDetails extends Component
     public $delegatePassType, $rateTypeString, $companyName, $alternativeCompanyName, $companySector, $companyAddress, $companyCountry, $companyCity, $companyLandlineNumber, $assistantEmailAddress, $companyMobileNumber;
 
     // DELEGATE DETAILS
-    public $mainDelegateId, $delegateId, $salutation, $firstName, $middleName, $lastName, $emailAddress, $mobileNumber, $nationality, $jobTitle, $badgeType, $promoCode, $promoCodeDiscount, $discountType, $promoCodeSuccess, $promoCodeFail, $type, $delegateIndex, $delegateInnerIndex;
+    public $mainDelegateId, $delegateId, $salutation, $firstName, $middleName, $lastName, $emailAddress, $mobileNumber, $nationality, $jobTitle, $badgeType, $promoCode, $promoCodeDiscount, $discountType, $promoCodeSuccess, $promoCodeFail, $type, $delegateIndex, $delegateInnerIndex, $country;
 
     public $transactionRemarks, $delegateCancellationStep = 1, $replaceDelegate, $delegateRefund;
 
-    public $replaceDelegateIndex, $replaceDelegateInnerIndex, $replaceSalutation, $replaceFirstName, $replaceMiddleName, $replaceLastName, $replaceEmailAddress, $replaceMobileNumber, $replaceNationality, $replaceJobTitle, $replaceBadgeType, $replacePromoCode, $replaceDiscountType, $replacePromoCodeDiscount, $replacePromoCodeSuccess, $replacePromoCodeFail, $replaceEmailAlreadyUsedError;
+    public $replaceDelegateIndex, $replaceDelegateInnerIndex, $replaceSalutation, $replaceFirstName, $replaceMiddleName, $replaceLastName, $replaceEmailAddress, $replaceMobileNumber, $replaceNationality, $replaceJobTitle, $replaceBadgeType, $replacePromoCode, $replaceDiscountType, $replacePromoCodeDiscount, $replacePromoCodeSuccess, $replacePromoCodeFail, $replaceEmailAlreadyUsedError, $replaceCountry;
 
     public $mapPaymentMethod, $mapSendEmailNotif, $sendInvoice;
 
@@ -93,6 +93,7 @@ class RegistrantDetails extends Component
                 'mobileNumber' => 'required',
                 'jobTitle' => 'required',
                 'badgeType' => 'required',
+                'country' => 'required',
             ],
             [
                 'firstName.required' => "First name is required",
@@ -103,6 +104,7 @@ class RegistrantDetails extends Component
                 'mobileNumber.required' => "Mobile number is required",
                 'jobTitle.required' => "Job title is required",
                 'badgeType.required' => "Registration type is required",
+                'country.required' => "Country is required",
             ]
         );
 
@@ -126,6 +128,7 @@ class RegistrantDetails extends Component
                 'job_title' => $this->jobTitle,
                 'badge_type' => $this->badgeType,
                 'pcode_used' => $this->promoCode,
+                'country' => $this->country,
             ])->save();
         } else {
             AdditionalDelegates::find($this->delegateId)->fill([
@@ -139,7 +142,8 @@ class RegistrantDetails extends Component
                 'job_title' => $this->jobTitle,
                 'badge_type' => $this->badgeType,
                 'pcode_used' => $this->promoCode,
-            ])->save();
+                'country' => $this->country,
+                ])->save();
         }
 
         $this->finalData['allDelegates'][$this->delegateIndex][$this->delegateInnerIndex]['salutation'] = $this->salutation;
@@ -155,6 +159,7 @@ class RegistrantDetails extends Component
         $this->finalData['allDelegates'][$this->delegateIndex][$this->delegateInnerIndex]['pcode_used'] = $this->promoCode;
         $this->finalData['allDelegates'][$this->delegateIndex][$this->delegateInnerIndex]['discount'] = $this->promoCodeDiscount;
         $this->finalData['allDelegates'][$this->delegateIndex][$this->delegateInnerIndex]['discount_type'] = $this->discountType;
+        $this->finalData['allDelegates'][$this->delegateIndex][$this->delegateInnerIndex]['country'] = $this->country;
 
         $this->calculateTotal();
 
@@ -182,6 +187,7 @@ class RegistrantDetails extends Component
         $this->promoCodeDiscount = $this->finalData['allDelegates'][$index][$innerIndex]['discount'];
         $this->discountType = $this->finalData['allDelegates'][$index][$innerIndex]['discount_type'];
         $this->type = $this->finalData['allDelegates'][$index][$innerIndex]['delegateType'];
+        $this->country = $this->finalData['allDelegates'][$index][$innerIndex]['country'];
 
         if ($this->discountType == "fixed") {
             $this->promoCodeSuccess = "Fixed rate applied";
@@ -286,6 +292,7 @@ class RegistrantDetails extends Component
         $this->promoCodeSuccess = null;
         $this->promoCodeFail = null;
         $this->type = null;
+        $this->country = null;
     }
 
 
@@ -1257,6 +1264,7 @@ class RegistrantDetails extends Component
                         'replaceMobileNumber' => 'required',
                         'replaceJobTitle' => 'required',
                         'replaceBadgeType' => 'required',
+                        'replaceCountry' => 'required',
                     ],
                     [
                         'replaceFirstName.required' => "First name is required",
@@ -1267,6 +1275,7 @@ class RegistrantDetails extends Component
                         'replaceMobileNumber.required' => "Mobile number is required",
                         'replaceJobTitle.required' => "Job title is required",
                         'replaceBadgeType.required' => "Registration type is required",
+                        'replaceCountry.required' => "Country is required",
                     ]
                 );
 
@@ -1417,6 +1426,7 @@ class RegistrantDetails extends Component
             'mobile_number' => $this->replaceMobileNumber,
             'badge_type' => $this->replaceBadgeType,
             'pcode_used' => $this->replacePromoCode,
+            'country' => $this->replaceCountry,
 
             'delegate_replaced_type' => $this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['delegate_replaced_type'],
             'delegate_replaced_from_id' => $this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['delegateId'],
@@ -1458,6 +1468,7 @@ class RegistrantDetails extends Component
             'pcode_used' => $this->replacePromoCode,
             'discount' => $subDiscount,
             'discount_type' => $subDiscountType,
+            'country' => $this->replaceCountry,
 
             'is_replacement' => true,
             'delegate_cancelled' => false,
@@ -1599,5 +1610,6 @@ class RegistrantDetails extends Component
         $this->replacePromoCodeSuccess = null;
 
         $this->replaceEmailAlreadyUsedError = null;
+        $this->replaceCountry = null;
     }
 }

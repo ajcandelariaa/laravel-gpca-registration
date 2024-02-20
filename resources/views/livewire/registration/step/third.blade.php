@@ -70,8 +70,8 @@
 
         {{-- ROW 2 --}}
         <div class="space-y-2 col-span-2">
-            <div class="grid grid-cols-2 gap-x-5">
-                <div class="col-span-2 sm:col-span-1">
+            <div class="grid grid-cols-3 gap-x-5">
+                <div class="col-span-3 sm:col-span-1">
                     <div class="text-registrationPrimaryColor">
                         Email address <span class="text-red-500">*</span>
                     </div>
@@ -99,7 +99,7 @@
                     </div>
                 </div>
 
-                <div class="col-span-2 sm:col-span-1">
+                <div class="col-span-3 sm:col-span-1">
                     <div class="text-registrationPrimaryColor">
                         Mobile number <span class="text-red-500">*</span>
                     </div>
@@ -108,6 +108,29 @@
                             class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
 
                         @error('mobileNumber')
+                            <div class="text-red-500 text-xs italic mt-1">
+                                {{ $message }}
+                            </div>
+                        @enderror
+                    </div>
+                </div>
+                
+                <div class="col-span-3 sm:col-span-1">
+                    <div class="text-registrationPrimaryColor">
+                        Country <span class="text-red-500">*</span>
+                    </div>
+                    <div>
+                        <select wire:model.lazy="country"
+                            class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                            <option value=""></option>
+                            @foreach ($countries as $countryChoice)
+                                <option value="{{ $countryChoice }}">
+                                    {{ $countryChoice }}
+                                </option>
+                            @endforeach
+                        </select>
+
+                        @error('country')
                             <div class="text-red-500 text-xs italic mt-1">
                                 {{ $message }}
                             </div>
@@ -130,9 +153,9 @@
                             class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                             <option value=""></option>
                             <option value="N/A">N/A</option>
-                            @foreach ($countries as $country)
-                                <option value="{{ $country }}">
-                                    {{ $country }}
+                            @foreach ($countries as $countryChoice)
+                                <option value="{{ $countryChoice }}">
+                                    {{ $countryChoice }}
                                 </option>
                             @endforeach
                         </select>
@@ -236,6 +259,7 @@
                             <p class="mt-2"> {{ $additionalDelegate['subEmailAddress'] }},
                                 {{ $additionalDelegate['subMobileNumber'] }}, {{ $additionalDelegate['subJobTitle'] }}
                             </p>
+                            <p>Country: {{ $additionalDelegate['subCountry'] }}</p>
                             <p>Nationality: {{ $additionalDelegate['subNationality'] }}</p>
                             @if ($additionalDelegate['subPromoCode'] == null)
                                 <p>Promo code used: None</p>
@@ -290,6 +314,7 @@
                     $nationality != null &&
                     $jobTitle != null &&
                     $badgeType != null &&
+                    $country != null &&
                     count($additionalDelegates) < 4)
                 <button wire:click.prevent="openAddModal" type="button" wire:key="btnOpenAddModal"
                     class="cursor-pointer hover:bg-registrationPrimaryColor hover:text-white font-bold border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor rounded-md py-4 px-10">+

@@ -40,13 +40,13 @@ class RegistrationForm extends Component
     public $companyName, $companySector, $companyAddress, $companyCountry, $companyCity, $companyLandlineNumber, $companyMobileNumber, $assistantEmailAddress, $heardWhere, $attendingTo = [];
 
     // MAIN DELEGATE
-    public $salutation, $firstName, $middleName, $lastName, $emailAddress, $mobileNumber, $nationality, $jobTitle, $badgeType, $promoCode, $promoCodeDiscount, $discountType, $isMainFree = false;
+    public $salutation, $firstName, $middleName, $lastName, $emailAddress, $mobileNumber, $nationality, $jobTitle, $badgeType, $promoCode, $promoCodeDiscount, $discountType, $isMainFree = false, $country;
 
     // SUB DELEGATE
-    public $subSalutation, $subFirstName, $subMiddleName, $subLastName, $subEmailAddress, $subMobileNumber, $subNationality, $subJobTitle, $subBadgeType, $subPromoCode, $subPromoCodeDiscount, $subDiscountType;
+    public $subSalutation, $subFirstName, $subMiddleName, $subLastName, $subEmailAddress, $subMobileNumber, $subNationality, $subJobTitle, $subBadgeType, $subPromoCode, $subPromoCodeDiscount, $subDiscountType, $subCountry;
 
     // SUB DELEGATE EDIT
-    public $subIdEdit, $subSalutationEdit, $subFirstNameEdit, $subMiddleNameEdit, $subLastNameEdit, $subEmailAddressEdit, $subMobileNumberEdit, $subNationalityEdit, $subJobTitleEdit, $subBadgeTypeEdit, $subPromoCodeEdit, $subPromoCodeDiscountEdit, $subDiscountTypeEdit;
+    public $subIdEdit, $subSalutationEdit, $subFirstNameEdit, $subMiddleNameEdit, $subLastNameEdit, $subEmailAddressEdit, $subMobileNumberEdit, $subNationalityEdit, $subJobTitleEdit, $subBadgeTypeEdit, $subPromoCodeEdit, $subPromoCodeDiscountEdit, $subDiscountTypeEdit, $subCountryEdit;
 
     // 3RD PAGE
     public $paymentMethod, $finalEventStartDate, $finalEventEndDate, $finalQuantity, $finalUnitPrice, $finalNetAmount, $finalDiscount, $finalVat, $finalTotal;
@@ -405,6 +405,7 @@ class RegistrationForm extends Component
                     'mobileNumber' => 'required',
                     'jobTitle' => 'required',
                     'badgeType' => 'required',
+                    'country' => 'required',
                 ],
                 [
                     'firstName.required' => "First name is required",
@@ -415,6 +416,7 @@ class RegistrationForm extends Component
                     'mobileNumber.required' => "Mobile number is required",
                     'jobTitle.required' => "Job title is required",
                     'badgeType.required' => "Registration type is required",
+                    'country.required' => "Country is required",
                 ]
             );
 
@@ -537,6 +539,7 @@ class RegistrationForm extends Component
             'job_title' => $this->jobTitle,
             'badge_type' => $this->badgeType,
             'pcode_used' => $this->promoCode,
+            'country' => $this->country,
 
             'heard_where' => $this->heardWhere,
 
@@ -596,6 +599,7 @@ class RegistrationForm extends Component
                     'mobile_number' => $additionalDelegate['subMobileNumber'],
                     'badge_type' => $additionalDelegate['subBadgeType'],
                     'pcode_used' => $additionalDelegate['subPromoCode'],
+                    'country' => $additionalDelegate['subCountry'],
                 ]);
 
                 Transactions::create([
@@ -1047,6 +1051,8 @@ class RegistrationForm extends Component
 
         $this->emailSubExistingError = null;
         $this->emailSubAlreadyUsedError = null;
+
+        $this->subCountry = null;
     }
 
     public function closeAddModal()
@@ -1075,6 +1081,8 @@ class RegistrationForm extends Component
                 $this->subDiscountTypeEdit = $additionalDelegate['subDiscountType'];
                 $this->promoCodeSuccessSubEdit = $additionalDelegate['promoCodeSuccessSub'];
                 $this->promoCodeFailSubEdit = $additionalDelegate['promoCodeFailSub'];
+
+                $this->subCountryEdit = $additionalDelegate['subCountry'];
             }
         }
     }
@@ -1099,6 +1107,8 @@ class RegistrationForm extends Component
 
         $this->emailSubExistingError = null;
         $this->emailSubAlreadyUsedError = null;
+
+        $this->subCountryEdit = null;
     }
 
     public function closeEditModal()
@@ -1121,6 +1131,7 @@ class RegistrationForm extends Component
                 'subNationality' => 'required',
                 'subJobTitle' => 'required',
                 'subBadgeType' => 'required',
+                'subCountry' => 'required',
             ],
             [
                 'subFirstName.required' => "First name is required",
@@ -1131,6 +1142,7 @@ class RegistrationForm extends Component
                 'subNationality.required' => "Nationality is required",
                 'subJobTitle.required' => "Job title is required",
                 'subBadgeType.required' => "Badge type is required",
+                'subCountry.required' => "Country is required",
             ]
         );
 
@@ -1161,6 +1173,7 @@ class RegistrationForm extends Component
                     'subDiscountType' => $this->subDiscountType,
                     'promoCodeSuccessSub' => $this->promoCodeSuccessSub,
                     'promoCodeFailSub' => $this->promoCodeFailSub,
+                    'subCountry' => $this->subCountry,
                 ]);
 
                 $this->resetAddModalFields();
@@ -1196,6 +1209,7 @@ class RegistrationForm extends Component
                 'subNationalityEdit' => 'required',
                 'subJobTitleEdit' => 'required',
                 'subBadgeTypeEdit' => 'required',
+                'subCountryEdit' => 'required',
             ],
             [
                 'subFirstNameEdit.required' => "First name is required",
@@ -1206,6 +1220,7 @@ class RegistrationForm extends Component
                 'subNationalityEdit.required' => "Nationality is required",
                 'subJobTitleEdit.required' => "Job title is required",
                 'subBadgeTypeEdit.required' => "Badge type is required",
+                'subCountryEdit.required' => "Country is required",
             ]
         );
 
@@ -1249,6 +1264,7 @@ class RegistrationForm extends Component
                         $this->additionalDelegates[$i]['subDiscountType'] = $this->subDiscountTypeEdit;
                         $this->additionalDelegates[$i]['promoCodeSuccessSub'] = $this->promoCodeSuccessSubEdit;
                         $this->additionalDelegates[$i]['promoCodeFailSub'] = $this->promoCodeFailSubEdit;
+                        $this->additionalDelegates[$i]['subCountry'] = $this->subCountryEdit;
 
                         $this->resetEditModalFields();
                         $this->showEditDelegateModal = false;

@@ -116,9 +116,9 @@
                                 <select wire:model.lazy="companyCountry"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                                     <option value=""></option>
-                                    @foreach ($countries as $country)
-                                        <option value="{{ $country }}" {{ $country == $companyCountry ? 'selected' : '' }}>
-                                            {{ $country }}</option>
+                                    @foreach ($countries as $countryChoice)
+                                        <option value="{{ $countryChoice }}" {{ $countryChoice == $companyCountry ? 'selected' : '' }}>
+                                            {{ $countryChoice }}</option>
                                     @endforeach
                                 </select>
                 

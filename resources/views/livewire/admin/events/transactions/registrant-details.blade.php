@@ -308,6 +308,15 @@
                                         <p>Mobile Number:</p>
                                         <p class="font-bold">{{ $innerDelegate['mobile_number'] }}</p>
 
+                                        <p>Country:</p>
+                                        <p class="font-bold">
+                                            @if ($innerDelegate['country'] == null || $innerDelegate['country'] == "")
+                                                N/A
+                                            @else
+                                                {{ $innerDelegate['country'] }}
+                                            @endif
+                                        </p>
+
                                         <p>Nationality:</p>
                                         <p class="font-bold">{{ $innerDelegate['nationality'] }}</p>
 

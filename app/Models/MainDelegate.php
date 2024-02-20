@@ -35,6 +35,7 @@ class MainDelegate extends Model
         'job_title',
         'badge_type',
         'pcode_used',
+        'country',
 
         'heard_where',
 
