@@ -56,9 +56,10 @@ class DelegateDetails extends Component
 
 
         $combinedStringPrint = "gpca@reg" . ',' . $eventId . ',' . $eventCategory . ',' . $finalDelegate['delegateId'] . ',' . $finalDelegate['delegateType'];
-        $finalCryptStringPrint = Crypt::encryptString($combinedStringPrint);
+        $finalCryptStringPrint = base64_encode($combinedStringPrint);
         $this->printBadgeDelegateUrl = 'ca' . $finalCryptStringPrint . 'gp';
 
+        
         $this->showEditSeatNumber = false;
     }
 
