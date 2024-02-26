@@ -133,6 +133,10 @@ class RegistrationPaid extends Mailable
                 return new Content(
                     markdown: 'emails.2024.scc.registration-paid',
                 );
+            } else if ($this->details['eventCategory'] == "DFCLW1") {
+                return new Content(
+                    markdown: 'emails.2024.dfclw1.registration-paid',
+                );
             } else {
                 return new Content(
                     markdown: 'emails.registration-paid',

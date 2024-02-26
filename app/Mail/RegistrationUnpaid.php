@@ -106,6 +106,10 @@ class RegistrationUnpaid extends Mailable
                 return new Content(
                     markdown: 'emails.2023.daw.registration-unpaid',
                 );
+            } else if ($this->details['eventCategory'] == "DFCLW1") {
+                return new Content(
+                    markdown: 'emails.2024.dfclw1.registration-unpaid',
+                );
             } else {
                 return new Content(
                     markdown: 'emails.registration-unpaid',

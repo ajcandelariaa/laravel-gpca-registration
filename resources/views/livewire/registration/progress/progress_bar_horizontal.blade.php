@@ -34,7 +34,7 @@
             4
         </div>
 
-        @if ($event->category != 'GLF')
+        @if ($event->category != 'GLF' && $event->category != 'DFCLW1')
             <div class="flex items-center justify-center">
                 <div style="height: 2px;" class="w-full bg-registrationPrimaryColor"></div>
             </div>
@@ -73,7 +73,7 @@
             Package summary
         </div>
 
-        @if ($event->category != 'GLF')
+        @if ($event->category != 'GLF' && $event->category != 'DFCLW1')
             <div class="w-full"></div>
 
 

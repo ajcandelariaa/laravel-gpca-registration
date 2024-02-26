@@ -61,7 +61,7 @@
 
 
     {{-- STEP 5 --}}
-    @if ($event->category != 'GLF')
+    @if ($event->category != 'GLF' && $event->category != 'DFCLW1')
         <div style="width: 60px;" class="flex justify-center">
             <div style="width: 2px;" class="h-12 bg-registrationPrimaryColor"></div>
         </div>

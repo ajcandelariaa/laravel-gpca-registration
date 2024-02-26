@@ -21,7 +21,7 @@
                 Email address: <span class="text-black">{{ $emailAddress }}</span>
             </div>
 
-            @if ($event->category != 'GLF')
+            @if ($event->category != 'GLF' && $event->category != 'DFCLW1')
                 <div class="text-registrationPrimaryColor col-span-2">
                     Payment method:
                 </div>
@@ -30,7 +30,7 @@
 
         <div class="mt-5 flex gap-5 items-start">
             @if ($finalTotal == 0)
-                @if ($event->category != 'GLF')
+                @if ($event->category != 'GLF' && $event->category != 'DFCLW1')
                     <button wire:click.prevent="btClicked" type="button"
                         class="{{ $paymentMethod == 'bankTransfer' ? 'bg-registrationSecondaryColor text-white' : 'hover:bg-registrationSecondaryColor hover:text-white border-registrationSecondaryColor border-2 bg-white text-registrationSecondaryColor' }} font-bold w-52 rounded-md py-5 ">
                         <i class="fa-solid fa-building-columns mr-2"></i> Bank transfer</button>
@@ -71,7 +71,7 @@
             class="hover:bg-registrationPrimaryColor hover:text-white font-bold border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor w-52 rounded-md py-2"
             wire:click.prevent="decreaseStep">PREVIOUS</button>
 
-        @if ($event->category == 'GLF')
+        @if ($event->category == 'GLF' && $event->category != 'DFCLW1')
             <button type="button" wire:key="btnIncreaseStep"
                 class="hover:bg-registrationPrimaryColorHover hover:text-white font-bold border-registrationPrimaryColor border-2 bg-registrationPrimaryColor text-white w-52 rounded-md py-2"
                 wire:click.prevent="increaseStep" wire:loading.attr="disabled"
@@ -84,7 +84,7 @@
         @endif
     </div>
 
-    @if ($event->category != 'GLF')
+    @if ($event->category != 'GLF' && $event->category != 'DFCLW1')
         <div class="mt-10">
             @include('livewire.registration.package_summary.package_rows')
             @include('livewire.registration.package_summary.package_cols')

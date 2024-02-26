@@ -545,7 +545,7 @@ class RegistrantDetails extends Component
                             } catch (\Exception $e) {
                                 Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaid($details1, $this->sendInvoice));
                             }
-                            if ($this->event->category != "GLF") {
+                            if ($this->event->category != "GLF" && $this->event->category != "DFCLW1") {
                                 if ($this->sendInvoice) {
                                     if ($delegatesIndex == 0) {
                                         try {
@@ -571,7 +571,7 @@ class RegistrantDetails extends Component
                 } catch (\Exception $e) {
                     Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaid($assistantDetails1, $this->sendInvoice));
                 }
-                if ($this->event->category != "GLF") {
+                if ($this->event->category != "GLF" && $this->event->category != "DFCLW1") {
                     if ($this->sendInvoice) {
                         try {
                             Mail::to($this->finalData['assistant_email_address'])->send(new RegistrationPaymentConfirmation($assistantDetails2, $this->sendInvoice));
@@ -1032,7 +1032,7 @@ class RegistrantDetails extends Component
                             } catch (\Exception $e) {
                                 Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaid($details1, $this->sendInvoice));
                             }
-                            if ($this->event->category != "GLF") {
+                            if ($this->event->category != "GLF" && $this->event->category != "DFCLW1") {
                                 if ($this->sendInvoice) {
                                     if ($delegatesIndex == 0) {
                                         try {
@@ -1070,7 +1070,7 @@ class RegistrantDetails extends Component
                 } catch (\Exception $e) {
                     Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaid($assistantDetails1, $this->sendInvoice));
                 }
-                if ($this->event->category != "GLF") {
+                if ($this->event->category != "GLF" && $this->event->category != "DFCLW1") {
                     if ($this->sendInvoice) {
                         try {
                             Mail::to($this->finalData['assistant_email_address'])->send(new RegistrationPaymentConfirmation($assistantDetails2, $this->sendInvoice));

@@ -432,7 +432,7 @@ class RegistrationForm extends Component
                         'text' => "",
                     ]);
                 } else {
-                    if ($this->event->category == "GLF") {
+                    if ($this->event->category == "GLF" || $this->event->category == "DFCLW1") {
                         $this->dispatchBrowserEvent('swal:registration-confirmation', [
                             'type' => 'warning',
                             'message' => 'Are you sure all the details are correct?',
@@ -464,7 +464,7 @@ class RegistrationForm extends Component
                 $this->checkUnitPrice();
                 $this->calculateAmount();
                 $this->currentStep += 1;
-                if ($this->event->category == "GLF") {
+                if ($this->event->category == "GLF" || $this->event->category == "DFCLW1") {
                     $this->paymentMethod = 'bankTransfer';
                 }
             }
@@ -617,7 +617,7 @@ class RegistrationForm extends Component
             $this->currentStep += 1;
         } else {
             $this->dispatchBrowserEvent('swal:remove-registration-loading-screen');
-            if ($this->event->category == "GLF") {
+            if ($this->event->category == "GLF" || $this->event->category == "DFCLW1") {
                 $this->submitBankTransfer();
             } else {
                 $this->currentStep += 1;
@@ -705,7 +705,7 @@ class RegistrationForm extends Component
             'badgeLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-badge" . "/" . "main" . "/" . $this->currentMainDelegateId,
         ];
 
-        if ($this->event->category != "GLF") {
+        if ($this->event->category != "GLF" || $this->event->category == "DFCLW1") {
             if ($this->isMainFree) {
                 try {
                     Mail::to($this->emailAddress)->cc($this->ccEmailNotif)->send(new RegistrationFree($details1));

@@ -51,7 +51,7 @@ class RegistrationController extends Controller
 
         if (!$events->isEmpty()) {
             foreach ($events as $event) {
-                if($event->category != "GLF"){
+                if($event->category != "GLF" && $event->category != "DFCLW1"){
                     $eventLink = env('APP_URL') . '/register/' . $event->year . '/' . $event->category . '/' . $event->id;
                     $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('d M Y') . ' - ' . Carbon::parse($event->event_end_date)->format('d M Y');
     
@@ -102,7 +102,7 @@ class RegistrationController extends Controller
                 $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('j F Y');
             } else {
                 $finalData = $this->registrationFailedViewEvents($eventCategory, $eventId, $mainDelegateId);
-                if($eventCategory == "GLF"){
+                if($eventCategory == "GLF" || $eventCategory == "DFCLW1"){
                     $eventFormattedDate =  Carbon::parse($event->event_end_date)->format('d M Y');
                 } else {
                     $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('d') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');
@@ -138,7 +138,7 @@ class RegistrationController extends Controller
                 $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('j F Y');
             } else {
                 $finalData = $this->registrationSuccessViewEvents($eventCategory, $eventId, $mainDelegateId);
-                if($eventCategory == "GLF"){
+                if($eventCategory == "GLF" || $eventCategory == "DFCLW1"){
                     $eventFormattedDate =  Carbon::parse($event->event_end_date)->format('d M Y');
                 } else {
                     $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('d') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');
@@ -3434,7 +3434,7 @@ class RegistrationController extends Controller
                 $bankDetails = config('app.bankDetails.DEFAULT');
             }
 
-            if($eventCategory == "GLF"){
+            if($eventCategory == "GLF" || $eventCategory == "DFCLW1"){
                 $eventFormattedData = Carbon::parse($event->event_end_date)->format('j F Y');
             } else {
                 $eventFormattedData = Carbon::parse($event->event_start_date)->format('j') . '-' . Carbon::parse($event->event_end_date)->format('j F Y');

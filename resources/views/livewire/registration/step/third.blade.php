@@ -184,7 +184,7 @@
                     </div>
                 </div>
 
-                @if ($event->category != 'GLF')
+                @if ($event->category != 'GLF' && $event->category != 'DFCLW1')
                     <div class="col-span-3 sm:col-span-1">
                         <div class="text-registrationPrimaryColor">
                             Promo code
@@ -234,7 +234,7 @@
     @endif --}}
 </div>
 
-@if ($event->category != 'GLF')
+@if ($event->category != 'GLF' && $event->category != 'DFCLW1')
     @if (!empty($additionalDelegates))
         <div class="mt-10 mx-5">
             <div class="text-registrationPrimaryColor italic font-bold text-xl">
