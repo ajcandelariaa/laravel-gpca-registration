@@ -56,7 +56,7 @@ class ScanQr extends Component
             $this->dispatchBrowserEvent('invalid-qr', [
                 'type' => 'error',
                 'message' => 'Invalid QR Code',
-                'text' => "Please inform our IT Team to assist you",
+                'text' => "[1] Please inform our IT Team to assist you",
             ]);
             $this->state = null;
         } else {
@@ -66,7 +66,7 @@ class ScanQr extends Component
                 $this->dispatchBrowserEvent('invalid-qr', [
                     'type' => 'error',
                     'message' => 'Invalid QR Code',
-                    'text' => "Please inform our IT Team admin to assist you",
+                    'text' => "[2] Please inform our IT Team admin to assist you",
                 ]);
                 $this->state = null;
             } else {
@@ -78,7 +78,7 @@ class ScanQr extends Component
                     $this->dispatchBrowserEvent('invalid-qr', [
                         'type' => 'error',
                         'message' => 'Invalid QR Code',
-                        'text' => "Please inform our IT Team admin to assist you",
+                        'text' => "[3] Please inform our IT Team admin to assist you",
                     ]);
                     $this->state = null;
                 } else {
@@ -87,7 +87,7 @@ class ScanQr extends Component
                         $this->dispatchBrowserEvent('invalid-qr', [
                             'type' => 'error',
                             'message' => 'Invalid QR Code',
-                            'text' => "Please inform our IT Team admin to assist you",
+                            'text' => "[4] Please inform our IT Team admin to assist you",
                         ]);
                         $this->state = null;
                     } else {
@@ -215,7 +215,7 @@ class ScanQr extends Component
                             $this->dispatchBrowserEvent('invalid-qr', [
                                 'type' => 'error',
                                 'message' => 'Invalid QR Code',
-                                'text' => "Please inform our IT Team admin to assist you",
+                                'text' => "[5] Please inform our IT Team admin to assist you",
                             ]);
                             $this->state = null;
                         }
