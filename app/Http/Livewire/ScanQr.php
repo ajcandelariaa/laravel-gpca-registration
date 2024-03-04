@@ -91,7 +91,6 @@ class ScanQr extends Component
                         ]);
                         $this->state = null;
                     } else {
-                        dd($arrayDecryptedText);
                         $eventId = $arrayDecryptedText[1];
                         $eventCategory = $arrayDecryptedText[2];
                         $delegateId = $arrayDecryptedText[3];
