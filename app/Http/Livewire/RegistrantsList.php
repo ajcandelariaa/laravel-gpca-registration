@@ -658,6 +658,7 @@ class RegistrantsList extends Component
                     'job_title' => $transaction['delegates'][0]['job_title'],
                     'badge_type' => $transaction['delegates'][0]['badge_type'],
                     'pcode_used' => $transaction['delegates'][0]['pcode_used'],
+                    'country' => $transaction['delegates'][0]['country'],
 
                     'quantity' => count($transaction['delegates']),
                     'unit_price' => $finalUnitPrice,
@@ -698,6 +699,7 @@ class RegistrantsList extends Component
                                 'job_title' => $transaction['delegates'][$x]['job_title'],
                                 'badge_type' => $transaction['delegates'][$x]['badge_type'],
                                 'pcode_used' => $transaction['delegates'][$x]['pcode_used'],
+                                'country' => $transaction['delegates'][$x]['country'],
                             ]);
             
                             Transactions::create([
