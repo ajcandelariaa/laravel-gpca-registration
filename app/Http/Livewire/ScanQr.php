@@ -82,7 +82,7 @@ class ScanQr extends Component
                     ]);
                     $this->state = null;
                 } else {
-                    if ($arrayDecryptedText[0] != "gpca@reg") {
+                    if ($arrayDecryptedText[0] != "gpca@scan") {
                         $this->dispatchBrowserEvent('remove-loading-screen');
                         $this->dispatchBrowserEvent('invalid-qr', [
                             'type' => 'error',
@@ -143,13 +143,13 @@ class ScanQr extends Component
                                     $this->badgeType = $delegateDetails->badge_type;
                                 }
 
-                                ScannedDelegates::create([
-                                    'event_id' => $eventId,
-                                    'event_category' => $eventCategory,
-                                    'delegate_id' => $delegateId,
-                                    'delegate_type' => $delegateType,
-                                    'scanned_date_time' => Carbon::now(),
-                                ]);
+                                // ScannedDelegates::create([
+                                //     'event_id' => $eventId,
+                                //     'event_category' => $eventCategory,
+                                //     'delegate_id' => $delegateId,
+                                //     'delegate_type' => $delegateType,
+                                //     'scanned_date_time' => Carbon::now(),
+                                // ]);
                             } else {
                                 if ($delegateType == "main") {
                                     $delegateDetails = MainVisitors::where('id', $delegateId)->first();
@@ -194,13 +194,13 @@ class ScanQr extends Component
                                     $this->badgeType = $delegateDetails->badge_type;
                                 }
 
-                                ScannedVisitors::create([
-                                    'event_id' => $eventId,
-                                    'event_category' => $eventCategory,
-                                    'visitor_id' => $delegateId,
-                                    'visitor_type' => $delegateType,
-                                    'scanned_date_time' => Carbon::now(),
-                                ]);
+                                // ScannedVisitors::create([
+                                //     'event_id' => $eventId,
+                                //     'event_category' => $eventCategory,
+                                //     'visitor_id' => $delegateId,
+                                //     'visitor_type' => $delegateType,
+                                //     'scanned_date_time' => Carbon::now(),
+                                // ]);
                             }
 
                             $this->dispatchBrowserEvent('scan-qr-success', [

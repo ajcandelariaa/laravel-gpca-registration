@@ -93,9 +93,9 @@ Route::get('/{eventCategory}/{eventId}/print-badge/{delegateType}/{delegateId}',
 
 Route::get('/download-file/{documentId}', [RegistrationController::class, 'downloadFile'])->name('download-file');
 
-Route::get('/fast-track', function (){
-    return view('home.fast_track');
-})->name('fast-track');
+// Route::get('/fast-track', function (){
+//     return view('home.fast_track');
+// })->name('fast-track');
 
 Route::get('/scan-qr', function (){
     return view('home.scan_qr');
