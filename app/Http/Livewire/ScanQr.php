@@ -96,8 +96,61 @@ class ScanQr extends Component
                         $delegateId = $arrayDecryptedText[3];
                         $delegateType = $arrayDecryptedText[4];
 
-                        if ($eventCategory == "AF" || $eventCategory == "AFV") {
-                            if ($eventCategory == "AF") {
+                        $event = Events::find($eventId);
+
+                        if ($event != null) {
+                            if ($eventCategory == "AFV") {
+                                if ($delegateType == "main") {
+                                    $delegateDetails = MainVisitors::where('id', $delegateId)->first();
+
+                                    if ($delegateDetails->alternative_company_name != null) {
+                                        $companyName = $delegateDetails->alternative_company_name;
+                                    } else {
+                                        $companyName = $delegateDetails->company_name;
+                                    }
+
+
+                                    if ($delegateDetails->salutation == "Dr." || $delegateDetails->salutation == "Prof.") {
+                                        $delegateSalutation = $delegateDetails->salutation;
+                                    } else {
+                                        $delegateSalutation = null;
+                                    }
+
+                                    $this->name = $delegateSalutation . ' ' . $delegateDetails->first_name . ' ' . $delegateDetails->middle_name . ' ' . $delegateDetails->last_name;
+                                    $this->jobTitle = $delegateDetails->job_title;
+                                    $this->companyName = $companyName;
+                                    $this->badgeType = $delegateDetails->badge_type;
+                                } else {
+                                    $delegateDetails = AdditionalVisitors::where('id', $delegateId)->first();
+                                    $mainVisitor = MainVisitors::where('id', $delegateDetails->main_delegate_id)->first();
+
+                                    if ($mainVisitor->alternative_company_name != null) {
+                                        $companyName = $mainVisitor->alternative_company_name;
+                                    } else {
+                                        $companyName = $mainVisitor->company_name;
+                                    }
+
+
+                                    if ($delegateDetails->salutation == "Dr." || $delegateDetails->salutation == "Prof.") {
+                                        $delegateSalutation = $delegateDetails->salutation;
+                                    } else {
+                                        $delegateSalutation = null;
+                                    }
+
+                                    $this->name = $delegateSalutation . ' ' . $delegateDetails->first_name . ' ' . $delegateDetails->middle_name . ' ' . $delegateDetails->last_name;
+                                    $this->jobTitle = $delegateDetails->job_title;
+                                    $this->companyName = $companyName;
+                                    $this->badgeType = $delegateDetails->badge_type;
+                                }
+
+                                // ScannedVisitors::create([
+                                //     'event_id' => $eventId,
+                                //     'event_category' => $eventCategory,
+                                //     'visitor_id' => $delegateId,
+                                //     'visitor_type' => $delegateType,
+                                //     'scanned_date_time' => Carbon::now(),
+                                // ]);
+                            } else {
                                 if ($delegateType == "main") {
                                     $delegateDetails = MainDelegates::where('id', $delegateId)->first();
 
@@ -150,57 +203,7 @@ class ScanQr extends Component
                                 //     'delegate_type' => $delegateType,
                                 //     'scanned_date_time' => Carbon::now(),
                                 // ]);
-                            } else {
-                                if ($delegateType == "main") {
-                                    $delegateDetails = MainVisitors::where('id', $delegateId)->first();
-
-                                    if ($delegateDetails->alternative_company_name != null) {
-                                        $companyName = $delegateDetails->alternative_company_name;
-                                    } else {
-                                        $companyName = $delegateDetails->company_name;
-                                    }
-
-
-                                    if ($delegateDetails->salutation == "Dr." || $delegateDetails->salutation == "Prof.") {
-                                        $delegateSalutation = $delegateDetails->salutation;
-                                    } else {
-                                        $delegateSalutation = null;
-                                    }
-
-                                    $this->name = $delegateSalutation . ' ' . $delegateDetails->first_name . ' ' . $delegateDetails->middle_name . ' ' . $delegateDetails->last_name;
-                                    $this->jobTitle = $delegateDetails->job_title;
-                                    $this->companyName = $companyName;
-                                    $this->badgeType = $delegateDetails->badge_type;
-                                } else {
-                                    $delegateDetails = AdditionalVisitors::where('id', $delegateId)->first();
-                                    $mainVisitor = MainVisitors::where('id', $delegateDetails->main_delegate_id)->first();
-
-                                    if ($mainVisitor->alternative_company_name != null) {
-                                        $companyName = $mainVisitor->alternative_company_name;
-                                    } else {
-                                        $companyName = $mainVisitor->company_name;
-                                    }
-
-
-                                    if ($delegateDetails->salutation == "Dr." || $delegateDetails->salutation == "Prof.") {
-                                        $delegateSalutation = $delegateDetails->salutation;
-                                    } else {
-                                        $delegateSalutation = null;
-                                    }
-
-                                    $this->name = $delegateSalutation . ' ' . $delegateDetails->first_name . ' ' . $delegateDetails->middle_name . ' ' . $delegateDetails->last_name;
-                                    $this->jobTitle = $delegateDetails->job_title;
-                                    $this->companyName = $companyName;
-                                    $this->badgeType = $delegateDetails->badge_type;
-                                }
-
-                                // ScannedVisitors::create([
-                                //     'event_id' => $eventId,
-                                //     'event_category' => $eventCategory,
-                                //     'visitor_id' => $delegateId,
-                                //     'visitor_type' => $delegateType,
-                                //     'scanned_date_time' => Carbon::now(),
-                                // ]);
+                                
                             }
 
                             $this->dispatchBrowserEvent('scan-qr-success', [
