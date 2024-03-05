@@ -107,7 +107,7 @@ class FastTrackController extends Controller
             if (!$subDelegates->isEmpty()) {
                 foreach ($subDelegates as $subDelegate) {
 
-                    if ($subDelegate->delegate_replaced_by_id == null && (!$subDelegate->delegate_refunded)) {
+                    // if ($subDelegate->delegate_replaced_by_id == null && (!$subDelegate->delegate_refunded)) {
                         if ($mainDelegate->registration_status == "confirmed") {
 
                             $registrationType = EventRegistrationType::where('event_id', $eventId)->where('event_category', $eventCategory)->where('registration_type', $subDelegate->badge_type)->first();
@@ -163,7 +163,7 @@ class FastTrackController extends Controller
                                 'seatNumber' => $subDelegate->seat_number ? $subDelegate->seat_number : "N/A",
                             ]);
                         }
-                    }
+                    // }
                 }
             }
         }
