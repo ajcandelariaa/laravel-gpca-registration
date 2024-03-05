@@ -103,12 +103,11 @@ class FastTrackController extends Controller
 
 
             $subDelegates = AdditionalDelegate::where('main_delegate_id', $mainDelegate->id)->get();
-            
+
             if (!$subDelegates->isEmpty()) {
                 foreach ($subDelegates as $subDelegate) {
 
-                    // if ($subDelegate->delegate_replaced_by_id == null && (!$subDelegate->delegate_refunded)) {
-                    //     if ($mainDelegate->registration_status == "confirmed") {
+                    if ($subDelegate->delegate_replaced_by_id == null && (!$subDelegate->delegate_refunded)) {
 
                             $registrationType = EventRegistrationType::where('event_id', $eventId)->where('event_category', $eventCategory)->where('registration_type', $subDelegate->badge_type)->first();
 
@@ -162,8 +161,7 @@ class FastTrackController extends Controller
                                 'frontTextBGColor' => $registrationType->badge_footer_front_bg_color,
                                 'seatNumber' => $subDelegate->seat_number ? $subDelegate->seat_number : "N/A",
                             ]);
-                    //     }
-                    // }
+                    }
                 }
             }
         }
