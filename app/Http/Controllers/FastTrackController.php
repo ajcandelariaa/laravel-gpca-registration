@@ -15,12 +15,13 @@ use Illuminate\Support\Facades\Validator;
 
 class FastTrackController extends Controller
 {
-    public function getFastTrackDetails($eventCategory, $eventYear){
+    public function getFastTrackDetails($eventCategory, $eventYear)
+    {
         $eventCategory = $eventCategory;
         $eventYear = $eventYear;
-        
+
         $event = Event::where('category', $eventCategory)->where('year', $eventYear)->first();
-        if($event != null){
+        if ($event != null) {
             return response()->json([
                 'confirmedAttendees' => $this->getConfirmedDelegates($event->id, $eventCategory, $eventYear),
             ]);
@@ -31,7 +32,8 @@ class FastTrackController extends Controller
         }
     }
 
-    public function getConfirmedDelegates($eventId, $eventCategory, $eventYear){
+    public function getConfirmedDelegates($eventId, $eventCategory, $eventYear)
+    {
         $confirmedDelegates = array();
         $mainDelegates = MainDelegate::where('event_id', $eventId)->get();
 
@@ -41,7 +43,7 @@ class FastTrackController extends Controller
             }
         }
 
-        
+
         foreach ($mainDelegates as $mainDelegate) {
             if ($mainDelegate->delegate_replaced_by_id == null && (!$mainDelegate->delegate_refunded)) {
                 if ($mainDelegate->registration_status == "confirmed") {
@@ -67,19 +69,19 @@ class FastTrackController extends Controller
                     }
 
                     $fullName = $delegateSalutation;
-                    
+
                     if (!empty($mainDelegate->first_name)) {
                         $fullName .= ' ' . $mainDelegate->first_name;
                     }
-                    
+
                     if (!empty($mainDelegate->middle_name)) {
                         $fullName .= ' ' . $mainDelegate->middle_name;
                     }
-                    
+
                     if (!empty($mainDelegate->last_name)) {
                         $fullName .= ' ' . $mainDelegate->last_name;
                     }
-                    
+
                     array_push($confirmedDelegates, [
                         'transactionId' => $finalTransactionId,
                         'id' => $mainDelegate->id,
@@ -101,14 +103,12 @@ class FastTrackController extends Controller
                 }
             }
 
+            if ($mainDelegate->registration_status == "confirmed") {
+                $subDelegates = AdditionalDelegate::where('main_delegate_id', $mainDelegate->id)->get();
+                if (!$subDelegates->isEmpty()) {
+                    foreach ($subDelegates as $subDelegate) {
 
-            $subDelegates = AdditionalDelegate::where('main_delegate_id', $mainDelegate->id)->get();
-
-            if (!$subDelegates->isEmpty()) {
-                foreach ($subDelegates as $subDelegate) {
-
-                    if ($subDelegate->delegate_replaced_by_id == null && (!$subDelegate->delegate_refunded)) {
-                        if ($mainDelegate->registration_status == "confirmed") {
+                        if ($subDelegate->delegate_replaced_by_id == null && (!$subDelegate->delegate_refunded)) {
 
                             $registrationType = EventRegistrationType::where('event_id', $eventId)->where('event_category', $eventCategory)->where('registration_type', $subDelegate->badge_type)->first();
 
@@ -131,15 +131,15 @@ class FastTrackController extends Controller
                             }
 
                             $fullName = $delegateSalutation;
-                            
+
                             if (!empty($subDelegate->first_name)) {
                                 $fullName .= ' ' . $subDelegate->first_name;
                             }
-                            
+
                             if (!empty($subDelegate->middle_name)) {
                                 $fullName .= ' ' . $subDelegate->middle_name;
                             }
-                            
+
                             if (!empty($subDelegate->last_name)) {
                                 $fullName .= ' ' . $subDelegate->last_name;
                             }
@@ -170,7 +170,7 @@ class FastTrackController extends Controller
         return $confirmedDelegates;
     }
 
-    
+
     public function printBadge(Request $request, $eventCategory, $eventYear)
     {
         $validator = Validator::make($request->all(), [
@@ -180,27 +180,27 @@ class FastTrackController extends Controller
             'pcName' => 'required|string',
             'pcNumber' => 'required|string',
         ]);
-    
+
         if ($validator->fails()) {
             return response()->json([
                 'message' => 'Validation failed',
                 'errors' => $validator->errors(),
             ], 422);
         }
-        
-        if($request->code == env("API_CODE")){
+
+        if ($request->code == env("API_CODE")) {
             $eventId = Event::where('category', $eventCategory)->where('year', $eventYear)->value('id');
 
-            if($eventId != null){
+            if ($eventId != null) {
                 $delegate = null;
 
-                if($request->delegateType == "main"){
+                if ($request->delegateType == "main") {
                     $delegate = MainDelegate::find($request->delegateId);
                 } else {
                     $delegate = AdditionalDelegate::find($request->delegateId);
                 }
 
-                if($delegate != null){
+                if ($delegate != null) {
                     PrintedBadge::create([
                         'event_id' => $eventId,
                         'event_category' => $eventCategory,
@@ -210,7 +210,7 @@ class FastTrackController extends Controller
                         'printed_by_pc_number' => $request->pcNumber,
                         'printed_date_time' => Carbon::now(),
                     ]);
-        
+
                     return response()->json([
                         'message' => 'Success',
                     ], 200);
@@ -244,22 +244,22 @@ class FastTrackController extends Controller
             'pcNumber' => 'required|string',
             'description' => 'required|string',
         ]);
-    
+
         if ($validator->fails()) {
             return response()->json([
                 'message' => 'Validation failed',
                 'errors' => $validator->errors(),
             ], 422);
         }
-        
-        if($request->code == env("API_CODE")){
+
+        if ($request->code == env("API_CODE")) {
             $eventId = Event::where('category', $eventCategory)->where('year', $eventYear)->value('id');
-            if($eventId != null){
+            if ($eventId != null) {
                 $delegateType = $request->delegateType;
                 $delegateId = $request->delegateId;
 
                 $delegate = ($delegateType == "main") ? MainDelegate::find($delegateId) : AdditionalDelegate::find($delegateId);
-                
+
                 if ($delegate != null) {
                     $delegate->update([
                         'salutation' => $request->salutation,
@@ -279,7 +279,7 @@ class FastTrackController extends Controller
                         'description' => $request->description,
                         'updated_date_time' => Carbon::now(),
                     ]);
-                
+
                     return response()->json([
                         'message' => 'Success',
                     ], 200);
