@@ -705,7 +705,7 @@ class RegistrationForm extends Component
             'badgeLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-badge" . "/" . "main" . "/" . $this->currentMainDelegateId,
         ];
 
-        if ($this->event->category != "GLF" || $this->event->category == "DFCLW1") {
+        if ($this->event->category != "GLF" || $this->event->category != "DFCLW1") {
             if ($this->isMainFree) {
                 try {
                     Mail::to($this->emailAddress)->cc($this->ccEmailNotif)->send(new RegistrationFree($details1));
