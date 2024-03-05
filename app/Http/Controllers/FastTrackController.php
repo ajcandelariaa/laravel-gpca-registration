@@ -23,7 +23,7 @@ class FastTrackController extends Controller
         $event = Event::where('category', $eventCategory)->where('year', $eventYear)->first();
         if ($event != null) {
             return response()->json([
-                'confirmedAttendees' => $this->getConfirmedDelegates($event->id, $eventCategory, $eventYear),
+                'confirmedAttendees' => count($this->getConfirmedDelegates($event->id, $eventCategory, $eventYear)),
             ]);
         } else {
             return response()->json([
