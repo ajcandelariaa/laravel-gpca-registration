@@ -16,20 +16,21 @@ class ScanQr extends Component
 {
     public $eventBanner;
     public $state;
-
     public $name, $jobTitle, $companyName, $badgeType;
+    public $eventCategory, $eventId;
 
     protected $listeners = ['scannedSuccess' => 'scannedQRContent', 'scannerStoppedSuccess' => 'scannerStopped'];
 
-    public function mount()
+    public function mount($eventCategory, $eventId)
     {
-        $this->eventBanner = Events::where('category', 'DFCLW1')->where('year', '2024')->value('banner');
+        $this->eventBanner = Events::where('id', $eventId)->where('category', $eventCategory)->value('banner');
+        $this->eventCategory = $eventCategory;
+        $this->eventId = $eventId;
     }
     public function render()
     {
-        return view('livewire.scan-qr.scan-qr');
+        return view('livewire.admin.events.scan-qr.scan-qr');
     }
-
 
     public function qrCodeScannerClicked()
     {
@@ -96,9 +97,7 @@ class ScanQr extends Component
                         $delegateId = $arrayDecryptedText[3];
                         $delegateType = $arrayDecryptedText[4];
 
-                        $event = Events::find($eventId);
-
-                        if ($event != null) {
+                        if ($this->eventCategory == $eventCategory && $this->eventId == $eventId) {
                             if ($eventCategory == "AFV") {
                                 if ($delegateType == "main") {
                                     $delegateDetails = MainVisitors::where('id', $delegateId)->first();

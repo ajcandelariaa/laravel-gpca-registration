@@ -22,10 +22,6 @@ Route::get('/', [RegistrationController::class, 'homepageView'])->name('homepage
 
 Route::prefix('admin')->group(function () {
     Route::middleware(['isAdmin'])->group(function () {
-        Route::get('/scan-qr', function (){
-            return view('home.scan_qr');
-        })->name('scan.qr');
-        
         Route::get('/logout', [AdminController::class, 'logout'])->name('admin.logout');
         Route::get('/dashboard', [AdminController::class, 'dashboardView'])->name('admin.dashboard.view');
 
@@ -68,6 +64,8 @@ Route::prefix('admin')->group(function () {
                     Route::get('/', [DelegateController::class, 'scannedDelegateListView'])->name('admin.scanned.delegate.list.view');
                 });
                 // Route::get('/onsite/register/', [RegistrationController::class, 'eventOnsiteRegistrationView'])->name('admin.event.onsite.register.view');
+                
+                Route::get('/scan-qr', [DelegateController::class, 'scanQrView'])->name('scan.qr');
             });
         });
 
