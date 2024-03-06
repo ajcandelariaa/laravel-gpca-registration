@@ -22,6 +22,10 @@ Route::get('/', [RegistrationController::class, 'homepageView'])->name('homepage
 
 Route::prefix('admin')->group(function () {
     Route::middleware(['isAdmin'])->group(function () {
+        Route::get('/scan-qr', function (){
+            return view('home.scan_qr');
+        })->name('scan.qr');
+        
         Route::get('/logout', [AdminController::class, 'logout'])->name('admin.logout');
         Route::get('/dashboard', [AdminController::class, 'dashboardView'])->name('admin.dashboard.view');
 
@@ -96,10 +100,6 @@ Route::get('/download-file/{documentId}', [RegistrationController::class, 'downl
 // Route::get('/fast-track', function (){
 //     return view('home.fast_track');
 // })->name('fast-track');
-
-Route::get('/scan-qr', function (){
-    return view('home.scan_qr');
-})->name('scan.qr');
 
 // Route::get('/phpinfo', function () {
 //     phpinfo();
