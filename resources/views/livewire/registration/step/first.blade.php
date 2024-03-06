@@ -112,8 +112,11 @@
                             href="https://www.gpcaregistration.com/register/2023/AFS/11" target="_blank"
                             class="text-blue-600 hover:underline font-semibold">register.</a></p>
                 @endif --}}
+
+                <p class="mt-5">For inquiries or to speak with a member of our team, please contact <strong>Faheem Chowdhury</strong>, <em>Head of Events & Sales</em>, at <a href="mailto:faheem@gpca.org.ae">faheem@gpca.org.ae</a> or call +971 4 451 0666  ext. 122.</p>
             </div>
         @endif
+        
 
         <div
             class="col-span-2 {{ $delegateFees->isNotEmpty() ? 'lg:col-span-1' : 'lg:col-span-2' }} lg:col-span-1 flex flex-col gap-5">
@@ -210,7 +213,8 @@
                 </div>
             </div>
         </div>
-        
-        <p class="col-span-2">For inquiries or to speak with a member of our team, please contact <strong>Faheem Chowdhury</strong>, <em>Head of Events & Sales</em>, at <a href="mailto:faheem@gpca.org.ae">faheem@gpca.org.ae</a> or call +971 4 451 0666  ext. 122.</p>
     </div>
+    @if ($delegateFees->isEmpty())
+        <p class="col-span-2 mt-5">For inquiries or to speak with a member of our team, please contact <strong>Faheem Chowdhury</strong>, <em>Head of Events & Sales</em>, at <a href="mailto:faheem@gpca.org.ae">faheem@gpca.org.ae</a> or call +971 4 451 0666  ext. 122.</p>
+    @endif
 </div>
