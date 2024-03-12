@@ -32,14 +32,14 @@
                             <td class="text-black">
                                 <div class="bg-white py-4">
                                     $ {{ number_format($event->eb_full_member_rate, 2, '.', ',') }}
-                                    {{ $event->event_vat == 0 ? '' : '+ ' . $event->event_vat . '%' }}
+                                    {{ $event->event_vat == 0 ? '' : '+VAT (' . $event->event_vat . '%)' }}
                                 </div>
                             </td>
                         @endif
                         <td class="text-black">
                             <div class="bg-white py-4 mr-1">
                                 $ {{ number_format($event->std_full_member_rate, 2, '.', ',') }}
-                                {{ $event->event_vat == 0 ? '' : '+ ' . $event->event_vat . '%' }}
+                                {{ $event->event_vat == 0 ? '' : '+VAT (' . $event->event_vat . '%)' }}
                             </div>
                         </td>
                     </tr>
@@ -54,14 +54,14 @@
                         <td class="text-black">
                             <div class="bg-white py-4">
                                 $ {{ number_format($event->eb_member_rate, 2, '.', ',') }}
-                                {{ $event->event_vat == 0 ? '' : '+ ' . $event->event_vat . '%' }}
+                                {{ $event->event_vat == 0 ? '' : '+VAT (' . $event->event_vat . '%)' }}
                             </div>
                         </td>
                     @endif
                     <td class="text-black">
                         <div class="bg-white py-4 mr-1">
                             $ {{ number_format($event->std_member_rate, 2, '.', ',') }}
-                            {{ $event->event_vat == 0 ? '' : '+ ' . $event->event_vat . '%' }}
+                            {{ $event->event_vat == 0 ? '' : '+VAT (' . $event->event_vat . '%)' }}
                         </div>
                     </td>
                 </tr>
@@ -75,14 +75,14 @@
                         <td class="text-black">
                             <div class="bg-white py-4 mb-1">
                                 $ {{ number_format($event->eb_nmember_rate, 2, '.', ',') }}
-                                {{ $event->event_vat == 0 ? '' : '+ ' . $event->event_vat . '%' }}
+                                {{ $event->event_vat == 0 ? '' : '+VAT (' . $event->event_vat . '%)' }}
                             </div>
                         </td>
                     @endif
                     <td class="text-black">
                         <div class="bg-white py-4 mb-1 mr-1">
                             $ {{ number_format($event->std_nmember_rate, 2, '.', ',') }}
-                            {{ $event->event_vat == 0 ? '' : '+ ' . $event->event_vat . '%' }}
+                            {{ $event->event_vat == 0 ? '' : '+VAT (' . $event->event_vat . '%)' }}
                         </div>
                     </td>
                 </tr>
