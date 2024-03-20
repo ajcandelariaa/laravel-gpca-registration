@@ -6,7 +6,7 @@
 
         <div class="italic mt-5">
             By registering your details, you understand that your personal data will be handled according to <a
-                href="https://www.gpca.org.ae/privacy-policy/" class="text-registrationPrimaryColor underline ">GPCA Privacy Policy</a>
+                href="https://www.gpca.org.ae/privacy-policy/" target="_blank" class="text-registrationPrimaryColor underline ">GPCA Privacy Policy</a>
         </div>
     </div>
 
