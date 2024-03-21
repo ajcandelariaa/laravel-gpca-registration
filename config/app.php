@@ -504,7 +504,7 @@ return [
         'default' => ['analee@gpca.org.ae', 'jovelyn@gpca.org.ae', 'forumregistration@gpca.org.ae'],
         'test' => ['aj@gpca.org.ae'],
         'daw' => ['aastha@gpca.org.ae', 'analee@gpca.org.ae', 'jovelyn@gpca.org.ae', 'forumregistration@gpca.org.ae'],
-        'scea' => ['analee@gpca.org.ae, nasim@gpca.org.ae, zaman@gpca.org.ae'],
+        'scea' => ['analee@gpca.org.ae', 'nasim@gpca.org.ae', 'zaman@gpca.org.ae'],
         'error' => ['forumregistration@gpca.org.ae'],
     ],
 
