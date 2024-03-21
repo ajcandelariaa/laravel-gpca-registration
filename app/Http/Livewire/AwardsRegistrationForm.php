@@ -4,7 +4,6 @@ namespace App\Http\Livewire;
 
 use App\Mail\RegistrationUnpaid;
 use App\Models\AwardsMainParticipant as AwardsMainParticipants;
-use App\Models\AwardsAdditionalParticipant as AwardsAdditionalParticipants;
 use App\Models\AwardsParticipantDocument as AwardsParticipantDocuments;
 use App\Models\AwardsParticipantTransaction as AwardsParticipantTransactions;
 use App\Models\Member as Members;
