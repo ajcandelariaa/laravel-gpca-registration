@@ -272,7 +272,7 @@
 
                         @error('entryForm')
                             <div class="text-red-500 text-xs italic mt-1">
-                                {{ $message }}
+                                Please try different file ({{ $message }})
                             </div>
                         @enderror
                     </div>
