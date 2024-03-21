@@ -3046,8 +3046,8 @@ class RegistrationController extends Controller
                         Mail::to($mainParticipant->email_address)->cc(config('app.ccEmailNotif.scea'))->send(new RegistrationPaid($details1));
                         Mail::to($mainParticipant->email_address)->cc(config('app.ccEmailNotif.scea'))->send(new RegistrationPaymentConfirmation($details2));
                     } catch (\Exception $e) {
-                        Mail::to(config('app.ccEmailNotif.scea'))->send(new RegistrationPaid($details1));
-                        Mail::to(config('app.ccEmailNotif.scea'))->send(new RegistrationPaymentConfirmation($details2));
+                        Mail::to('zaman@gpca.org.ae')->send(new RegistrationPaid($details1));
+                        Mail::to('zaman@gpca.org.ae')->send(new RegistrationPaymentConfirmation($details2));
                     }
 
 
@@ -3082,7 +3082,7 @@ class RegistrationController extends Controller
                     try {
                         Mail::to($mainParticipant->email_address)->cc(config('app.ccEmailNotif.scea'))->send(new RegistrationCardDeclined($details));
                     } catch (\Exception $e) {
-                        Mail::to(config('app.ccEmailNotif.scea'))->send(new RegistrationCardDeclined($details));
+                        Mail::to('zaman@gpca.org.ae')->send(new RegistrationCardDeclined($details));
                     }
 
                     return redirect()->route('register.loading.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'eventYear' => $event->year, 'mainDelegateId' => $mainDelegateId, 'status' => "failed"]);
@@ -3117,7 +3117,7 @@ class RegistrationController extends Controller
                 try {
                     Mail::to($mainParticipant->email_address)->cc(config('app.ccEmailNotif.scea'))->send(new RegistrationCardDeclined($details));
                 } catch (\Exception $e) {
-                    Mail::to(config('app.ccEmailNotif.scea'))->send(new RegistrationCardDeclined($details));
+                    Mail::to('zaman@gpca.org.ae')->send(new RegistrationCardDeclined($details));
                 }
 
                 return redirect()->route('register.loading.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'eventYear' => $event->year, 'mainDelegateId' => $mainDelegateId, 'status' => "failed"]);

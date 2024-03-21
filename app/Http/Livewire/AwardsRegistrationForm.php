@@ -457,7 +457,7 @@ class AwardsRegistrationForm extends Component
         try {
             Mail::to($this->emailAddress)->cc($this->ccEmailNotif)->send(new RegistrationUnpaid($details1));
         } catch (\Exception $e) {
-            Mail::to(config('app.ccEmailNotif.scea'))->send(new RegistrationUnpaid($details1));
+            Mail::to('zaman@gpca.org.ae')->send(new RegistrationUnpaid($details1));
         }
 
         return redirect()->route('register.success.view', ['eventCategory' => $this->event->category, 'eventId' => $this->event->id, 'eventYear' => $this->event->year, 'mainDelegateId' => $this->currentMainPartcipantId]);

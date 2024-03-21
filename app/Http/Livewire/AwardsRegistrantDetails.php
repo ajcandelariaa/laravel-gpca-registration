@@ -412,7 +412,7 @@ class AwardsRegistrantDetails extends Component
                             try {
                                 Mail::to($innerParticipant['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaid($details1, $this->sendInvoice));
                             } catch (\Exception $e) {
-                                Mail::to(config('app.ccEmailNotif.scea'))->send(new RegistrationPaid($details1, $this->sendInvoice));
+                                Mail::to('zaman@gpca.org.ae')->send(new RegistrationPaid($details1, $this->sendInvoice));
                             }
 
                             if ($this->sendInvoice) {
@@ -420,7 +420,7 @@ class AwardsRegistrantDetails extends Component
                                     try {
                                         Mail::to($innerParticipant['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
                                     } catch (\Exception $e) {
-                                        Mail::to(config('app.ccEmailNotif.scea'))->send(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+                                        Mail::to('zaman@gpca.org.ae')->send(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
                                     }
                                 }
                             }
@@ -670,26 +670,26 @@ class AwardsRegistrantDetails extends Component
                             try {
                                 Mail::to($innerParticipant['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationUnpaid($details1, $this->sendInvoice));
                             } catch (\Exception $e) {
-                                Mail::to(config('app.ccEmailNotif.scea'))->send(new RegistrationUnpaid($details1, $this->sendInvoice));
+                                Mail::to('zaman@gpca.org.ae')->send(new RegistrationUnpaid($details1, $this->sendInvoice));
                             }
                         } else if ($this->finalData['payment_status'] == "free" && $this->finalData['registration_status'] == "pending") {
                             try {
                                 Mail::to($innerParticipant['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationFree($details1, $this->sendInvoice));
                             } catch (\Exception $e) {
-                                Mail::to(config('app.ccEmailNotif.scea'))->send(new RegistrationFree($details1, $this->sendInvoice));
+                                Mail::to('zaman@gpca.org.ae')->send(new RegistrationFree($details1, $this->sendInvoice));
                             }
                         } else {
                             try {
                                 Mail::to($innerParticipant['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaid($details1, $this->sendInvoice));
                             } catch (\Exception $e) {
-                                Mail::to(config('app.ccEmailNotif.scea'))->send(new RegistrationPaid($details1, $this->sendInvoice));
+                                Mail::to('zaman@gpca.org.ae')->send(new RegistrationPaid($details1, $this->sendInvoice));
                             }
                             if ($this->sendInvoice) {
                                 if ($participantsIndex == 0) {
                                     try {
                                         Mail::to($innerParticipant['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
                                     } catch (\Exception $e) {
-                                        Mail::to(config('app.ccEmailNotif.scea'))->send(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+                                        Mail::to('zaman@gpca.org.ae')->send(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
                                     }
                                 }
                             }
@@ -738,7 +738,7 @@ class AwardsRegistrantDetails extends Component
                         try {
                             Mail::to($innerParticipant['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaymentReminder($details));
                         } catch (\Exception $e) {
-                            Mail::to(config('app.ccEmailNotif.scea'))->send(new RegistrationPaymentReminder($details));
+                            Mail::to('zaman@gpca.org.ae')->send(new RegistrationPaymentReminder($details));
                         }
                     }
                 }
