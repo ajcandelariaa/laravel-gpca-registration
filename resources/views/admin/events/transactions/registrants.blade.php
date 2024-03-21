@@ -7,6 +7,8 @@
         @livewire('visitor-registrants-list', ['eventId' => $eventId, 'eventCategory' => $eventCategory])
     @elseif ($eventCategory == 'RCCA')
         @livewire('rcc-awards-registrants-list', ['eventId' => $eventId, 'eventCategory' => $eventCategory])
+    @elseif ($eventCategory == 'SCEA')
+        @livewire('awards-registrants-list', ['eventId' => $eventId, 'eventCategory' => $eventCategory])
     @else
         @livewire('registrants-list', ['eventId' => $eventId, 'eventCategory' => $eventCategory])
     @endif

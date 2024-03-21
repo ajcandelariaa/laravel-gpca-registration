@@ -119,6 +119,8 @@
         @livewire('visitor-registration-form', ['data' => $event])
     @elseif ($event->category == 'RCCA')
         @livewire('rcc-awards-registration-form', ['data' => $event])
+    @elseif ($event->category == 'SCEA')
+        @livewire('awards-registration-form', ['data' => $event])
     @else
         @livewire('registration-form', ['data' => $event])
     @endif

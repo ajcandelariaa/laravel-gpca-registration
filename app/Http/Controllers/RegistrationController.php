@@ -8,6 +8,10 @@ use App\Mail\RegistrationPaymentConfirmation;
 use App\Models\AdditionalDelegate;
 use App\Models\AdditionalSpouse;
 use App\Models\AdditionalVisitor;
+use App\Models\AwardsAdditionalParticipant;
+use App\Models\AwardsMainParticipant;
+use App\Models\AwardsParticipantDocument;
+use App\Models\AwardsParticipantTransaction;
 use App\Models\PromoCode;
 use App\Models\Event;
 use App\Models\MainDelegate;
@@ -100,6 +104,9 @@ class RegistrationController extends Controller
             } else if ($eventCategory == "RCCA") {
                 $finalData = $this->registrationFailedViewRccAwards($eventCategory, $eventId, $mainDelegateId);
                 $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('j F Y');
+            } else if ($eventCategory == "SCEA") {
+                $finalData = $this->registrationFailedViewAwards($eventCategory, $eventId, $mainDelegateId);
+                $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('j F Y');
             } else {
                 $finalData = $this->registrationFailedViewEvents($eventCategory, $eventId, $mainDelegateId);
                 if($eventCategory == "GLF" || $eventCategory == "DFCLW1"){
@@ -135,6 +142,9 @@ class RegistrationController extends Controller
                 $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('d') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');
             } else if ($eventCategory == "RCCA") {
                 $finalData = $this->registrationSuccessViewRccAwards($eventCategory, $eventId, $mainDelegateId);
+                $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('j F Y');
+            } else if ($eventCategory == "SCEA") {
+                $finalData = $this->registrationSuccessViewAwards($eventCategory, $eventId, $mainDelegateId);
                 $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('j F Y');
             } else {
                 $finalData = $this->registrationSuccessViewEvents($eventCategory, $eventId, $mainDelegateId);
@@ -281,6 +291,8 @@ class RegistrationController extends Controller
                 $finalData = $this->registrantDetailVisitorsView($eventCategory, $eventId, $registrantId);
             } else if ($eventCategory == "RCCA") {
                 $finalData = $this->registrantDetailRCCAwardsView($eventCategory, $eventId, $registrantId);
+            } else if ($eventCategory == "SCEA") {
+                $finalData = $this->registrantDetailAwardsView($eventCategory, $eventId, $registrantId);
             } else {
                 $finalData = $this->registrantDetailEventsView($eventCategory, $eventId, $registrantId);
             }
@@ -1560,6 +1572,218 @@ class RegistrationController extends Controller
     }
 
 
+    public function registrantDetailAwardsView($eventCategory, $eventId, $registrantId)
+    {
+        if (AwardsMainParticipant::where('id', $registrantId)->where('event_id', $eventId)->exists()) {
+            $finalData = array();
+
+            $subParticipantReplacementArray = array();
+            $allParticipantsArray = array();
+            $allParticipantsArrayTemp = array();
+
+            $countFinalQuantity = 0;
+
+            $eventYear = Event::where('id', $eventId)->value('year');
+            $mainParticipant = AwardsMainParticipant::where('id', $registrantId)->where('event_id', $eventId)->first();
+
+            foreach (config('app.eventCategories') as $eventCategoryC => $code) {
+                if ($eventCategory == $eventCategoryC) {
+                    $eventCode = $code;
+                }
+            }
+
+            $tempYear = Carbon::parse($mainParticipant->registered_date_time)->format('y');
+            $transactionId = AwardsParticipantTransaction::where('participant_id', $mainParticipant->id)->where('participant_type', "main")->value('id');
+            $lastDigit = 1000 + intval($transactionId);
+            $invoiceNumber = $eventCategory . $tempYear . "/" . $lastDigit;
+
+            if ($mainParticipant->participant_replaced_by_id == null && (!$mainParticipant->participant_refunded)) {
+                $countFinalQuantity++;
+            }
+
+            $subParticipants = AwardsAdditionalParticipant::where('main_participant_id', $registrantId)->get();
+            if (!$subParticipants->isEmpty()) {
+                foreach ($subParticipants as $subParticipant) {
+                    if ($subParticipant->participant_replaced_by_id == null && (!$subParticipant->participant_refunded)) {
+                        $countFinalQuantity++;
+                    }
+
+                    if ($subParticipant->participant_replaced_from_id != null) {
+                        array_push($subParticipantReplacementArray, [
+                            'subParticipantId' => $subParticipant->id,
+                            'name' => $subParticipant->salutation . " " . $subParticipant->first_name . " " . $subParticipant->middle_name . " " . $subParticipant->last_name,
+                            'salutation' => $subParticipant->salutation,
+                            'first_name' => $subParticipant->first_name,
+                            'middle_name' => $subParticipant->middle_name,
+                            'last_name' => $subParticipant->last_name,
+                            'email_address' => $subParticipant->email_address,
+                            'mobile_number' => $subParticipant->mobile_number,
+                            'address' => $subParticipant->address,
+                            'country' => $subParticipant->country,
+                            'city' => $subParticipant->city,
+                            'job_title' => $subParticipant->job_title,
+                            'nationality' => $subParticipant->nationality,
+
+                            'participant_cancelled' => $subParticipant->participant_cancelled,
+                            'participant_replaced' => $subParticipant->participant_replaced,
+                            'participant_refunded' => $subParticipant->participant_refunded,
+
+                            'participant_replaced_type' => $subParticipant->participant_replaced_type,
+                            'participant_original_from_id' => $subParticipant->participant_original_from_id,
+                            'participant_replaced_from_id' => $subParticipant->participant_replaced_from_id,
+                            'participant_replaced_by_id' => $subParticipant->participant_replaced_by_id,
+
+                            'participant_cancelled_datetime' => $subParticipant->participant_cancelled_datetime,
+                            'participant_refunded_datetime' => $subParticipant->participant_refunded_datetime,
+                            'participant_replaced_datetime' => $subParticipant->participant_replaced_datetime,
+                        ]);
+                    }
+                }
+            }
+
+
+            $finalTransactionId = $eventYear . $eventCode . $lastDigit;
+
+            array_push($allParticipantsArrayTemp, [
+                'transactionId' => $finalTransactionId,
+                'mainParticipantId' => $mainParticipant->id,
+                'participantId' => $mainParticipant->id,
+                'participantType' => "main",
+
+                'name' => $mainParticipant->salutation . " " . $mainParticipant->first_name . " " . $mainParticipant->middle_name . " " . $mainParticipant->last_name,
+                'salutation' => $mainParticipant->salutation,
+                'first_name' => $mainParticipant->first_name,
+                'middle_name' => $mainParticipant->middle_name,
+                'last_name' => $mainParticipant->last_name,
+                'email_address' => $mainParticipant->email_address,
+                'mobile_number' => $mainParticipant->mobile_number,
+                'address' => $mainParticipant->address,
+                'country' => $mainParticipant->country,
+                'city' => $mainParticipant->city,
+                'job_title' => $mainParticipant->job_title,
+                'nationality' => $mainParticipant->nationality,
+
+                'is_replacement' => false,
+                'participant_cancelled' => $mainParticipant->participant_cancelled,
+                'participant_replaced' => $mainParticipant->participant_replaced,
+                'participant_refunded' => $mainParticipant->participant_refunded,
+
+                'participant_replaced_type' => "main",
+                'participant_original_from_id' => $mainParticipant->id,
+                'participant_replaced_from_id' => null,
+                'participant_replaced_by_id' => $mainParticipant->participant_replaced_by_id,
+
+                'participant_cancelled_datetime' => ($mainParticipant->participant_cancelled_datetime == null) ? "N/A" : Carbon::parse($mainParticipant->participant_cancelled_datetime)->format('M j, Y g:i A'),
+                'participant_refunded_datetime' => ($mainParticipant->participant_refunded_datetime == null) ? "N/A" : Carbon::parse($mainParticipant->participant_refunded_datetime)->format('M j, Y g:i A'),
+                'participant_replaced_datetime' => ($mainParticipant->participant_replaced_datetime == null) ? "N/A" : Carbon::parse($mainParticipant->participant_replaced_datetime)->format('M j, Y g:i A'),
+            ]);
+
+            if ($mainParticipant->participant_replaced_by_id != null) {
+                foreach ($subParticipantReplacementArray as $subParticipantReplacement) {
+                    if ($mainParticipant->id == $subParticipantReplacement['participant_original_from_id'] && $subParticipantReplacement['participant_replaced_type'] == "main") {
+
+                        $transactionId = AwardsParticipantTransaction::where('participant_id', $subParticipantReplacement['subParticipantId'])->where('participant_type', "sub")->value('id');
+                        $lastDigit = 1000 + intval($transactionId);
+                        $finalTransactionId = $eventYear . $eventCode . $lastDigit;
+
+                        array_push($allParticipantsArrayTemp, [
+                            'transactionId' => $finalTransactionId,
+                            'mainParticipantId' => $mainParticipant->id,
+                            'participantId' => $subParticipantReplacement['subParticipantId'],
+                            'participantType' => "sub",
+
+                            'name' => $subParticipantReplacement['salutation'] . " " . $subParticipantReplacement['first_name'] . " " . $subParticipantReplacement['middle_name'] . " " . $subParticipantReplacement['last_name'],
+                            'salutation' => $subParticipantReplacement['salutation'],
+                            'first_name' => $subParticipantReplacement['first_name'],
+                            'middle_name' => $subParticipantReplacement['middle_name'],
+                            'last_name' => $subParticipantReplacement['last_name'],
+                            'email_address' => $subParticipantReplacement['email_address'],
+                            'mobile_number' => $subParticipantReplacement['mobile_number'],
+                            'address' => $subParticipantReplacement['address'],
+                            'country' => $subParticipantReplacement['country'],
+                            'city' => $subParticipantReplacement['city'],
+                            'job_title' => $subParticipantReplacement['job_title'],
+                            'nationality' => $subParticipantReplacement['nationality'],
+
+                            'is_replacement' => true,
+                            'participant_cancelled' => $subParticipantReplacement['participant_cancelled'],
+                            'participant_replaced' => $subParticipantReplacement['participant_replaced'],
+                            'participant_refunded' => $subParticipantReplacement['participant_refunded'],
+
+                            'participant_replaced_type' => $subParticipantReplacement['participant_replaced_type'],
+                            'participant_original_from_id' => $subParticipantReplacement['participant_original_from_id'],
+                            'participant_replaced_from_id' => $subParticipantReplacement['participant_replaced_from_id'],
+                            'participant_replaced_by_id' => $subParticipantReplacement['participant_replaced_by_id'],
+
+                            'participant_cancelled_datetime' => ($subParticipantReplacement['participant_cancelled_datetime'] == null) ? "N/A" : Carbon::parse($subParticipantReplacement['participant_cancelled_datetime'])->format('M j, Y g:i A'),
+                            'participant_refunded_datetime' => ($subParticipantReplacement['participant_refunded_datetime'] == null) ? "N/A" : Carbon::parse($subParticipantReplacement['participant_refunded_datetime'])->format('M j, Y g:i A'),
+                            'participant_replaced_datetime' => ($subParticipantReplacement['participant_replaced_datetime'] == null) ? "N/A" : Carbon::parse($subParticipantReplacement['participant_replaced_datetime'])->format('M j, Y g:i A'),
+                        ]);
+                    }
+                }
+            }
+
+            array_push($allParticipantsArray, $allParticipantsArrayTemp);
+
+            $entryFormId = AwardsParticipantDocument::where('event_id', $eventId)->where('participant_id', $mainParticipant->id)->where('document_type', 'entryForm')->value('id');
+            
+            $entryFormFileName = AwardsParticipantDocument::where('event_id', $eventId)->where('participant_id', $mainParticipant->id)->where('document_type', 'entryForm')->value('document_file_name');
+            $getSupportingDocumentFiles = AwardsParticipantDocument::where('event_id', $eventId)->where('participant_id', $mainParticipant->id)->where('document_type', 'supportingDocument')->get();
+
+            $supportingDocumentsDownloadId = [];
+            $supportingDocumentsDownloadFileName = [];
+
+            if ($getSupportingDocumentFiles->isNotEmpty()) {
+                foreach ($getSupportingDocumentFiles as $supportingDocument) {
+                    $supportingDocumentsDownloadId[] = $supportingDocument->id;
+                    $supportingDocumentsDownloadFileName[] = $supportingDocument->document_file_name;
+                }
+            }
+
+            $finalData = [
+                'mainParticipantId' => $mainParticipant->id,
+
+                'pass_type' => $mainParticipant->pass_type,
+                'rate_type' => $mainParticipant->rate_type,
+                'rate_type_string' => $mainParticipant->rate_type_string,
+
+                'category' => $mainParticipant->category,
+                'company_name' => $mainParticipant->company_name,
+                'alternative_company_name' => $mainParticipant->alternative_company_name,
+
+                'entryFormId' => $entryFormId,
+                'entryFormFileName' => $entryFormFileName,
+                'supportingDocumentsDownloadId' => $supportingDocumentsDownloadId,
+                'supportingDocumentsDownloadFileName' => $supportingDocumentsDownloadFileName,
+
+                'heard_where' => $mainParticipant->heard_where,
+
+                'quantity' => $mainParticipant->quantity,
+                'finalQuantity' => $countFinalQuantity,
+
+                'mode_of_payment' => $mainParticipant->mode_of_payment,
+                'registration_status' => $mainParticipant->registration_status,
+                'payment_status' => $mainParticipant->payment_status,
+                'registered_date_time' => Carbon::parse($mainParticipant->registered_date_time)->format('M j, Y g:i A'),
+                'paid_date_time' => ($mainParticipant->paid_date_time == null) ? "N/A" : Carbon::parse($mainParticipant->paid_date_time)->format('M j, Y g:i A'),
+
+                'registration_method' => $mainParticipant->registration_method,
+                'transaction_remarks' => $mainParticipant->transaction_remarks,
+
+                'registration_confirmation_sent_count' => $mainParticipant->registration_confirmation_sent_count,
+                'registration_confirmation_sent_datetime' => ($mainParticipant->registration_confirmation_sent_datetime == null) ? "N/A" : Carbon::parse($mainParticipant->registration_confirmation_sent_datetime)->format('M j, Y g:i A'),
+
+                'invoiceNumber' => $invoiceNumber,
+                'allParticipants' => $allParticipantsArray,
+
+                'invoiceData' => $this->getInvoice($eventCategory, $eventId, $registrantId),
+            ];
+            // dd($finalData);
+            return $finalData;
+        } else {
+            abort(404, 'The URL is incorrect');
+        }
+    }
 
 
 
@@ -1584,6 +1808,12 @@ class RegistrationController extends Controller
                     $pdf = Pdf::loadView('admin.events.transactions.invoices.rcca.unpaid', $finalData);
                 } else {
                     $pdf = Pdf::loadView('admin.events.transactions.invoices.rcca.paid', $finalData);
+                }
+            } else if ($eventCategory == "SCEA") {
+                if ($finalData['paymentStatus'] == "unpaid") {
+                    $pdf = Pdf::loadView('admin.events.transactions.invoices.awards.unpaid', $finalData);
+                } else {
+                    $pdf = Pdf::loadView('admin.events.transactions.invoices.awards.paid', $finalData);
                 }
             } else if ($eventCategory == "AFS") {
                 if ($finalData['paymentStatus'] == "unpaid") {
@@ -1620,6 +1850,12 @@ class RegistrationController extends Controller
                         $pdf = Pdf::loadView('admin.events.transactions.invoices.rcca.unpaid', $finalData);
                     } else {
                         $pdf = Pdf::loadView('admin.events.transactions.invoices.rcca.paid', $finalData);
+                    }
+                } else if ($eventCategory == "SCEA") {
+                    if ($finalData['paymentStatus'] == "unpaid") {
+                        $pdf = Pdf::loadView('admin.events.transactions.invoices.awards.unpaid', $finalData);
+                    } else {
+                        $pdf = Pdf::loadView('admin.events.transactions.invoices.awards.paid', $finalData);
                     }
                 } else if ($eventCategory == "AFS") {
                     if ($finalData['paymentStatus'] == "unpaid") {
@@ -1658,6 +1894,8 @@ class RegistrationController extends Controller
                 $invoiceData = $this->getInvoiceVisitor($eventCategory, $eventId, $registrantId);
             } else if ($eventCategory == "RCCA") {
                 $invoiceData = $this->getInvoiceRccAwards($eventCategory, $eventId, $registrantId);
+            } else if ($eventCategory == "SCEA") {
+                $invoiceData = $this->getInvoiceAwards($eventCategory, $eventId, $registrantId);
             } else {
                 $invoiceData = $this->getInvoiceEvents($eventCategory, $eventId, $registrantId);
             }
@@ -1676,6 +1914,8 @@ class RegistrationController extends Controller
                 $finalData = $this->visitorRegistrantsExportData($eventCategory, $eventId);
             } else if ($eventCategory == "RCCA") {
                 $finalData = $this->rccAwardsRegistrantsExportData($eventCategory, $eventId);
+            } else if ($eventCategory == "SCEA") {
+                $finalData = $this->awardsRegistrantsExportData($eventCategory, $eventId);
             } else {
                 $finalData = $this->eventRegistrantsExportData($eventCategory, $eventId);
             }
@@ -2663,6 +2903,225 @@ class RegistrationController extends Controller
                 }
                 return redirect()->route('register.loading.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'eventYear' => $event->year, 'mainDelegateId' => $mainDelegateId, 'status' => "failed"]);
             }
+        } else if ($registrationFormType == "awards") {
+            $mainDelegateId = request()->query('mainDelegateId');
+            $sessionId = request()->query('sessionId');
+            if (
+                request()->input('response_gatewayRecommendation') == "PROCEED" &&
+                request()->input('result') == "SUCCESS" &&
+                request()->input('order_id') &&
+                request()->input('transaction_id') &&
+                request()->query('sessionId') &&
+                request()->query('mainDelegateId') &&
+                request()->query('registrationFormType')
+            ) {
+                $orderId = request()->input('order_id');
+                $oldTransactionId = request()->input('transaction_id');
+                $newTransactionId = substr(uniqid(), -8);
+
+                $apiEndpoint = env('MERCHANT_API_URL');
+                $merchantId = env('MERCHANT_ID');
+                $authPass = env('MERCHANT_AUTH_PASSWORD');
+
+                $client = new Client();
+                $response = $client->request('PUT', $apiEndpoint . '/order/' . $orderId . '/transaction/' . $newTransactionId, [
+                    'auth' => [
+                        'merchant.' . $merchantId,
+                        $authPass,
+                    ],
+                    'headers' => [
+                        'Content-Type' => 'application/json'
+                    ],
+                    'json' => [
+                        'apiOperation' => "PAY",
+                        "authentication" => [
+                            "transactionId" => $oldTransactionId,
+                        ],
+                        "order" => [
+                            "reference" => $orderId,
+                        ],
+                        "session" => [
+                            'id' => $sessionId,
+                        ],
+                        "transaction" => [
+                            "reference" => $orderId,
+                        ],
+                    ]
+                ]);
+                $body = $response->getBody()->getContents();
+                $data = json_decode($body, true);
+
+                if (
+                    $data['response']['gatewayCode'] == "APPROVED" &&
+                    $data['response']['gatewayRecommendation'] == "NO_ACTION" &&
+                    $data['transaction']['authenticationStatus'] == "AUTHENTICATION_SUCCESSFUL" &&
+                    $data['transaction']['type'] == "PAYMENT"
+                ) {
+                    AwardsMainParticipant::find($mainDelegateId)->fill([
+                        'registration_status' => "confirmed",
+                        'payment_status' => "paid",
+                        'paid_date_time' => Carbon::now(),
+
+                        'registration_confirmation_sent_count' => 1,
+                        'registration_confirmation_sent_datetime' => Carbon::now(),
+                    ])->save();
+
+                    $mainParticipant = AwardsMainParticipant::where('id', $mainDelegateId)->first();
+                    $event = Event::where('id', $mainParticipant->event_id)->first();
+                    $eventFormattedData = Carbon::parse($event->event_start_date)->format('j F Y');
+
+                    $transactionId = AwardsParticipantTransaction::where('participant_id', $mainDelegateId)->where('participant_type', "main")->value('id');
+                    $lastDigit = 1000 + intval($transactionId);
+
+                    foreach (config('app.eventCategories') as $eventCategoryC => $code) {
+                        if ($event->category == $eventCategoryC) {
+                            $getEventcode = $code;
+                        }
+                    }
+
+                    $tempTransactionId = "$event->year" . "$getEventcode" . "$lastDigit";
+                    $invoiceLink = env('APP_URL') . '/' . $event->category . '/' . $event->id . '/view-invoice/' . $mainDelegateId;
+
+                    $entryFormId = AwardsParticipantDocument::where('event_id', $event->id)->where('participant_id', $mainDelegateId)->where('document_type', 'entryForm')->value('id');
+                    $entryFormFileName = AwardsParticipantDocument::where('event_id', $event->id)->where('participant_id', $mainDelegateId)->where('document_type', 'entryForm')->value('document_file_name');
+            
+                    $getSupportingDocumentFiles = AwardsParticipantDocument::where('event_id', $event->id)->where('participant_id', $mainDelegateId)->where('document_type', 'supportingDocument')->get();
+            
+                    $supportingDocumentsDownloadId = [];
+                    $supportingDocumentsDownloadFileName = [];
+            
+                    if ($getSupportingDocumentFiles->isNotEmpty()) {
+                        foreach ($getSupportingDocumentFiles as $supportingDocument) {
+                            $supportingDocumentsDownloadId[] = $supportingDocument->id;
+                            $supportingDocumentsDownloadFileName[] = $supportingDocument->document_file_name;
+                        }
+                    }
+
+                    $downloadLink = env('APP_URL') . "/" . $event->category . "/" . $event->id . '/download-file/';
+
+                    $details1 = [
+                        'name' => $mainParticipant->salutation . " " . $mainParticipant->first_name . " " . $mainParticipant->middle_name . " " . $mainParticipant->last_name,
+                        'eventLink' => $event->link,
+                        'eventName' => $event->name,
+                        'eventDates' => $eventFormattedData,
+                        'eventLocation' => $event->location,
+                        'eventCategory' => $event->category,
+                        'eventYear' => $event->year,
+
+                        'jobTitle' => $mainParticipant->job_title,
+                        'companyName' => $mainParticipant->company_name,
+                        'emailAddress' => $mainParticipant->email_address,
+                        'mobileNumber' => $mainParticipant->mobile_number,
+                        'city' => $mainParticipant->city,
+                        'country' => $mainParticipant->country,
+                        'category' => $mainParticipant->category,
+                        'nationality' => $mainParticipant->nationality,
+                        'subCategory' => ($mainParticipant->sub_category != null) ? $mainParticipant->sub_category : 'N/A',
+                        'entryFormId' => $entryFormId,
+                        'entryFormFileName' => $entryFormFileName,
+                        'supportingDocumentsDownloadId' => $supportingDocumentsDownloadId,
+                        'supportingDocumentsDownloadFileName' => $supportingDocumentsDownloadFileName,
+                        'downloadLink' => $downloadLink,
+
+                        'amountPaid' => $mainParticipant->total_amount,
+                        'transactionId' => $tempTransactionId,
+                        'invoiceLink' => $invoiceLink,
+                        'badgeLink' => env('APP_URL') . "/" . $event->category . "/" . $event->id . "/view-badge" . "/" . "main" . "/" . $mainParticipant->id,
+                    ];
+
+                    $details2 = [
+                        'name' => $mainParticipant->salutation . " " . $mainParticipant->first_name . " " . $mainParticipant->middle_name . " " . $mainParticipant->last_name,
+                        'eventLink' => $event->link,
+                        'eventName' => $event->name,
+                        'eventCategory' => $event->category,
+                        'eventYear' => $event->year,
+
+                        'invoiceAmount' => $mainParticipant->total_amount,
+                        'amountPaid' => $mainParticipant->total_amount,
+                        'balance' => 0,
+                        'invoiceLink' => $invoiceLink,
+                    ];
+
+                    try {
+                        Mail::to($mainParticipant->email_address)->cc(config('app.ccEmailNotif.scea'))->send(new RegistrationPaid($details1));
+                        Mail::to($mainParticipant->email_address)->cc(config('app.ccEmailNotif.scea'))->send(new RegistrationPaymentConfirmation($details2));
+                    } catch (\Exception $e) {
+                        Mail::to(config('app.ccEmailNotif.scea'))->send(new RegistrationPaid($details1));
+                        Mail::to(config('app.ccEmailNotif.scea'))->send(new RegistrationPaymentConfirmation($details2));
+                    }
+
+
+                    return redirect()->route('register.loading.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'eventYear' => $event->year, 'mainDelegateId' => $mainDelegateId, 'status' => "success"]);
+                } else {
+                    // (This is the part where we will send them email notification failed and redirect them)
+                    AwardsMainParticipant::find($mainDelegateId)->fill([
+                        'registration_status' => "pending",
+                        'payment_status' => "unpaid",
+                    ])->save();
+
+                    $mainParticipant = AwardsMainParticipant::where('id', $mainDelegateId)->first();
+                    $event = Event::where('id', $mainParticipant->event_id)->first();
+                    $eventFormattedData = Carbon::parse($event->event_start_date)->format('j F Y');
+
+                    $bankDetails = config('app.bankDetails.DEFAULT');
+
+                    $invoiceLink = env('APP_URL') . '/' . $event->category . '/' . $event->id . '/view-invoice/' . $mainDelegateId;
+
+                    $details = [
+                        'name' => $mainParticipant->salutation . " " . $mainParticipant->first_name . " " . $mainParticipant->middle_name . " " . $mainParticipant->last_name,
+                        'eventLink' => $event->link,
+                        'eventName' => $event->name,
+                        'eventCategory' => $event->category,
+                        'eventDates' => $eventFormattedData,
+                        'eventLocation' => $event->location,
+                        'bankDetails' => $bankDetails,
+                        'invoiceLink' => $invoiceLink,
+                        'eventYear' => $event->year,
+                    ];
+
+                    try {
+                        Mail::to($mainParticipant->email_address)->cc(config('app.ccEmailNotif.scea'))->send(new RegistrationCardDeclined($details));
+                    } catch (\Exception $e) {
+                        Mail::to(config('app.ccEmailNotif.scea'))->send(new RegistrationCardDeclined($details));
+                    }
+
+                    return redirect()->route('register.loading.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'eventYear' => $event->year, 'mainDelegateId' => $mainDelegateId, 'status' => "failed"]);
+                }
+            } else {
+                // (This is the part where we will send them email notification failed and redirect them)
+                AwardsMainParticipant::find($mainDelegateId)->fill([
+                    'registration_status' => "pending",
+                    'payment_status' => "unpaid",
+                ])->save();
+
+                $mainParticipant = AwardsMainParticipant::where('id', $mainDelegateId)->first();
+                $event = Event::where('id', $mainParticipant->event_id)->first();
+                $eventFormattedData = Carbon::parse($event->event_start_date)->format('j F Y');
+
+                $bankDetails = config('app.bankDetails.DEFAULT');
+
+                $invoiceLink = env('APP_URL') . '/' . $event->category . '/' . $event->id . '/view-invoice/' . $mainDelegateId;
+
+                $details = [
+                    'name' => $mainParticipant->salutation . " " . $mainParticipant->first_name . " " . $mainParticipant->middle_name . " " . $mainParticipant->last_name,
+                    'eventLink' => $event->link,
+                    'eventName' => $event->name,
+                    'eventCategory' => $event->category,
+                    'eventDates' => $eventFormattedData,
+                    'eventLocation' => $event->location,
+                    'bankDetails' => $bankDetails,
+                    'invoiceLink' => $invoiceLink,
+                    'eventYear' => $event->year,
+                ];
+
+                try {
+                    Mail::to($mainParticipant->email_address)->cc(config('app.ccEmailNotif.scea'))->send(new RegistrationCardDeclined($details));
+                } catch (\Exception $e) {
+                    Mail::to(config('app.ccEmailNotif.scea'))->send(new RegistrationCardDeclined($details));
+                }
+
+                return redirect()->route('register.loading.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'eventYear' => $event->year, 'mainDelegateId' => $mainDelegateId, 'status' => "failed"]);
+            }
         } else {
             $mainDelegateId = request()->query('mainDelegateId');
             $sessionId = request()->query('sessionId');
@@ -2915,6 +3374,36 @@ class RegistrationController extends Controller
         }
     }
 
+    public function eventDownloadFile($eventCategory, $eventId, $documentId)
+    {
+        if (Event::where('id', $eventId)->exists()) {
+            if (AwardsParticipantDocument::where('id', $documentId)->exists()) {
+                $documentFilePathTemp = AwardsParticipantDocument::where('id', $documentId)->value('document');
+                $documentFilePath = Str::replace('public', 'storage', $documentFilePathTemp);
+
+                if (!Storage::url($documentFilePath)) {
+                    abort(404, 'File not found');
+                }
+
+                $mimeType = Storage::mimeType($documentFilePath);
+
+                $path = parse_url($documentFilePath, PHP_URL_PATH);
+                $filename = basename($path);
+
+                $headers = [
+                    'Content-Type' => $mimeType,
+                    'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+                ];
+
+                return Response::download($documentFilePath, $filename, $headers);
+            } else {
+                abort(404, 'File not found');
+            }
+        } else {
+            abort(404, 'Event not found');
+        }
+    }
+
 
 
 
@@ -3037,6 +3526,32 @@ class RegistrationController extends Controller
         }
     }
 
+    public function registrationFailedViewAwards($eventCategory, $eventId, $mainParticipantId)
+    {
+        $mainParticipant = AwardsMainParticipant::where('id', $mainParticipantId)->first();
+
+        if ($mainParticipant->confirmation_status == "failed" || $mainParticipant->confirmation_date_time == null) {
+            $invoiceLink = env('APP_URL') . '/' . $eventCategory . '/' . $eventId . '/view-invoice/' . $mainParticipantId;
+
+            $bankDetails = config('app.bankDetails.DEFAULT');
+
+            if ($mainParticipant->confirmation_date_time == null) {
+                AwardsMainParticipant::find($mainParticipantId)->fill([
+                    'confirmation_date_time' => Carbon::now(),
+                    'confirmation_status' => "failed",
+                ])->save();
+            }
+
+            return [
+                'invoiceLink' => $invoiceLink,
+                'bankDetails' => $bankDetails,
+                'paymentStatus' => $mainParticipant->payment_status,
+            ];
+        } else {
+            abort(404, 'The URL is incorrect');
+        }
+    }
+
 
 
     public function registrationSuccessViewEvents($eventCategory, $eventId, $mainDelegateId)
@@ -3140,6 +3655,31 @@ class RegistrationController extends Controller
 
             if ($mainParticipant->confirmation_date_time == null) {
                 RccAwardsMainParticipant::find($mainParticipantId)->fill([
+                    'confirmation_date_time' => Carbon::now(),
+                    'confirmation_status' => "success",
+                ])->save();
+            }
+
+            return [
+                'invoiceLink' => $invoiceLink,
+                'bankDetails' => $bankDetails,
+                'paymentStatus' => $mainParticipant->payment_status,
+            ];
+        } else {
+            abort(404, 'The URL is incorrect');
+        }
+    }
+
+    public function registrationSuccessViewAwards($eventCategory, $eventId, $mainParticipantId)
+    {
+        $mainParticipant = AwardsMainParticipant::where('id', $mainParticipantId)->first();
+
+        if ($mainParticipant->confirmation_status == "success" || $mainParticipant->confirmation_date_time == null) {
+            $invoiceLink = env('APP_URL') . '/' . $eventCategory . '/' . $eventId . '/view-invoice/' . $mainParticipantId;
+            $bankDetails = config('app.bankDetails.DEFAULT');
+
+            if ($mainParticipant->confirmation_date_time == null) {
+                AwardsMainParticipant::find($mainParticipantId)->fill([
                     'confirmation_date_time' => Carbon::now(),
                     'confirmation_status' => "success",
                 ])->save();
@@ -4011,6 +4551,134 @@ class RegistrationController extends Controller
                 'bankDetails' => $bankDetails,
                 'finalQuantity' => $countFinalQuantity,
                 'total_amount_string' => ucwords($this->numberToWords($mainParticipant->total_amount)),
+            ];
+
+            return $invoiceData;
+        } else {
+            abort(404, 'The URL is incorrect');
+        }
+    }
+
+    
+
+    public function getInvoiceAwards($eventCategory, $eventId, $registrantId)
+    {
+        if (AwardsMainParticipant::where('id', $registrantId)->where('event_id', $eventId)->exists()) {
+            $event = Event::where('category', $eventCategory)->where('id', $eventId)->first();
+            $invoiceDetails = array();
+            $countFinalQuantity = 0;
+
+            $mainParticipant = AwardsMainParticipant::where('id', $registrantId)->where('event_id', $eventId)->first();
+
+            $addMainParticipant = true;
+            if ($mainParticipant->participant_cancelled) {
+                if ($mainParticipant->participant_refunded || $mainParticipant->participant_replaced) {
+                    $addMainParticipant = false;
+                }
+            }
+
+            if ($mainParticipant->participant_replaced_by_id == null & (!$mainParticipant->participant_refunded)) {
+                $countFinalQuantity++;
+            }
+
+            if ($addMainParticipant) {
+                array_push($invoiceDetails, [
+                    'delegateDescription' => "Awards Submission fee",
+                    'delegateNames' => [
+                        "Category: " . $mainParticipant->category,
+                    ],
+                    'badgeType' => null,
+                    'quantity' => 1,
+                    'totalDiscount' => 0,
+                    'totalNetAmount' =>  $mainParticipant->unit_price,
+                    'promoCodeDiscount' => 0,
+                ]);
+            }
+
+
+            $subParticipants = AwardsAdditionalParticipant::where('main_participant_id', $registrantId)->get();
+            if (!$subParticipants->isEmpty()) {
+                foreach ($subParticipants as $subParticipant) {
+                    if ($subParticipant->participant_replaced_by_id == null & (!$subParticipant->participant_refunded)) {
+                        $countFinalQuantity++;
+                    }
+
+                    $addSubParticipant = true;
+                    if ($subParticipant->participant_cancelled) {
+                        if ($subParticipant->participant_refunded || $subParticipant->participant_replaced) {
+                            $addSubParticipant = false;
+                        }
+                    }
+
+                    if ($addSubParticipant) {
+                        $existingIndex = 0;
+
+                        if (count($invoiceDetails) == 0) {
+                            array_push($invoiceDetails, [
+                                'delegateDescription' => "Awards Submission fee",
+                                'delegateNames' => [
+                                    "Category: " . $mainParticipant->category,
+                                ],
+                                'badgeType' => null,
+                                'quantity' => 1,
+                                'totalDiscount' => 0,
+                                'totalNetAmount' =>  $mainParticipant->unit_price,
+                                'promoCodeDiscount' => 0,
+                            ]);
+                        }
+                    }
+                }
+            }
+
+            $transactionId = AwardsParticipantTransaction::where('participant_id', $mainParticipant->id)->where('participant_type', "main")->value('id');
+
+            $tempYear = Carbon::parse($mainParticipant->registered_date_time)->format('y');
+            $lastDigit = 1000 + intval($transactionId);
+
+            foreach (config('app.eventCategories') as $eventCategoryC => $code) {
+                if ($event->category == $eventCategoryC) {
+                    $getEventcode = $code;
+                }
+            }
+
+            $tempInvoiceNumber = "$event->category" . "$tempYear" . "/" . "$lastDigit";
+            $tempBookReference = "$event->year" . "$getEventcode" . "$lastDigit";
+
+            $bankDetails = config('app.bankDetails.DEFAULT');
+
+            $eventFormattedData = Carbon::parse($event->event_start_date)->format('j F Y');
+            $fullname = $mainParticipant->first_name . ' ' . $mainParticipant->middle_name . ' ' . $mainParticipant->last_name;
+
+            if ($mainParticipant->alternative_company_name == null) {
+                $finalCompanyName = $mainParticipant->company_name;
+            } else {
+                $finalCompanyName = $mainParticipant->alternative_company_name;
+            }
+
+            $invoiceData = [
+                "finalEventStartDate" => Carbon::parse($event->event_start_date)->format('d M Y'),
+                "finalEventEndDate" => Carbon::parse($event->event_end_date)->format('d M Y'),
+                "eventFormattedData" => $eventFormattedData,
+                "companyName" => $finalCompanyName,
+                "companyAddress" => $fullname,
+                "companyCity" => null,
+                "companyCountry" => null,
+                "invoiceDate" => Carbon::parse($mainParticipant->registered_date_time)->format('d/m/Y'),
+                "invoiceNumber" => $tempInvoiceNumber,
+                "bookRefNumber" => $tempBookReference,
+                "paymentStatus" => $mainParticipant->payment_status,
+                "eventName" => $event->name,
+                "eventLocation" => $event->location,
+                "eventVat" => $event->event_vat,
+                'vat_price' => $mainParticipant->vat_price,
+                'net_amount' => $mainParticipant->net_amount,
+                'total_amount' => $mainParticipant->total_amount,
+                'unit_price' => $mainParticipant->unit_price,
+                'invoiceDetails' => $invoiceDetails,
+                'bankDetails' => $bankDetails,
+                'finalQuantity' => $countFinalQuantity,
+                'total_amount_string' => ucwords($this->numberToWords($mainParticipant->total_amount)),
+                "registrationMethod" => $mainParticipant->registration_method,
             ];
 
             return $invoiceData;
@@ -5249,6 +5917,7 @@ class RegistrationController extends Controller
         ];
     }
 
+
     public function rccAwardsRegistrantsExportData($eventCategory, $eventId)
     {
         $finalExcelData = array();
@@ -5540,6 +6209,329 @@ class RegistrationController extends Controller
                         $data['registration_date_time'],
                         $data['paid_date_time'],
                         $data['printed_badge_date'],
+
+                        $data['registration_method'],
+                        $data['transaction_remarks'],
+
+                        $data['participant_cancelled'],
+                        $data['participant_replaced'],
+                        $data['participant_refunded'],
+
+                        $data['participant_replaced_type'],
+                        $data['participant_original_from_id'],
+                        $data['participant_replaced_from_id'],
+                        $data['participant_replaced_by_id'],
+
+                        $data['participant_cancelled_datetime'],
+                        $data['participant_refunded_datetime'],
+                        $data['participant_replaced_datetime'],
+                    )
+                );
+            }
+            fclose($file);
+        };
+
+        return [
+            'callback' => $callback,
+            'headers' => $headers,
+        ];
+    }
+
+    
+
+    public function awardsRegistrantsExportData($eventCategory, $eventId)
+    {
+        $finalExcelData = array();
+        $event = Event::where('id', $eventId)->where('category', $eventCategory)->first();
+
+        $mainParticipants = AwardsMainParticipant::where('event_id', $eventId)->get();
+        if (!$mainParticipants->isEmpty()) {
+            foreach ($mainParticipants as $mainParticipant) {
+                $mainTransactionId = AwardsParticipantTransaction::where('participant_id', $mainParticipant->id)->where('participant_type', "main")->value('id');
+
+                $tempYear = Carbon::parse($mainParticipant->registered_date_time)->format('y');
+                $lastDigit = 1000 + intval($mainTransactionId);
+
+                foreach (config('app.eventCategories') as $eventCategoryC => $code) {
+                    if ($event->category == $eventCategoryC) {
+                        $getEventcode = $code;
+                    }
+                }
+
+                $tempInvoiceNumber = "$event->category" . "$tempYear" . "/" . "$lastDigit";
+                $tempBookReference = "$event->year" . "$getEventcode" . "$lastDigit";
+
+                $discountPrice = 0.0;
+                $netAMount = $mainParticipant->unit_price;
+
+                $entryFormId = AwardsParticipantDocument::where('event_id', $eventId)->where('participant_id', $mainParticipant->id)->where('document_type', 'entryForm')->value('id');
+                $getSupportingDocumentFiles = AwardsParticipantDocument::where('event_id', $eventId)->where('participant_id', $mainParticipant->id)->where('document_type', 'supportingDocument')->get();
+
+                $supportingDocumentLinks = [];
+
+                if ($getSupportingDocumentFiles->isNotEmpty()) {
+                    foreach ($getSupportingDocumentFiles as $supportingDocument) {
+                        $supportingDocumentLink = env('APP_URL') . "/" . $event->category . "/" . $event->id . '/download-file/' . $supportingDocument->id;
+                        $supportingDocumentLinks[] = $supportingDocumentLink;
+                    }
+                }
+
+                $entryFormDownloadLink = env('APP_URL') . "/" . $event->category . "/" . $event->id . '/download-file/' . $entryFormId;
+
+                $vatPrice = $netAMount * ($event->event_vat / 100);
+
+                array_push($finalExcelData, [
+                    'transaction_id' => $tempBookReference,
+                    'id' => $mainParticipant->id,
+                    'participantType' => 'Main',
+                    'event' => $eventCategory,
+                    'pass_type' => $mainParticipant->pass_type,
+                    'rate_type' => $mainParticipant->rate_type,
+
+                    'category' => $mainParticipant->category,
+                    'sub_category' => ($mainParticipant->sub_category == null) ? 'N/A' : $mainParticipant->sub_category,
+                    'company_name' => $mainParticipant->company_name,
+
+                    'salutation' => $mainParticipant->salutation,
+                    'first_name' => $mainParticipant->first_name,
+                    'middle_name' => $mainParticipant->middle_name,
+                    'last_name' => $mainParticipant->last_name,
+                    'email_address' => $mainParticipant->email_address,
+                    'mobile_number' => $mainParticipant->mobile_number,
+                    'address' => $mainParticipant->address,
+                    'country' => $mainParticipant->country,
+                    'city' => $mainParticipant->city,
+                    'job_title' => $mainParticipant->job_title,
+                    'nationality' => $mainParticipant->nationality,
+
+                    'entryFormDownloadLink' => $entryFormDownloadLink,
+                    'supportingDocumentLinks' => $supportingDocumentLinks,
+
+                    'unit_price' => $mainParticipant->unit_price,
+                    'discount_price' => $discountPrice,
+                    'net_amount' => $netAMount,
+                    'vat_price' => $vatPrice,
+
+                    // PLEASE CONTINUE HERE
+                    'total_amount' => $mainParticipant->total_amount,
+                    'payment_status' => $mainParticipant->delegate_refunded ? 'refunded' : $mainParticipant->payment_status,
+                    'registration_status' => $mainParticipant->delegate_cancelled ? 'cancelled' : $mainParticipant->registration_status,
+                    'mode_of_payment' => $mainParticipant->mode_of_payment,
+                    'invoice_number' => $tempInvoiceNumber,
+                    'reference_number' => $tempBookReference,
+                    'registration_date_time' => $mainParticipant->registered_date_time,
+                    'paid_date_time' => $mainParticipant->paid_date_time,
+
+                    // NEW june 6 2023
+                    'registration_method' => $mainParticipant->registration_method,
+                    'transaction_remarks' => $mainParticipant->transaction_remarks,
+
+                    'participant_cancelled' => $mainParticipant->participant_cancelled,
+                    'participant_replaced' => $mainParticipant->participant_replaced,
+                    'participant_refunded' => $mainParticipant->participant_refunded,
+
+                    'participant_replaced_type' => null,
+                    'participant_original_from_id' => null,
+                    'participant_replaced_from_id' => null,
+                    'participant_replaced_by_id' => $mainParticipant->participant_replaced_by_id,
+
+                    'participant_cancelled_datetime' => $mainParticipant->participant_cancelled_datetime,
+                    'participant_refunded_datetime' => $mainParticipant->participant_refunded_datetime,
+                    'participant_replaced_datetime' => $mainParticipant->participant_replaced_datetime,
+                ]);
+
+                $subParticipants = AwardsAdditionalParticipant::where('main_participant_id', $mainParticipant->id)->get();
+
+                if (!$subParticipants->isEmpty()) {
+                    foreach ($subParticipants as $subParticipant) {
+                        $subTransactionId = AwardsParticipantTransaction::where('participant_id', $subParticipant->id)->where('participant_type', "sub")->value('id');
+
+                        $discountPrice = 0.0;
+                        $netAMount = $mainParticipant->unit_price;
+
+                        $lastDigit = 1000 + intval($subTransactionId);
+                        $tempBookReferenceSub = "$event->year" . "$getEventcode" . "$lastDigit";
+
+                        array_push($finalExcelData, [
+                            'transaction_id' => $tempBookReferenceSub,
+                            'id' => $subParticipant->id,
+                            'participantType' => 'Sub',
+                            'event' => $eventCategory,
+                            'pass_type' => $mainParticipant->pass_type,
+                            'rate_type' => $mainParticipant->rate_type,
+
+                            'category' => $mainParticipant->category,
+                            'sub_category' => ($mainParticipant->sub_category == null) ? 'N/A' : $mainParticipant->sub_category,
+                            'company_name' => $mainParticipant->company_name,
+
+                            'salutation' => $subParticipant->salutation,
+                            'first_name' => $subParticipant->first_name,
+                            'middle_name' => $subParticipant->middle_name,
+                            'last_name' => $subParticipant->last_name,
+                            'email_address' => $subParticipant->email_address,
+                            'mobile_number' => $subParticipant->mobile_number,
+                            'address' => $subParticipant->address,
+                            'country' => $subParticipant->country,
+                            'city' => $subParticipant->city,
+                            'job_title' => $subParticipant->job_title,
+                            'nationality' => $subParticipant->nationality,
+
+                            'entryFormDownloadLink' => $entryFormDownloadLink,
+                            'supportingDocumentLinks' => $supportingDocumentLinks,
+
+                            'unit_price' => $mainParticipant->unit_price,
+                            'discount_price' => $discountPrice,
+                            'net_amount' => $netAMount,
+                            'vat_price' => $vatPrice,
+
+                            // PLEASE CONTINUE HERE
+                            'total_amount' => $mainParticipant->total_amount,
+                            'payment_status' => $subParticipant->delegate_refunded ? 'refunded' : $mainParticipant->payment_status,
+                            'registration_status' => $subParticipant->delegate_cancelled ? 'cancelled' : $mainParticipant->registration_status,
+                            'mode_of_payment' => $mainParticipant->mode_of_payment,
+                            'invoice_number' => $tempInvoiceNumber,
+                            'reference_number' => $tempBookReference,
+                            'registration_date_time' => $mainParticipant->registered_date_time,
+                            'paid_date_time' => $mainParticipant->paid_date_time,
+
+                            // NEW june 6 2023
+                            'registration_method' => $mainParticipant->registration_method,
+                            'transaction_remarks' => $mainParticipant->transaction_remarks,
+
+                            'participant_cancelled' => $subParticipant->participant_cancelled,
+                            'participant_replaced' => $subParticipant->participant_replaced,
+                            'participant_refunded' => $subParticipant->participant_refunded,
+
+                            'participant_replaced_type' => $subParticipant->participant_replaced_type,
+                            'participant_original_from_id' => $subParticipant->participant_original_from_id,
+                            'participant_replaced_from_id' => $subParticipant->participant_replaced_from_id,
+                            'participant_replaced_by_id' => $subParticipant->participant_replaced_by_id,
+
+                            'participant_cancelled_datetime' => $subParticipant->participant_cancelled_datetime,
+                            'participant_refunded_datetime' => $subParticipant->participant_refunded_datetime,
+                            'participant_replaced_datetime' => $subParticipant->participant_replaced_datetime,
+                        ]);
+                    }
+                }
+            }
+        }
+
+        $currentDate = Carbon::now()->format('Y-m-d');
+        $fileName = $eventCategory . ' ' . $event->year . ' Transactions ' . '[' . $currentDate . '].csv';
+        $headers = array(
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=$fileName",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        );
+
+        $columns = array(
+            'Transaction Id',
+            'ID',
+            'Participant Type',
+            'Event',
+            'Pass Type',
+            'Rate Type',
+
+            'Category',
+            'Company Name',
+
+            'Salutation',
+            'First Name',
+            'Middle Name',
+            'Last Name',
+            'Email Address',
+            'Mobile Number',
+            'Address',
+            'Country',
+            'City',
+            'Nationality',
+            'Job Title',
+
+            'Entry Form',
+            'Supporting Document 1',
+            'Supporting Document 2',
+            'Supporting Document 3',
+            'Supporting Document 4',
+
+            'Unit Price',
+            'Discount Price',
+            'Vat Price',
+            'Total Amount',
+            'Payment Status',
+            'Registration Status',
+            'Payment method',
+            'Invoice Number',
+            'Reference Number',
+            'Registered Date & Time',
+            'Paid Date & Time',
+
+            'Registration Method',
+            'Transaction Remarks',
+
+            'Participant Cancelled',
+            'Participant Replaced',
+            'Participant Refunded',
+
+            'Participant Replaced Type',
+            'Participant Original From Id',
+            'Participant Replaced From Id',
+            'Participant Replaced By Id',
+
+            'Participant Cancelled Date & Time',
+            'Participant Refunded Date & Time',
+            'Participant Replaced Date & Time',
+
+        );
+
+        $callback = function () use ($finalExcelData, $columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+
+            foreach ($finalExcelData as $data) {
+                fputcsv(
+                    $file,
+                    array(
+                        $data['transaction_id'],
+                        $data['id'],
+                        $data['participantType'],
+                        $data['event'],
+                        $data['pass_type'],
+                        $data['rate_type'],
+
+                        $data['category'],
+                        $data['company_name'],
+
+                        $data['salutation'],
+                        $data['first_name'],
+                        $data['middle_name'],
+                        $data['last_name'],
+                        $data['email_address'],
+                        $data['mobile_number'],
+                        $data['address'],
+                        $data['country'],
+                        $data['city'],
+                        $data['nationality'],
+                        $data['job_title'],
+
+                        $data['entryFormDownloadLink'],
+                        $data['supportingDocumentLinks'][0] ?? 'N/A',
+                        $data['supportingDocumentLinks'][1] ?? 'N/A',
+                        $data['supportingDocumentLinks'][2] ?? 'N/A',
+                        $data['supportingDocumentLinks'][3] ?? 'N/A',
+
+                        $data['unit_price'],
+                        $data['discount_price'],
+                        $data['vat_price'],
+                        $data['net_amount'],
+                        $data['payment_status'],
+                        $data['registration_status'],
+                        $data['mode_of_payment'],
+                        $data['invoice_number'],
+                        $data['reference_number'],
+                        $data['registration_date_time'],
+                        $data['paid_date_time'],
 
                         $data['registration_method'],
                         $data['transaction_remarks'],

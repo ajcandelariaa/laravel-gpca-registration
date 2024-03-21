@@ -35,7 +35,7 @@ class RegistrationCardDeclined extends Mailable
      */
     public function envelope()
     {
-        if ($this->details['eventCategory'] == "RCCA") {
+        if ($this->details['eventCategory'] == "RCCA" || $this->details['eventCategory'] == "SCEA") {
             $subject = 'Declined payment for your entry submission on the '. $this->details['eventName'];
         } else {
             $subject = 'Your payment registration for the '. $this->details['eventName'].' has been declined';

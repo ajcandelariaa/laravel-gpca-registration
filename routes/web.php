@@ -94,6 +94,7 @@ Route::get('/{eventCategory}/{eventId}/view-invoice/{registrantId}', [Registrati
 Route::get('/{eventCategory}/{eventId}/print-badge/{delegateType}/{delegateId}', [DelegateController::class, 'delegateDetailPublicPrintBadge'])->name('public-print-badge');
 
 Route::get('/download-file/{documentId}', [RegistrationController::class, 'downloadFile'])->name('download-file');
+Route::get('/{eventCategory}/{eventId}/download-file/{documentId}', [RegistrationController::class, 'eventDownloadFile'])->name('event-download-file');
 
 // Route::get('/fast-track', function (){
 //     return view('home.fast_track');

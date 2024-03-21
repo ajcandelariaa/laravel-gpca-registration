@@ -44,6 +44,12 @@ class RegistrationUnpaid extends Mailable
             } else {
                 $subject = 'Outstanding payment for your ' . $this->details['eventName'] . ' registration';
             }
+        } else if ($this->details['eventYear'] == '2024') {
+            if ($this->details['eventCategory'] == "SCEA") {
+                $subject = 'Outstanding payment for your entry submission on the ' . $this->details['eventName'];
+            } else {
+                $subject = 'Outstanding payment for your ' . $this->details['eventName'] . ' registration';
+            }
         } else {
             $subject = 'Outstanding payment for your ' . $this->details['eventName'] . ' registration';
         }
@@ -131,6 +137,10 @@ class RegistrationUnpaid extends Mailable
             } else if ($this->details['eventCategory'] == "SCC") {
                 return new Content(
                     markdown: 'emails.2024.scc.registration-unpaid',
+                );
+            } else if ($this->details['eventCategory'] == "SCEA") {
+                return new Content(
+                    markdown: 'emails.2024.scea.registration-unpaid',
                 );
             } else {
                 return new Content(

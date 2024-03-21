@@ -477,6 +477,7 @@ return [
         'AF' => "06", 
         'GLF' => "07", 
 
+        'SCEA' => "11",
         'RCCA' => "51",
         'RCCW1' => "52",
         'AFS' => "61",
@@ -485,6 +486,7 @@ return [
         'PSW' => "21",
         'DAW' => "22",
         'DFCLW1' => "23",
+
     ],
 
     'bankDetails' => [
@@ -502,6 +504,7 @@ return [
         'default' => ['analee@gpca.org.ae', 'jovelyn@gpca.org.ae', 'forumregistration@gpca.org.ae'],
         'test' => ['aj@gpca.org.ae'],
         'daw' => ['aastha@gpca.org.ae', 'analee@gpca.org.ae', 'jovelyn@gpca.org.ae', 'forumregistration@gpca.org.ae'],
+        'scea' => ['analee@gpca.org.ae, nasim@gpca.org.ae, zaman@gpca.org.ae'],
         'error' => ['forumregistration@gpca.org.ae'],
     ],
 
@@ -509,6 +512,7 @@ return [
     //     'default' => ['aj@gpca.org.ae'],
     //     'test' => ['aj@gpca.org.ae'],
     //     'daw' => ['aj@gpca.org.ae'],
+    //     'scea' => ['aj@gpca.org.ae'],
     //     'error' => ['aj@gpca.org.ae'],
     // ],
 
@@ -527,5 +531,12 @@ return [
             'Health and Safety',
         ],
         'Responsible Partner' => null,
+    ],
+    
+    'sccAwardsCategories' => [
+        'Supply Chain Innovation Award',
+        'Best LSP of the Year',
+        'Excellence in Sustainability Award',
+        'Women in Supply Chain Award',
     ],
 ];

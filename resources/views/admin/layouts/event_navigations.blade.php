@@ -14,7 +14,7 @@
                     class="{{ request()->is('admin/event/*/*/detail*') ? 'underline' : 'hover:underline' }} text-registrationPrimaryColor">Event
                     Detail</a>
 
-                @if ($eventCategory != 'AFS' && $eventCategory != 'RCCA')
+                @if ($eventCategory != 'AFS' && $eventCategory != 'RCCA' && $eventCategory != 'SCEA')
                     <a href="{{ route('admin.event.registration-type.view', ['eventCategory' => $eventCategory, 'eventId' => $eventId]) }}"
                         class="{{ request()->is('admin/event/*/*/registration-type*') ? 'underline' : 'hover:underline' }} text-registrationPrimaryColor">Registration
                         Type</a>
@@ -37,7 +37,7 @@
                 <a href="{{ route('admin.event.registrants.view', ['eventCategory' => $eventCategory, 'eventId' => $eventId]) }}"
                     class="{{ request()->is('admin/event/*/*/registrant*') ? 'underline' : 'hover:underline' }} text-registrationPrimaryColor">Transactions</a>
 
-                @if ($eventCategory != 'AFS' && $eventCategory != 'RCCA')
+                @if ($eventCategory != 'AFS' && $eventCategory != 'RCCA' && $eventCategory != 'SCEA')
                     <a href="{{ route('admin.event.delegates.view', ['eventCategory' => $eventCategory, 'eventId' => $eventId]) }}"
                         class="{{ request()->is('admin/event/*/*/delegate*') ? 'underline' : 'hover:underline' }} text-registrationPrimaryColor">
                         @if ($eventCategory == 'AFV')
