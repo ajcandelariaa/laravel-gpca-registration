@@ -1396,11 +1396,11 @@ class EventController extends Controller
                                 ]);
                             }
                         } else {
-                            if ($additionalParticipants->participant_refunded) {
+                            if ($additionalParticipant->participant_refunded) {
                                 $totalRefunded++;
                             }
 
-                            if ($additionalParticipants->participant_cancelled) {
+                            if ($additionalParticipant->participant_cancelled) {
                                 $totalCancelled++;
                             }
                         }
