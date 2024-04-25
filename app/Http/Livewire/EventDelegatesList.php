@@ -25,6 +25,8 @@ class EventDelegatesList extends Component
 
     public $name, $company, $jobTitle, $registrationType, $badgeViewFFText, $badgeViewFBText, $badgeViewFFBGColor, $badgeViewFBBGColor, $badgeViewFFTextColor, $badgeViewFBTextColor;
 
+    public $perPage, $currentPage, $startIndex, $showAll;
+
     protected $listeners = ['printBadgeConfirmed' => 'printBadge', 'broadcastEmailConfirmed' => 'sendBroadcastEmail'];
 
     public function mount($eventId, $eventCategory)
@@ -43,7 +45,7 @@ class EventDelegatesList extends Component
             foreach ($mainDelegates as $mainDelegate) {
                 $companyName = "";
 
-                if($mainDelegate->alternative_company_name != null){
+                if ($mainDelegate->alternative_company_name != null) {
                     $companyName = $mainDelegate->alternative_company_name;
                 } else {
                     $companyName = $mainDelegate->company_name;
@@ -152,6 +154,11 @@ class EventDelegatesList extends Component
             }
         }
         $this->finalListsOfDelegates = $this->finalListsOfDelegatesTemp;
+        $this->currentPage = 1;
+        $this->startIndex = 0;
+        $this->perPage = 20;
+        $this->showAll = false;
+        $this->paginateData();
     }
 
     public function render()
@@ -159,11 +166,61 @@ class EventDelegatesList extends Component
         return view('livewire.admin.events.delegates.event-delegates-list');
     }
 
-    public function search(){
+    public function toggleShowAll()
+    {
+        $this->showAll = !$this->showAll;
+        $this->searchTerm = null;
+        $this->currentPage = 1;
+        $this->startIndex = 0;
+        $this->search();
+    }
+
+    public function totalPages()
+    {
+        return ceil(count($this->finalListsOfDelegatesTemp) / $this->perPage);
+    }
+
+    public function gotoPage($page)
+    {
+        if ($page >= 1 && $page <= $this->totalPages()) {
+            $this->currentPage = $page;
+            $this->paginateData();
+        }
+    }
+
+    public function paginateData()
+    {
+        $this->startIndex = ($this->currentPage - 1) * $this->perPage;
+        $pagedData = array_slice($this->finalListsOfDelegatesTemp, $this->startIndex, $this->perPage);
+        $this->finalListsOfDelegates = $pagedData;
+    }
+
+    public function previousPage()
+    {
+        if ($this->currentPage > 1) {
+            $this->currentPage--;
+            $this->paginateData();
+        }
+    }
+
+    public function nextPage()
+    {
+        if ($this->currentPage * $this->perPage < count($this->finalListsOfDelegatesTemp)) {
+            $this->currentPage++;
+            $this->paginateData();
+        }
+    }
+
+    public function search()
+    {
         if (empty($this->searchTerm)) {
-            $this->finalListsOfDelegates = $this->finalListsOfDelegatesTemp;
+            if ($this->showAll) {
+                $this->finalListsOfDelegates = $this->finalListsOfDelegatesTemp;
+            } else {
+                $this->paginateData();
+            }
         } else {
-            $this->finalListsOfDelegates = collect($this->finalListsOfDelegatesTemp)
+            $filteredData = collect($this->finalListsOfDelegatesTemp)
                 ->filter(function ($item) {
                     return str_contains(strtolower($item['delegateCompany']), strtolower($this->searchTerm)) ||
                         str_contains(strtolower($item['delegateSalutation']), strtolower($this->searchTerm)) ||
@@ -177,6 +234,14 @@ class EventDelegatesList extends Component
                         str_contains(strtolower($item['delegateBadgeType']), strtolower($this->searchTerm));
                 })
                 ->all();
+
+            if ($this->showAll) {
+                $this->finalListsOfDelegates = $filteredData;
+            } else {
+                $startIndex = ($this->currentPage - 1) * $this->perPage;
+                $endIndex = min($startIndex + $this->perPage, count($filteredData));
+                $this->finalListsOfDelegates = array_slice($filteredData, $startIndex, $endIndex - $startIndex);
+            }
         }
     }
 
@@ -267,15 +332,17 @@ class EventDelegatesList extends Component
     }
 
 
-    public function sendBroadcastEmailShow(){
+    public function sendBroadcastEmailShow()
+    {
         $this->dispatchBrowserEvent('swal:broadcast-email-confirmation', [
             'type' => 'warning',
             'message' => 'Are you sure?',
             'text' => "",
         ]);
-    }    
+    }
 
-    public function sendBroadcastEmail(){
+    public function sendBroadcastEmail()
+    {
         $this->dispatchBrowserEvent('swal:broadcast-email-success', [
             'type' => 'success',
             'message' => 'Broadcast Email Notification Sent!',

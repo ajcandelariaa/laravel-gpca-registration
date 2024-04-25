@@ -7,6 +7,38 @@
             <div>
                 {{-- <button type="button" wire:click="sendBroadcastEmailShow" wire:key="sendBroadcastEmailShow"
                     class="bg-sky-600 hover:bg-sky-700 text-white py-2 px-5 rounded-md text-lg text-center">Send Broadcast Email Notification</button> --}}
+
+                @if (!empty($finalListsOfDelegates))
+                    <div class="mt-4">
+                        @if (!$showAll)
+                            @if ($currentPage > 1)
+                                <button wire:click="previousPage"
+                                    class="mr-2 bg-gray-200 text-gray-700 px-2 py-1 rounded-md text-sm">Previous</button>
+                            @endif
+
+                            <div class="inline-flex">
+                                @for ($i = max(1, $currentPage - 2); $i <= min($currentPage + 2, $this->totalPages()); $i++)
+                                    @if ($currentPage == $i)
+                                        <button wire:click="gotoPage({{ $i }})"
+                                            class="bg-registrationPrimaryColor text-white ml-1 px-2 py-1 rounded-md text-sm">{{ $i }}</button>
+                                    @else
+                                        <button wire:click="gotoPage({{ $i }})"
+                                            class="bg-gray-200 text-gray-700 ml-1 px-2 py-1 rounded-md text-sm">{{ $i }}</button>
+                                    @endif
+                                @endfor
+                            </div>
+
+                            @if ($currentPage < $this->totalPages())
+                                <button wire:click="nextPage"
+                                    class="ml-2 bg-gray-200 text-gray-700 px-2 py-1 rounded-md text-sm">Next</button>
+                            @endif
+                        @endif
+                        <button wire:click="toggleShowAll"
+                            class="ml-2 bg-gray-200 text-gray-700 px-2 py-1 rounded-md text-sm">
+                            {{ $showAll ? 'Paginate' : 'Show All' }}
+                        </button>
+                    </div>
+                @endif
             </div>
             <div class="flex items-center gap-2">
                 <div class="relative">
@@ -25,7 +57,8 @@
         </div>
 
         <div class="shadow-lg my-5 bg-white rounded-md">
-            <h1 class="text-center text-2xl bg-registrationPrimaryColor text-white py-4">Confirmed Delegates ({{ count($finalListsOfDelegates) }})</h1>
+            <h1 class="text-center text-2xl bg-registrationPrimaryColor text-white py-4">Confirmed Delegates
+                ({{ count($finalListsOfDelegatesTemp) }})</h1>
 
             <div class="grid grid-cols-12 gap-5 p-4 text-center items-center bg-blue-600 text-white ">
                 <div class="col-span-1 break-words">No.</div>
@@ -49,7 +82,7 @@
                 @foreach ($finalListsOfDelegates as $delegateIndex => $finalListsOfDelegate)
                     <div
                         class="grid grid-cols-12 gap-5 py-2 px-4 mb-1 text-center items-center  {{ $delegateIndex % 2 == 0 ? 'bg-registrationInputFieldsBGColor' : 'bg-registrationCardBGColor' }}">
-                        <div class="col-span-1 break-words text-sm">{{ $delegateIndex + 1 }}</div>
+                        <div class="col-span-1 break-words text-sm">{{ $startIndex + $delegateIndex + 1 }}</div>
 
                         <div class="col-span-1 break-words text-sm">
                             <a href="{{ route('admin.event.delegates.detail.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'delegateType' => $finalListsOfDelegate['delegateType'], 'delegateId' => $finalListsOfDelegate['delegateId']]) }}"
@@ -127,11 +160,40 @@
                     </div>
                 @endforeach
 
-
                 @if ($badgeView)
                     @include('livewire.admin.events.delegates.view_badge_modal')
                 @endif
             @endif
         </div>
+        @if (!empty($finalListsOfDelegates))
+            <div class="mt-4">
+                @if (!$showAll)
+                    @if ($currentPage > 1)
+                        <button wire:click="previousPage"
+                            class="mr-2 bg-gray-200 text-gray-700 px-2 py-1 rounded-md text-sm">Previous</button>
+                    @endif
+
+                    <div class="inline-flex">
+                        @for ($i = max(1, $currentPage - 2); $i <= min($currentPage + 2, $this->totalPages()); $i++)
+                            @if ($currentPage == $i)
+                                <button wire:click="gotoPage({{ $i }})"
+                                    class="bg-registrationPrimaryColor text-white ml-1 px-2 py-1 rounded-md text-sm">{{ $i }}</button>
+                            @else
+                                <button wire:click="gotoPage({{ $i }})"
+                                    class="bg-gray-200 text-gray-700 ml-1 px-2 py-1 rounded-md text-sm">{{ $i }}</button>
+                            @endif
+                        @endfor
+                    </div>
+
+                    @if ($currentPage < $this->totalPages())
+                        <button wire:click="nextPage"
+                            class="ml-2 bg-gray-200 text-gray-700 px-2 py-1 rounded-md text-sm">Next</button>
+                    @endif
+                @endif
+                <button wire:click="toggleShowAll" class="ml-2 bg-gray-200 text-gray-700 px-2 py-1 rounded-md text-sm">
+                    {{ $showAll ? 'Paginate' : 'Show All' }}
+                </button>
+            </div>
+        @endif
     </div>
 </div>
