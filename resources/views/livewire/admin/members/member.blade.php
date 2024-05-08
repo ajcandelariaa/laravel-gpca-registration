@@ -16,6 +16,9 @@
                 <button type="button" wire:click="openImportModal" wire:key="openImportModal"
                     class="bg-sky-600 hover:bg-sky-700 text-white py-2 px-5 rounded-md text-lg text-center">Import
                     Members</button>
+                <button type="button" wire:click="deleteAllMembersClicked" wire:key="deleteAllMembersClicked"
+                    class="bg-red-600 hover:bg-red-700 text-white py-2 px-5 rounded-md text-lg text-center">Delete
+                    Members</button>
             </div>
             <form>
                 <div class="relative">
@@ -51,9 +54,9 @@
                     class="grid grid-cols-12 gap-5 py-2 px-4 mb-1 items-center text-center {{ $count % 2 == 0 ? 'bg-registrationInputFieldsBGColor' : 'bg-registrationCardBGColor' }}">
                     <div class="col-span-1 break-words">{{ $count }}</div>
                     <div class="col-span-1 break-words">
-                        @if ($member->type == "full")
+                        @if ($member->type == 'full')
                             Full
-                        @else 
+                        @else
                             Associate
                         @endif
                     </div>
@@ -100,7 +103,7 @@
             @endforeach
         @endif
     </div>
-    
+
     @if ($showImportModal)
         @include('livewire.admin.members.import_member_form')
     @endif

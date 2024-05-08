@@ -23,13 +23,15 @@ class Member extends Component
 
     public $csvFileError;
 
-    protected $listeners = ['deleteMemberConfirmed' => 'deleteMember', 'importMemberConfirmed' => 'submitImportMember'];
+    protected $listeners = ['deleteMemberConfirmed' => 'deleteMember', 'importMemberConfirmed' => 'submitImportMember', 'deleteAllMembersConfirmed' => 'deleteAllMembers'];
 
     public function render()
     {
         $this->companySectors = config('app.companySectors');
         if (empty($this->searchTerm)) {
-            $this->members = Members::orderBy('created_at', 'ASC')->get();
+            $fullMembers = Members::orderBy('name', 'ASC')->where('type', 'full')->get();
+            $associateMembers = Members::orderBy('name', 'ASC')->where('type', 'associate')->get();
+            $this->members = $fullMembers->merge($associateMembers);
         } else {
             $this->members = Members::where('name', 'like', '%' . $this->searchTerm . '%')
                 ->orWhere('sector', 'like', '%' . $this->searchTerm . '%')
@@ -182,22 +184,33 @@ class Member extends Component
     public function importMemberConfirmation()
     {
         $this->validate([
-            'csvFile' => 'required',
+            'csvFile' => 'required|mimes:csv,txt',
         ]);
 
-        $file = fopen($this->csvFile->getRealPath(), "r");
-        while (($row = fgetcsv($file, 1000, ",")) !== FALSE) {
-            // $name = mb_convert_encoding($row[0], 'UTF-8', 'ISO-8859-1');
-            // $sector = mb_convert_encoding($row[1], 'UTF-8', 'ISO-8859-1');
-            $this->insertedData[] = $row;
+        $file = fopen($this->csvFile->getRealPath(), "r", 'UTF-8');
+        $rows = [];
+
+        $rowCounter = 0;
+        while (($row = fgetcsv($file, 0, ",")) !== FALSE) {
+            if ($rowCounter > 0) {
+                $tempRow = [];
+                foreach ($row as $col) {
+                    $tempRow[] = trim($col);
+                }
+                $row = $tempRow;
+            }
+
+            $rowCounter++;
+            $rows[] = $row;
         }
         fclose($file);
+        // dd($rows);
 
         $checkIfCorrectFormat = true;
-        for ($i = 0; $i < count($this->insertedData); $i++) {
+        for ($i = 0; $i < count($rows); $i++) {
             if ($i == 0) {
-                if (count($this->insertedData[$i]) == 2) {
-                    if($this->insertedData[$i][0] != "Company Name" || $this->insertedData[$i][1] != "Company Sectors"){
+                if (count($rows[$i]) == 2) {
+                    if ($rows[$i][0] != "Company Name" || $rows[$i][1] != "Type") {
                         $checkIfCorrectFormat = false;
                     }
                 } else {
@@ -207,15 +220,15 @@ class Member extends Component
             }
         }
 
-        if($checkIfCorrectFormat){
+        if ($checkIfCorrectFormat) {
+            $this->csvFileError = null;
+            $this->insertedData = $rows;
             $this->dispatchBrowserEvent('swal:import-member-confirmation', [
                 'type' => 'warning',
                 'message' => 'Are you sure?',
                 'text' => "",
             ]);
-            $this->csvFileError = null;
         } else {
-            // PUT ERROR
             $this->csvFileError = "File is not valid, please make sure you have the correct format.";
         }
     }
@@ -228,7 +241,7 @@ class Member extends Component
             } else {
                 Members::create([
                     'name' => $this->insertedData[$i][0],
-                    'sector' => ($this->insertedData[$i][1] == null) ? null : $this->insertedData[$i][1],
+                    'type' => $this->insertedData[$i][1],
                     'active' => true,
                 ]);
             }
@@ -240,6 +253,26 @@ class Member extends Component
         $this->dispatchBrowserEvent('swal:import-member', [
             'type' => 'success',
             'message' => 'Members Imported Successfully!',
+            'text' => ''
+        ]);
+    }
+
+    public function deleteAllMembersClicked()
+    {
+        $this->dispatchBrowserEvent('swal:delete-all-members-confirmation', [
+            'type' => 'warning',
+            'message' => 'Are you sure?',
+            'text' => "",
+        ]);
+    }
+
+    public function deleteAllMembers()
+    {
+        Members::truncate();
+
+        $this->dispatchBrowserEvent('swal:delete-all-members', [
+            'type' => 'success',
+            'message' => 'Members Deleted Successfully!',
             'text' => ''
         ]);
     }

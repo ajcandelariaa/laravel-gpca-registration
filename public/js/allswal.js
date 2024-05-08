@@ -565,6 +565,43 @@ window.addEventListener("swal:update-member", (event) => {
 });
 
 // MEMBER DELETE CONFIRMATION
+window.addEventListener("swal:delete-all-members-confirmation", (event) => {
+    swal({
+        title: event.detail.message,
+        text: event.detail.text,
+        icon: event.detail.type,
+        buttons: {
+            confirm: {
+                text: "Yes, delete it!",
+                value: true,
+                visible: true,
+                closeModal: true,
+            },
+            cancel: {
+                text: "Cancel",
+                value: null,
+                visible: true,
+                closeModal: true,
+            },
+        }
+      }).then((result) => {
+        console.log(result);
+        if (result) {
+            Livewire.emit('deleteAllMembersConfirmed')
+        }
+      });
+});
+
+// MEMBER DELETED
+window.addEventListener("swal:delete-all-members", (event) => {
+    swal({
+        title: event.detail.message,
+        text: event.detail.text,
+        icon: event.detail.type,
+    });
+});
+
+// MEMBER DELETE CONFIRMATION
 window.addEventListener("swal:delete-member-confirmation", (event) => {
     swal({
         title: event.detail.message,
