@@ -104,8 +104,8 @@
                 mirror: false,
                 captureImage: false,
                 backgroundScan: false,
-                refractoryPeriod: 3000,
-                scanPeriod: 1,
+                refractoryPeriod: 5000,
+                scanPeriod: 3,
             });
 
             scanner.addListener('scan', function(content) {
@@ -122,15 +122,26 @@
 
             Instascan.Camera.getCameras().then(function(cameras) {
                 if (cameras.length > 0) {
+                    var hasBackCamera = false;
+                    var backCameraIndex;
                     for (var i = 0; i < cameras.length; i++) {
                         // var message = "Index " + i + ": " + cameras[i].id + ": " + cameras[i].name;
                         // alert(message);
                         if (cameras[i].name === "Back Camera") {
-                            scanner.start(cameras[i]).then(function() {
-                                scannAnimation.classList.remove('hidden');
-                            });
+                            hasBackCamera = true;
+                            backCameraIndex = i;
                             break;
                         }
+                    }
+
+                    if (hasBackCamera) {
+                        scanner.start(cameras[backCameraIndex]).then(function() {
+                            scannAnimation.classList.remove('hidden');
+                        });
+                    } else {
+                        scanner.start(cameras[0]).then(function() {
+                            scannAnimation.classList.remove('hidden');
+                        });
                     }
 
                 } else {
