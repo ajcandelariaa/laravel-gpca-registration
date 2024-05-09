@@ -103,7 +103,7 @@
                 captureImage: false,
                 backgroundScan: false,
                 refractoryPeriod: 3000,
-                scanPeriod: 5,
+                scanPeriod: 1,
             });
 
             scanner.addListener('scan', function(content) {
