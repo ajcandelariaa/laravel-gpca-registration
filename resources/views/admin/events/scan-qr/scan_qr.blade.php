@@ -122,6 +122,7 @@
                 if (cameras.length > 0) {
                     for(var i=0; i<cameras.length++; i++){
                         var message = "Index ". i . ":" . cameras[i].id . ":" . cameras[i].name
+                        alert(message);
                     }
                     scanner.start(cameras[cameras.length-1]).then(function() {
                         scannAnimation.classList.remove('hidden');
