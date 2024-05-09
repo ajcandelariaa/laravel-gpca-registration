@@ -122,28 +122,31 @@
 
             Instascan.Camera.getCameras().then(function(cameras) {
                 if (cameras.length > 0) {
-                    var hasBackCamera = false;
-                    var backCameraIndex;
-                    for (var i = 0; i < cameras.length; i++) {
-                        // var message = "Index " + i + ": " + cameras[i].id + ": " + cameras[i].name;
-                        // alert(message);
-                        if (cameras[i].name === "Back Camera") {
-                            hasBackCamera = true;
-                            backCameraIndex = i;
-                            break;
-                        }
-                    }
+                    // var hasBackCamera = false;
+                    // var backCameraIndex;
+                    // for (var i = 0; i < cameras.length; i++) {
+                    //     // var message = "Index " + i + ": " + cameras[i].id + ": " + cameras[i].name;
+                    //     // alert(message);
+                    //     if (cameras[i].name === "Back Camera") {
+                    //         hasBackCamera = true;
+                    //         backCameraIndex = i;
+                    //         break;
+                    //     }
+                    // }
 
-                    if (hasBackCamera) {
-                        scanner.start(cameras[backCameraIndex]).then(function() {
+                    // if (hasBackCamera) {
+                    //     scanner.start(cameras[backCameraIndex]).then(function() {
+                    //         scannAnimation.classList.remove('hidden');
+                    //     });
+                    // } else {
+                    //     scanner.start(cameras[0]).then(function() {
+                    //         scannAnimation.classList.remove('hidden');
+                    //     });
+                    // }
+
+                    scanner.start(cameras[0]).then(function() {
                             scannAnimation.classList.remove('hidden');
                         });
-                    } else {
-                        scanner.start(cameras[0]).then(function() {
-                            scannAnimation.classList.remove('hidden');
-                        });
-                    }
-
                 } else {
                     console.error('No cameras found.');
                     alert('No cameras found.');
