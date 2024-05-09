@@ -18,7 +18,7 @@
                     <div class="relative overflow-hidden rounded-lg border-4 border-gray-300">
                         {{-- <div class="hidden absolute inset-0 bg-gradient-to-r from-registrationPrimaryColor to-registrationSecondaryColor opacity-0 animate-scan m-2"
                             id="scan-animation"></div> --}}
-                        <video id="preview" playsinline autoplay></video>
+                        <video id="preview" playsinline></video>
                     </div>
 
                     <p id="closeScannerBtn" class="text-white font-semibold underline mt-10 text-xl cursor-pointer">
