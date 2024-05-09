@@ -99,7 +99,7 @@
             var scanner = new Instascan.Scanner({
                 continues: true,
                 video: videoTag,
-                mirror: false,
+                mirror: true,
                 captureImage: false,
                 backgroundScan: false,
                 refractoryPeriod: 3000,
