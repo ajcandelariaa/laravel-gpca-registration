@@ -46,7 +46,7 @@ class ScanQr extends Component
 
     public function returnToHome()
     {
-        return redirect()->route('scan.qr');
+        return redirect()->route('scan.qr', ['eventCategory' => $this->eventCategory, 'eventId'=>$this->eventId]);
     }
 
 

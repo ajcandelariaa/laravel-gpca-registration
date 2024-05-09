@@ -51,7 +51,7 @@
                     </div>
 
                     <button type="button" class="bg-red-600 text-white rounded-md text-lg py-2 w-52 mt-10"
-                        wire:click.prevent="returnToHome">Return to Home</button>
+                        wire:click="returnToHome">Return to Home</button>
                 </div>
             @endif
         @endif
