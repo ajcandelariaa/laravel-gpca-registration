@@ -121,12 +121,16 @@
             Instascan.Camera.getCameras().then(function(cameras) {
                 if (cameras.length > 0) {
                     for (var i = 0; i < cameras.length; i++) {
-                        var message = "Index " + i + ": " + cameras[i].id + ": " + cameras[i].name;
-                        alert(message);
+                        // var message = "Index " + i + ": " + cameras[i].id + ": " + cameras[i].name;
+                        // alert(message);
+                        if (cameras[i].name === "Back Camera") {
+                            scanner.start(cameras[i]).then(function() {
+                                scannAnimation.classList.remove('hidden');
+                            });
+                            break;
+                        }
                     }
-                    scanner.start(cameras[cameras.length - 1]).then(function() {
-                        scannAnimation.classList.remove('hidden');
-                    });
+
                 } else {
                     console.error('No cameras found.');
                     alert('No cameras found.');
