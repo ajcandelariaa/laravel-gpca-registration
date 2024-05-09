@@ -150,58 +150,80 @@ class ScanQr extends Component
                                     'scanned_date_time' => Carbon::now(),
                                 ]);
                             } else {
+                                $updateScannnedDelegateTable = true;
                                 if ($delegateType == "main") {
-                                    $delegateDetails = MainDelegates::where('id', $delegateId)->first();
-
-                                    if ($delegateDetails->alternative_company_name != null) {
-                                        $companyName = $delegateDetails->alternative_company_name;
+                                    $delegateDetails = MainDelegates::where('event_id', $this->eventId)->where('id', $delegateId)->first();
+                                    if ($delegateDetails == null) {
+                                        $updateScannnedDelegateTable = false;
+                                        $this->dispatchBrowserEvent('remove-loading-screen');
+                                        $this->dispatchBrowserEvent('invalid-qr', [
+                                            'type' => 'error',
+                                            'message' => 'Invalid QR Code',
+                                            'text' => "[6.1] Please inform our IT Team admin to assist you",
+                                        ]);
+                                        $this->state = null;
                                     } else {
-                                        $companyName = $delegateDetails->company_name;
+                                        if ($delegateDetails->alternative_company_name != null) {
+                                            $companyName = $delegateDetails->alternative_company_name;
+                                        } else {
+                                            $companyName = $delegateDetails->company_name;
+                                        }
+
+
+                                        if ($delegateDetails->salutation == "Dr." || $delegateDetails->salutation == "Prof.") {
+                                            $delegateSalutation = $delegateDetails->salutation;
+                                        } else {
+                                            $delegateSalutation = null;
+                                        }
+
+                                        $this->name = $delegateSalutation . ' ' . $delegateDetails->first_name . ' ' . $delegateDetails->middle_name . ' ' . $delegateDetails->last_name;
+                                        $this->jobTitle = $delegateDetails->job_title;
+                                        $this->companyName = $companyName;
+                                        $this->badgeType = $delegateDetails->badge_type;
                                     }
-
-
-                                    if ($delegateDetails->salutation == "Dr." || $delegateDetails->salutation == "Prof.") {
-                                        $delegateSalutation = $delegateDetails->salutation;
-                                    } else {
-                                        $delegateSalutation = null;
-                                    }
-
-                                    $this->name = $delegateSalutation . ' ' . $delegateDetails->first_name . ' ' . $delegateDetails->middle_name . ' ' . $delegateDetails->last_name;
-                                    $this->jobTitle = $delegateDetails->job_title;
-                                    $this->companyName = $companyName;
-                                    $this->badgeType = $delegateDetails->badge_type;
                                 } else {
                                     $delegateDetails = AdditionalDelegates::where('id', $delegateId)->first();
-                                    $mainDelegate = MainDelegates::where('id', $delegateDetails->main_delegate_id)->first();
+                                    $mainDelegate = MainDelegates::where('event_id', $this->eventId)->where('id', $delegateDetails->main_delegate_id)->first();
 
-
-
-                                    if ($mainDelegate->alternative_company_name != null) {
-                                        $companyName = $mainDelegate->alternative_company_name;
+                                    if ($mainDelegate == null) {
+                                        $updateScannnedDelegateTable = false;
+                                        $this->dispatchBrowserEvent('remove-loading-screen');
+                                        $this->dispatchBrowserEvent('invalid-qr', [
+                                            'type' => 'error',
+                                            'message' => 'Invalid QR Code',
+                                            'text' => "[6.2] Please inform our IT Team admin to assist you",
+                                        ]);
+                                        $this->state = null;
                                     } else {
-                                        $companyName = $mainDelegate->company_name;
+                                        if ($mainDelegate->alternative_company_name != null) {
+                                            $companyName = $mainDelegate->alternative_company_name;
+                                        } else {
+                                            $companyName = $mainDelegate->company_name;
+                                        }
+
+
+                                        if ($delegateDetails->salutation == "Dr." || $delegateDetails->salutation == "Prof.") {
+                                            $delegateSalutation = $delegateDetails->salutation;
+                                        } else {
+                                            $delegateSalutation = null;
+                                        }
+
+                                        $this->name = $delegateSalutation . ' ' . $delegateDetails->first_name . ' ' . $delegateDetails->middle_name . ' ' . $delegateDetails->last_name;
+                                        $this->jobTitle = $delegateDetails->job_title;
+                                        $this->companyName = $companyName;
+                                        $this->badgeType = $delegateDetails->badge_type;
                                     }
-
-
-                                    if ($delegateDetails->salutation == "Dr." || $delegateDetails->salutation == "Prof.") {
-                                        $delegateSalutation = $delegateDetails->salutation;
-                                    } else {
-                                        $delegateSalutation = null;
-                                    }
-
-                                    $this->name = $delegateSalutation . ' ' . $delegateDetails->first_name . ' ' . $delegateDetails->middle_name . ' ' . $delegateDetails->last_name;
-                                    $this->jobTitle = $delegateDetails->job_title;
-                                    $this->companyName = $companyName;
-                                    $this->badgeType = $delegateDetails->badge_type;
                                 }
 
-                                ScannedDelegates::create([
-                                    'event_id' => $eventId,
-                                    'event_category' => $eventCategory,
-                                    'delegate_id' => $delegateId,
-                                    'delegate_type' => $delegateType,
-                                    'scanned_date_time' => Carbon::now(),
-                                ]);
+                                if($updateScannnedDelegateTable){
+                                    ScannedDelegates::create([
+                                        'event_id' => $eventId,
+                                        'event_category' => $eventCategory,
+                                        'delegate_id' => $delegateId,
+                                        'delegate_type' => $delegateType,
+                                        'scanned_date_time' => Carbon::now(),
+                                    ]);
+                                }
                             }
 
                             $this->dispatchBrowserEvent('scan-qr-success', [
