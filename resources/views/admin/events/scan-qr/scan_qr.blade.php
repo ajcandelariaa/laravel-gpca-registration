@@ -118,65 +118,25 @@
                 scanner.stop();
             });
 
-            // Instascan.Camera.getCameras().then(function(cameras) {
-            //     if (cameras.length > 0) {
-            //         scanner.start(cameras[1]).then(function() {
-            //             scannAnimation.classList.remove('hidden');
-            //         });
-            //         console.log(cameras)
-            //     } else {
-            //         console.error('No cameras found.');
-            //         alert('No cameras found.');
-            //     }
-            // }).catch(function(e) {
-            //     console.error(e);
-            //     alert(e);
-            // });
-
-            // Use MediaStreamTrack.getSources() to get a list of media input devices
-            if (typeof MediaStreamTrack === 'undefined' || typeof MediaStreamTrack.getSources === 'undefined') {
-                console.error('MediaStreamTrack.getSources() not supported.');
-                alert('Camera access not supported.');
-            } else {
-                MediaStreamTrack.getSources(function(sources) {
-                    let backCamera = null;
-                    sources.forEach(function(source) {
-                        if (source.kind === 'video' && source.facing === 'environment') {
-                            backCamera = source;
-                        }
+            Instascan.Camera.getCameras().then(function(cameras) {
+                if (cameras.length > 0) {
+                    scanner.start(cameras[0]).then(function() {
+                        scannAnimation.classList.remove('hidden');
                     });
-
-                    if (backCamera) {
-                        const constraints = {
-                            video: {
-                                deviceId: {
-                                    exact: backCamera.deviceId
-                                },
-                            },
-                        };
-                        navigator.mediaDevices.getUserMedia(constraints)
-                            .then(function(stream) {
-                                videoTag.srcObject = stream;
-                                scanner.start(videoTag.srcObject).then(function() {
-                                    scannAnimation.classList.remove('hidden');
-                                });
-                            })
-                            .catch(function(error) {
-                                console.error('Error accessing camera:', error);
-                                alert('Error accessing camera.');
-                            });
-                    } else {
-                        console.error('Back camera not found.');
-                        alert('Back camera not found.');
-                    }
-                });
-            }
+                } else {
+                    console.error('No cameras found.');
+                    alert('No cameras found.');
+                }
+            }).catch(function(e) {
+                console.error(e);
+                alert(e);
+            });
         });
 
         window.addEventListener("scan-qr-success", () => {
             let registrationLloadingScreen = document.getElementById('registration-loading-screen');
             registrationLloadingScreen.classList.add('hidden');
-
+            
             swal({
                 title: event.detail.message,
                 text: event.detail.text,
