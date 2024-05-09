@@ -82,6 +82,17 @@ class FastTrackController extends Controller
                         $fullName .= ' ' . $mainDelegate->last_name;
                     }
 
+                    if($eventCategory == "PC"){
+                        $finalFrontTextBGColor = "#ffffff";
+                        $finalFontTextColor = "#0A6A56";
+                    } else if ($eventCategory == "SCC"){
+                        $finalFrontTextBGColor = "#ffffff";
+                        $finalFontTextColor = "#00375D";
+                    } else {
+                        $finalFrontTextBGColor = $registrationType->badge_footer_front_bg_color;
+                        $finalFontTextColor = $registrationType->badge_footer_front_text_color;
+                    }
+
                     array_push($confirmedDelegates, [
                         'transactionId' => $finalTransactionId,
                         'id' => $mainDelegate->id,
@@ -96,8 +107,8 @@ class FastTrackController extends Controller
                         'badgeType' => $mainDelegate->badge_type,
 
                         'frontText' => $registrationType->badge_footer_front_name,
-                        'frontTextColor' => $registrationType->badge_footer_front_text_color,
-                        'frontTextBGColor' => $registrationType->badge_footer_front_bg_color,
+                        'frontTextColor' => $finalFontTextColor,
+                        'frontTextBGColor' => $finalFrontTextBGColor,
                         'seatNumber' => $mainDelegate->seat_number ? $mainDelegate->seat_number : "N/A",
                     ]);
                 }
@@ -144,6 +155,18 @@ class FastTrackController extends Controller
                                 $fullName .= ' ' . $subDelegate->last_name;
                             }
 
+
+                            if($eventCategory == "PC"){
+                                $finalFrontTextBGColor = "#ffffff";
+                                $finalFontTextColor = "#0A6A56";
+                            } else if ($eventCategory == "SCC"){
+                                $finalFrontTextBGColor = "#ffffff";
+                                $finalFontTextColor = "#00375D";
+                            } else {
+                                $finalFrontTextBGColor = $registrationType->badge_footer_front_bg_color;
+                                $finalFontTextColor = $registrationType->badge_footer_front_text_color;
+                            }
+
                             array_push($confirmedDelegates, [
                                 'transactionId' => $finalTransactionId,
                                 'id' => $subDelegate->id,
@@ -158,8 +181,8 @@ class FastTrackController extends Controller
                                 'badgeType' => $subDelegate->badge_type,
 
                                 'frontText' => $registrationType->badge_footer_front_name,
-                                'frontTextColor' => $registrationType->badge_footer_front_text_color,
-                                'frontTextBGColor' => $registrationType->badge_footer_front_bg_color,
+                                'frontTextColor' => $finalFontTextColor,
+                                'frontTextBGColor' => $finalFrontTextBGColor,
                                 'seatNumber' => $subDelegate->seat_number ? $subDelegate->seat_number : "N/A",
                             ]);
                         }

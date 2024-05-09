@@ -1365,6 +1365,7 @@ class RegistrantDetails extends Component
                 'text' => "",
             ]);
         }
+        $this->calculateTotal();
         $this->showDelegateCancellationModal = false;
     }
 
