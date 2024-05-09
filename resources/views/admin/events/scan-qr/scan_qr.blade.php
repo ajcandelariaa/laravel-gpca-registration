@@ -123,6 +123,7 @@
                     scanner.start(cameras[1]).then(function() {
                         scannAnimation.classList.remove('hidden');
                     });
+                    alert(cameras.length);
                 } else {
                     console.error('No cameras found.');
                     alert('No cameras found.');
