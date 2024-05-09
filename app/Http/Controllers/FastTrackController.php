@@ -84,10 +84,10 @@ class FastTrackController extends Controller
 
                     if($eventCategory == "PC"){
                         $finalFrontTextBGColor = "#ffffff";
-                        $finalFontTextColor = "#0A6A56";
+                        $finalFontTextColor = "#000000";
                     } else if ($eventCategory == "SCC"){
                         $finalFrontTextBGColor = "#ffffff";
-                        $finalFontTextColor = "#00375D";
+                        $finalFontTextColor = "#000000";
                     } else {
                         $finalFrontTextBGColor = $registrationType->badge_footer_front_bg_color;
                         $finalFontTextColor = $registrationType->badge_footer_front_text_color;
@@ -158,10 +158,10 @@ class FastTrackController extends Controller
 
                             if($eventCategory == "PC"){
                                 $finalFrontTextBGColor = "#ffffff";
-                                $finalFontTextColor = "#0A6A56";
+                                $finalFontTextColor = "#000000";
                             } else if ($eventCategory == "SCC"){
                                 $finalFrontTextBGColor = "#ffffff";
-                                $finalFontTextColor = "#00375D";
+                                $finalFontTextColor = "#000000";
                             } else {
                                 $finalFrontTextBGColor = $registrationType->badge_footer_front_bg_color;
                                 $finalFontTextColor = $registrationType->badge_footer_front_text_color;
