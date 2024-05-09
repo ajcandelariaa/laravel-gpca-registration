@@ -4,16 +4,20 @@
     </div>
 
     <div class="mx-10 my-10">
-        <form>
-            <div class="relative">
-                <input type="text" wire:model="searchTerm"
-                    class="border border-gray-300 bg-white rounded-md py-2 pl-10 pr-4 block transition duration-150 ease-in-out sm:text-sm sm:leading-5"
-                    placeholder="Search...">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <i class="fas fa-search text-gray-400"></i>
+        <div class="flex justify-between">
+            <form>
+                <div class="relative">
+                    <input type="text" wire:model="searchTerm"
+                        class="border border-gray-300 bg-white rounded-md py-2 pl-10 pr-4 block transition duration-150 ease-in-out sm:text-sm sm:leading-5"
+                        placeholder="Search...">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-search text-gray-400"></i>
+                    </div>
                 </div>
-            </div>
-        </form>
+            </form>
+    
+            <a href="{{ route('scan.qr', ['eventCategory' => $event->category, 'eventId' => $event->id]) }}" class="bg-green-600 hover:bg-green-700 text-white py-2 px-5 rounded-md text-lg text-center">Go to QR Code Scanner</a>
+        </div>
 
         <div class="shadow-lg my-5 pt-5 bg-white rounded-md">
             <h1 class="text-center text-2xl bg-registrationPrimaryColor text-white py-4">Scanned delegates</h1>

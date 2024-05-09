@@ -1,6 +1,8 @@
 <div class="min-h-screen flex flex-col">
-    <header class="">
-        <img src="{{ Storage::url($eventBanner) }}" class="w-full">
+    <header>
+        <a href="{{ route('admin.scanned.delegate.list.view', ['eventCategory' => $eventCategory, 'eventId' => $eventId]) }}">
+            <img src="{{ Storage::url($eventBanner) }}" class="w-full">
+        </a>
     </header>
 
     <main class="container mx-auto my-10 flex-1 flex items-center justify-center">
