@@ -102,7 +102,7 @@
                 mirror: false,
                 captureImage: false,
                 backgroundScan: false,
-                refractoryPeriod: 10000,
+                refractoryPeriod: 3000,
                 scanPeriod: 5,
             });
 
