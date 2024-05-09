@@ -120,7 +120,7 @@
 
             Instascan.Camera.getCameras().then(function(cameras) {
                 if (cameras.length > 0) {
-                    scanner.start(cameras[1]).then(function() {
+                    scanner.start(cameras[2]).then(function() {
                         scannAnimation.classList.remove('hidden');
                     });
                 } else {
