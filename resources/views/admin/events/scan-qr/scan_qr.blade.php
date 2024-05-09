@@ -120,11 +120,11 @@
 
             Instascan.Camera.getCameras().then(function(cameras) {
                 if (cameras.length > 0) {
-                    for(var i=0; i<cameras.length++; i++){
-                        var message = "Index ". i . ":" . cameras[i].id . ":" . cameras[i].name
+                    for (var i = 0; i < cameras.length; i++) {
+                        var message = "Index " + i + ": " + cameras[i].id + ": " + cameras[i].name;
                         alert(message);
                     }
-                    scanner.start(cameras[cameras.length-1]).then(function() {
+                    scanner.start(cameras[cameras.length - 1]).then(function() {
                         scannAnimation.classList.remove('hidden');
                     });
                 } else {
@@ -140,7 +140,7 @@
         window.addEventListener("scan-qr-success", () => {
             let registrationLloadingScreen = document.getElementById('registration-loading-screen');
             registrationLloadingScreen.classList.add('hidden');
-            
+
             swal({
                 title: event.detail.message,
                 text: event.detail.text,
