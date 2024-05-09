@@ -119,16 +119,13 @@
             });
 
             Instascan.Camera.getCameras().then(function(cameras) {
-                // Find the back camera
-                const backCamera = cameras.find(camera => camera.name.includes('back') || camera.name
-                    .includes('environment'));
-                if (backCamera) {
-                    scanner.start(backCamera).then(function() {
+                if (cameras.length > 0) {
+                    scanner.start(cameras[cameras.length - 1]).then(function() {
                         scannAnimation.classList.remove('hidden');
                     });
                 } else {
-                    console.error('No back camera found.');
-                    alert('No back camera found.');
+                    console.error('No cameras found.');
+                    alert('No cameras found.');
                 }
             }).catch(function(e) {
                 console.error(e);
@@ -139,7 +136,7 @@
         window.addEventListener("scan-qr-success", () => {
             let registrationLloadingScreen = document.getElementById('registration-loading-screen');
             registrationLloadingScreen.classList.add('hidden');
-
+            
             swal({
                 title: event.detail.message,
                 text: event.detail.text,
