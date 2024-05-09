@@ -99,7 +99,7 @@
             var scanner = new Instascan.Scanner({
                 continues: true,
                 video: videoTag,
-                mirror: true,
+                mirror: false,
                 captureImage: false,
                 backgroundScan: false,
                 refractoryPeriod: 3000,
@@ -120,7 +120,7 @@
 
             Instascan.Camera.getCameras().then(function(cameras) {
                 if (cameras.length > 0) {
-                    scanner.start(cameras[1]).then(function() {
+                    scanner.start(cameras[cameras.length-1]).then(function() {
                         scannAnimation.classList.remove('hidden');
                     });
                 } else {
