@@ -72,9 +72,9 @@
             animation: scan 2s infinite;
         }
     </style>
-    <script src="{{ asset('js/instascan/instascan.js') }}"></script>
-    <script src="{{ asset('js/instascan/instascan.min.js') }}"></script>
-    {{-- <script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script> --}}
+    {{-- <script src="{{ asset('js/instascan/instascan.js') }}"></script>
+    <script src="{{ asset('js/instascan/instascan.min.js') }}"></script> --}}
+    <script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
 </head>
 
 <body class="font-montserrat">
