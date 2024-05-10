@@ -12,6 +12,7 @@ use App\Models\Transaction;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class FastTrackController extends Controller
 {
@@ -104,7 +105,7 @@ class FastTrackController extends Controller
                         'lname' => $mainDelegate->last_name,
                         'jobTitle' => trim($mainDelegate->job_title),
                         'companyName' => trim($companyName),
-                        'badgeType' => $mainDelegate->badge_type,
+                        'badgeType' => Str::upper($mainDelegate->badge_type),
 
                         'frontText' => $registrationType->badge_footer_front_name,
                         'frontTextColor' => $finalFontTextColor,
@@ -178,7 +179,7 @@ class FastTrackController extends Controller
                                 'lname' => $subDelegate->last_name,
                                 'jobTitle' => trim($subDelegate->job_title),
                                 'companyName' => trim($companyName),
-                                'badgeType' => $subDelegate->badge_type,
+                                'badgeType' => Str::upper($subDelegate->badge_type),
 
                                 'frontText' => $registrationType->badge_footer_front_name,
                                 'frontTextColor' => $finalFontTextColor,
