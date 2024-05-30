@@ -26,6 +26,7 @@ module.exports = {
         delegateFeesGrid: 'auto 150px',
         delegateDetailGrid: '320px auto',
         delegateDetailGrid2: '200px auto',
+        '13': 'repeat(13, minmax(0, 1fr))',
       },
       backgroundImage: {
         loginBg: "url('/public/assets/images/loginbg.png')",

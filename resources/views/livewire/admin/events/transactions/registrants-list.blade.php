@@ -73,7 +73,7 @@
         <div class="shadow-lg my-5 pt-5 bg-white rounded-md">
             <h1 class="text-center text-2xl bg-registrationPrimaryColor text-white py-4">Transactions ({{ count($finalListOfRegistrants) }})</h1>
 
-            <div class="grid grid-cols-12 gap-5 p-4 text-center items-center bg-blue-600 text-white ">
+            <div class="grid grid-cols-13 gap-5 p-4 text-center items-center bg-blue-600 text-white ">
                 <div class="col-span-1 break-words">Invoice Number</div>
                 <div class="col-span-1 break-words">Company</div>
                 <div class="col-span-1 break-words">Country</div>
@@ -81,6 +81,7 @@
                 <div class="col-span-1 break-words">Pass Type</div>
                 <div class="col-span-1 break-words">Quantity</div>
                 <div class="col-span-1 break-words">Total Amount</div>
+                <div class="col-span-1 break-words">Access type</div>
                 <div class="col-span-1 break-words">Registered Date & Time</div>
                 <div class="col-span-1 break-words">Registration Status</div>
                 <div class="col-span-1 break-words">Payment Status</div>
@@ -99,7 +100,7 @@
             @else
                 @foreach ($finalListOfRegistrants as $finalListOfRegistrant)
                     <div
-                        class="grid grid-cols-12 gap-5 px-4 py-2 mb-1 text-center items-center text-sm {{ $count % 2 == 0 ? 'bg-registrationInputFieldsBGColor' : 'bg-registrationCardBGColor' }}">
+                        class="grid grid-cols-13 gap-5 px-4 py-2 mb-1 text-center items-center text-sm {{ $count % 2 == 0 ? 'bg-registrationInputFieldsBGColor' : 'bg-registrationCardBGColor' }}">
                         <div class="col-span-1 break-words">{{ $finalListOfRegistrant['invoiceNumber'] }}</div>
                         <div class="col-span-1 break-words">{{ $finalListOfRegistrant['companyName'] }}</div>
                         <div class="col-span-1 break-words">{{ $finalListOfRegistrant['country'] }}</div>
@@ -108,6 +109,7 @@
                         <div class="col-span-1 break-words">{{ $finalListOfRegistrant['quantity'] }}</div>
                         <div class="col-span-1 break-words">$
                             {{ number_format($finalListOfRegistrant['totalAmount'], 2, '.', ',') }}</div>
+                        <div class="col-span-1 break-words">{{ $finalListOfRegistrant['accessType'] }}</div>
                         <div class="col-span-1 break-words">{{ $finalListOfRegistrant['regDateTime'] }}</div>
                         <div class="col-span-1 break-words">{{ $finalListOfRegistrant['regStatus'] }}</div>
                         <div class="col-span-1 break-words">{{ $finalListOfRegistrant['payStatus'] }}</div>

@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Enums\AccessTypes;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -36,7 +37,7 @@ class RegistrationFree extends Mailable
     public function envelope()
     {
         $subject = 'Registration confirmation for the ' . $this->details['eventName'];
-        
+
         return new Envelope(
             from: new Address('forumregistration@gpca.org.ae', 'GPCA Events Registration'),
             subject: $subject,
@@ -114,9 +115,19 @@ class RegistrationFree extends Mailable
                     markdown: 'emails.2024.dfclw1.registration-free',
                 );
             } else if ($this->details['eventCategory'] == "ANC") {
-                return new Content(
-                    markdown: 'emails.2024.anc.registration-free',
-                );
+                if ($this->details['accessType'] == AccessTypes::CONFERENCE_ONLY->value) {
+                    return new Content(
+                        markdown: 'emails.2024.anc.co.registration-free',
+                    );
+                } else if ($this->details['accessType'] == AccessTypes::WORKSHOP_ONLY->value) {
+                    return new Content(
+                        markdown: 'emails.2024.anc.wo.registration-free',
+                    );
+                } else {
+                    return new Content(
+                        markdown: 'emails.2024.anc.registration-free',
+                    );
+                }
             } else {
                 return new Content(
                     markdown: 'emails.registration-free',

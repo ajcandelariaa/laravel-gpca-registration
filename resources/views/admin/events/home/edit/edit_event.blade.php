@@ -32,13 +32,23 @@
 
                     @include('admin.events.home.edit.eb_details')
 
+                    @include('admin.events.home.edit.std_details')
 
                     <div class="space-y-2 col-span-2 mt-6">
                         <hr>
                     </div>
 
-                    @include('admin.events.home.edit.std_details')
+                    @include('admin.events.home.edit.wo_eb_details')
 
+                    @include('admin.events.home.edit.wo_std_details')
+
+                    <div class="space-y-2 col-span-2 mt-6">
+                        <hr>
+                    </div>
+
+                    @include('admin.events.home.edit.co_eb_details')
+
+                    @include('admin.events.home.edit.co_std_details')
 
                     <div class="space-y-2 col-span-2 mt-6">
                         <hr>

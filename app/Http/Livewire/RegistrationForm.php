@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire;
 
+use App\Enums\AccessTypes;
 use App\Mail\RegistrationFree;
 use App\Mail\RegistrationUnpaid;
 use Livewire\Component;
@@ -27,6 +28,8 @@ class RegistrationForm extends Component
     public $members, $event, $delegateFees;
 
     public $finalEbEndDate, $finalStdStartDate;
+    public $finalWoEbEndDate, $finalWoStdStartDate;
+    public $finalCoEbEndDate, $finalCoStdStartDate;
     public $currentStep = 1;
     public $showAddDelegateModal = false;
     public $showEditDelegateModal = false;
@@ -34,7 +37,7 @@ class RegistrationForm extends Component
 
 
     // DELEGATE PASS TYPE
-    public $delegatePassType, $rateType;
+    public $accessType, $delegatePassType, $rateType;
 
     // COMPANY INFO
     public $companyName, $companySector, $companyAddress, $companyCountry, $companyCity, $companyLandlineNumber, $companyMobileNumber, $assistantEmailAddress, $heardWhere, $attendingTo = [];
@@ -88,6 +91,7 @@ class RegistrationForm extends Component
         }
 
         $this->event = $data;
+        $this->accessType = AccessTypes::FULL_EVENT->value;
         $this->currentStep = 1;
 
         $this->badgeType = "Delegate";
@@ -111,7 +115,30 @@ class RegistrationForm extends Component
             $this->finalEbEndDate = null;
         }
 
+        if ($this->event->wo_eb_end_date != null && $this->event->wo_eb_member_rate != null && $this->event->wo_eb_nmember_rate != null) {
+            if ($today->lte(Carbon::parse($this->event->wo_eb_end_date))) {
+                $this->finalWoEbEndDate = Carbon::parse($this->event->wo_eb_end_date)->format('d M Y');
+            } else {
+                $this->finalWoEbEndDate = null;
+            }
+        } else {
+            $this->finalWoEbEndDate = null;
+        }
+
+        if ($this->event->co_eb_end_date != null && $this->event->co_eb_member_rate != null && $this->event->co_eb_nmember_rate != null) {
+            if ($today->lte(Carbon::parse($this->event->co_eb_end_date))) {
+                $this->finalCoEbEndDate = Carbon::parse($this->event->co_eb_end_date)->format('d M Y');
+            } else {
+                $this->finalCoEbEndDate = null;
+            }
+        } else {
+            $this->finalCoEbEndDate = null;
+        }
+
         $this->finalStdStartDate = Carbon::parse($this->event->std_start_date)->format('d M Y');
+        $this->finalWoStdStartDate = Carbon::parse($this->event->wo_std_start_date)->format('d M Y');
+        $this->finalCoStdStartDate = Carbon::parse($this->event->co_std_start_date)->format('d M Y');
+
         $this->finalEventStartDate = Carbon::parse($this->event->event_start_date)->format('d M Y');
         $this->finalEventEndDate = Carbon::parse($this->event->event_end_date)->format('d M Y');
 
@@ -135,44 +162,154 @@ class RegistrationForm extends Component
         $today = Carbon::today();
 
         // CHECK UNIT PRICE
-        if ($this->event->eb_end_date != null && $this->event->eb_member_rate != null && $this->event->eb_nmember_rate != null) {
-            if ($today->lte(Carbon::parse($this->event->eb_end_date))) {
-                if ($this->delegatePassType == "fullMember") {
-                    $this->rateTypeString = "Full member early bird rate";
-                    $this->finalUnitPrice = $this->event->eb_full_member_rate;
-                } else if ($this->delegatePassType == "member") {
-                    $this->rateTypeString = "Member early bird rate";
-                    $this->finalUnitPrice = $this->event->eb_member_rate;
+        if ($this->accessType == AccessTypes::CONFERENCE_ONLY->value) {
+            if ($this->event->co_eb_end_date != null && $this->event->co_eb_member_rate != null && $this->event->co_eb_nmember_rate != null) {
+                if ($today->lte(Carbon::parse($this->event->co_eb_end_date))) {
+                    if ($this->delegatePassType == "fullMember") {
+                        $this->rateTypeString = "Full member early bird rate - " . $this->getAccessTypesDescription();
+                        $this->finalUnitPrice = $this->event->co_eb_full_member_rate;
+                    } else if ($this->delegatePassType == "member") {
+                        $this->rateTypeString = "Member early bird rate - " . $this->getAccessTypesDescription();
+                        $this->finalUnitPrice = $this->event->co_eb_member_rate;
+                    } else {
+                        $this->rateTypeString = "Non-Member early bird rate - " . $this->getAccessTypesDescription();
+                        $this->finalUnitPrice = $this->event->co_eb_nmember_rate;
+                    }
+                    $this->rateType = "Early Bird";
                 } else {
-                    $this->rateTypeString = "Non-Member early bird rate";
-                    $this->finalUnitPrice = $this->event->eb_nmember_rate;
+                    if ($this->delegatePassType == "fullMember") {
+                        $this->rateTypeString = "Full member standard rate - " . $this->getAccessTypesDescription();
+                        $this->finalUnitPrice = $this->event->co_std_full_member_rate;
+                    } else if ($this->delegatePassType == "member") {
+                        $this->rateTypeString = "Member standard rate - " . $this->getAccessTypesDescription();
+                        $this->finalUnitPrice = $this->event->co_std_member_rate;
+                    } else {
+                        $this->rateTypeString = "Non-Member standard rate - " . $this->getAccessTypesDescription();
+                        $this->finalUnitPrice = $this->event->co_std_nmember_rate;
+                    }
+                    $this->rateType = "Standard";
                 }
-                $this->rateType = "Early Bird";
             } else {
                 if ($this->delegatePassType == "fullMember") {
-                    $this->rateTypeString = "Full member standard rate";
-                    $this->finalUnitPrice = $this->event->std_full_member_rate;
+                    $this->rateTypeString = "Full member standard rate - " . $this->getAccessTypesDescription();
+                    $this->finalUnitPrice = $this->event->co_std_full_member_rate;
                 } else if ($this->delegatePassType == "member") {
-                    $this->rateTypeString = "Member standard rate";
-                    $this->finalUnitPrice = $this->event->std_member_rate;
+                    $this->rateTypeString = "Member standard rate - " . $this->getAccessTypesDescription();
+                    $this->finalUnitPrice = $this->event->co_std_member_rate;
                 } else {
-                    $this->rateTypeString = "Non-Member standard rate";
-                    $this->finalUnitPrice = $this->event->std_nmember_rate;
+                    $this->rateTypeString = "Non-Member standard rate - " . $this->getAccessTypesDescription();
+                    $this->finalUnitPrice = $this->event->co_std_nmember_rate;
+                }
+                $this->rateType = "Standard";
+            }
+        } else if ($this->accessType == AccessTypes::WORKSHOP_ONLY->value) {
+            if ($this->event->wo_eb_end_date != null && $this->event->wo_eb_member_rate != null && $this->event->wo_eb_nmember_rate != null) {
+                if ($today->lte(Carbon::parse($this->event->wo_eb_end_date))) {
+                    if ($this->delegatePassType == "fullMember") {
+                        $this->rateTypeString = "Full member early bird rate - " . $this->getAccessTypesDescription();
+                        $this->finalUnitPrice = $this->event->wo_eb_full_member_rate;
+                    } else if ($this->delegatePassType == "member") {
+                        $this->rateTypeString = "Member early bird rate - " . $this->getAccessTypesDescription();
+                        $this->finalUnitPrice = $this->event->wo_eb_member_rate;
+                    } else {
+                        $this->rateTypeString = "Non-Member early bird rate - " . $this->getAccessTypesDescription();
+                        $this->finalUnitPrice = $this->event->wo_eb_nmember_rate;
+                    }
+                    $this->rateType = "Early Bird";
+                } else {
+                    if ($this->delegatePassType == "fullMember") {
+                        $this->rateTypeString = "Full member standard rate - " . $this->getAccessTypesDescription();
+                        $this->finalUnitPrice = $this->event->wo_std_full_member_rate;
+                    } else if ($this->delegatePassType == "member") {
+                        $this->rateTypeString = "Member standard rate - " . $this->getAccessTypesDescription();
+                        $this->finalUnitPrice = $this->event->wo_std_member_rate;
+                    } else {
+                        $this->rateTypeString = "Non-Member standard rate - " . $this->getAccessTypesDescription();
+                        $this->finalUnitPrice = $this->event->wo_std_nmember_rate;
+                    }
+                    $this->rateType = "Standard";
+                }
+            } else {
+                if ($this->delegatePassType == "fullMember") {
+                    $this->rateTypeString = "Full member standard rate - " . $this->getAccessTypesDescription();
+                    $this->finalUnitPrice = $this->event->wo_std_full_member_rate;
+                } else if ($this->delegatePassType == "member") {
+                    $this->rateTypeString = "Member standard rate - " . $this->getAccessTypesDescription();
+                    $this->finalUnitPrice = $this->event->wo_std_member_rate;
+                } else {
+                    $this->rateTypeString = "Non-Member standard rate - " . $this->getAccessTypesDescription();
+                    $this->finalUnitPrice = $this->event->wo_std_nmember_rate;
                 }
                 $this->rateType = "Standard";
             }
         } else {
-            if ($this->delegatePassType == "fullMember") {
-                $this->rateTypeString = "Full member standard rate";
-                $this->finalUnitPrice = $this->event->std_full_member_rate;
-            } else if ($this->delegatePassType == "member") {
-                $this->rateTypeString = "Member standard rate";
-                $this->finalUnitPrice = $this->event->std_member_rate;
+            if ($this->event->eb_end_date != null && $this->event->eb_member_rate != null && $this->event->eb_nmember_rate != null) {
+                if ($today->lte(Carbon::parse($this->event->eb_end_date))) {
+                    if ($this->delegatePassType == "fullMember") {
+                        $this->rateTypeString = "Full member early bird rate - " . $this->getAccessTypesDescription();
+                        $this->finalUnitPrice = $this->event->eb_full_member_rate;
+                    } else if ($this->delegatePassType == "member") {
+                        $this->rateTypeString = "Member early bird rate - " . $this->getAccessTypesDescription();
+                        $this->finalUnitPrice = $this->event->eb_member_rate;
+                    } else {
+                        $this->rateTypeString = "Non-Member early bird rate - " . $this->getAccessTypesDescription();
+                        $this->finalUnitPrice = $this->event->eb_nmember_rate;
+                    }
+                    $this->rateType = "Early Bird";
+                } else {
+                    if ($this->delegatePassType == "fullMember") {
+                        $this->rateTypeString = "Full member standard rate - " . $this->getAccessTypesDescription();
+                        $this->finalUnitPrice = $this->event->std_full_member_rate;
+                    } else if ($this->delegatePassType == "member") {
+                        $this->rateTypeString = "Member standard rate - " . $this->getAccessTypesDescription();
+                        $this->finalUnitPrice = $this->event->std_member_rate;
+                    } else {
+                        $this->rateTypeString = "Non-Member standard rate - " . $this->getAccessTypesDescription();
+                        $this->finalUnitPrice = $this->event->std_nmember_rate;
+                    }
+                    $this->rateType = "Standard";
+                }
             } else {
-                $this->rateTypeString = "Non-Member standard rate";
-                $this->finalUnitPrice = $this->event->std_nmember_rate;
+                if ($this->delegatePassType == "fullMember") {
+                    $this->rateTypeString = "Full member standard rate - " . $this->getAccessTypesDescription();
+                    $this->finalUnitPrice = $this->event->std_full_member_rate;
+                } else if ($this->delegatePassType == "member") {
+                    $this->rateTypeString = "Member standard rate - " . $this->getAccessTypesDescription();
+                    $this->finalUnitPrice = $this->event->std_member_rate;
+                } else {
+                    $this->rateTypeString = "Non-Member standard rate - " . $this->getAccessTypesDescription();
+                    $this->finalUnitPrice = $this->event->std_nmember_rate;
+                }
+                $this->rateType = "Standard";
             }
-            $this->rateType = "Standard";
+        }
+    }
+
+    public function getAccessTypesDescription()
+    {
+        if ($this->accessType == AccessTypes::CONFERENCE_ONLY->value) {
+            return "Conference only";
+        } else if ($this->accessType == AccessTypes::WORKSHOP_ONLY->value) {
+            return "Workshop only";
+        } else {
+            if (
+                $this->event->co_eb_full_member_rate != null ||
+                $this->event->co_eb_member_rate != null ||
+                $this->event->co_eb_nmember_rate != null ||
+                $this->event->co_std_full_member_rate != null ||
+                $this->event->co_std_member_rate != null ||
+                $this->event->co_std_nmember_rate != null ||
+                $this->event->wo_eb_full_member_rate != null ||
+                $this->event->wo_eb_member_rate != null ||
+                $this->event->wo_eb_nmember_rate != null ||
+                $this->event->wo_std_full_member_rate != null ||
+                $this->event->wo_std_member_rate != null ||
+                $this->event->wo_std_nmember_rate != null
+            ) {
+                return "Full event";
+            } else {
+                return null;
+            }
         }
     }
 
@@ -338,9 +475,11 @@ class RegistrationForm extends Component
                 $this->validate(
                     [
                         'companyName' => 'required',
+                        'accessType' => 'required',
                     ],
                     [
                         'companyName.required' => "Company name is required",
+                        'accessType.required' => "Access type is required",
                     ]
                 );
                 $this->currentStep += 1;
@@ -516,6 +655,7 @@ class RegistrationForm extends Component
 
         $newRegistrant = MainDelegates::create([
             'event_id' => $this->event->id,
+            'access_type' => $this->accessType,
             'pass_type' => $this->delegatePassType,
             'rate_type' => $this->rateType,
             'rate_type_string' => $this->rateTypeString,
@@ -696,6 +836,7 @@ class RegistrationForm extends Component
             'eventCategory' => $this->event->category,
             'eventYear' => $this->event->year,
 
+            'accessType' => $this->accessType,
             'jobTitle' => $this->jobTitle,
             'companyName' => $this->companyName,
             'amountPaid' => 0,
@@ -709,12 +850,20 @@ class RegistrationForm extends Component
             if ($this->isMainFree) {
                 try {
                     Mail::to($this->emailAddress)->cc($this->ccEmailNotif)->send(new RegistrationFree($details1));
+                    MainDelegates::find($this->currentMainDelegateId)->fill([
+                        'registration_confirmation_sent_count' => 1,
+                        'registration_confirmation_sent_datetime' => Carbon::now(),
+                    ])->save();
                 } catch (\Exception $e) {
                     Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationFree($details1));
                 }
             } else {
                 try {
                     Mail::to($this->emailAddress)->cc($this->ccEmailNotif)->send(new RegistrationUnpaid($details1));
+                    MainDelegates::find($this->currentMainDelegateId)->fill([
+                        'registration_confirmation_sent_count' => 1,
+                        'registration_confirmation_sent_datetime' => Carbon::now(),
+                    ])->save();
                 } catch (\Exception $e) {
                     Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationUnpaid($details1));
                 }
@@ -754,6 +903,7 @@ class RegistrationForm extends Component
                         'eventCategory' => $this->event->category,
                         'eventYear' => $this->event->year,
 
+                        'accessType' => $this->accessType,
                         'jobTitle' => $additionalDelegate->job_title,
                         'companyName' => $this->companyName,
                         'amountPaid' => 0,

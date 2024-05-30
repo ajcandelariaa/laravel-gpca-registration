@@ -17,9 +17,33 @@
 
         <div class="grid grid-cols-12 gap-20 mt-10">
             <div class="col-span-5">
-                <div class="grid grid-cols-2 bg-registrationCardBGColor py-3 px-4 gap-4">
-                    <p>Rate:</p>
-                    <p class="font-bold">{{ $finalData['rate_type_string'] }}</p>
+                {{-- <div class="bg-registrationCardBGColor py-3 px-4 gap-4">
+                    <p class="font-bold text-center">{{ $finalData['rate_type_string'] }}</p>
+                </div> --}}
+
+                <div class="mt-3 bg-registrationInputFieldsBGColor py-1 px-1">
+                    <div class="flex items-center gap-3">
+                        <p class="text-xl text-registrationPrimaryColor font-bold italic py-4 px-3">Registration Details</p>
+                        <button wire:click="openEditRegistrationDetailsModal"
+                            class="cursor-pointer hover:text-yellow-600 text-yellow-500">
+                            <i class="fa-solid fa-pen-to-square"></i> Edit
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-2 bg-white py-3 px-4 gap-4">
+                        <p>Access Type:</p>
+
+                        @if ($finalData['access_type'] == 'conferenceOnly')
+                            <p class="font-bold">Conference only</p>
+                        @elseif ($finalData['access_type'] == 'workshopOnly')
+                            <p class="font-bold">Workshop only</p>
+                        @else
+                            <p class="font-bold">Full event</p>
+                        @endif
+
+                        <p>Rate Type:</p>
+                        <p class="font-bold">{{ $finalData['rate_type'] }}</p>
+                    </div>
                 </div>
 
                 <div class="mt-3 bg-registrationInputFieldsBGColor py-1 px-1">
@@ -487,6 +511,10 @@
 
         @if ($showCompanyModal)
             @include('livewire.admin.events.transactions.edit-forms.edit_company_form')
+        @endif
+
+        @if ($showRegistrationDetailsModal)
+            @include('livewire.admin.events.transactions.edit-forms.edit_reg_details_form')
         @endif
 
         @if ($showTransactionRemarksModal)

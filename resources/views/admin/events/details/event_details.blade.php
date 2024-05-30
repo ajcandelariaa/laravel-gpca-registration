@@ -16,7 +16,7 @@
         <img src="{{ Storage::url($event->banner) }}" alt="" class="w-full object-cover">
     </div>
 
-    <div class="container mx-auto my-10">
+    <div class="container mx-auto mt-10">
         <div class="flex items-center justify-between">
             <div class="flex items-center gap-4">
                 <img src="{{ Storage::url($event->logo) }}" alt="" class="h-16">
@@ -79,85 +79,17 @@
         <div class="mt-5">
             {{ $event->description }}
         </div>
+    </div>
 
-        <table class="w-1/2 mx-auto bg-registrationPrimaryColor text-white text-center mt-10" cellspacing="1"
-            cellpadding="2">
-            <thead>
-                <tr>
-                    <td class="py-4 font-bold text-lg">Pass Category</td>
-                    @if ($finalEbEndDate != null)
-                        <td class="py-4 font-bold text-lg">
-                            <span>Early Bird Rate <br> <span class="font-normal text-base">(valid until
-                                    {{ $finalEbEndDate }})</span></span>
-                        </td>
-                    @endif
-                    <td class="py-4 font-bold text-lg">
-                        <span>Standard Rate <br> <span class="font-normal text-base">(starting
-                                {{ $finalStdStartDate }})</span></span>
-                    </td>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="text-black">
-                        <div class="bg-white py-4 font-bold ml-1">
-                            Full Member
-                        </div>
-                    </td>
-                    @if ($finalEbEndDate != null)
-                        <td class="text-black">
-                            <div class="bg-white py-4">
-                                $ {{ $event->eb_full_member_rate ? $event->eb_full_member_rate : '0.00' }} +
-                                {{ $event->event_vat }}%
-                            </div>
-                        </td>
-                    @endif
-                    <td class="text-black">
-                        <div class="bg-white py-4 mr-1">
-                            $ {{ $event->std_full_member_rate ? $event->std_full_member_rate : '0.00' }} +
-                            {{ $event->event_vat }}%
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="text-black">
-                        <div class="bg-white py-4 font-bold ml-1">
-                            Member
-                        </div>
-                    </td>
-                    @if ($finalEbEndDate != null)
-                        <td class="text-black">
-                            <div class="bg-white py-4">
-                                $ {{ $event->eb_member_rate }} + {{ $event->event_vat }}%
-                            </div>
-                        </td>
-                    @endif
-                    <td class="text-black">
-                        <div class="bg-white py-4 mr-1">
-                            $ {{ $event->std_member_rate }} + {{ $event->event_vat }}%
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="text-black">
-                        <div class="bg-white py-4 font-bold mb-1 ml-1">
-                            Non-Member
-                        </div>
-                    </td>
-                    @if ($finalEbEndDate != null)
-                        <td class="text-black">
-                            <div class="bg-white py-4 mb-1">
-                                $ {{ $event->eb_nmember_rate }} + {{ $event->event_vat }}%
-                            </div>
-                        </td>
-                    @endif
-                    <td class="text-black">
-                        <div class="bg-white py-4 mb-1 mr-1">
-                            $ {{ $event->std_nmember_rate }} + {{ $event->event_vat }}%
-                        </div>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+    <div class="w-10/12 mb-20 grid grid-cols-3 mx-auto gap-10"> 
+        <div class="col-span-1">
+            @include('admin.events.details.fe_rate')
+        </div>
+        <div class="col-span-1">
+            @include('admin.events.details.wo_rate')
+        </div>
+        <div class="col-span-1">
+            @include('admin.events.details.co_rate')
+        </div>
     </div>
 @endsection

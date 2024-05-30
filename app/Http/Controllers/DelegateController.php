@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\AccessTypes;
 use App\Http\Controllers\Controller;
 use App\Models\AdditionalDelegate;
 use App\Models\AdditionalVisitor;
@@ -202,6 +203,14 @@ class DelegateController extends Controller
                         $finalTransactionId = $eventYear . $eventCode . $lastDigit;
                         $invoiceNumber = $eventCategory . $tempYear . "/" . $lastDigit;
 
+                        if($tempDelegate->access_type == AccessTypes::CONFERENCE_ONLY->value){
+                            $finalAccessType = "Conference only";
+                        } else if ($tempDelegate->access_type == AccessTypes::WORKSHOP_ONLY->value){
+                            $finalAccessType = "Workshop only";
+                        } else {
+                            $finalAccessType = "Full event";
+                        }
+
                         $finalDelegate = [
                             'eventCategory' => $eventCategory,
                             'eventId' => $eventId,
@@ -222,6 +231,7 @@ class DelegateController extends Controller
 
                             'seat_number' => $tempDelegate->seat_number,
 
+                            'access_type' => $finalAccessType,
                             'pass_type' => $tempDelegate->pass_type,
                             'company_name' => $tempDelegate->company_name,
                             'alternative_company_name' => $tempDelegate->alternative_company_name,
@@ -249,6 +259,14 @@ class DelegateController extends Controller
                         $finalTransactionId = $eventYear . $eventCode . $lastDigit;
                         $invoiceNumber = $eventCategory . $tempYear . "/" . $lastDigit2;
 
+                        if($tempDelegate->access_type == AccessTypes::CONFERENCE_ONLY->value){
+                            $finalAccessType = "Conference only";
+                        } else if ($tempDelegate->access_type == AccessTypes::WORKSHOP_ONLY->value){
+                            $finalAccessType = "Workshop only";
+                        } else {
+                            $finalAccessType = "Full event";
+                        }
+
                         $finalDelegate = [
                             'delegateType' => $delegateType,
                             'delegateId' => $delegateId,
@@ -267,6 +285,7 @@ class DelegateController extends Controller
                             
                             'seat_number' => $tempDelegate->seat_number,
 
+                            'access_type' => $finalAccessType,
                             'pass_type' => $mainDelegateInfo->pass_type,
                             'company_name' => $mainDelegateInfo->company_name,
                             'alternative_company_name' => $mainDelegateInfo->alternative_company_name,

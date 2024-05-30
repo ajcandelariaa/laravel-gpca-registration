@@ -1,9 +1,9 @@
 <x-mail::message>
 <p class="sub">Dear {{ $details['name'] }},</p>
 
-<p class="sub" style="margin-top: 15px;">Thank you for registering to attend the <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a>, taking place from 10-12 September 2024 at the {{ $details['eventLocation'] }}</p>
+<p class="sub" style="margin-top: 15px;">Thank you for registering to attend the Operational Excellence in the GCC Agri-Nutrients Industry Workshop, taking place on 10 September 2024 at the {{ $details['eventLocation'] }}</p>
 
-<p class="sub" style="margin-top: 15px;">Your registration has been confirmed and you can access the workshop on 10<sup>th</sup> September, participate in the discussions during the conference and meet the key players at the exhibition floor from 11-12 September. You will gain access to the networking features and gala dinner during the duration of the event. Please find below the summary of your booking confirmation.</p>
+<p class="sub" style="margin-top: 15px;">Your registration has been confirmed and your delegate pass can be accessed during the <strong><em>workshop only</em></strong>. You will have access to the networking break, networking dinner, and the Gala dinner. Please find below the summary of your booking confirmation.</p>
 
 <p class="sub" style="margin-top: 20px;"><strong>Collection of badges</strong></p>
 <p class="sub" style="margin-top: 5px;">Upon your arrival, kindly make your way to the registration desk to collect your event badge located at the Foyer and present your ID or email confirmation. Registration starts at 07:30am onwards.</p>

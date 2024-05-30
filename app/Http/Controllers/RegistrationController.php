@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\AccessTypes;
 use App\Mail\RegistrationCardDeclined;
 use App\Mail\RegistrationPaid;
 use App\Mail\RegistrationPaymentConfirmation;
@@ -649,10 +650,17 @@ class RegistrationController extends Controller
 
             // dd($allDelegatesArray);
 
+            if($mainDelegate->rate_type == "standard" || $mainDelegate->rate_type == "Standard"){
+                $finalRateType = "Standard";
+            } else {
+                $finalRateType = "Early Bird";
+            }
+
             $finalData = [
                 'mainDelegateId' => $mainDelegate->id,
+                'access_type' => $mainDelegate->access_type,
                 'pass_type' => $mainDelegate->pass_type,
-                'rate_type' => $mainDelegate->rate_type,
+                'rate_type' => $finalRateType,
                 'rate_type_string' => $mainDelegate->rate_type_string,
                 'company_name' => $mainDelegate->company_name,
                 'alternative_company_name' => $mainDelegate->alternative_company_name,
@@ -2041,6 +2049,7 @@ class RegistrationController extends Controller
                         'eventCategory' => $event->category,
                         'eventYear' => $event->year,
 
+                        'accessType' => $mainDelegate->access_type,
                         'jobTitle' => $mainDelegate->job_title,
                         'companyName' => $mainDelegate->company_name,
                         'amountPaid' => $amountPaid,
@@ -2128,6 +2137,7 @@ class RegistrationController extends Controller
                                 'eventCategory' => $event->category,
                                 'eventYear' => $event->year,
 
+                                'accessType' => $mainDelegate->access_type,
                                 'jobTitle' => $additionalDelegate->job_title,
                                 'companyName' => $mainDelegate->company_name,
                                 'amountPaid' => $amountPaidSub,
@@ -3760,9 +3770,21 @@ class RegistrationController extends Controller
                     if ($mainDiscountType != null) {
                         if ($mainDiscountType == "percentage") {
                             if ($mainDiscount == 100) {
-                                $delegateDescription = "Delegate Registration Fee - Complimentary";
+                                if($mainDelegate->accessType == AccessTypes::CONFERENCE_ONLY->value){
+                                    $delegateDescription = "Delegate Registration Fee - Complimentary - Conference only";
+                                } else if ($mainDelegate->accessType == AccessTypes::WORKSHOP_ONLY->value){
+                                    $delegateDescription = "Delegate Registration Fee - Complimentary - Workshop only";
+                                } else {
+                                    $delegateDescription = "Delegate Registration Fee - Complimentary";
+                                }
                             } else if ($mainDiscount > 0 && $mainDiscount < 100) {
-                                $delegateDescription = "Delegate Registration Fee - " . $passType . " discounted rate";
+                                if($mainDelegate->accessType == AccessTypes::CONFERENCE_ONLY->value){
+                                    $delegateDescription = "Delegate Registration Fee - " . $passType . " discounted rate - Conference only";
+                                } else if ($mainDelegate->accessType == AccessTypes::WORKSHOP_ONLY->value){
+                                    $delegateDescription = "Delegate Registration Fee - " . $passType . " discounted rate - Workshop only";
+                                } else {
+                                    $delegateDescription = "Delegate Registration Fee - " . $passType . " discounted rate";
+                                }
                             } else {
                                 $delegateDescription = "Delegate Registration Fee - {$mainDelegate->rate_type_string}";
                             }
@@ -3900,9 +3922,21 @@ class RegistrationController extends Controller
                                 if ($subDiscountType != null) {
                                     if ($subDiscountType == "percentage") {
                                         if ($subDiscount == 100) {
-                                            $subDelegateDescription = "Delegate Registration Fee - Complimentary";
+                                            if($mainDelegate->accessType == AccessTypes::CONFERENCE_ONLY->value){
+                                                $subDelegateDescription = "Delegate Registration Fee - Complimentary - Conference only";
+                                            } else if ($mainDelegate->accessType == AccessTypes::WORKSHOP_ONLY->value){
+                                                $subDelegateDescription = "Delegate Registration Fee - Complimentary - Workshop only";
+                                            } else {
+                                                $subDelegateDescription = "Delegate Registration Fee - Complimentary";
+                                            }
                                         } else if ($subDiscount > 0 && $subDiscount < 100) {
-                                            $subDelegateDescription = "Delegate Registration Fee - " . $passType . " discounted rate";
+                                            if($mainDelegate->accessType == AccessTypes::CONFERENCE_ONLY->value){
+                                                $subDelegateDescription = "Delegate Registration Fee - " . $passType . " discounted rate - Conference only";
+                                            } else if ($mainDelegate->accessType == AccessTypes::WORKSHOP_ONLY->value){
+                                                $subDelegateDescription = "Delegate Registration Fee - " . $passType . " discounted rate - Workshop only";
+                                            } else {
+                                                $subDelegateDescription = "Delegate Registration Fee - " . $passType . " discounted rate";
+                                            }
                                         } else {
                                             $subDelegateDescription = "Delegate Registration Fee - {$mainDelegate->rate_type_string}";
                                         }
@@ -4783,6 +4817,7 @@ class RegistrationController extends Controller
                     'id' => $mainDelegate->id,
                     'delegateType' => 'Main',
                     'event' => $eventCategory,
+                    'access_type' => $mainDelegate->access_type,
                     'pass_type' => $mainDelegate->pass_type,
                     'rate_type' => ($netAMount == 0) ? 'Complementary' : $mainDelegate->rate_type,
 
@@ -4842,6 +4877,10 @@ class RegistrationController extends Controller
                     // NEW june 6 2023
                     'registration_method' => $mainDelegate->registration_method,
                     'transaction_remarks' => $mainDelegate->transaction_remarks,
+
+                    // NEW may 29 2024
+                    'registration_confirmation_sent_count' => $mainDelegate->registration_confirmation_sent_count,
+                    'registration_confirmation_sent_datetime' => $mainDelegate->registration_confirmation_sent_datetime,
 
                     'delegate_cancelled' => $mainDelegate->delegate_cancelled,
                     'delegate_replaced' => $mainDelegate->delegate_replaced,
@@ -4938,6 +4977,7 @@ class RegistrationController extends Controller
                             'id' => $subDelegate->id,
                             'delegateType' => 'Sub',
                             'event' => $eventCategory,
+                            'access_type' => $mainDelegate->access_type,
                             'pass_type' => $mainDelegate->pass_type,
                             'rate_type' => $mainDelegate->rate_type,
 
@@ -4999,6 +5039,10 @@ class RegistrationController extends Controller
                             'registration_method' => $mainDelegate->registration_method,
                             'transaction_remarks' => $mainDelegate->transaction_remarks,
 
+                            // NEW may 29 2024
+                            'registration_confirmation_sent_count' => $mainDelegate->registration_confirmation_sent_count,
+                            'registration_confirmation_sent_datetime' => $mainDelegate->registration_confirmation_sent_datetime,
+
                             'delegate_cancelled' => $subDelegate->delegate_cancelled,
                             'delegate_replaced' => $subDelegate->delegate_replaced,
                             'delegate_refunded' => $subDelegate->delegate_refunded,
@@ -5031,6 +5075,7 @@ class RegistrationController extends Controller
             'ID',
             'Delegate Type',
             'Event',
+            'Access Type',
             'Pass Type',
             'Rate Type',
 
@@ -5078,6 +5123,9 @@ class RegistrationController extends Controller
             'Registration Method',
             'Transaction Remarks',
 
+            'Registration Confirmation Sent Count',
+            'Registration Confirmation Last Sent Date Time',
+
             'Delegate Cancelled',
             'Delegate Replaced',
             'Delegate Refunded',
@@ -5116,6 +5164,7 @@ class RegistrationController extends Controller
                         $data['id'],
                         $data['delegateType'],
                         $data['event'],
+                        $data['access_type'],
                         $data['pass_type'],
                         $data['rate_type'],
 
@@ -5163,6 +5212,9 @@ class RegistrationController extends Controller
 
                         $data['registration_method'],
                         $data['transaction_remarks'],
+
+                        $data['registration_confirmation_sent_count'],
+                        $data['registration_confirmation_sent_datetime'],
 
                         $data['delegate_cancelled'],
                         $data['delegate_replaced'],

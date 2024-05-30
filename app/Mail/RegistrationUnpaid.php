@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Enums\AccessTypes;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -143,9 +144,19 @@ class RegistrationUnpaid extends Mailable
                     markdown: 'emails.2024.scea.registration-unpaid',
                 );
             } else if ($this->details['eventCategory'] == "ANC") {
-                return new Content(
-                    markdown: 'emails.2024.anc.registration-unpaid',
-                );
+                if ($this->details['accessType'] == AccessTypes::CONFERENCE_ONLY->value) {
+                    return new Content(
+                        markdown: 'emails.2024.anc.co.registration-unpaid',
+                    );
+                } else if ($this->details['accessType'] == AccessTypes::WORKSHOP_ONLY->value) {
+                    return new Content(
+                        markdown: 'emails.2024.anc.wo.registration-unpaid',
+                    );
+                } else {
+                    return new Content(
+                        markdown: 'emails.2024.anc.registration-unpaid',
+                    );
+                }
             } else {
                 return new Content(
                     markdown: 'emails.registration-unpaid',

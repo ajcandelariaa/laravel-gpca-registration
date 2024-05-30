@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Enums\AccessTypes;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -144,9 +145,19 @@ class RegistrationPaid extends Mailable
                     markdown: 'emails.2024.scea.registration-paid',
                 );
             } else if ($this->details['eventCategory'] == "ANC") {
-                return new Content(
-                    markdown: 'emails.2024.anc.registration-paid',
-                );
+                if ($this->details['accessType'] == AccessTypes::CONFERENCE_ONLY->value) {
+                    return new Content(
+                        markdown: 'emails.2024.anc.co.registration-paid',
+                    );
+                } else if ($this->details['accessType'] == AccessTypes::WORKSHOP_ONLY->value) {
+                    return new Content(
+                        markdown: 'emails.2024.anc.wo.registration-paid',
+                    );
+                } else {
+                    return new Content(
+                        markdown: 'emails.2024.anc.registration-paid',
+                    );
+                }
             } else {
                 return new Content(
                     markdown: 'emails.registration-paid',

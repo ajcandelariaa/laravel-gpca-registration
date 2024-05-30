@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\AccessTypes;
 use App\Http\Livewire\PromoCode;
 use App\Models\AdditionalDelegate;
 use App\Models\AdditionalSpouse;
@@ -165,6 +166,9 @@ class EventController extends Controller
         $totalPending = 0;
         $totalDroppedOut = 0;
         $totalCancelled = 0;
+        $totalFEAttendee = 0;
+        $totalWOAttendee = 0;
+        $totalCOAttendee = 0;
         $arrayCountryTotal = array();
         $arrayCompanyTotal = array();
         $arrayRegistrationTypeTotal = array();
@@ -183,100 +187,102 @@ class EventController extends Controller
                 }
 
                 if ($mainDelegate->delegate_replaced_by_id == null && (!$mainDelegate->delegate_refunded)) {
-                    if ($mainDelegate->registration_status == "confirmed") {
-                        $totalConfirmedDelegates++;
-                    }
-
                     $totalDelegates++;
 
-                    if ($mainDelegate->pass_type == "fullMember") {
-                        $totalFullMember++;
-                    } else if ($mainDelegate->pass_type == "member") {
-                        $totalMember++;
-                    } else {
-                        $totalNonMember++;
-                    }
-
-                    if ($mainDelegate->mode_of_payment == "creditCard") {
-                        $totalCreditCard++;
-                    } else {
-                        $totalBankTransfer++;
-                    }
-
-                    if ($mainDelegate->payment_status == "paid") {
-                        $delegatePaidDate = Carbon::parse($mainDelegate->paid_date_time);
-                        if ($dateToday->isSameDay($delegatePaidDate)) {
-                            $totalPaidToday++;
+                    if ($mainDelegate->registration_status == "confirmed") {
+                        $totalConfirmedDelegates++;
+                        if ($mainDelegate->access_type == AccessTypes::CONFERENCE_ONLY->value) {
+                            $totalCOAttendee++;
+                        } else if ($mainDelegate->access_type == AccessTypes::WORKSHOP_ONLY->value) {
+                            $totalWOAttendee++;
+                        } else {
+                            $totalFEAttendee++;
                         }
 
-                        $noRefund++;
-                        $totalPaid++;
-                    } else if ($mainDelegate->payment_status == "free") {
-                        $totalFree++;
-                    } else if ($mainDelegate->payment_status == "unpaid") {
-                        $totalUnpaid++;
-                    } else {
-                    }
+
+                        if ($mainDelegate->pass_type == "fullMember") {
+                            $totalFullMember++;
+                        } else if ($mainDelegate->pass_type == "member") {
+                            $totalMember++;
+                        } else {
+                            $totalNonMember++;
+                        }
+
+                        if ($mainDelegate->mode_of_payment == "creditCard") {
+                            $totalCreditCard++;
+                        } else {
+                            $totalBankTransfer++;
+                        }
+
+                        if ($mainDelegate->payment_status == "paid") {
+                            $delegatePaidDate = Carbon::parse($mainDelegate->paid_date_time);
+                            if ($dateToday->isSameDay($delegatePaidDate)) {
+                                $totalPaidToday++;
+                            }
+
+                            $noRefund++;
+                            $totalPaid++;
+                        } else if ($mainDelegate->payment_status == "free") {
+                            $totalFree++;
+                        } else if ($mainDelegate->payment_status == "unpaid") {
+                            $totalUnpaid++;
+                        } else {
+                        }
 
 
-                    if ($mainDelegate->registration_method == "online") {
-                        $totalOnline++;
-                    } else if ($mainDelegate->registration_method == "imported") {
-                        $totalImported++;
-                    } else {
-                        $totalOnsite++;
-                    }
+                        if ($mainDelegate->registration_method == "online") {
+                            $totalOnline++;
+                        } else if ($mainDelegate->registration_method == "imported") {
+                            $totalImported++;
+                        } else {
+                            $totalOnsite++;
+                        }
+
+                        if ($this->checkIfCountryExist($mainDelegate->company_country, $arrayCountryTotal)) {
+                            foreach ($arrayCountryTotal as $index => $country) {
+                                if ($country['name'] == $mainDelegate->company_country) {
+                                    $arrayCountryTotal[$index]['total'] = $country['total'] + 1;
+                                }
+                            }
+                        } else {
+                            array_push($arrayCountryTotal, [
+                                'name' => $mainDelegate->company_country,
+                                'total' => 1,
+                            ]);
+                        }
 
 
-                    if ($mainDelegate->registration_status == "confirmed") {
-                        $totalConfirmed++;
+
+                        if ($this->checkIfCompanyExist($mainDelegate->company_name, $arrayCompanyTotal)) {
+                            foreach ($arrayCompanyTotal as $index => $company) {
+                                if ($company['name'] == $mainDelegate->company_name) {
+                                    $arrayCompanyTotal[$index]['total'] = $company['total'] + 1;
+                                }
+                            }
+                        } else {
+                            array_push($arrayCompanyTotal, [
+                                'name' => $mainDelegate->company_name,
+                                'total' => 1,
+                            ]);
+                        }
+
+
+                        if ($this->checkIfRegistrationTypeExist($mainDelegate->badge_type, $arrayRegistrationTypeTotal)) {
+                            foreach ($arrayRegistrationTypeTotal as $index => $registrationType) {
+                                if ($registrationType['name'] == $mainDelegate->badge_type) {
+                                    $arrayRegistrationTypeTotal[$index]['total'] = $registrationType['total'] + 1;
+                                }
+                            }
+                        } else {
+                            array_push($arrayRegistrationTypeTotal, [
+                                'name' => $mainDelegate->badge_type,
+                                'total' => 1,
+                            ]);
+                        }
                     } else if ($mainDelegate->registration_status == "pending") {
                         $totalPending++;
                     } else if ($mainDelegate->registration_status == "droppedOut") {
                         $totalDroppedOut++;
-                    }
-
-                    if ($this->checkIfCountryExist($mainDelegate->company_country, $arrayCountryTotal)) {
-                        foreach ($arrayCountryTotal as $index => $country) {
-                            if ($country['name'] == $mainDelegate->company_country) {
-                                $arrayCountryTotal[$index]['total'] = $country['total'] + 1;
-                            }
-                        }
-                    } else {
-                        array_push($arrayCountryTotal, [
-                            'name' => $mainDelegate->company_country,
-                            'total' => 1,
-                        ]);
-                    }
-
-
-
-
-                    if ($this->checkIfCompanyExist($mainDelegate->company_name, $arrayCompanyTotal)) {
-                        foreach ($arrayCompanyTotal as $index => $company) {
-                            if ($company['name'] == $mainDelegate->company_name) {
-                                $arrayCompanyTotal[$index]['total'] = $company['total'] + 1;
-                            }
-                        }
-                    } else {
-                        array_push($arrayCompanyTotal, [
-                            'name' => $mainDelegate->company_name,
-                            'total' => 1,
-                        ]);
-                    }
-
-
-                    if ($this->checkIfRegistrationTypeExist($mainDelegate->badge_type, $arrayRegistrationTypeTotal)) {
-                        foreach ($arrayRegistrationTypeTotal as $index => $registrationType) {
-                            if ($registrationType['name'] == $mainDelegate->badge_type) {
-                                $arrayRegistrationTypeTotal[$index]['total'] = $registrationType['total'] + 1;
-                            }
-                        }
-                    } else {
-                        array_push($arrayRegistrationTypeTotal, [
-                            'name' => $mainDelegate->badge_type,
-                            'total' => 1,
-                        ]);
                     }
                 } else {
                     if ($mainDelegate->delegate_refunded) {
@@ -292,102 +298,109 @@ class EventController extends Controller
                 if ($additionalDelegates->isNotEmpty()) {
                     foreach ($additionalDelegates as $additionalDelegate) {
                         if ($additionalDelegate->delegate_replaced_by_id == null && (!$additionalDelegate->delegate_refunded)) {
-                            if ($mainDelegate->registration_status == "confirmed") {
-                                $totalConfirmedDelegates++;
-                            }
-
                             $totalDelegates++;
 
-
-                            if ($mainDelegate->pass_type == "fullMember") {
-                                $totalFullMember++;
-                            } else if ($mainDelegate->pass_type == "member") {
-                                $totalMember++;
-                            } else {
-                                $totalNonMember++;
-                            }
-
-                            if ($mainDelegate->mode_of_payment == "creditCard") {
-                                $totalCreditCard++;
-                            } else {
-                                $totalBankTransfer++;
-                            }
-
-
-                            if ($mainDelegate->payment_status == "paid") {
-                                $delegatePaidDate = Carbon::parse($mainDelegate->paid_date_time);
-                                if ($dateToday->isSameDay($delegatePaidDate)) {
-                                    $totalPaidToday++;
-                                }
-
-                                $noRefund++;
-                                $totalPaid++;
-                            } else if ($mainDelegate->payment_status == "free") {
-                                $totalFree++;
-                            } else if ($mainDelegate->payment_status == "unpaid") {
-                                $totalUnpaid++;
-                            } else {
-                            }
-
-                            if ($mainDelegate->registration_method == "online") {
-                                $totalOnline++;
-                            } else if ($mainDelegate->registration_method == "imported") {
-                                $totalImported++;
-                            } else {
-                                $totalOnsite++;
-                            }
-
-
                             if ($mainDelegate->registration_status == "confirmed") {
-                                $totalConfirmed++;
-                            } else if ($mainDelegate->registration_status == "pending") {
-                                $totalPending++;
-                            } else if ($mainDelegate->registration_status == "droppedOut") {
-                                $totalDroppedOut++;
-                            }
-
-
-
-
-                            if ($this->checkIfCountryExist($mainDelegate->company_country, $arrayCountryTotal)) {
-                                foreach ($arrayCountryTotal as $index => $country) {
-                                    if ($country['name'] == $mainDelegate->company_country) {
-                                        $arrayCountryTotal[$index]['total'] = $country['total'] + 1;
-                                    }
+                                $totalConfirmedDelegates++;
+                                
+                                if ($mainDelegate->access_type == AccessTypes::CONFERENCE_ONLY->value) {
+                                    $totalCOAttendee++;
+                                } else if ($mainDelegate->access_type == AccessTypes::WORKSHOP_ONLY->value) {
+                                    $totalWOAttendee++;
+                                } else {
+                                    $totalFEAttendee++;
                                 }
-                            } else {
-                                array_push($arrayCountryTotal, [
-                                    'name' => $mainDelegate->company_country,
-                                    'total' => 1,
-                                ]);
-                            }
 
-
-                            if ($this->checkIfCompanyExist($mainDelegate->company_name, $arrayCompanyTotal)) {
-                                foreach ($arrayCompanyTotal as $index => $company) {
-                                    if ($company['name'] == $mainDelegate->company_name) {
-                                        $arrayCompanyTotal[$index]['total'] = $company['total'] + 1;
-                                    }
+                                if ($mainDelegate->pass_type == "fullMember") {
+                                    $totalFullMember++;
+                                } else if ($mainDelegate->pass_type == "member") {
+                                    $totalMember++;
+                                } else {
+                                    $totalNonMember++;
                                 }
-                            } else {
-                                array_push($arrayCompanyTotal, [
-                                    'name' => $mainDelegate->company_name,
-                                    'total' => 1,
-                                ]);
-                            }
 
-
-                            if ($this->checkIfRegistrationTypeExist($additionalDelegate->badge_type, $arrayRegistrationTypeTotal)) {
-                                foreach ($arrayRegistrationTypeTotal as $index => $registrationType) {
-                                    if ($registrationType['name'] == $additionalDelegate->badge_type) {
-                                        $arrayRegistrationTypeTotal[$index]['total'] = $registrationType['total'] + 1;
-                                    }
+                                if ($mainDelegate->mode_of_payment == "creditCard") {
+                                    $totalCreditCard++;
+                                } else {
+                                    $totalBankTransfer++;
                                 }
-                            } else {
-                                array_push($arrayRegistrationTypeTotal, [
-                                    'name' => $additionalDelegate->badge_type,
-                                    'total' => 1,
-                                ]);
+
+
+                                if ($mainDelegate->payment_status == "paid") {
+                                    $delegatePaidDate = Carbon::parse($mainDelegate->paid_date_time);
+                                    if ($dateToday->isSameDay($delegatePaidDate)) {
+                                        $totalPaidToday++;
+                                    }
+
+                                    $noRefund++;
+                                    $totalPaid++;
+                                } else if ($mainDelegate->payment_status == "free") {
+                                    $totalFree++;
+                                } else if ($mainDelegate->payment_status == "unpaid") {
+                                    $totalUnpaid++;
+                                } else {
+                                }
+
+                                if ($mainDelegate->registration_method == "online") {
+                                    $totalOnline++;
+                                } else if ($mainDelegate->registration_method == "imported") {
+                                    $totalImported++;
+                                } else {
+                                    $totalOnsite++;
+                                }
+
+
+                                if ($mainDelegate->registration_status == "confirmed") {
+                                    $totalConfirmed++;
+                                } else if ($mainDelegate->registration_status == "pending") {
+                                    $totalPending++;
+                                } else if ($mainDelegate->registration_status == "droppedOut") {
+                                    $totalDroppedOut++;
+                                }
+
+
+
+
+                                if ($this->checkIfCountryExist($mainDelegate->company_country, $arrayCountryTotal)) {
+                                    foreach ($arrayCountryTotal as $index => $country) {
+                                        if ($country['name'] == $mainDelegate->company_country) {
+                                            $arrayCountryTotal[$index]['total'] = $country['total'] + 1;
+                                        }
+                                    }
+                                } else {
+                                    array_push($arrayCountryTotal, [
+                                        'name' => $mainDelegate->company_country,
+                                        'total' => 1,
+                                    ]);
+                                }
+
+
+                                if ($this->checkIfCompanyExist($mainDelegate->company_name, $arrayCompanyTotal)) {
+                                    foreach ($arrayCompanyTotal as $index => $company) {
+                                        if ($company['name'] == $mainDelegate->company_name) {
+                                            $arrayCompanyTotal[$index]['total'] = $company['total'] + 1;
+                                        }
+                                    }
+                                } else {
+                                    array_push($arrayCompanyTotal, [
+                                        'name' => $mainDelegate->company_name,
+                                        'total' => 1,
+                                    ]);
+                                }
+
+
+                                if ($this->checkIfRegistrationTypeExist($additionalDelegate->badge_type, $arrayRegistrationTypeTotal)) {
+                                    foreach ($arrayRegistrationTypeTotal as $index => $registrationType) {
+                                        if ($registrationType['name'] == $additionalDelegate->badge_type) {
+                                            $arrayRegistrationTypeTotal[$index]['total'] = $registrationType['total'] + 1;
+                                        }
+                                    }
+                                } else {
+                                    array_push($arrayRegistrationTypeTotal, [
+                                        'name' => $additionalDelegate->badge_type,
+                                        'total' => 1,
+                                    ]);
+                                }
                             }
                         } else {
                             if ($additionalDelegate->delegate_refunded) {
@@ -415,36 +428,36 @@ class EventController extends Controller
         $printedBadgesArray = array();
         $printedBadges = PrintedBadge::where('event_id', $eventId)->get();
 
-        foreach($printedBadges as $printedBadge){
+        foreach ($printedBadges as $printedBadge) {
             $finalString = $printedBadge->delegate_id . $printedBadge->delegate_type;
             array_push($printedBadgesArray, $finalString);
         }
 
-        $uniquePrintedBadgesArray = array_unique($printedBadgesArray); 
-        $finalPrintedBadgesArray = array_diff_key( $printedBadgesArray, $uniquePrintedBadgesArray ); 
+        $uniquePrintedBadgesArray = array_unique($printedBadgesArray);
+        $finalPrintedBadgesArray = array_diff_key($printedBadgesArray, $uniquePrintedBadgesArray);
 
         $delegateBadgePrinted = count($printedBadges) - count($finalPrintedBadgesArray);
         $duplicateBadgePrinted = count($finalPrintedBadgesArray);
         $totalBadgePrinted = count($printedBadges);
 
 
-        
+
 
         $scannedDelegatesArray = array();
         $scannedDelegates = ScannedDelegate::where('event_id', $eventId)->get();
 
-        foreach($scannedDelegates as $scannedDelegate){
+        foreach ($scannedDelegates as $scannedDelegate) {
             $finalString = $scannedDelegate->delegate_id . $scannedDelegate->delegate_type;
             array_push($scannedDelegatesArray, $finalString);
         }
 
-        $uniqueScannedDelegateArray = array_unique($scannedDelegatesArray); 
-        $finalScannedDelegateArray = array_diff_key( $scannedDelegatesArray, $uniqueScannedDelegateArray ); 
+        $uniqueScannedDelegateArray = array_unique($scannedDelegatesArray);
+        $finalScannedDelegateArray = array_diff_key($scannedDelegatesArray, $uniqueScannedDelegateArray);
 
         $delegateBadgeScanned = count($scannedDelegates) - count($finalScannedDelegateArray);
         $duplicateBadgeScanned = count($finalScannedDelegateArray);
         $totalBadgeScanned = count($scannedDelegates);
-        
+
         $finalData = [
             'totalConfirmedDelegates' => $totalConfirmedDelegates,
             'totalDelegates' => $totalDelegates,
@@ -461,6 +474,10 @@ class EventController extends Controller
             'totalPaidToday' => $totalPaidToday,
             'totalAmountPaidToday' => $totalAmountPaidToday,
             'totalAmountPaid' => $totalAmountPaid,
+
+            'totalFEAttendee' => $totalFEAttendee,
+            'totalCOAttendee' => $totalCOAttendee,
+            'totalWOAttendee' => $totalWOAttendee,
 
             'passType' => [$totalFullMember, $totalMember, $totalNonMember],
             'paymentStatus' => [$totalPaid, $totalFree, $totalUnpaid, $totalRefunded],
@@ -957,13 +974,13 @@ class EventController extends Controller
         $printedBadgesArray = array();
         $printedBadges = VisitorPrintedBadge::where('event_id', $eventId)->get();
 
-        foreach($printedBadges as $printedBadge){
+        foreach ($printedBadges as $printedBadge) {
             $finalString = $printedBadge->visitor_id . $printedBadge->visitor_type;
             array_push($printedBadgesArray, $finalString);
         }
 
-        $uniquePrintedBadgesArray = array_unique($printedBadgesArray); 
-        $finalPrintedBadgesArray = array_diff_key( $printedBadgesArray, $uniquePrintedBadgesArray ); 
+        $uniquePrintedBadgesArray = array_unique($printedBadgesArray);
+        $finalPrintedBadgesArray = array_diff_key($printedBadgesArray, $uniquePrintedBadgesArray);
 
         $visitorBadgePrinted = count($printedBadges) - count($finalPrintedBadgesArray);
         $duplicateBadgePrinted = count($finalPrintedBadgesArray);
@@ -974,13 +991,13 @@ class EventController extends Controller
         $scannedVisitorsArray = array();
         $scannedVisitors = ScannedVisitor::where('event_id', $eventId)->get();
 
-        foreach($scannedVisitors as $scannedVisitor){
+        foreach ($scannedVisitors as $scannedVisitor) {
             $finalString = $scannedVisitor->visitor_id . $scannedVisitor->visitor_type;
             array_push($scannedVisitorsArray, $finalString);
         }
 
-        $uniqueScannedVisitorArray = array_unique($scannedVisitorsArray); 
-        $finalScannedVisitorArray = array_diff_key( $scannedVisitorsArray, $uniqueScannedVisitorArray ); 
+        $uniqueScannedVisitorArray = array_unique($scannedVisitorsArray);
+        $finalScannedVisitorArray = array_diff_key($scannedVisitorsArray, $uniqueScannedVisitorArray);
 
         $visitorBadgeScanned = count($scannedVisitors) - count($finalScannedVisitorArray);
         $duplicateBadgeScanned = count($finalScannedVisitorArray);
@@ -1442,18 +1459,26 @@ class EventController extends Controller
         if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {
             $event = Event::where('category', $eventCategory)->where('id', $eventId)->first();
 
-            $today = Carbon::today();
-            if ($event->eb_end_date != null && $event->eb_member_rate != null && $event->eb_nmember_rate != null) {
-                if ($today->lte(Carbon::parse($event->eb_end_date))) {
-                    $finalEbEndDate = Carbon::parse($event->eb_end_date)->format('d M Y');
-                } else {
-                    $finalEbEndDate = null;
-                }
-            } else {
-                $finalEbEndDate = null;
-            }
+            // $today = Carbon::today();
+            // if ($event->eb_end_date != null && $event->eb_member_rate != null && $event->eb_nmember_rate != null) {
+            //     if ($today->lte(Carbon::parse($event->eb_end_date))) {
+            //         $finalEbEndDate = Carbon::parse($event->eb_end_date)->format('d M Y');
+            //     } else {
+            //         $finalEbEndDate = null;
+            //     }
+            // } else {
+            //     $finalEbEndDate = null;
+            // }
 
-            $finalStdStartDate = Carbon::parse($event->std_start_date)->format('d M Y');
+            $finalEbEndDate = $event->eb_end_date ? Carbon::parse($event->eb_end_date)->format('d M Y') : null;
+            $finalStdStartDate = $event->std_start_date ? Carbon::parse($event->std_start_date)->format('d M Y') : null;
+
+            $finalWoEbEndDate = $event->wo_eb_end_date ? Carbon::parse($event->wo_eb_end_date)->format('d M Y') : null;
+            $finalWoStdStartDate = $event->wo_std_start_date ? Carbon::parse($event->wo_std_start_date)->format('d M Y') : null;
+
+            $finalCoEbEndDate = $event->co_eb_end_date ? Carbon::parse($event->co_eb_end_date)->format('d M Y') : null;
+            $finalCoStdStartDate = $event->co_std_start_date ? Carbon::parse($event->co_std_start_date)->format('d M Y') : null;
+
             $finalEventStartDate = Carbon::parse($event->event_start_date)->format('d M Y');
             $finalEventEndDate = Carbon::parse($event->event_end_date)->format('d M Y');
 
@@ -1466,6 +1491,13 @@ class EventController extends Controller
                 "event" => $event,
                 "finalEbEndDate" => $finalEbEndDate,
                 "finalStdStartDate" => $finalStdStartDate,
+
+                "finalWoEbEndDate" => $finalWoEbEndDate,
+                "finalWoStdStartDate" => $finalWoStdStartDate,
+
+                "finalCoEbEndDate" => $finalCoEbEndDate,
+                "finalCoStdStartDate" => $finalCoStdStartDate,
+
                 "finalEventStartDate" => $finalEventStartDate,
                 "finalEventEndDate" => $finalEventEndDate,
                 "regFormLink" => $regFormLink,
@@ -1544,6 +1576,26 @@ class EventController extends Controller
                 'std_member_rate' => 'required|numeric|min:0|max:99999.99',
                 'std_nmember_rate' => 'required|numeric|min:0|max:99999.99',
 
+                'wo_eb_end_date' => 'nullable|date',
+                'wo_eb_full_member_rate' => 'nullable|numeric|min:0|max:99999.99',
+                'wo_eb_member_rate' => 'nullable|numeric|min:0|max:99999.99',
+                'wo_eb_nmember_rate' => 'nullable|numeric|min:0|max:99999.99',
+
+                'wo_std_start_date' => 'nullable|date',
+                'wo_std_full_member_rate' => 'nullable|numeric|min:0|max:99999.99',
+                'wo_std_member_rate' => 'nullable|numeric|min:0|max:99999.99',
+                'wo_std_nmember_rate' => 'nullable|numeric|min:0|max:99999.99',
+
+                'co_eb_end_date' => 'nullable|date',
+                'co_eb_full_member_rate' => 'nullable|numeric|min:0|max:99999.99',
+                'co_eb_member_rate' => 'nullable|numeric|min:0|max:99999.99',
+                'co_eb_nmember_rate' => 'nullable|numeric|min:0|max:99999.99',
+
+                'co_std_start_date' => 'nullable|date',
+                'co_std_full_member_rate' => 'nullable|numeric|min:0|max:99999.99',
+                'co_std_member_rate' => 'nullable|numeric|min:0|max:99999.99',
+                'co_std_nmember_rate' => 'nullable|numeric|min:0|max:99999.99',
+
                 'badge_footer_link' => 'required',
                 'badge_footer_link_color' => 'required',
                 'badge_footer_bg_color' => 'required',
@@ -1602,6 +1654,52 @@ class EventController extends Controller
                 'std_nmember_rate.max' => 'Standard Non-Member Rate may not be greater than :max.',
 
 
+                'wo_eb_end_date.date' => 'Early Bird End Date must be a date',
+                'wo_eb_full_member_rate.numeric' => 'Early Bird Full Member Rate must be a number.',
+                'wo_eb_full_member_rate.min' => 'Early Bird Full Member Rate must be at least :min.',
+                'wo_eb_full_member_rate.max' => 'Early Bird Full Member Rate may not be greater than :max.',
+                'wo_eb_member_rate.numeric' => 'Early Bird Member Rate must be a number.',
+                'wo_eb_member_rate.min' => 'Early Bird Member Rate must be at least :min.',
+                'wo_eb_member_rate.max' => 'Early Bird Member Rate may not be greater than :max.',
+                'wo_eb_nmember_rate.numeric' => 'Early Bird Non-Member Rate must be a number.',
+                'wo_eb_nmember_rate.min' => 'Early Bird Non-Member Rate must be at least :min.',
+                'wo_eb_nmember_rate.max' => 'Early Bird Non-Member Rate may not be greater than :max.',
+
+                'wo_std_start_date.date' => 'Standard Start Date must be a date',
+                'wo_std_full_member_rate.numeric' => 'Standard Full Member Rate must be a number.',
+                'wo_std_full_member_rate.min' => 'Standard Full Member Rate must be at least :min.',
+                'wo_std_full_member_rate.max' => 'Standard Full Member Rate may not be greater than :max.',
+                'wo_std_member_rate.numeric' => 'Standard Member Rate must be a number.',
+                'wo_std_member_rate.min' => 'Standard Member Rate must be at least :min.',
+                'wo_std_member_rate.max' => 'Standard Member Rate may not be greater than :max.',
+                'wo_std_nmember_rate.numeric' => 'Standard Non-Member Rate must be a number.',
+                'wo_std_nmember_rate.min' => 'Standard Non-Member Rate must be at least :min.',
+                'wo_std_nmember_rate.max' => 'Standard Non-Member Rate may not be greater than :max.',
+
+
+                'co_eb_end_date.date' => 'Early Bird End Date must be a date',
+                'co_eb_full_member_rate.numeric' => 'Early Bird Full Member Rate must be a number.',
+                'co_eb_full_member_rate.min' => 'Early Bird Full Member Rate must be at least :min.',
+                'co_eb_full_member_rate.max' => 'Early Bird Full Member Rate may not be greater than :max.',
+                'co_eb_member_rate.numeric' => 'Early Bird Member Rate must be a number.',
+                'co_eb_member_rate.min' => 'Early Bird Member Rate must be at least :min.',
+                'co_eb_member_rate.max' => 'Early Bird Member Rate may not be greater than :max.',
+                'co_eb_nmember_rate.numeric' => 'Early Bird Non-Member Rate must be a number.',
+                'co_eb_nmember_rate.min' => 'Early Bird Non-Member Rate must be at least :min.',
+                'co_eb_nmember_rate.max' => 'Early Bird Non-Member Rate may not be greater than :max.',
+
+                'co_std_start_date.date' => 'Standard Start Date must be a date',
+                'co_std_full_member_rate.numeric' => 'Standard Full Member Rate must be a number.',
+                'co_std_full_member_rate.min' => 'Standard Full Member Rate must be at least :min.',
+                'co_std_full_member_rate.max' => 'Standard Full Member Rate may not be greater than :max.',
+                'co_std_member_rate.numeric' => 'Standard Member Rate must be a number.',
+                'co_std_member_rate.min' => 'Standard Member Rate must be at least :min.',
+                'co_std_member_rate.max' => 'Standard Member Rate may not be greater than :max.',
+                'co_std_nmember_rate.numeric' => 'Standard Non-Member Rate must be a number.',
+                'co_std_nmember_rate.min' => 'Standard Non-Member Rate must be at least :min.',
+                'co_std_nmember_rate.max' => 'Standard Non-Member Rate may not be greater than :max.',
+
+
                 'badge_footer_link.required' => 'Badge Footer Link is required',
                 'badge_footer_link_color.required' => 'Badge Footer Link Color is required',
                 'badge_footer_bg_color.required' => 'Badge Footer Link Background Color is required',
@@ -1639,6 +1737,28 @@ class EventController extends Controller
             'std_full_member_rate' => $request->std_full_member_rate,
             'std_member_rate' => $request->std_member_rate,
             'std_nmember_rate' => $request->std_nmember_rate,
+
+
+            'wo_eb_end_date' => $request->wo_eb_end_date,
+            'wo_eb_full_member_rate' => $request->wo_eb_full_member_rate,
+            'wo_eb_member_rate' => $request->wo_eb_member_rate,
+            'wo_eb_nmember_rate' => $request->wo_eb_nmember_rate,
+
+            'wo_std_start_date' => $request->wo_std_start_date,
+            'wo_std_full_member_rate' => $request->wo_std_full_member_rate,
+            'wo_std_member_rate' => $request->wo_std_member_rate,
+            'wo_std_nmember_rate' => $request->wo_std_nmember_rate,
+
+
+            'co_eb_end_date' => $request->co_eb_end_date,
+            'co_eb_full_member_rate' => $request->co_eb_full_member_rate,
+            'co_eb_member_rate' => $request->co_eb_member_rate,
+            'co_eb_nmember_rate' => $request->co_eb_nmember_rate,
+
+            'co_std_start_date' => $request->co_std_start_date,
+            'co_std_full_member_rate' => $request->co_std_full_member_rate,
+            'co_std_member_rate' => $request->co_std_member_rate,
+            'co_std_nmember_rate' => $request->co_std_nmember_rate,
 
             'badge_footer_link' => $request->badge_footer_link,
             'badge_footer_link_color' => $request->badge_footer_link_color,
@@ -1706,6 +1826,27 @@ class EventController extends Controller
                     'std_member_rate' => 'required|numeric|min:0|max:99999.99',
                     'std_nmember_rate' => 'required|numeric|min:0|max:99999.99',
 
+                    'wo_eb_end_date' => 'nullable|date',
+                    'wo_eb_full_member_rate' => 'nullable|numeric|min:0|max:99999.99',
+                    'wo_eb_member_rate' => 'nullable|numeric|min:0|max:99999.99',
+                    'wo_eb_nmember_rate' => 'nullable|numeric|min:0|max:99999.99',
+
+                    'wo_std_start_date' => 'nullable|date',
+                    'wo_std_full_member_rate' => 'nullable|numeric|min:0|max:99999.99',
+                    'wo_std_member_rate' => 'nullable|numeric|min:0|max:99999.99',
+                    'wo_std_nmember_rate' => 'nullable|numeric|min:0|max:99999.99',
+
+                    'co_eb_end_date' => 'nullable|date',
+                    'co_eb_full_member_rate' => 'nullable|numeric|min:0|max:99999.99',
+                    'co_eb_member_rate' => 'nullable|numeric|min:0|max:99999.99',
+                    'co_eb_nmember_rate' => 'nullable|numeric|min:0|max:99999.99',
+
+                    'co_std_start_date' => 'nullable|date',
+                    'co_std_full_member_rate' => 'nullable|numeric|min:0|max:99999.99',
+                    'co_std_member_rate' => 'nullable|numeric|min:0|max:99999.99',
+                    'co_std_nmember_rate' => 'nullable|numeric|min:0|max:99999.99',
+
+
                     'badge_footer_link' => 'required',
                     'badge_footer_link_color' => 'required',
                     'badge_footer_bg_color' => 'required',
@@ -1763,6 +1904,51 @@ class EventController extends Controller
                     'std_nmember_rate.min' => 'Standard Non-Member Rate must be at least :min.',
                     'std_nmember_rate.max' => 'Standard Non-Member Rate may not be greater than :max.',
 
+                    'wo_eb_end_date.date' => 'Early Bird End Date must be a date',
+                    'wo_eb_full_member_rate.numeric' => 'Early Bird Full Member Rate must be a number.',
+                    'wo_eb_full_member_rate.min' => 'Early Bird Full Member Rate must be at least :min.',
+                    'wo_eb_full_member_rate.max' => 'Early Bird Full Member Rate may not be greater than :max.',
+                    'wo_eb_member_rate.numeric' => 'Early Bird Member Rate must be a number.',
+                    'wo_eb_member_rate.min' => 'Early Bird Member Rate must be at least :min.',
+                    'wo_eb_member_rate.max' => 'Early Bird Member Rate may not be greater than :max.',
+                    'wo_eb_nmember_rate.numeric' => 'Early Bird Non-Member Rate must be a number.',
+                    'wo_eb_nmember_rate.min' => 'Early Bird Non-Member Rate must be at least :min.',
+                    'wo_eb_nmember_rate.max' => 'Early Bird Non-Member Rate may not be greater than :max.',
+
+                    'wo_std_start_date.date' => 'Standard Start Date must be a date',
+                    'wo_std_full_member_rate.numeric' => 'Standard Full Member Rate must be a number.',
+                    'wo_std_full_member_rate.min' => 'Standard Full Member Rate must be at least :min.',
+                    'wo_std_full_member_rate.max' => 'Standard Full Member Rate may not be greater than :max.',
+                    'wo_std_member_rate.numeric' => 'Standard Member Rate must be a number.',
+                    'wo_std_member_rate.min' => 'Standard Member Rate must be at least :min.',
+                    'wo_std_member_rate.max' => 'Standard Member Rate may not be greater than :max.',
+                    'wo_std_nmember_rate.numeric' => 'Standard Non-Member Rate must be a number.',
+                    'wo_std_nmember_rate.min' => 'Standard Non-Member Rate must be at least :min.',
+                    'wo_std_nmember_rate.max' => 'Standard Non-Member Rate may not be greater than :max.',
+
+
+                    'co_eb_end_date.date' => 'Early Bird End Date must be a date',
+                    'co_eb_full_member_rate.numeric' => 'Early Bird Full Member Rate must be a number.',
+                    'co_eb_full_member_rate.min' => 'Early Bird Full Member Rate must be at least :min.',
+                    'co_eb_full_member_rate.max' => 'Early Bird Full Member Rate may not be greater than :max.',
+                    'co_eb_member_rate.numeric' => 'Early Bird Member Rate must be a number.',
+                    'co_eb_member_rate.min' => 'Early Bird Member Rate must be at least :min.',
+                    'co_eb_member_rate.max' => 'Early Bird Member Rate may not be greater than :max.',
+                    'co_eb_nmember_rate.numeric' => 'Early Bird Non-Member Rate must be a number.',
+                    'co_eb_nmember_rate.min' => 'Early Bird Non-Member Rate must be at least :min.',
+                    'co_eb_nmember_rate.max' => 'Early Bird Non-Member Rate may not be greater than :max.',
+
+                    'co_std_start_date.date' => 'Standard Start Date must be a date',
+                    'co_std_full_member_rate.numeric' => 'Standard Full Member Rate must be a number.',
+                    'co_std_full_member_rate.min' => 'Standard Full Member Rate must be at least :min.',
+                    'co_std_full_member_rate.max' => 'Standard Full Member Rate may not be greater than :max.',
+                    'co_std_member_rate.numeric' => 'Standard Member Rate must be a number.',
+                    'co_std_member_rate.min' => 'Standard Member Rate must be at least :min.',
+                    'co_std_member_rate.max' => 'Standard Member Rate may not be greater than :max.',
+                    'co_std_nmember_rate.numeric' => 'Standard Non-Member Rate must be a number.',
+                    'co_std_nmember_rate.min' => 'Standard Non-Member Rate must be at least :min.',
+                    'co_std_nmember_rate.max' => 'Standard Non-Member Rate may not be greater than :max.',
+
 
                     'badge_footer_link.required' => 'Badge Footer Link is required',
                     'badge_footer_link_color.required' => 'Badge Footer Link Color is required',
@@ -1794,6 +1980,30 @@ class EventController extends Controller
             $event->std_full_member_rate = $validatedData['std_full_member_rate'];
             $event->std_member_rate = $validatedData['std_member_rate'];
             $event->std_nmember_rate = $validatedData['std_nmember_rate'];
+
+
+
+            $event->wo_eb_end_date = $validatedData['wo_eb_end_date'];
+            $event->wo_eb_full_member_rate = $validatedData['wo_eb_full_member_rate'];
+            $event->wo_eb_member_rate = $validatedData['wo_eb_member_rate'];
+            $event->wo_eb_nmember_rate = $validatedData['wo_eb_nmember_rate'];
+
+            $event->wo_std_start_date = $validatedData['wo_std_start_date'];
+            $event->wo_std_full_member_rate = $validatedData['wo_std_full_member_rate'];
+            $event->wo_std_member_rate = $validatedData['wo_std_member_rate'];
+            $event->wo_std_nmember_rate = $validatedData['wo_std_nmember_rate'];
+
+
+            $event->co_eb_end_date = $validatedData['co_eb_end_date'];
+            $event->co_eb_full_member_rate = $validatedData['co_eb_full_member_rate'];
+            $event->co_eb_member_rate = $validatedData['co_eb_member_rate'];
+            $event->co_eb_nmember_rate = $validatedData['co_eb_nmember_rate'];
+
+            $event->co_std_start_date = $validatedData['co_std_start_date'];
+            $event->co_std_full_member_rate = $validatedData['co_std_full_member_rate'];
+            $event->co_std_member_rate = $validatedData['co_std_member_rate'];
+            $event->co_std_nmember_rate = $validatedData['co_std_nmember_rate'];
+
 
             $event->badge_footer_link = $validatedData['badge_footer_link'];
             $event->badge_footer_link_color = $validatedData['badge_footer_link_color'];
@@ -1832,15 +2042,15 @@ class EventController extends Controller
         }
     }
 
-    public function updateEventStatus(Request $request, $eventCategory, $eventId, $eventStatus){
+    public function updateEventStatus(Request $request, $eventCategory, $eventId, $eventStatus)
+    {
         if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {
 
             Event::where('id', $eventId)->update([
-                'active'=> !$eventStatus,
+                'active' => !$eventStatus,
             ]);
 
             return redirect()->route('admin.event.detail.view', ['eventCategory' => $eventCategory, 'eventId' => $eventId])->with('success', 'Event status updated successfully.');
-
         } else {
             abort(404, 'The URL is incorrect');
         }
@@ -1901,15 +2111,16 @@ class EventController extends Controller
     //                       RENDER APIS
     // =========================================================
 
-    public function getRegistrationTypes($eventCategory, $year){
-        if(Event::where('category', $eventCategory)->where('year', $year)->exists()){
+    public function getRegistrationTypes($eventCategory, $year)
+    {
+        if (Event::where('category', $eventCategory)->where('year', $year)->exists()) {
             $eventId = Event::where('category', $eventCategory)->where('year', $year)->value('id');
             $registrationTypes = EventRegistrationType::where('event_id', $eventId)->where('active', true)->get();
-    
+
             $finalRegistrationTypes = array();
-    
-            if($registrationTypes->isNotEmpty()){
-                foreach($registrationTypes as $registrationType){
+
+            if ($registrationTypes->isNotEmpty()) {
+                foreach ($registrationTypes as $registrationType) {
                     array_push($finalRegistrationTypes, $registrationType->registration_type);
                 }
             }
@@ -1925,30 +2136,31 @@ class EventController extends Controller
         }
     }
 
-    public function exportListOfPromoCodes($eventCategory, $eventId){
+    public function exportListOfPromoCodes($eventCategory, $eventId)
+    {
         if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {
             $finalExcelData = array();
 
             $eventYear = Event::where('category', $eventCategory)->where('id', $eventId)->value('year');
             $promoCodes = ModelsPromoCode::where('event_id', $eventId)->where('event_category', $eventCategory)->get();
 
-            foreach($promoCodes as $promoCode){
+            foreach ($promoCodes as $promoCode) {
                 $badgeTypesForPromoCode = $promoCode->badge_type;
 
                 $additionalBadgeTypes = PromoCodeAddtionalBadgeType::where('event_id', $eventId)->where('promo_code_id', $promoCode->id)->get();
 
-                if($additionalBadgeTypes->isNotEmpty()){
-                    foreach($additionalBadgeTypes as $additionalBadgeType){
+                if ($additionalBadgeTypes->isNotEmpty()) {
+                    foreach ($additionalBadgeTypes as $additionalBadgeType) {
                         $badgeTypesForPromoCode = "$badgeTypesForPromoCode, $additionalBadgeType->badge_type";
                     }
                 }
 
-                if($promoCode->discount_type == "percentage"){
+                if ($promoCode->discount_type == "percentage") {
                     $discountType = "Percentage";
                     $discount = "$promoCode->discount %";
                     $newRate = 'N/A';
                     $newRateDescription = 'N/A';
-                } else if ($promoCode->discount_type == "price"){
+                } else if ($promoCode->discount_type == "price") {
                     $discountType = "Price";
                     $discount = "$ $promoCode->discount";
                     $newRate = 'N/A';
@@ -1960,7 +2172,7 @@ class EventController extends Controller
                     $newRateDescription = $promoCode->new_rate_description;
                 }
 
-                
+
                 array_push($finalExcelData, [
                     'promo_code' => $promoCode->promo_code,
                     'registration_types' => $badgeTypesForPromoCode,
@@ -1987,7 +2199,7 @@ class EventController extends Controller
                 "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
                 "Expires"             => "0"
             );
-            
+
             $columns = array(
                 'Promo Code',
                 'Registration types',
@@ -2006,7 +2218,7 @@ class EventController extends Controller
             $callback = function () use ($finalExcelData, $columns) {
                 $file = fopen('php://output', 'w');
                 fputcsv($file, $columns);
-    
+
                 foreach ($finalExcelData as $data) {
                     fputcsv(
                         $file,

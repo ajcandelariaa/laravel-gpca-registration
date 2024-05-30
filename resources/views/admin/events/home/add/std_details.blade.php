@@ -1,7 +1,7 @@
 {{-- ROW 6 --}}
 <div class="space-y-2 col-span-2 grid grid-cols-4 gap-x-5 items-start">
     <div class="text-registrationPrimaryColor font-medium text-xl pt-3 pb-2 col-span-4">
-        Standard Details
+        Full Event - Standard Details
     </div>
     <div>
         <div class="text-registrationPrimaryColor">

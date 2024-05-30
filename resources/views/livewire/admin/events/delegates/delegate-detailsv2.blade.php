@@ -104,6 +104,9 @@
 
                 <div class="grid grid-cols-delegateDetailGrid2 gap-y-2 items-center">
 
+                    <p class="font-bold">Access type:</p>
+                    <p>{{ $finalDelegate['access_type'] }}</p>
+
                     <p class="font-bold">Transaction ID:</p>
                     <p>{{ $finalDelegate['finalTransactionId'] }}</p>
 

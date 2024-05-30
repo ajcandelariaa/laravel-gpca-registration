@@ -9,7 +9,7 @@
 
         <div class="grid grid-cols-1 gap-4 text-center">
             <div class="bg-blue-500 p-4 rounded-lg shadow-lg">
-                <h3 class="text-lg font-semibold text-white">Confirmed delegates</h3>
+                <h3 class="text-lg font-semibold text-white">Confirmed attendees</h3>
                 <p class="text-4xl font-bold text-white">{{ $finalData['totalConfirmedDelegates'] }}</p>
             </div>
         </div>
@@ -70,6 +70,21 @@
             </div>
         </div>
 
+        <div class="grid grid-cols-3 gap-4 text-center mt-10">
+            <div class="bg-green-500 p-4 rounded-lg shadow-lg">
+                <h3 class="text-lg font-semibold text-white">Full event attendees</h3>
+                <p class="text-4xl font-bold text-white">{{ $finalData['totalFEAttendee'] }}</p>
+            </div>
+            <div class="bg-green-500 p-4 rounded-lg shadow-lg">
+                <h3 class="text-lg font-semibold text-white">Conference only attendees</h3>
+                <p class="text-4xl font-bold text-white">{{ $finalData['totalCOAttendee'] }}</p>
+            </div>
+            <div class="bg-green-500 p-4 rounded-lg shadow-lg">
+                <h3 class="text-lg font-semibold text-white">Workshop only attendees</h3>
+                <p class="text-4xl font-bold text-white">{{ $finalData['totalWOAttendee'] }}</p>
+            </div>
+        </div>
+
         <div class="grid grid-cols-3 gap-5 mt-10">
             <div class="border border-gray-200">
                 <p class="py-2 bg-registrationPrimaryColor text-xl text-white text-center">Pass Type</p>
@@ -118,7 +133,7 @@
         <div class="grid grid-cols-3 gap-8 mt-10">
             @if (count($finalData['arrayCountryTotal']) > 0)
                 <div class="bg-white rounded-lg shadow-md text-center">
-                    <h2 class="text-lg font-semibold bg-blue-700 text-white px-6 py-4 rounded-t-lg">Country</h2>
+                    <h2 class="text-lg font-semibold bg-blue-700 text-white px-6 py-4 rounded-t-lg">Country ({{ count($finalData['arrayCountryTotal']) }})</h2>
                     <div class="grid grid-cols-2 justify-center items-center bg-blue-500">
                         <p class="py-3 px-6 font-medium text-sm text-white">Name</p>
                         <p class="py-3 px-6 font-medium text-sm text-white">Total</p>
@@ -135,7 +150,7 @@
 
             @if (count($finalData['arrayCompanyTotal']) > 0)
                 <div class="bg-white rounded-lg shadow-md text-center">
-                    <h2 class="text-lg font-semibold bg-blue-700 text-white px-6 py-4 rounded-t-lg">Company</h2>
+                    <h2 class="text-lg font-semibold bg-blue-700 text-white px-6 py-4 rounded-t-lg">Company ({{ count($finalData['arrayCompanyTotal']) }})</h2>
                     <div class="grid grid-cols-2 justify-center items-center bg-blue-500">
                         <p class="py-3 px-6 font-medium text-sm text-white">Name</p>
                         <p class="py-3 px-6 font-medium text-sm text-white">Total</p>
@@ -152,7 +167,7 @@
 
             @if (count($finalData['arrayRegistrationTypeTotal']) > 0)
                 <div class="bg-white rounded-lg shadow-md text-center">
-                    <h2 class="text-lg font-semibold bg-blue-700 text-white px-6 py-4 rounded-t-lg">Registration Type</h2>
+                    <h2 class="text-lg font-semibold bg-blue-700 text-white px-6 py-4 rounded-t-lg">Registration Type ({{ count($finalData['arrayRegistrationTypeTotal']) }})</h2>
                     <div class="grid grid-cols-2 justify-center items-center bg-blue-500">
                         <p class="py-3 px-6 font-medium text-sm text-white">Name</p>
                         <p class="py-3 px-6 font-medium text-sm text-white">Total</p>

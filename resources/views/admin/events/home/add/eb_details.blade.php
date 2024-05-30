@@ -3,7 +3,7 @@
     
     <div class="flex justify-between pt-3 pb-2 col-span-4">
         <div class="text-registrationPrimaryColor font-medium text-xl ">
-            Early Bird Details
+            Full Event - Early Bird Details
         </div>
         <div>
             <input type="checkbox" id="toggle_inputs" class="cursor-pointer">

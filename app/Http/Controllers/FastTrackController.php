@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\AccessTypes;
 use App\Models\AdditionalDelegate;
 use App\Models\DelegateDetailsUpdateLog;
 use App\Models\Event;
@@ -83,10 +84,10 @@ class FastTrackController extends Controller
                         $fullName .= ' ' . $mainDelegate->last_name;
                     }
 
-                    if($eventCategory == "PC"){
+                    if ($eventCategory == "PC") {
                         $finalFrontTextBGColor = "#ffffff";
                         $finalFontTextColor = "#000000";
-                    } else if ($eventCategory == "SCC"){
+                    } else if ($eventCategory == "SCC") {
                         $finalFrontTextBGColor = "#ffffff";
                         $finalFontTextColor = "#000000";
                     } else {
@@ -94,7 +95,16 @@ class FastTrackController extends Controller
                         $finalFontTextColor = $registrationType->badge_footer_front_text_color;
                     }
 
+                    if ($mainDelegate->access_type == AccessTypes::CONFERENCE_ONLY->value) {
+                        $finalAccessType = "CO";
+                    } else if ($mainDelegate->access_type == AccessTypes::WORKSHOP_ONLY->value) {
+                        $finalAccessType = "WO";
+                    } else {
+                        $finalAccessType = "FE";
+                    }
+
                     array_push($confirmedDelegates, [
+                        'accessType' => $finalAccessType,
                         'transactionId' => $finalTransactionId,
                         'id' => $mainDelegate->id,
                         'delegateType' => "main",
@@ -157,10 +167,10 @@ class FastTrackController extends Controller
                             }
 
 
-                            if($eventCategory == "PC"){
+                            if ($eventCategory == "PC") {
                                 $finalFrontTextBGColor = "#ffffff";
                                 $finalFontTextColor = "#000000";
-                            } else if ($eventCategory == "SCC"){
+                            } else if ($eventCategory == "SCC") {
                                 $finalFrontTextBGColor = "#ffffff";
                                 $finalFontTextColor = "#000000";
                             } else {
@@ -168,7 +178,16 @@ class FastTrackController extends Controller
                                 $finalFontTextColor = $registrationType->badge_footer_front_text_color;
                             }
 
+                            if ($mainDelegate->access_type == AccessTypes::CONFERENCE_ONLY->value) {
+                                $finalAccessType = "CO";
+                            } else if ($mainDelegate->access_type == AccessTypes::WORKSHOP_ONLY->value) {
+                                $finalAccessType = "WO";
+                            } else {
+                                $finalAccessType = "FE";
+                            }
+
                             array_push($confirmedDelegates, [
+                                'accessType' => $finalAccessType,
                                 'transactionId' => $finalTransactionId,
                                 'id' => $subDelegate->id,
                                 'delegateType' => "sub",

@@ -11,6 +11,7 @@ class MainDelegate extends Model
     
     protected $fillable = [
         'event_id',
+        'access_type',
         'pass_type',
         'rate_type',
         'rate_type_string',

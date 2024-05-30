@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire;
 
+use App\Enums\AccessTypes;
 use App\Mail\RegistrationFree;
 use App\Mail\RegistrationPaid;
 use App\Mail\RegistrationPaymentConfirmation;
@@ -26,7 +27,7 @@ class RegistrantDetails extends Component
 
     public $eventCategory, $eventId, $registrantId, $finalData, $members, $event;
 
-    public $rateType, $finalUnitPrice;
+    public $accessType, $rateType, $finalUnitPrice;
 
     // COMPANY INFO
     public $delegatePassType, $rateTypeString, $companyName, $alternativeCompanyName, $companySector, $companyAddress, $companyCountry, $companyCity, $companyLandlineNumber, $assistantEmailAddress, $companyMobileNumber;
@@ -43,6 +44,7 @@ class RegistrantDetails extends Component
     // MODALS
     public $showDelegateModal = false;
     public $showCompanyModal = false;
+    public $showRegistrationDetailsModal = false;
     public $showTransactionRemarksModal = false;
     public $showDelegateCancellationModal = false;
     public $showMarkAsPaidModal = false;
@@ -143,7 +145,7 @@ class RegistrantDetails extends Component
                 'badge_type' => $this->badgeType,
                 'pcode_used' => $this->promoCode,
                 'country' => $this->country,
-                ])->save();
+            ])->save();
         }
 
         $this->finalData['allDelegates'][$this->delegateIndex][$this->delegateInnerIndex]['salutation'] = $this->salutation;
@@ -311,19 +313,19 @@ class RegistrantDetails extends Component
 
         if ($this->finalData['rate_type'] == "standard" || $this->finalData['rate_type'] == "Standard") {
             if ($this->delegatePassType == "fullMember") {
-                $this->rateTypeString = "Full member standard rate";
+                $this->rateTypeString = "Full member standard rate - " . $this->getAccessTypesDescription($this->accessType, true);
             } else if ($this->delegatePassType == "member") {
-                $this->rateTypeString = "Member standard rate";
+                $this->rateTypeString = "Member standard rate - " . $this->getAccessTypesDescription($this->accessType, true);
             } else {
-                $this->rateTypeString = "Non-Member standard rate";
+                $this->rateTypeString = "Non-Member standard rate - " . $this->getAccessTypesDescription($this->accessType, true);
             }
         } else {
             if ($this->delegatePassType == "fullMember") {
-                $this->rateTypeString = "Full member early bird rate";
+                $this->rateTypeString = "Full member early bird rate - " . $this->getAccessTypesDescription($this->accessType, true);
             } else if ($this->delegatePassType == "member") {
-                $this->rateTypeString = "Member early bird rate";
+                $this->rateTypeString = "Member early bird rate - " . $this->getAccessTypesDescription($this->accessType, true);
             } else {
-                $this->rateTypeString = "Non-Member early bird rate";
+                $this->rateTypeString = "Non-Member early bird rate - " . $this->getAccessTypesDescription($this->accessType, true);
             }
         }
 
@@ -401,6 +403,64 @@ class RegistrantDetails extends Component
         $this->companyLandlineNumber = null;
         $this->companyMobileNumber = null;
         $this->assistantEmailAddress = null;
+    }
+
+    public function updateRegistrationDetails()
+    {
+        $this->validate([
+            'accessType' => 'required',
+            'rateType' => 'required',
+        ]);
+
+        if ($this->finalData['rate_type'] == "Standard") {
+            if ($this->finalData['pass_type'] == "fullMember") {
+                $this->rateTypeString = "Full member standard rate - " . $this->getAccessTypesDescription($this->accessType, true);
+            } else if ($this->finalData['pass_type'] == "member") {
+                $this->rateTypeString = "Member standard rate - " . $this->getAccessTypesDescription($this->accessType, true);
+            } else {
+                $this->rateTypeString = "Non-Member standard rate - " . $this->getAccessTypesDescription($this->accessType, true);
+            }
+        } else {
+            if ($this->finalData['pass_type'] == "fullMember") {
+                $this->rateTypeString = "Full member early bird rate - " . $this->getAccessTypesDescription($this->accessType, true);
+            } else if ($this->finalData['pass_type'] == "member") {
+                $this->rateTypeString = "Member early bird rate - " . $this->getAccessTypesDescription($this->accessType, true);
+            } else {
+                $this->rateTypeString = "Non-Member early bird rate - " . $this->getAccessTypesDescription($this->accessType, true);
+            }
+        }
+
+        MainDelegates::find($this->finalData['mainDelegateId'])->fill([
+            'access_type' => $this->accessType,
+            'rate_type' => $this->rateType,
+            'rate_type_string' => $this->rateTypeString,
+        ])->save();
+
+        $this->finalData['access_type'] = $this->accessType;
+        $this->finalData['rate_type'] = $this->rateType;
+        $this->finalData['rate_type_string'] = $this->rateTypeString;
+
+        $this->calculateTotal();
+
+        $this->accessType = null;
+        $this->rateType = null;
+        $this->rateTypeString = null;
+        $this->showRegistrationDetailsModal = false;
+    }
+
+    public function openEditRegistrationDetailsModal()
+    {
+        $this->accessType = $this->finalData['access_type'];
+        $this->rateType = $this->finalData['rate_type'];
+        $this->showRegistrationDetailsModal = true;
+    }
+
+    public function closeEditRegistrationDetailsModal()
+    {
+        $this->accessType = null;
+        $this->rateType = null;
+        $this->rateTypeString = null;
+        $this->showRegistrationDetailsModal = false;
     }
 
     public function openMarkAsPaidModal()
@@ -513,6 +573,7 @@ class RegistrantDetails extends Component
                                 'eventCategory' => $this->event->category,
                                 'eventYear' => $this->event->year,
 
+                                'accessType' => $this->finalData['access_type'],
                                 'jobTitle' => $innerDelegate['job_title'],
                                 'companyName' => $finalCompanyName,
                                 'amountPaid' => $amountPaid,
@@ -608,21 +669,59 @@ class RegistrantDetails extends Component
     {
         // CHECK UNIT PRICE
         // dd($this->finalData);
-        if ($this->finalData['rate_type'] == "standard" || $this->finalData['rate_type'] == "Standard") {
-            if ($this->finalData['pass_type'] == "fullMember") {
-                return $this->event->std_full_member_rate;
-            } else if ($this->finalData['pass_type'] == "member") {
-                return $this->event->std_member_rate;
+        if ($this->accessType == AccessTypes::CONFERENCE_ONLY->value) {
+            if ($this->finalData['rate_type'] == "standard" || $this->finalData['rate_type'] == "Standard") {
+                if ($this->finalData['pass_type'] == "fullMember") {
+                    return $this->event->co_std_full_member_rate;
+                } else if ($this->finalData['pass_type'] == "member") {
+                    return $this->event->co_std_member_rate;
+                } else {
+                    return $this->event->co_std_nmember_rate;
+                }
             } else {
-                return $this->event->std_nmember_rate;
+                if ($this->finalData['pass_type'] == "fullMember") {
+                    return $this->event->co_eb_full_member_rate;
+                } else if ($this->finalData['pass_type'] == "member") {
+                    return $this->event->co_eb_member_rate;
+                } else {
+                    return $this->event->co_eb_nmember_rate;
+                }
+            }
+        } else if ($this->accessType == AccessTypes::WORKSHOP_ONLY->value) {
+            if ($this->finalData['rate_type'] == "standard" || $this->finalData['rate_type'] == "Standard") {
+                if ($this->finalData['pass_type'] == "fullMember") {
+                    return $this->event->wo_std_full_member_rate;
+                } else if ($this->finalData['pass_type'] == "member") {
+                    return $this->event->wo_std_member_rate;
+                } else {
+                    return $this->event->wo_std_nmember_rate;
+                }
+            } else {
+                if ($this->finalData['pass_type'] == "fullMember") {
+                    return $this->event->wo_eb_full_member_rate;
+                } else if ($this->finalData['pass_type'] == "member") {
+                    return $this->event->wo_eb_member_rate;
+                } else {
+                    return $this->event->wo_eb_nmember_rate;
+                }
             }
         } else {
-            if ($this->finalData['pass_type'] == "fullMember") {
-                return $this->event->eb_full_member_rate;
-            } else if ($this->finalData['pass_type'] == "member") {
-                return $this->event->eb_member_rate;
+            if ($this->finalData['rate_type'] == "standard" || $this->finalData['rate_type'] == "Standard") {
+                if ($this->finalData['pass_type'] == "fullMember") {
+                    return $this->event->std_full_member_rate;
+                } else if ($this->finalData['pass_type'] == "member") {
+                    return $this->event->std_member_rate;
+                } else {
+                    return $this->event->std_nmember_rate;
+                }
             } else {
-                return $this->event->eb_nmember_rate;
+                if ($this->finalData['pass_type'] == "fullMember") {
+                    return $this->event->eb_full_member_rate;
+                } else if ($this->finalData['pass_type'] == "member") {
+                    return $this->event->eb_member_rate;
+                } else {
+                    return $this->event->eb_nmember_rate;
+                }
             }
         }
     }
@@ -678,7 +777,11 @@ class RegistrantDetails extends Component
                 if ($mainDiscountType == "percentage") {
 
                     if ($mainDiscount == 100) {
-                        $delegateDescription = "Delegate Registration Fee - Complimentary";
+                        if ($this->getAccessTypesDescription($this->accessType, true) == null) {
+                            $delegateDescription = "Delegate Registration Fee - Complimentary";
+                        } else {
+                            $delegateDescription = "Delegate Registration Fee - Complimentary - " . $this->getAccessTypesDescription($this->accessType, true);
+                        }
                     } else if ($mainDiscount > 0 && $mainDiscount < 100) {
                         $delegateDescription = "Delegate Registration Fee - " . $mainDelegate->rate_type_string . " (" . $mainDiscount . "% discount)";
                     } else {
@@ -811,7 +914,11 @@ class RegistrantDetails extends Component
                         if ($subDiscountType != null) {
                             if ($subDiscountType == "percentage") {
                                 if ($subDiscount == 100) {
-                                    $subDelegateDescription = "Delegate Registration Fee - Complimentary";
+                                    if ($this->getAccessTypesDescription($this->accessType, true) == null) {
+                                        $subDelegateDescription = "Delegate Registration Fee - Complimentary";
+                                    } else {
+                                        $subDelegateDescription = "Delegate Registration Fee - Complimentary - " . $this->getAccessTypesDescription($this->accessType, true);
+                                    }
                                 } else if ($subDiscount > 0 && $subDiscount < 100) {
                                     $subDelegateDescription = "Delegate Registration Fee - " . $mainDelegate->rate_type_string . " (" . $subDiscount . "% discount)";
                                 } else {
@@ -979,6 +1086,7 @@ class RegistrantDetails extends Component
                             'eventCategory' => $this->event->category,
                             'eventYear' => $this->event->year,
 
+                            'accessType' => $this->finalData['access_type'],
                             'jobTitle' => $innerDelegate['job_title'],
                             'companyName' => $finalCompanyName,
                             'amountPaid' => $amountPaid,
@@ -1612,5 +1720,37 @@ class RegistrantDetails extends Component
 
         $this->replaceEmailAlreadyUsedError = null;
         $this->replaceCountry = null;
+    }
+
+    public function getAccessTypesDescription($accessType, $enableNullForFullEvent)
+    {
+        if ($accessType == AccessTypes::CONFERENCE_ONLY->value) {
+            return "Conference only";
+        } else if ($accessType == AccessTypes::WORKSHOP_ONLY->value) {
+            return "Workshop only";
+        } else {
+            if ($enableNullForFullEvent) {
+                if (
+                    $this->event->co_eb_full_member_rate != null ||
+                    $this->event->co_eb_member_rate != null ||
+                    $this->event->co_eb_nmember_rate != null ||
+                    $this->event->co_std_full_member_rate != null ||
+                    $this->event->co_std_member_rate != null ||
+                    $this->event->co_std_nmember_rate != null ||
+                    $this->event->wo_eb_full_member_rate != null ||
+                    $this->event->wo_eb_member_rate != null ||
+                    $this->event->wo_eb_nmember_rate != null ||
+                    $this->event->wo_std_full_member_rate != null ||
+                    $this->event->wo_std_member_rate != null ||
+                    $this->event->wo_std_nmember_rate != null
+                ) {
+                    return "Full event";
+                } else {
+                    return null;
+                }
+            } else {
+                return "Full event";
+            }
+        }
     }
 }

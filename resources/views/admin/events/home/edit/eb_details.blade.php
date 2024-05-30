@@ -3,7 +3,7 @@
 
     <div class="flex justify-between pt-3 pb-2 col-span-4">
         <div class="text-registrationPrimaryColor font-medium text-xl ">
-            Early Bird Details
+            Full Event - Early Bird Details
         </div>
         <div>
             @if ($event->eb_end_date != null || $event->eb_member_rate != null || $event->eb_nmember_rate != null)
