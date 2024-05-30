@@ -3,7 +3,7 @@
 
 <p class="sub" style="margin-top: 15px;">Thank you for registering to attend the <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a>, taking place from 11-12 September 2024 at the {{ $details['eventLocation'] }}</p>
 
-<p class="sub" style="margin-top: 15px;">Your registration has been confirmed and your delegate pass can be accessed during the <strong><em>conference only</em></strong>. You will have access to the networking breaks and Gala dinner during the events. Please find below the summary of your booking confirmation.</p>
+<p class="sub" style="margin-top: 15px;">Your registration has been confirmed and your delegate pass can be accessed during the <strong><em>conference only</em></strong>. You will have access to the networking break and gala dinner during the event. Please find below the summary of your booking confirmation.</p>
 
 <p class="sub" style="margin-top: 20px;"><strong>Collection of badges</strong></p>
 <p class="sub" style="margin-top: 5px;">Upon your arrival, kindly make your way to the registration desk to collect your event badge located at the Foyer and present your ID or email confirmation. Registration starts at 07:30am onwards.</p>
