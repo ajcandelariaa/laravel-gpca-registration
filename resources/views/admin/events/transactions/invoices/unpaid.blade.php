@@ -60,8 +60,7 @@
             @if ($count == 1)
                 <tr class="tr-description">
                     <td class="first-col">
-                        <p><strong>{{ $eventName }} – {{ $eventFormattedData }} at
-                                {{ $eventLocation }}</strong></p>
+                        <p><strong>{{ $invoiceDescription }}</strong></p>
                     </td>
                     <td class="second-col">&nbsp;</td>
                     <td class="third-col">&nbsp;</td>

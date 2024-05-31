@@ -34,6 +34,7 @@ class RegistrationForm extends Component
     public $showAddDelegateModal = false;
     public $showEditDelegateModal = false;
     public $additionalDelegates = [];
+    public $invoiceDescription;
 
 
     // DELEGATE PASS TYPE
@@ -558,6 +559,18 @@ class RegistrationForm extends Component
                     'country.required' => "Country is required",
                 ]
             );
+            
+            if($this->event->category == "ANC" && $this->event->year == "2024"){
+                if($this->accessType == AccessTypes::CONFERENCE_ONLY->value){
+                    $this->invoiceDescription = $this->event->name . ' – 11-12 September 2024  at ' . $this->event->location;
+                } else if ($this->accessType == AccessTypes::WORKSHOP_ONLY->value){
+                    $this->invoiceDescription = "Operational Excellence in the GCC Agri-Nutrients Industry Workshop – 10th September 2024 at " .  $this->event->location;
+                } else {
+                    $this->invoiceDescription = "Operational Excellence in the GCC Agri-Nutrients Industry Workshop and " . $this->event->name . ' – ' . $this->eventFormattedDate . ' at ' . $this->event->location;
+                }
+            } else {
+                $this->invoiceDescription = $this->event->name . ' – ' . $this->eventFormattedDate . ' at ' . $this->event->location;
+            }
 
             $this->dispatchBrowserEvent('swal:add-step3-registration-loading-screen');
         } else if ($this->currentStep == 4) {

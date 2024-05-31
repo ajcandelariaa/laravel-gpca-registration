@@ -24,6 +24,8 @@ use NumberFormatter;
 class RegistrantDetails extends Component
 {
     public $countries, $companySectors, $salutations, $registrationTypes;
+    
+    public $eventFormattedDate;
 
     public $eventCategory, $eventId, $registrantId, $finalData, $members, $event;
 
@@ -77,6 +79,8 @@ class RegistrantDetails extends Component
         } else {
             $this->ccEmailNotif = config('app.ccEmailNotif.default');
         }
+        
+        $this->eventFormattedDate = Carbon::parse($this->event->event_start_date)->format('j') . '-' . Carbon::parse($this->event->event_end_date)->format('j F Y');
     }
 
     public function render()
@@ -440,6 +444,18 @@ class RegistrantDetails extends Component
         $this->finalData['rate_type'] = $this->rateType;
         $this->finalData['rate_type_string'] = $this->rateTypeString;
 
+        if($this->event->category == "ANC" && $this->event->year == "2024"){
+            if($this->accessType == AccessTypes::CONFERENCE_ONLY->value){
+                $this->finalData['invoiceData']['invoiceDescription'] = $this->event->name . ' – 11-12 September 2024  at ' . $this->event->location;
+            } else if ($this->accessType == AccessTypes::WORKSHOP_ONLY->value){
+                $this->finalData['invoiceData']['invoiceDescription'] = "Operational Excellence in the GCC Agri-Nutrients Industry Workshop – 10th September 2024 at " .  $this->event->location;
+            } else {
+                $this->finalData['invoiceData']['invoiceDescription'] = "Operational Excellence in the GCC Agri-Nutrients Industry Workshop and " . $this->event->name . ' – ' . $this->eventFormattedDate . ' at ' . $this->event->location;
+            }
+        } else {
+            $this->finalData['invoiceData']['invoiceDescription'] = $this->event->name . ' – ' . $this->eventFormattedDate . ' at ' . $this->event->location;
+        }
+        
         $this->calculateTotal();
 
         $this->accessType = null;

@@ -6,8 +6,7 @@
             <div class="bg-white p-4">
                 @foreach ($delegatInvoiceDetails as $index => $delegatInvoiceDetail)
                     @if ($index == 0)
-                        <p>{{ $event->name }} – {{ $eventFormattedDate }} at
-                            {{ $event->location }}</p>
+                        <p>{{ $invoiceDescription }}</p>
                         <p class="mt-10">{{ $delegatInvoiceDetail['delegateDescription'] }}</p>
                     @else
                         <p class="mt-5">{{ $delegatInvoiceDetail['delegateDescription'] }}</p>

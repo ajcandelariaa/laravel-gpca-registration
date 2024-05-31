@@ -4020,9 +4020,22 @@ class RegistrationController extends Controller
                 $finalCompanyName = $mainDelegate->alternative_company_name;
             }
 
+            if($event->category == "ANC" && $event->year == "2024"){
+                if($mainDelegate->access_type == AccessTypes::CONFERENCE_ONLY->value){
+                    $invoiceDescription = $event->name . ' – 11-12 September 2024  at ' . $event->location;
+                } else if ($mainDelegate->access_type == AccessTypes::WORKSHOP_ONLY->value){
+                    $invoiceDescription = "Operational Excellence in the GCC Agri-Nutrients Industry Workshop – 10th September 2024 at " .  $event->location;
+                } else {
+                    $invoiceDescription = "Operational Excellence in the GCC Agri-Nutrients Industry Workshop and " . $event->name . ' – ' . $eventFormattedData . ' at ' . $event->location;
+                }
+            } else {
+                $invoiceDescription = $event->name . ' – ' . $eventFormattedData . ' at ' . $event->location;
+            }
+
             $invoiceData = [
                 "finalEventStartDate" => Carbon::parse($event->event_start_date)->format('d M Y'),
                 "finalEventEndDate" => Carbon::parse($event->event_end_date)->format('d M Y'),
+                "invoiceDescription" => $invoiceDescription,
                 "eventFormattedData" => $eventFormattedData,
                 "companyName" => $finalCompanyName,
                 "companyAddress" => $mainDelegate->company_address,

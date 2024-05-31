@@ -439,9 +439,7 @@
                             <div class="grid grid-cols-6 gap-x-2">
                                 <div class="col-span-2 bg-white p-4">
                                     @if ($count == 1)
-                                        <p>{{ $finalData['invoiceData']['eventName'] }} –
-                                            {{ $finalData['invoiceData']['eventFormattedData'] }}
-                                            at {{ $finalData['invoiceData']['eventLocation'] }}</p>
+                                        <p>{{ $finalData['invoiceData']['invoiceDescription'] }}</p>
                                         <p class="mt-10">{{ $delegatInvoiceDetail['delegateDescription'] }}</p>
                                     @else
                                         <p>{{ $delegatInvoiceDetail['delegateDescription'] }}</p>
