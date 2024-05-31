@@ -123,7 +123,7 @@ class RegistrationUnpaid extends Mailable
                 );
             }
         } else if ($this->details['eventYear'] == '2024') {
-            if($this->details['eventCategory'] == "GLF"){
+            if ($this->details['eventCategory'] == "GLF") {
                 return new Content(
                     markdown: 'emails.2024.glf.registration-unpaid',
                 );
@@ -157,12 +157,30 @@ class RegistrationUnpaid extends Mailable
                         markdown: 'emails.2024.anc.registration-unpaid',
                     );
                 }
+            } else if ($this->details['eventCategory'] == "PSC") {
+                if ($this->details['accessType'] == AccessTypes::CONFERENCE_ONLY->value) {
+                    return new Content(
+                        markdown: 'emails.2024.psc.co.registration-unpaid',
+                    );
+                } else if ($this->details['accessType'] == AccessTypes::WORKSHOP_ONLY->value) {
+                    return new Content(
+                        markdown: 'emails.2024.psc.wo.registration-unpaid',
+                    );
+                } else {
+                    return new Content(
+                        markdown: 'emails.2024.psc.registration-unpaid',
+                    );
+                }
+            } else if ($this->details['eventCategory'] == "AF") {
+                return new Content(
+                    markdown: 'emails.2024.af.registration-unpaid',
+                );
             } else {
                 return new Content(
                     markdown: 'emails.registration-unpaid',
                 );
             }
-        }  else {
+        } else {
             return new Content(
                 markdown: 'emails.registration-unpaid',
             );

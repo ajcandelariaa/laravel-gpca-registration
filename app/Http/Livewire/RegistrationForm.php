@@ -90,6 +90,12 @@ class RegistrationForm extends Component
         } else {
             $this->bankDetails = config('app.bankDetails.DEFAULT');
         }
+        
+        if ($data->category == "DAW") {
+            $this->ccEmailNotif = config('app.ccEmailNotif.daw');
+        } else {
+            $this->ccEmailNotif = config('app.ccEmailNotif.default');
+        }
 
         $this->event = $data;
         $this->accessType = AccessTypes::FULL_EVENT->value;
@@ -143,14 +149,7 @@ class RegistrationForm extends Component
         $this->finalEventStartDate = Carbon::parse($this->event->event_start_date)->format('d M Y');
         $this->finalEventEndDate = Carbon::parse($this->event->event_end_date)->format('d M Y');
 
-
         $this->eventFormattedDate = Carbon::parse($this->event->event_start_date)->format('j') . '-' . Carbon::parse($this->event->event_end_date)->format('j F Y');
-
-        if ($data->category == "DAW") {
-            $this->ccEmailNotif = config('app.ccEmailNotif.daw');
-        } else {
-            $this->ccEmailNotif = config('app.ccEmailNotif.default');
-        }
     }
 
     public function render()

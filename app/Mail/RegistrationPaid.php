@@ -120,7 +120,7 @@ class RegistrationPaid extends Mailable
                 );
             }
         } else if ($this->details['eventYear'] == '2024') {
-            if($this->details['eventCategory'] == "GLF"){
+            if ($this->details['eventCategory'] == "GLF") {
                 return new Content(
                     markdown: 'emails.2024.glf.registration-paid',
                 );
@@ -158,6 +158,24 @@ class RegistrationPaid extends Mailable
                         markdown: 'emails.2024.anc.registration-paid',
                     );
                 }
+            } else if ($this->details['eventCategory'] == "PSC") {
+                if ($this->details['accessType'] == AccessTypes::CONFERENCE_ONLY->value) {
+                    return new Content(
+                        markdown: 'emails.2024.psc.co.registration-paid',
+                    );
+                } else if ($this->details['accessType'] == AccessTypes::WORKSHOP_ONLY->value) {
+                    return new Content(
+                        markdown: 'emails.2024.psc.wo.registration-paid',
+                    );
+                } else {
+                    return new Content(
+                        markdown: 'emails.2024.psc.registration-paid',
+                    );
+                }
+            } else if ($this->details['eventCategory'] == "AF") {
+                return new Content(
+                    markdown: 'emails.2024.af.registration-paid',
+                );
             } else {
                 return new Content(
                     markdown: 'emails.registration-paid',

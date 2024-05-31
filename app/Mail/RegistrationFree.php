@@ -128,6 +128,24 @@ class RegistrationFree extends Mailable
                         markdown: 'emails.2024.anc.registration-free',
                     );
                 }
+            } else if ($this->details['eventCategory'] == "PSC") {
+                if ($this->details['accessType'] == AccessTypes::CONFERENCE_ONLY->value) {
+                    return new Content(
+                        markdown: 'emails.2024.psc.co.registration-free',
+                    );
+                } else if ($this->details['accessType'] == AccessTypes::WORKSHOP_ONLY->value) {
+                    return new Content(
+                        markdown: 'emails.2024.psc.wo.registration-free',
+                    );
+                } else {
+                    return new Content(
+                        markdown: 'emails.2024.psc.registration-free',
+                    );
+                }
+            } else if ($this->details['eventCategory'] == "AF") {
+                return new Content(
+                    markdown: 'emails.2024.af.registration-free',
+                );
             } else {
                 return new Content(
                     markdown: 'emails.registration-free',
