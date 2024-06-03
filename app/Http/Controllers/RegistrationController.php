@@ -56,12 +56,12 @@ class RegistrationController extends Controller
 
         if (!$events->isEmpty()) {
             foreach ($events as $event) {
-                if($event->category != "GLF" && $event->category != "DFCLW1"){
+                if ($event->category != "GLF" && $event->category != "DFCLW1") {
                     $eventLink = env('APP_URL') . '/register/' . $event->year . '/' . $event->category . '/' . $event->id;
                     $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('d M Y') . ' - ' . Carbon::parse($event->event_end_date)->format('d M Y');
-    
+
                     $eventEndDate = Carbon::parse($event->event_end_date);
-    
+
                     if (Carbon::now()->lt($eventEndDate->addDay()) && $event->active) {
                         array_push($finalUpcomingEvents, [
                             'eventLogo' => $event->logo,
@@ -110,7 +110,7 @@ class RegistrationController extends Controller
                 $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('j F Y');
             } else {
                 $finalData = $this->registrationFailedViewEvents($eventCategory, $eventId, $mainDelegateId);
-                if($eventCategory == "GLF" || $eventCategory == "DFCLW1"){
+                if ($eventCategory == "GLF" || $eventCategory == "DFCLW1") {
                     $eventFormattedDate =  Carbon::parse($event->event_end_date)->format('d M Y');
                 } else {
                     $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('d') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');
@@ -149,7 +149,7 @@ class RegistrationController extends Controller
                 $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('j F Y');
             } else {
                 $finalData = $this->registrationSuccessViewEvents($eventCategory, $eventId, $mainDelegateId);
-                if($eventCategory == "GLF" || $eventCategory == "DFCLW1"){
+                if ($eventCategory == "GLF" || $eventCategory == "DFCLW1") {
                     $eventFormattedDate =  Carbon::parse($event->event_end_date)->format('d M Y');
                 } else {
                     $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('d') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');
@@ -650,7 +650,7 @@ class RegistrationController extends Controller
 
             // dd($allDelegatesArray);
 
-            if($mainDelegate->rate_type == "standard" || $mainDelegate->rate_type == "Standard"){
+            if ($mainDelegate->rate_type == "standard" || $mainDelegate->rate_type == "Standard") {
                 $finalRateType = "Standard";
             } else {
                 $finalRateType = "Early Bird";
@@ -1734,7 +1734,7 @@ class RegistrationController extends Controller
             array_push($allParticipantsArray, $allParticipantsArrayTemp);
 
             $entryFormId = AwardsParticipantDocument::where('event_id', $eventId)->where('participant_id', $mainParticipant->id)->where('document_type', 'entryForm')->value('id');
-            
+
             $entryFormFileName = AwardsParticipantDocument::where('event_id', $eventId)->where('participant_id', $mainParticipant->id)->where('document_type', 'entryForm')->value('document_file_name');
             $getSupportingDocumentFiles = AwardsParticipantDocument::where('event_id', $eventId)->where('participant_id', $mainParticipant->id)->where('document_type', 'supportingDocument')->get();
 
@@ -2031,7 +2031,7 @@ class RegistrationController extends Controller
                                 $amountPaid = $mainDelegateDiscountedPrice + $mainDelegateVatPrice;
                             } else if ($promoCode->discount_type == "price") {
                                 $mainDelegateDiscountedPrice = $mainDelegate->unit_price - $promoCode->discount;
-                                $mainDelegateVatPrice = $mainDelegateDiscountedPrice * ($event->event_vat / 100); 
+                                $mainDelegateVatPrice = $mainDelegateDiscountedPrice * ($event->event_vat / 100);
                                 $amountPaid = $mainDelegateDiscountedPrice + $mainDelegateVatPrice;
                             } else {
                                 $mainDelegateVatPrice = $promoCode->new_rate * ($event->event_vat / 100);
@@ -2119,7 +2119,7 @@ class RegistrationController extends Controller
                                         $amountPaidSub = $subDelegateDiscountedPrice + $subDelegateVatPrice;
                                     } else if ($promoCode->discount_type == "price") {
                                         $subDelegateDiscountedPrice = $mainDelegate->unit_price - $promoCode->discount;
-                                        $subDelegateVatPrice = $subDelegateDiscountedPrice * ($event->event_vat / 100); 
+                                        $subDelegateVatPrice = $subDelegateDiscountedPrice * ($event->event_vat / 100);
                                         $amountPaidSub = $subDelegateDiscountedPrice + $subDelegateVatPrice;
                                     } else {
                                         $subDelegateVatPrice = $promoCode->new_rate * ($event->event_vat / 100);
@@ -2994,12 +2994,12 @@ class RegistrationController extends Controller
 
                     $entryFormId = AwardsParticipantDocument::where('event_id', $event->id)->where('participant_id', $mainDelegateId)->where('document_type', 'entryForm')->value('id');
                     $entryFormFileName = AwardsParticipantDocument::where('event_id', $event->id)->where('participant_id', $mainDelegateId)->where('document_type', 'entryForm')->value('document_file_name');
-            
+
                     $getSupportingDocumentFiles = AwardsParticipantDocument::where('event_id', $event->id)->where('participant_id', $mainDelegateId)->where('document_type', 'supportingDocument')->get();
-            
+
                     $supportingDocumentsDownloadId = [];
                     $supportingDocumentsDownloadFileName = [];
-            
+
                     if ($getSupportingDocumentFiles->isNotEmpty()) {
                         foreach ($getSupportingDocumentFiles as $supportingDocument) {
                             $supportingDocumentsDownloadId[] = $supportingDocument->id;
@@ -3770,17 +3770,17 @@ class RegistrationController extends Controller
                     if ($mainDiscountType != null) {
                         if ($mainDiscountType == "percentage") {
                             if ($mainDiscount == 100) {
-                                if($mainDelegate->accessType == AccessTypes::CONFERENCE_ONLY->value){
+                                if ($mainDelegate->accessType == AccessTypes::CONFERENCE_ONLY->value) {
                                     $delegateDescription = "Delegate Registration Fee - Complimentary - Conference only";
-                                } else if ($mainDelegate->accessType == AccessTypes::WORKSHOP_ONLY->value){
+                                } else if ($mainDelegate->accessType == AccessTypes::WORKSHOP_ONLY->value) {
                                     $delegateDescription = "Delegate Registration Fee - Complimentary - Workshop only";
                                 } else {
                                     $delegateDescription = "Delegate Registration Fee - Complimentary";
                                 }
                             } else if ($mainDiscount > 0 && $mainDiscount < 100) {
-                                if($mainDelegate->accessType == AccessTypes::CONFERENCE_ONLY->value){
+                                if ($mainDelegate->accessType == AccessTypes::CONFERENCE_ONLY->value) {
                                     $delegateDescription = "Delegate Registration Fee - " . $passType . " discounted rate - Conference only";
-                                } else if ($mainDelegate->accessType == AccessTypes::WORKSHOP_ONLY->value){
+                                } else if ($mainDelegate->accessType == AccessTypes::WORKSHOP_ONLY->value) {
                                     $delegateDescription = "Delegate Registration Fee - " . $passType . " discounted rate - Workshop only";
                                 } else {
                                     $delegateDescription = "Delegate Registration Fee - " . $passType . " discounted rate";
@@ -3922,17 +3922,17 @@ class RegistrationController extends Controller
                                 if ($subDiscountType != null) {
                                     if ($subDiscountType == "percentage") {
                                         if ($subDiscount == 100) {
-                                            if($mainDelegate->accessType == AccessTypes::CONFERENCE_ONLY->value){
+                                            if ($mainDelegate->accessType == AccessTypes::CONFERENCE_ONLY->value) {
                                                 $subDelegateDescription = "Delegate Registration Fee - Complimentary - Conference only";
-                                            } else if ($mainDelegate->accessType == AccessTypes::WORKSHOP_ONLY->value){
+                                            } else if ($mainDelegate->accessType == AccessTypes::WORKSHOP_ONLY->value) {
                                                 $subDelegateDescription = "Delegate Registration Fee - Complimentary - Workshop only";
                                             } else {
                                                 $subDelegateDescription = "Delegate Registration Fee - Complimentary";
                                             }
                                         } else if ($subDiscount > 0 && $subDiscount < 100) {
-                                            if($mainDelegate->accessType == AccessTypes::CONFERENCE_ONLY->value){
+                                            if ($mainDelegate->accessType == AccessTypes::CONFERENCE_ONLY->value) {
                                                 $subDelegateDescription = "Delegate Registration Fee - " . $passType . " discounted rate - Conference only";
-                                            } else if ($mainDelegate->accessType == AccessTypes::WORKSHOP_ONLY->value){
+                                            } else if ($mainDelegate->accessType == AccessTypes::WORKSHOP_ONLY->value) {
                                                 $subDelegateDescription = "Delegate Registration Fee - " . $passType . " discounted rate - Workshop only";
                                             } else {
                                                 $subDelegateDescription = "Delegate Registration Fee - " . $passType . " discounted rate";
@@ -4008,7 +4008,7 @@ class RegistrationController extends Controller
                 $bankDetails = config('app.bankDetails.DEFAULT');
             }
 
-            if($eventCategory == "GLF" || $eventCategory == "DFCLW1"){
+            if ($eventCategory == "GLF" || $eventCategory == "DFCLW1") {
                 $eventFormattedData = Carbon::parse($event->event_end_date)->format('j F Y');
             } else {
                 $eventFormattedData = Carbon::parse($event->event_start_date)->format('j') . '-' . Carbon::parse($event->event_end_date)->format('j F Y');
@@ -4020,13 +4020,21 @@ class RegistrationController extends Controller
                 $finalCompanyName = $mainDelegate->alternative_company_name;
             }
 
-            if($event->category == "ANC" && $event->year == "2024"){
-                if($mainDelegate->access_type == AccessTypes::CONFERENCE_ONLY->value){
+            if ($event->category == "ANC" && $event->year == "2024") {
+                if ($mainDelegate->access_type == AccessTypes::CONFERENCE_ONLY->value) {
                     $invoiceDescription = $event->name . ' – 11-12 September 2024  at ' . $event->location;
-                } else if ($mainDelegate->access_type == AccessTypes::WORKSHOP_ONLY->value){
+                } else if ($mainDelegate->access_type == AccessTypes::WORKSHOP_ONLY->value) {
                     $invoiceDescription = "Operational Excellence in the GCC Agri-Nutrients Industry Workshop – 10th September 2024 at " .  $event->location;
                 } else {
                     $invoiceDescription = "Operational Excellence in the GCC Agri-Nutrients Industry Workshop and " . $event->name . ' – ' . $eventFormattedData . ' at ' . $event->location;
+                }
+            } else if ($event->category == "PSC" && $event->year == "2024") {
+                if ($mainDelegate->access_type == AccessTypes::CONFERENCE_ONLY->value) {
+                    $invoiceDescription = $event->name . ' – 08-10 October 2024  at ' . $event->location;
+                } else if ($mainDelegate->access_type == AccessTypes::WORKSHOP_ONLY->value) {
+                    $invoiceDescription = "Process Safety Workshops – 7th October 2024 at " .  $event->location;
+                } else {
+                    $invoiceDescription = "Process Safety Workshops and " . $event->name . ' – ' . $eventFormattedData . ' at ' . $event->location;
                 }
             } else {
                 $invoiceDescription = $event->name . ' – ' . $eventFormattedData . ' at ' . $event->location;
@@ -4606,7 +4614,7 @@ class RegistrationController extends Controller
         }
     }
 
-    
+
 
     public function getInvoiceAwards($eventCategory, $eventId, $registrantId)
     {
@@ -6302,7 +6310,7 @@ class RegistrationController extends Controller
         ];
     }
 
-    
+
 
     public function awardsRegistrantsExportData($eventCategory, $eventId)
     {

@@ -90,7 +90,7 @@ class RegistrationForm extends Component
         } else {
             $this->bankDetails = config('app.bankDetails.DEFAULT');
         }
-        
+
         if ($data->category == "DAW") {
             $this->ccEmailNotif = config('app.ccEmailNotif.daw');
         } else {
@@ -558,14 +558,22 @@ class RegistrationForm extends Component
                     'country.required' => "Country is required",
                 ]
             );
-            
-            if($this->event->category == "ANC" && $this->event->year == "2024"){
-                if($this->accessType == AccessTypes::CONFERENCE_ONLY->value){
+
+            if ($this->event->category == "ANC" && $this->event->year == "2024") {
+                if ($this->accessType == AccessTypes::CONFERENCE_ONLY->value) {
                     $this->invoiceDescription = $this->event->name . ' – 11-12 September 2024  at ' . $this->event->location;
-                } else if ($this->accessType == AccessTypes::WORKSHOP_ONLY->value){
+                } else if ($this->accessType == AccessTypes::WORKSHOP_ONLY->value) {
                     $this->invoiceDescription = "Operational Excellence in the GCC Agri-Nutrients Industry Workshop – 10th September 2024 at " .  $this->event->location;
                 } else {
                     $this->invoiceDescription = "Operational Excellence in the GCC Agri-Nutrients Industry Workshop and " . $this->event->name . ' – ' . $this->eventFormattedDate . ' at ' . $this->event->location;
+                }
+            } else if ($this->event->category == "PSC" && $this->event->year == "2024") {
+                if ($this->accessType == AccessTypes::CONFERENCE_ONLY->value) {
+                    $this->invoiceDescription = $this->event->name . ' – 08-10 October 2024 at ' . $this->event->location;
+                } else if ($this->accessType == AccessTypes::WORKSHOP_ONLY->value) {
+                    $this->invoiceDescription = "Process Safety Workshops – 7th October 2024 at " .  $this->event->location;
+                } else {
+                    $this->invoiceDescription = "Process Safety Workshops and " . $this->event->name . ' – ' . $this->eventFormattedDate . ' at ' . $this->event->location;
                 }
             } else {
                 $this->invoiceDescription = $this->event->name . ' – ' . $this->eventFormattedDate . ' at ' . $this->event->location;
