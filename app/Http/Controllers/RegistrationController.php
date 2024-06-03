@@ -685,6 +685,8 @@ class RegistrationController extends Controller
                 'attending_welcome_dinner' => $mainDelegate->attending_welcome_dinner,
                 'attending_gala_dinner' => $mainDelegate->attending_gala_dinner,
 
+                'optional_interests' => $mainDelegate->optional_interests,
+
                 'mode_of_payment' => $mainDelegate->mode_of_payment,
                 'registration_status' => "$mainDelegate->registration_status",
                 'payment_status' => $mainDelegate->payment_status,
@@ -2040,6 +2042,10 @@ class RegistrationController extends Controller
                         }
                     }
 
+                    $combinedStringPrint = "gpca@reg" . ',' . $event->id . ',' . $event->category . ',' . $mainDelegate->id . ',' . 'main';
+                    $finalCryptStringPrint = base64_encode($combinedStringPrint);
+                    $qrCodeForPrint = 'ca' . $finalCryptStringPrint . 'gp';
+
                     $details1 = [
                         'name' => $mainDelegate->salutation . " " . $mainDelegate->first_name . " " . $mainDelegate->middle_name . " " . $mainDelegate->last_name,
                         'eventLink' => $event->link,
@@ -2056,6 +2062,7 @@ class RegistrationController extends Controller
                         'transactionId' => $tempTransactionId,
                         'invoiceLink' => $invoiceLink,
                         'badgeLink' => env('APP_URL') . "/" . $event->category . "/" . $event->id . "/view-badge" . "/" . "main" . "/" . $mainDelegateId,
+                        'qrCodeForPrint' => $qrCodeForPrint,
                     ];
 
                     $details2 = [
@@ -2128,6 +2135,10 @@ class RegistrationController extends Controller
                                 }
                             }
 
+                            $combinedStringPrintSub = "gpca@reg" . ',' . $event->id . ',' . $event->category . ',' . $additionalDelegate->id . ',' . 'sub';
+                            $finalCryptStringPrintSub = base64_encode($combinedStringPrintSub);
+                            $qrCodeForPrintSub = 'ca' . $finalCryptStringPrintSub . 'gp';
+
                             $details1 = [
                                 'name' => $additionalDelegate->salutation . " " . $additionalDelegate->first_name . " " . $additionalDelegate->middle_name . " " . $additionalDelegate->last_name,
                                 'eventLink' => $event->link,
@@ -2144,6 +2155,7 @@ class RegistrationController extends Controller
                                 'transactionId' => $tempTransactionId,
                                 'invoiceLink' => $invoiceLink,
                                 'badgeLink' => env('APP_URL') . "/" . $event->category . "/" . $event->id . "/view-badge" . "/" . "sub" . "/" . $additionalDelegate->id,
+                                'qrCodeForPrint' => $qrCodeForPrintSub,
                             ];
                             try {
                                 Mail::to($additionalDelegate->email_address)->cc($ccEmailNotif)->send(new RegistrationPaid($details1));
@@ -4875,6 +4887,8 @@ class RegistrationController extends Controller
                     'attending_welcome_dinner' => $mainDelegate->attending_welcome_dinner,
                     'attending_gala_dinner' => $mainDelegate->attending_gala_dinner,
 
+                    'optional_interests' => $mainDelegate->optional_interests,
+
                     'unit_price' => $unitPrice,
                     'discount_price' => $discountPrice,
                     'net_amount' => $netAMount,
@@ -5035,6 +5049,8 @@ class RegistrationController extends Controller
                             'attending_welcome_dinner' => $mainDelegate->attending_welcome_dinner,
                             'attending_gala_dinner' => $mainDelegate->attending_gala_dinner,
 
+                            'optional_interests' => $mainDelegate->optional_interests,
+
                             'unit_price' => $unitPrice,
                             'discount_price' => $discountPrice,
                             'net_amount' => $netAMount,
@@ -5171,6 +5187,8 @@ class RegistrationController extends Controller
             'Attending to Networking Dinner',
             'Attending to Welcome Dinner',
             'Attending to Gala Dinner',
+
+            'Optional Interests'
         );
 
         $callback = function () use ($finalExcelData, $columns) {
@@ -5261,6 +5279,8 @@ class RegistrationController extends Controller
                         $data['attending_networking_dinner'],
                         $data['attending_welcome_dinner'],
                         $data['attending_gala_dinner'],
+
+                        $data['optional_interests'],
                     )
                 );
             }

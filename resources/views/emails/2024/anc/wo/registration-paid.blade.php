@@ -1,7 +1,7 @@
 <x-mail::message>
 <p class="sub">Dear {{ $details['name'] }},</p>
 
-<p class="sub" style="margin-top: 15px;">Thank you for registering to attend the Operational Excellence in the GCC Agri-Nutrients Industry Workshop, taking place on 10 September 2024 at the {{ $details['eventLocation'] }}</p>
+<p class="sub" style="margin-top: 15px;">Thank you for registering to attend the Operational Excellence in the GCC Agri-Nutrients Industry Workshop, taking place on 10 September 2024 at the {{ $details['eventLocation'] }}. By registering as a delegate, you are subject to the terms & condition. </p>
 
 <p class="sub" style="margin-top: 15px;">Your registration has been confirmed and your delegate pass can be accessed during the <strong><em>workshop only</em></strong>. You will have access to the networking break, and the gala dinner. Please find below the summary of your booking confirmation.</p>
 

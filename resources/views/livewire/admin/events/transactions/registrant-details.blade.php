@@ -23,7 +23,8 @@
 
                 <div class="mt-3 bg-registrationInputFieldsBGColor py-1 px-1">
                     <div class="flex items-center gap-3">
-                        <p class="text-xl text-registrationPrimaryColor font-bold italic py-4 px-3">Registration Details</p>
+                        <p class="text-xl text-registrationPrimaryColor font-bold italic py-4 px-3">Registration Details
+                        </p>
                         <button wire:click="openEditRegistrationDetailsModal"
                             class="cursor-pointer hover:text-yellow-600 text-yellow-500">
                             <i class="fa-solid fa-pen-to-square"></i> Edit
@@ -126,6 +127,16 @@
                             <p>Would you be attending the Networking Gala Dinner and SC Excellence Awards on
                                 16<sup>th</sup> May 2013?</p>
                             <p class="font-bold"> {{ $finalData['scc_attending_nd'] }} </p>
+                        @endif
+
+                        @if ($eventCategory == 'PSC' && $event->year == '2024')
+                            <p>Workshop interested in:</p>
+                            @if ($finalData['optional_interests'] != null)
+                                <p class="font-bold"> {{ $finalData['optional_interests'] }} </p>
+                            @else
+                                
+                                <p class="font-bold">N/A</p>
+                            @endif
                         @endif
                     </div>
                 </div>
@@ -334,7 +345,7 @@
 
                                         <p>Country:</p>
                                         <p class="font-bold">
-                                            @if ($innerDelegate['country'] == null || $innerDelegate['country'] == "")
+                                            @if ($innerDelegate['country'] == null || $innerDelegate['country'] == '')
                                                 N/A
                                             @else
                                                 {{ $innerDelegate['country'] }}

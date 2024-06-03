@@ -48,6 +48,8 @@ class MainDelegate extends Model
         'attending_welcome_dinner',
         'attending_gala_dinner',
 
+        'optional_interests',
+
         'seat_number',
 
         'quantity',

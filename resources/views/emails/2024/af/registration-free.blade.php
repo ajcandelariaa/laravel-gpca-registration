@@ -6,7 +6,13 @@
 <p class="sub" style="margin-top: 15px;"><strong>Please note that your registration is subject to confirmation from one of our team members. We will review the registration details you've provided to ensure we have the accurate information to make the necessary badge arrangements.</strong></p>
 
 <p class="sub" style="margin-top: 20px;"><strong>Collection of badges</strong></p>
-<p class="sub" style="margin-top: 5px;">Upon your arrival, kindly make your way to the registration desk to collect your event badge located at the Foyer and present your ID or email confirmation. Registration starts at 07:30am onwards.</p>
+<p class="sub" style="margin-top: 5px;">Upon your arrival, you can pick up your badge from the fast-track counter or from the relevant registration counter located at the Oman Convention & Exhibition Centre foyer.</p>
+
+<p class="sub" style="margin-top: 15px;">Use this QR code to print your own badge onsite.</p>
+
+<img src="data:image/png;base64, {!! base64_encode(
+    QrCode::format('png')->size(200)->generate($details['qrCodeForPrint']),
+) !!} " style="margin-top: 5px;">
 
 <p class="sub" style="margin-top: 15px;">Your registration details as follows:</p>
 
@@ -28,11 +34,15 @@ Download invoice
 
 <p class="sub" style="margin-top: 15px;">To request any updates on your registration details, kindly contact <a href="mailto:jovelyn@gpca.org.ae">jovelyn@gpca.org.ae</a> to rectify your badge. </p>
 
-<p class="sub" style="margin-top: 20px; text-decoration: underline;"><strong>INVITATION LETTER</strong></p>
+<p class="sub" style="margin-top: 20px;"><strong>GENERAL INFORMATION</strong></p>
 
-<p class="sub" style="margin-top: 5px;">Non-GCC participants attending the <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a> must process their own visa. For your visa eligibility and visa application guidelines, please visit <a href="https://ksavisa.sa/" target="_blank">https://ksavisa.sa/</a>.</p>
+<p class="sub" style="margin-top: 15px; text-decoration: underline;"><strong>Oman Visa</strong></p>
 
-<p class="sub" style="margin-top: 15px;">Invitation letter is available on request, only once payment has been made. Please contact <a href="mailto:jovelyn@gpca.org.ae">jovelyn@gpca.org.ae</a> for further assistance.</p>
+<p class="sub" style="margin-top: 5px;">Non-GCC participants attending the <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a> must process their own visa. For your visa eligibility and visa application guidelines, please visit <a href="https://evisa.rop.gov.om/en/home?tabId=tyqwi7" target="_blank">Home - Evisa (rop.gov.om)</a>.</p>
+
+<p class="sub" style="margin-top: 15px; text-decoration: underline;"><strong>Hotel Accommodation</strong></p>
+
+<p class="sub" style="margin-top: 5px;">To avail the special hotel rates kindly click <a href="https://www.gpcaforum.com/wp-content/uploads/2024/06/18th-Annual-GPCA-Forum-–-Partner-Hotels.pdf" target="_blank">here</a> for the list of partner hotels in Muscat Oman. Kindly indicate in your accommodation inquiry that you are attending the <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a>. </p>
 
 <p class="sub" style="margin-top: 15px;">For any event related queries, please feel free to reach out to the following team members:</p>
 
@@ -56,7 +66,7 @@ Download invoice
 
 <p class="sub" style="margin-top: 15px;">Stay updated on upcoming GPCA events and industry news by following our <a href="https://www.linkedin.com/company/gulf-petrochemicals-and-chemicals-association-gpca-/">LinkedIn Page</a>. You can also connect with us on our official social media accounts: <a href="https://twitter.com/GulfPetChem">Twitter</a>, <a href="https://www.instagram.com/gulfpetchem/">Instagram</a>, <a href="https://www.facebook.com/GulfPetChem?fref=ts">Facebook</a>, and <a href="https://www.youtube.com/user/GPCAorg">YouTube</a>. </p>
 
-<p class="sub" style="margin-top: 15px;">Thank you, and we look forward to welcoming you in Oman for the {{ $details['eventName'] }}.</p>
+<p class="sub" style="margin-top: 15px;">Thank you, and we look forward to welcoming you in Muscat for the {{ $details['eventName'] }}.</p>
 
 <p class="sub" style="margin-top: 15px;">Kind Regards,</p>
 <p class="sub">GPCA Team</p>

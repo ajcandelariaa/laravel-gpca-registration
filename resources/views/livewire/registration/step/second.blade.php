@@ -220,6 +220,29 @@
             </div>
         @endif
 
+        @if ($event->category == 'PSC' && $accessType == "workshopOnly")
+            <div class="col-span-2 sm:col-span-1 space-y-2">
+                <div class="text-registrationPrimaryColor">
+                    Which workshop are you interested in: <span class="text-red-500">*</span>
+                </div>
+                <div>
+                    <select wire:model.lazy="optionalInterests"
+                        class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                        <option value=""></option>
+                        <option value="Workshop 1">Workshop 1</option>
+                        <option value="Workshop 2">Workshop 2</option>
+                        <option value="Workshop 3">Workshop 3</option>
+                    </select>
+
+                    @error('optionalInterests')
+                        <div class="text-red-500 text-xs italic mt-1">
+                            {{ $message }}
+                        </div>
+                    @enderror
+                </div>
+            </div>
+        @endif
+
 
         {{-- <div class="col-span-2 sm:col-span-1 space-y-2">
             @if ($event->category == 'AF' && $event->year == '2023')

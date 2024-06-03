@@ -588,6 +588,10 @@ class RegistrantDetails extends Component
                                 $finalCompanyName = $this->finalData['alternative_company_name'];
                             }
 
+                            $combinedStringPrint = "gpca@reg" . ',' . $this->event->id . ',' . $this->event->category . ',' . $innerDelegate['delegateId'] . ',' . $innerDelegate['delegateType'];
+                            $finalCryptStringPrint = base64_encode($combinedStringPrint);
+                            $qrCodeForPrint = 'ca' . $finalCryptStringPrint . 'gp';
+
                             $details1 = [
                                 'name' => $innerDelegate['name'],
                                 'eventLink' => $this->event->link,
@@ -604,6 +608,7 @@ class RegistrantDetails extends Component
                                 'transactionId' => $innerDelegate['transactionId'],
                                 'invoiceLink' => $invoiceLink,
                                 'badgeLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-badge" . "/" . $innerDelegate['delegateType'] . "/" . $innerDelegate['delegateId'],
+                                'qrCodeForPrint' => $qrCodeForPrint,
                             ];
 
 
@@ -1101,6 +1106,10 @@ class RegistrantDetails extends Component
                             $finalCompanyName = $this->finalData['alternative_company_name'];
                         }
 
+                        $combinedStringPrint = "gpca@reg" . ',' . $this->event->id . ',' . $this->event->category . ',' . $innerDelegate['delegateId'] . ',' . $innerDelegate['delegateType'];
+                        $finalCryptStringPrint = base64_encode($combinedStringPrint);
+                        $qrCodeForPrint = 'ca' . $finalCryptStringPrint . 'gp';
+
                         $details1 = [
                             'name' => $innerDelegate['name'],
                             'eventLink' => $this->event->link,
@@ -1118,6 +1127,7 @@ class RegistrantDetails extends Component
                             'invoiceLink' => $invoiceLink,
                             'earlyBirdValidityDate' => $earlyBirdValidityDate->format('jS F'),
                             'badgeLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-badge" . "/" . $innerDelegate['delegateType'] . "/" . $innerDelegate['delegateId'],
+                            'qrCodeForPrint' => $qrCodeForPrint,
                         ];
 
                         $details2 = [

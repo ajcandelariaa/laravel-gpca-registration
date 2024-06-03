@@ -41,7 +41,7 @@ class RegistrationForm extends Component
     public $accessType, $delegatePassType, $rateType;
 
     // COMPANY INFO
-    public $companyName, $companySector, $companyAddress, $companyCountry, $companyCity, $companyLandlineNumber, $companyMobileNumber, $assistantEmailAddress, $heardWhere, $attendingTo = [];
+    public $companyName, $companySector, $companyAddress, $companyCountry, $companyCity, $companyLandlineNumber, $companyMobileNumber, $assistantEmailAddress, $heardWhere, $attendingTo = [], $optionalInterests;
 
     // MAIN DELEGATE
     public $salutation, $firstName, $middleName, $lastName, $emailAddress, $mobileNumber, $nationality, $jobTitle, $badgeType, $promoCode, $promoCodeDiscount, $discountType, $isMainFree = false, $country;
@@ -487,7 +487,7 @@ class RegistrationForm extends Component
                 $this->delegatePassTypeError = "Delegate pass type is required";
             }
         } else if ($this->currentStep == 2) {
-            if ($this->event->category == "AF") {
+            if ($this->event->category == "AF" && ($this->event->year == '2023' || $this->event->year == '2024')) {
                 $this->validate(
                     [
                         'companySector' => 'required',
@@ -509,24 +509,47 @@ class RegistrationForm extends Component
                     ]
                 );
             } else {
-                $this->validate(
-                    [
-                        'companySector' => 'required',
-                        'companyAddress' => 'required',
-                        'companyCountry' => 'required',
-                        'companyCity' => 'required',
-                        'companyMobileNumber' => 'required',
-                        'assistantEmailAddress' => 'nullable|email',
-                    ],
-                    [
-                        'companySector.required' => 'Company sector is required',
-                        'companyAddress.required' => 'Company address is required',
-                        'companyCountry.required' => 'Country is required',
-                        'companyCity.required' => 'City is required',
-                        'companyMobileNumber.required' => 'Mobile number is required',
-                        'assistantEmailAddress.email' => 'Assistant\'s email address must be a valid email',
-                    ]
-                );
+                if ($this->event->category == "PSC" && $this->accessType == AccessTypes::WORKSHOP_ONLY->value) {
+                    $this->validate(
+                        [
+                            'companySector' => 'required',
+                            'companyAddress' => 'required',
+                            'companyCountry' => 'required',
+                            'companyCity' => 'required',
+                            'companyMobileNumber' => 'required',
+                            'assistantEmailAddress' => 'nullable|email',
+                            'optionalInterests' => 'required',
+                        ],
+                        [
+                            'companySector.required' => 'Company sector is required',
+                            'companyAddress.required' => 'Company address is required',
+                            'companyCountry.required' => 'Country is required',
+                            'companyCity.required' => 'City is required',
+                            'companyMobileNumber.required' => 'Mobile number is required',
+                            'assistantEmailAddress.email' => 'Assistant\'s email address must be a valid email',
+                            'optionalInterests.required' => 'Please choose at least one',
+                        ]
+                    );
+                } else {
+                    $this->validate(
+                        [
+                            'companySector' => 'required',
+                            'companyAddress' => 'required',
+                            'companyCountry' => 'required',
+                            'companyCity' => 'required',
+                            'companyMobileNumber' => 'required',
+                            'assistantEmailAddress' => 'nullable|email',
+                        ],
+                        [
+                            'companySector.required' => 'Company sector is required',
+                            'companyAddress.required' => 'Company address is required',
+                            'companyCountry.required' => 'Country is required',
+                            'companyCity.required' => 'City is required',
+                            'companyMobileNumber.required' => 'Mobile number is required',
+                            'assistantEmailAddress.email' => 'Assistant\'s email address must be a valid email',
+                        ]
+                    );
+                }
             }
             $this->currentStep += 1;
         } else if ($this->currentStep == 3) {
@@ -673,6 +696,12 @@ class RegistrationForm extends Component
             }
         }
 
+        if ($this->accessType != AccessTypes::WORKSHOP_ONLY->value && $this->event->category == "PSC") {
+            $finalOptionalInterests = null;
+        } else {
+            $finalOptionalInterests = $this->optionalInterests;
+        }
+
         $newRegistrant = MainDelegates::create([
             'event_id' => $this->event->id,
             'access_type' => $this->accessType,
@@ -710,6 +739,8 @@ class RegistrationForm extends Component
             'attending_networking_dinner' => $attending_networking_dinner,
             'attending_welcome_dinner' => $attending_welcome_dinner,
             'attending_gala_dinner' => $attending_gala_dinner,
+
+            'optional_interests' => $finalOptionalInterests,
 
             'quantity' => $this->finalQuantity,
             'unit_price' => $this->finalUnitPrice,
@@ -847,6 +878,10 @@ class RegistrationForm extends Component
             $earlyBirdValidityDate = Carbon::createFromFormat('Y-m-d', $this->event->eb_end_date);
         }
 
+        $combinedStringPrint = "gpca@reg" . ',' . $this->event->id . ',' . $this->event->category . ',' . $this->currentMainDelegateId . ',' . 'main';
+        $finalCryptStringPrint = base64_encode($combinedStringPrint);
+        $qrCodeForPrint = 'ca' . $finalCryptStringPrint . 'gp';
+
         $details1 = [
             'name' => $this->salutation . " " . $this->firstName . " " . $this->middleName . " " . $this->lastName,
             'eventLink' => $this->event->link,
@@ -864,7 +899,10 @@ class RegistrationForm extends Component
             'invoiceLink' => $invoiceLink,
             'earlyBirdValidityDate' => $earlyBirdValidityDate->format('jS F'),
             'badgeLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-badge" . "/" . "main" . "/" . $this->currentMainDelegateId,
+            'qrCodeForPrint' => $qrCodeForPrint,
         ];
+
+
 
         if ($this->event->category != "GLF" && $this->event->category != "DFCLW1") {
             if ($this->isMainFree) {
@@ -914,6 +952,11 @@ class RegistrationForm extends Component
                     $lastDigit = 1000 + intval($transaction->id);
                     $tempTransactionId = $this->event->year . "$getEventcode" . "$lastDigit";
 
+
+                    $combinedStringPrintSub = "gpca@reg" . ',' . $this->event->id . ',' . $this->event->category . ',' . $additionalDelegate->id . ',' . 'sub';
+                    $finalCryptStringPrintSub = base64_encode($combinedStringPrintSub);
+                    $qrCodeForPrintSub = 'ca' . $finalCryptStringPrintSub . 'gp';
+
                     $details1 = [
                         'name' => $additionalDelegate->salutation . " " . $additionalDelegate->first_name . " " . $additionalDelegate->middle_name . " " . $additionalDelegate->last_name,
                         'eventLink' => $this->event->link,
@@ -931,6 +974,7 @@ class RegistrationForm extends Component
                         'invoiceLink' => $invoiceLink,
                         'earlyBirdValidityDate' => $earlyBirdValidityDate->format('jS F'),
                         'badgeLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-badge" . "/" . "sub" . "/" . $additionalDelegate->id,
+                        'qrCodeForPrint' => $qrCodeForPrintSub,
                     ];
 
                     $isSubFree = false;

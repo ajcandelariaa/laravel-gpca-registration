@@ -295,7 +295,7 @@ class RegistrantsList extends Component
         $checkIfCorrectFormat = true;
         for ($i = 0; $i < count($rows); $i++) {
             if ($i == 0) {
-                if (count($rows[$i]) == 24) {
+                if (count($rows[$i]) == 25) {
                     if (
                         $rows[$i][0] != "Rate type" ||
                         $rows[$i][1] != "Access type" ||
@@ -320,7 +320,8 @@ class RegistrantsList extends Component
                         $rows[$i][20] != "Mobile Number" ||
                         $rows[$i][21] != "Country" ||
                         $rows[$i][22] != "Nationality" ||
-                        $rows[$i][23] != "Job Title"
+                        $rows[$i][23] != "Job Title" ||
+                        $rows[$i][24] != "Optional Interests"
                     ) {
                         $checkIfCorrectFormat = false;
                     }
@@ -824,6 +825,8 @@ class RegistrantsList extends Component
                     'badge_type' => $transaction['delegates'][0]['badge_type'],
                     'pcode_used' => $transaction['delegates'][0]['pcode_used'],
                     'country' => $transaction['delegates'][0]['country'],
+                    
+                    'optional_interests' => $transaction['optional_interests'],
 
                     'quantity' => count($transaction['delegates']),
                     'unit_price' => $finalUnitPrice,
@@ -953,6 +956,7 @@ class RegistrantsList extends Component
                     'delegates' => [
                         $delegate
                     ],
+                    'optional_interests' => $rows[$i][24] == "" ? null : $rows[$i][24],
                 ]);
             }
         } else {
@@ -987,6 +991,7 @@ class RegistrantsList extends Component
                 'delegates' => [
                     $delegate
                 ],
+                'optional_interests' => $rows[$i][24] == "" ? null : $rows[$i][24],
             ]);
         }
         return $arrayData;
