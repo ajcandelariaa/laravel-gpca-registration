@@ -1,7 +1,7 @@
 <x-mail::message>
 <p class="sub">Dear {{ $details['name'] }},</p>
 
-<p class="sub" style="margin-top: 15px;">Thank you for registering to attend the Workshop, taking place on 7 October 2024 at the {{ $details['eventLocation'] }}.</p>
+<p class="sub" style="margin-top: 15px;">Thank you for registering to attend the Workshop taking place on 07 October 2024 at the {{ $details['eventLocation'] }}. By registering as a delegate, you are subject to the terms & condition. </p>
 
 <p class="sub" style="margin-top: 15px; color: red;">Please note that your registration is not yet confirmed. To avoid any inconvenience during onsite badge collection, please settle your payment or contact our finance team at <a href="mailto:analee@gpca.org.ae">analee@gpca.org.ae</a>.</p>
 
@@ -23,7 +23,7 @@ Download invoice
 </x-mail::button>
 @endif
 
-<p class="sub" style="margin-top: 15px;">To request any updates on your registration details, kindly contact <a href="mailto:jovelyn@gpca.org.ae">jovelyn@gpca.org.ae</a> to rectify your badge. </p>
+<p class="sub" style="margin-top: 15px;">To request any update on your registration details or would like to upgrade your pass to attend the full event for four days, kindly contact <a href="mailto:jovelyn@gpca.org.ae">jovelyn@gpca.org.ae</a>.</p>
 
 <p class="sub" style="margin-top: 20px; text-decoration: underline;"><strong>INVITATION LETTER</strong></p>
 

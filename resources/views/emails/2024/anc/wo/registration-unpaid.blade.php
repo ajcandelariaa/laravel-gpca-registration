@@ -23,7 +23,7 @@ Download invoice
 </x-mail::button>
 @endif
 
-<p class="sub" style="margin-top: 15px;">To request any updates on your registration details, kindly contact <a href="mailto:jovelyn@gpca.org.ae">jovelyn@gpca.org.ae</a> to rectify your badge. </p>
+<p class="sub" style="margin-top: 15px;">To request any update on your registration details or would like to upgrade your pass to attend the full event for three days, kindly contact <a href="mailto:jovelyn@gpca.org.ae">jovelyn@gpca.org.ae</a>.</p>
 
 <p class="sub" style="margin-top: 20px; text-decoration: underline;"><strong>INVITATION LETTER</strong></p>
 
