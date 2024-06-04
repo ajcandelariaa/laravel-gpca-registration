@@ -162,7 +162,6 @@ class RegistrationForm extends Component
         $today = Carbon::today();
 
         // CHECK UNIT PRICE
-        if($this->event->wo_)
         if ($this->accessType == AccessTypes::CONFERENCE_ONLY->value) {
             if ($this->event->co_eb_end_date != null && $this->event->co_eb_member_rate != null && $this->event->co_eb_nmember_rate != null) {
                 if ($today->lte(Carbon::parse($this->event->co_eb_end_date))) {

@@ -229,9 +229,9 @@
                     <select wire:model.lazy="optionalInterests"
                         class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                         <option value=""></option>
-                        <option value="Workshop 1">Workshop 1</option>
-                        <option value="Workshop 2">Workshop 2</option>
-                        <option value="Workshop 3">Workshop 3</option>
+                        <option value="Effective Investigations of Process Safety Incidents">Effective Investigations of Process Safety Incidents</option>
+                        <option value="Risk assessment (PHA/LOPA)">Risk assessment (PHA/LOPA)</option>
+                        <option value="Process Safety by Frontlines">Process Safety by Frontlines</option>
                     </select>
 
                     @error('optionalInterests')
