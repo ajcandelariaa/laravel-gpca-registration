@@ -12,7 +12,7 @@
 
 <img src="data:image/png;base64, {!! base64_encode(
     QrCode::format('png')->size(200)->generate($details['qrCodeForPrint']),
-) !!} " style="margin-top: 5px;">
+) !!} " style="margin-top: 10px; display: block;">
 
 <p class="sub" style="margin-top: 15px;">Your registration details as follows:</p>
 
