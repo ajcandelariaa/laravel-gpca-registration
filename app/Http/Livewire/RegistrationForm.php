@@ -487,7 +487,7 @@ class RegistrationForm extends Component
                 $this->delegatePassTypeError = "Delegate pass type is required";
             }
         } else if ($this->currentStep == 2) {
-            if ($this->event->category == "AF" && ($this->event->year == '2023' || $this->event->year == '2024')) {
+            if ($this->event->category == "AF" && ($this->event->year == '2023')) {
                 $this->validate(
                     [
                         'companySector' => 'required',
