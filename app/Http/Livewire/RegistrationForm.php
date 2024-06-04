@@ -162,42 +162,43 @@ class RegistrationForm extends Component
         $today = Carbon::today();
 
         // CHECK UNIT PRICE
+        if($this->event->wo_)
         if ($this->accessType == AccessTypes::CONFERENCE_ONLY->value) {
             if ($this->event->co_eb_end_date != null && $this->event->co_eb_member_rate != null && $this->event->co_eb_nmember_rate != null) {
                 if ($today->lte(Carbon::parse($this->event->co_eb_end_date))) {
                     if ($this->delegatePassType == "fullMember") {
-                        $this->rateTypeString = "Full member early bird rate - " . $this->getAccessTypesDescription();
+                        $this->rateTypeString = "Full member early bird rate" . $this->getAccessTypesDescription();
                         $this->finalUnitPrice = $this->event->co_eb_full_member_rate;
                     } else if ($this->delegatePassType == "member") {
-                        $this->rateTypeString = "Member early bird rate - " . $this->getAccessTypesDescription();
+                        $this->rateTypeString = "Member early bird rate" . $this->getAccessTypesDescription();
                         $this->finalUnitPrice = $this->event->co_eb_member_rate;
                     } else {
-                        $this->rateTypeString = "Non-Member early bird rate - " . $this->getAccessTypesDescription();
+                        $this->rateTypeString = "Non-Member early bird rate" . $this->getAccessTypesDescription();
                         $this->finalUnitPrice = $this->event->co_eb_nmember_rate;
                     }
                     $this->rateType = "Early Bird";
                 } else {
                     if ($this->delegatePassType == "fullMember") {
-                        $this->rateTypeString = "Full member standard rate - " . $this->getAccessTypesDescription();
+                        $this->rateTypeString = "Full member standard rate" . $this->getAccessTypesDescription();
                         $this->finalUnitPrice = $this->event->co_std_full_member_rate;
                     } else if ($this->delegatePassType == "member") {
-                        $this->rateTypeString = "Member standard rate - " . $this->getAccessTypesDescription();
+                        $this->rateTypeString = "Member standard rate" . $this->getAccessTypesDescription();
                         $this->finalUnitPrice = $this->event->co_std_member_rate;
                     } else {
-                        $this->rateTypeString = "Non-Member standard rate - " . $this->getAccessTypesDescription();
+                        $this->rateTypeString = "Non-Member standard rate" . $this->getAccessTypesDescription();
                         $this->finalUnitPrice = $this->event->co_std_nmember_rate;
                     }
                     $this->rateType = "Standard";
                 }
             } else {
                 if ($this->delegatePassType == "fullMember") {
-                    $this->rateTypeString = "Full member standard rate - " . $this->getAccessTypesDescription();
+                    $this->rateTypeString = "Full member standard rate" . $this->getAccessTypesDescription();
                     $this->finalUnitPrice = $this->event->co_std_full_member_rate;
                 } else if ($this->delegatePassType == "member") {
-                    $this->rateTypeString = "Member standard rate - " . $this->getAccessTypesDescription();
+                    $this->rateTypeString = "Member standard rate" . $this->getAccessTypesDescription();
                     $this->finalUnitPrice = $this->event->co_std_member_rate;
                 } else {
-                    $this->rateTypeString = "Non-Member standard rate - " . $this->getAccessTypesDescription();
+                    $this->rateTypeString = "Non-Member standard rate" . $this->getAccessTypesDescription();
                     $this->finalUnitPrice = $this->event->co_std_nmember_rate;
                 }
                 $this->rateType = "Standard";
@@ -206,38 +207,38 @@ class RegistrationForm extends Component
             if ($this->event->wo_eb_end_date != null && $this->event->wo_eb_member_rate != null && $this->event->wo_eb_nmember_rate != null) {
                 if ($today->lte(Carbon::parse($this->event->wo_eb_end_date))) {
                     if ($this->delegatePassType == "fullMember") {
-                        $this->rateTypeString = "Full member early bird rate - " . $this->getAccessTypesDescription();
+                        $this->rateTypeString = "Full member early bird rate" . $this->getAccessTypesDescription();
                         $this->finalUnitPrice = $this->event->wo_eb_full_member_rate;
                     } else if ($this->delegatePassType == "member") {
-                        $this->rateTypeString = "Member early bird rate - " . $this->getAccessTypesDescription();
+                        $this->rateTypeString = "Member early bird rate" . $this->getAccessTypesDescription();
                         $this->finalUnitPrice = $this->event->wo_eb_member_rate;
                     } else {
-                        $this->rateTypeString = "Non-Member early bird rate - " . $this->getAccessTypesDescription();
+                        $this->rateTypeString = "Non-Member early bird rate" . $this->getAccessTypesDescription();
                         $this->finalUnitPrice = $this->event->wo_eb_nmember_rate;
                     }
                     $this->rateType = "Early Bird";
                 } else {
                     if ($this->delegatePassType == "fullMember") {
-                        $this->rateTypeString = "Full member standard rate - " . $this->getAccessTypesDescription();
+                        $this->rateTypeString = "Full member standard rate" . $this->getAccessTypesDescription();
                         $this->finalUnitPrice = $this->event->wo_std_full_member_rate;
                     } else if ($this->delegatePassType == "member") {
-                        $this->rateTypeString = "Member standard rate - " . $this->getAccessTypesDescription();
+                        $this->rateTypeString = "Member standard rate" . $this->getAccessTypesDescription();
                         $this->finalUnitPrice = $this->event->wo_std_member_rate;
                     } else {
-                        $this->rateTypeString = "Non-Member standard rate - " . $this->getAccessTypesDescription();
+                        $this->rateTypeString = "Non-Member standard rate" . $this->getAccessTypesDescription();
                         $this->finalUnitPrice = $this->event->wo_std_nmember_rate;
                     }
                     $this->rateType = "Standard";
                 }
             } else {
                 if ($this->delegatePassType == "fullMember") {
-                    $this->rateTypeString = "Full member standard rate - " . $this->getAccessTypesDescription();
+                    $this->rateTypeString = "Full member standard rate" . $this->getAccessTypesDescription();
                     $this->finalUnitPrice = $this->event->wo_std_full_member_rate;
                 } else if ($this->delegatePassType == "member") {
-                    $this->rateTypeString = "Member standard rate - " . $this->getAccessTypesDescription();
+                    $this->rateTypeString = "Member standard rate" . $this->getAccessTypesDescription();
                     $this->finalUnitPrice = $this->event->wo_std_member_rate;
                 } else {
-                    $this->rateTypeString = "Non-Member standard rate - " . $this->getAccessTypesDescription();
+                    $this->rateTypeString = "Non-Member standard rate" . $this->getAccessTypesDescription();
                     $this->finalUnitPrice = $this->event->wo_std_nmember_rate;
                 }
                 $this->rateType = "Standard";
@@ -246,38 +247,38 @@ class RegistrationForm extends Component
             if ($this->event->eb_end_date != null && $this->event->eb_member_rate != null && $this->event->eb_nmember_rate != null) {
                 if ($today->lte(Carbon::parse($this->event->eb_end_date))) {
                     if ($this->delegatePassType == "fullMember") {
-                        $this->rateTypeString = "Full member early bird rate - " . $this->getAccessTypesDescription();
+                        $this->rateTypeString = "Full member early bird rate" . $this->getAccessTypesDescription();
                         $this->finalUnitPrice = $this->event->eb_full_member_rate;
                     } else if ($this->delegatePassType == "member") {
-                        $this->rateTypeString = "Member early bird rate - " . $this->getAccessTypesDescription();
+                        $this->rateTypeString = "Member early bird rate" . $this->getAccessTypesDescription();
                         $this->finalUnitPrice = $this->event->eb_member_rate;
                     } else {
-                        $this->rateTypeString = "Non-Member early bird rate - " . $this->getAccessTypesDescription();
+                        $this->rateTypeString = "Non-Member early bird rate" . $this->getAccessTypesDescription();
                         $this->finalUnitPrice = $this->event->eb_nmember_rate;
                     }
                     $this->rateType = "Early Bird";
                 } else {
                     if ($this->delegatePassType == "fullMember") {
-                        $this->rateTypeString = "Full member standard rate - " . $this->getAccessTypesDescription();
+                        $this->rateTypeString = "Full member standard rate" . $this->getAccessTypesDescription();
                         $this->finalUnitPrice = $this->event->std_full_member_rate;
                     } else if ($this->delegatePassType == "member") {
-                        $this->rateTypeString = "Member standard rate - " . $this->getAccessTypesDescription();
+                        $this->rateTypeString = "Member standard rate" . $this->getAccessTypesDescription();
                         $this->finalUnitPrice = $this->event->std_member_rate;
                     } else {
-                        $this->rateTypeString = "Non-Member standard rate - " . $this->getAccessTypesDescription();
+                        $this->rateTypeString = "Non-Member standard rate" . $this->getAccessTypesDescription();
                         $this->finalUnitPrice = $this->event->std_nmember_rate;
                     }
                     $this->rateType = "Standard";
                 }
             } else {
                 if ($this->delegatePassType == "fullMember") {
-                    $this->rateTypeString = "Full member standard rate - " . $this->getAccessTypesDescription();
+                    $this->rateTypeString = "Full member standard rate" . $this->getAccessTypesDescription();
                     $this->finalUnitPrice = $this->event->std_full_member_rate;
                 } else if ($this->delegatePassType == "member") {
-                    $this->rateTypeString = "Member standard rate - " . $this->getAccessTypesDescription();
+                    $this->rateTypeString = "Member standard rate" . $this->getAccessTypesDescription();
                     $this->finalUnitPrice = $this->event->std_member_rate;
                 } else {
-                    $this->rateTypeString = "Non-Member standard rate - " . $this->getAccessTypesDescription();
+                    $this->rateTypeString = "Non-Member standard rate" . $this->getAccessTypesDescription();
                     $this->finalUnitPrice = $this->event->std_nmember_rate;
                 }
                 $this->rateType = "Standard";
@@ -288,9 +289,9 @@ class RegistrationForm extends Component
     public function getAccessTypesDescription()
     {
         if ($this->accessType == AccessTypes::CONFERENCE_ONLY->value) {
-            return "Conference only";
+            return " - Conference only";
         } else if ($this->accessType == AccessTypes::WORKSHOP_ONLY->value) {
-            return "Workshop only";
+            return " - Workshop only";
         } else {
             if (
                 $this->event->co_eb_full_member_rate != null ||
@@ -306,7 +307,7 @@ class RegistrationForm extends Component
                 $this->event->wo_std_member_rate != null ||
                 $this->event->wo_std_nmember_rate != null
             ) {
-                return "Full event";
+                return " - Full event";
             } else {
                 return null;
             }

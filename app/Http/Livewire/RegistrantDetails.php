@@ -317,19 +317,19 @@ class RegistrantDetails extends Component
 
         if ($this->finalData['rate_type'] == "standard" || $this->finalData['rate_type'] == "Standard") {
             if ($this->delegatePassType == "fullMember") {
-                $this->rateTypeString = "Full member standard rate - " . $this->getAccessTypesDescription($this->accessType, true);
+                $this->rateTypeString = "Full member standard rate" . $this->getAccessTypesDescription($this->accessType, true);
             } else if ($this->delegatePassType == "member") {
-                $this->rateTypeString = "Member standard rate - " . $this->getAccessTypesDescription($this->accessType, true);
+                $this->rateTypeString = "Member standard rate" . $this->getAccessTypesDescription($this->accessType, true);
             } else {
-                $this->rateTypeString = "Non-Member standard rate - " . $this->getAccessTypesDescription($this->accessType, true);
+                $this->rateTypeString = "Non-Member standard rate" . $this->getAccessTypesDescription($this->accessType, true);
             }
         } else {
             if ($this->delegatePassType == "fullMember") {
-                $this->rateTypeString = "Full member early bird rate - " . $this->getAccessTypesDescription($this->accessType, true);
+                $this->rateTypeString = "Full member early bird rate" . $this->getAccessTypesDescription($this->accessType, true);
             } else if ($this->delegatePassType == "member") {
-                $this->rateTypeString = "Member early bird rate - " . $this->getAccessTypesDescription($this->accessType, true);
+                $this->rateTypeString = "Member early bird rate" . $this->getAccessTypesDescription($this->accessType, true);
             } else {
-                $this->rateTypeString = "Non-Member early bird rate - " . $this->getAccessTypesDescription($this->accessType, true);
+                $this->rateTypeString = "Non-Member early bird rate" . $this->getAccessTypesDescription($this->accessType, true);
             }
         }
 
@@ -418,19 +418,19 @@ class RegistrantDetails extends Component
 
         if ($this->finalData['rate_type'] == "Standard") {
             if ($this->finalData['pass_type'] == "fullMember") {
-                $this->rateTypeString = "Full member standard rate - " . $this->getAccessTypesDescription($this->accessType, true);
+                $this->rateTypeString = "Full member standard rate" . $this->getAccessTypesDescription($this->accessType, true);
             } else if ($this->finalData['pass_type'] == "member") {
-                $this->rateTypeString = "Member standard rate - " . $this->getAccessTypesDescription($this->accessType, true);
+                $this->rateTypeString = "Member standard rate" . $this->getAccessTypesDescription($this->accessType, true);
             } else {
-                $this->rateTypeString = "Non-Member standard rate - " . $this->getAccessTypesDescription($this->accessType, true);
+                $this->rateTypeString = "Non-Member standard rate" . $this->getAccessTypesDescription($this->accessType, true);
             }
         } else {
             if ($this->finalData['pass_type'] == "fullMember") {
-                $this->rateTypeString = "Full member early bird rate - " . $this->getAccessTypesDescription($this->accessType, true);
+                $this->rateTypeString = "Full member early bird rate" . $this->getAccessTypesDescription($this->accessType, true);
             } else if ($this->finalData['pass_type'] == "member") {
-                $this->rateTypeString = "Member early bird rate - " . $this->getAccessTypesDescription($this->accessType, true);
+                $this->rateTypeString = "Member early bird rate" . $this->getAccessTypesDescription($this->accessType, true);
             } else {
-                $this->rateTypeString = "Non-Member early bird rate - " . $this->getAccessTypesDescription($this->accessType, true);
+                $this->rateTypeString = "Non-Member early bird rate" . $this->getAccessTypesDescription($this->accessType, true);
             }
         }
 
@@ -809,7 +809,7 @@ class RegistrantDetails extends Component
                         if ($this->getAccessTypesDescription($this->accessType, true) == null) {
                             $delegateDescription = "Delegate Registration Fee - Complimentary";
                         } else {
-                            $delegateDescription = "Delegate Registration Fee - Complimentary - " . $this->getAccessTypesDescription($this->accessType, true);
+                            $delegateDescription = "Delegate Registration Fee - Complimentary" . $this->getAccessTypesDescription($this->accessType, true);
                         }
                     } else if ($mainDiscount > 0 && $mainDiscount < 100) {
                         $delegateDescription = "Delegate Registration Fee - " . $mainDelegate->rate_type_string . " (" . $mainDiscount . "% discount)";
@@ -946,7 +946,7 @@ class RegistrantDetails extends Component
                                     if ($this->getAccessTypesDescription($this->accessType, true) == null) {
                                         $subDelegateDescription = "Delegate Registration Fee - Complimentary";
                                     } else {
-                                        $subDelegateDescription = "Delegate Registration Fee - Complimentary - " . $this->getAccessTypesDescription($this->accessType, true);
+                                        $subDelegateDescription = "Delegate Registration Fee - Complimentary" . $this->getAccessTypesDescription($this->accessType, true);
                                     }
                                 } else if ($subDiscount > 0 && $subDiscount < 100) {
                                     $subDelegateDescription = "Delegate Registration Fee - " . $mainDelegate->rate_type_string . " (" . $subDiscount . "% discount)";
@@ -1759,9 +1759,9 @@ class RegistrantDetails extends Component
     public function getAccessTypesDescription($accessType, $enableNullForFullEvent)
     {
         if ($accessType == AccessTypes::CONFERENCE_ONLY->value) {
-            return "Conference only";
+            return " - Conference only";
         } else if ($accessType == AccessTypes::WORKSHOP_ONLY->value) {
-            return "Workshop only";
+            return " - Workshop only";
         } else {
             if ($enableNullForFullEvent) {
                 if (
@@ -1778,12 +1778,12 @@ class RegistrantDetails extends Component
                     $this->event->wo_std_member_rate != null ||
                     $this->event->wo_std_nmember_rate != null
                 ) {
-                    return "Full event";
+                    return " - Full event";
                 } else {
                     return null;
                 }
             } else {
-                return "Full event";
+                return " - Full event";
             }
         }
     }
