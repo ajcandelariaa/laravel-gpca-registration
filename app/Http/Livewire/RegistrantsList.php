@@ -159,9 +159,9 @@ class RegistrantsList extends Component
     public function getAccessTypesDescription($accessType, $enableNullForFullEvent)
     {
         if ($accessType == AccessTypes::CONFERENCE_ONLY->value) {
-            return "Conference only";
+            return " - Conference only";
         } else if ($accessType == AccessTypes::WORKSHOP_ONLY->value) {
-            return "Workshop only";
+            return " - Workshop only";
         } else {
             if ($enableNullForFullEvent) {
                 if (
@@ -178,12 +178,12 @@ class RegistrantsList extends Component
                     $this->event->wo_std_member_rate != null ||
                     $this->event->wo_std_nmember_rate != null
                 ) {
-                    return "Full event";
+                    return " - Full event";
                 } else {
                     return null;
                 }
             } else {
-                return "Full event";
+                return " - Full event";
             }
         }
     }
@@ -630,30 +630,30 @@ class RegistrantsList extends Component
                         $delegatePassType = 'fullMember';
 
                         if ($transaction['rate_type'] == "earlyBird") {
-                            $rateTypeString = "Full member early bird rate - " . $this->getAccessTypesDescription($transaction['access_type'], true);
+                            $rateTypeString = "Full member early bird rate" . $this->getAccessTypesDescription($transaction['access_type'], true);
                             $finalUnitPrice = $this->event->co_eb_full_member_rate;
                         } else {
-                            $rateTypeString = "Full member standard rate - " . $this->getAccessTypesDescription($transaction['access_type'], true);
+                            $rateTypeString = "Full member standard rate" . $this->getAccessTypesDescription($transaction['access_type'], true);
                             $finalUnitPrice = $this->event->co_std_full_member_rate;
                         }
                     } else if ($transaction['pass_type'] == "Member") {
                         $delegatePassType = 'member';
 
                         if ($transaction['rate_type'] == "earlyBird") {
-                            $rateTypeString = "Member early bird rate - " . $this->getAccessTypesDescription($transaction['access_type'], true);
+                            $rateTypeString = "Member early bird rate" . $this->getAccessTypesDescription($transaction['access_type'], true);
                             $finalUnitPrice = $this->event->co_eb_member_rate;
                         } else {
-                            $rateTypeString = "Member standard rate - " . $this->getAccessTypesDescription($transaction['access_type'], true);
+                            $rateTypeString = "Member standard rate" . $this->getAccessTypesDescription($transaction['access_type'], true);
                             $finalUnitPrice = $this->event->co_std_member_rate;
                         }
                     } else {
                         $delegatePassType = 'nonMember';
 
                         if ($transaction['rate_type'] == "earlyBird") {
-                            $rateTypeString = "Non-Member early bird rate - " . $this->getAccessTypesDescription($transaction['access_type'], true);
+                            $rateTypeString = "Non-Member early bird rate" . $this->getAccessTypesDescription($transaction['access_type'], true);
                             $finalUnitPrice = $this->event->co_eb_nmember_rate;
                         } else {
-                            $rateTypeString = "Non-Member standard rate - " . $this->getAccessTypesDescription($transaction['access_type'], true);
+                            $rateTypeString = "Non-Member standard rate" . $this->getAccessTypesDescription($transaction['access_type'], true);
                             $finalUnitPrice = $this->event->co_std_nmember_rate;
                         }
                     }
@@ -662,30 +662,30 @@ class RegistrantsList extends Component
                         $delegatePassType = 'fullMember';
 
                         if ($transaction['rate_type'] == "earlyBird") {
-                            $rateTypeString = "Full member early bird rate - " . $this->getAccessTypesDescription($transaction['access_type'], true);
+                            $rateTypeString = "Full member early bird rate" . $this->getAccessTypesDescription($transaction['access_type'], true);
                             $finalUnitPrice = $this->event->wo_eb_full_member_rate;
                         } else {
-                            $rateTypeString = "Full member standard rate - " . $this->getAccessTypesDescription($transaction['access_type'], true);
+                            $rateTypeString = "Full member standard rate" . $this->getAccessTypesDescription($transaction['access_type'], true);
                             $finalUnitPrice = $this->event->wo_std_full_member_rate;
                         }
                     } else if ($transaction['pass_type'] == "Member") {
                         $delegatePassType = 'member';
 
                         if ($transaction['rate_type'] == "earlyBird") {
-                            $rateTypeString = "Member early bird rate - " . $this->getAccessTypesDescription($transaction['access_type'], true);
+                            $rateTypeString = "Member early bird rate" . $this->getAccessTypesDescription($transaction['access_type'], true);
                             $finalUnitPrice = $this->event->wo_eb_member_rate;
                         } else {
-                            $rateTypeString = "Member standard rate - " . $this->getAccessTypesDescription($transaction['access_type'], true);
+                            $rateTypeString = "Member standard rate" . $this->getAccessTypesDescription($transaction['access_type'], true);
                             $finalUnitPrice = $this->event->wo_std_member_rate;
                         }
                     } else {
                         $delegatePassType = 'nonMember';
 
                         if ($transaction['rate_type'] == "earlyBird") {
-                            $rateTypeString = "Non-Member early bird rate - " . $this->getAccessTypesDescription($transaction['access_type'], true);
+                            $rateTypeString = "Non-Member early bird rate" . $this->getAccessTypesDescription($transaction['access_type'], true);
                             $finalUnitPrice = $this->event->wo_eb_nmember_rate;
                         } else {
-                            $rateTypeString = "Non-Member standard rate - " . $this->getAccessTypesDescription($transaction['access_type'], true);
+                            $rateTypeString = "Non-Member standard rate" . $this->getAccessTypesDescription($transaction['access_type'], true);
                             $finalUnitPrice = $this->event->wo_std_nmember_rate;
                         }
                     }
@@ -694,30 +694,30 @@ class RegistrantsList extends Component
                         $delegatePassType = 'fullMember';
 
                         if ($transaction['rate_type'] == "earlyBird") {
-                            $rateTypeString = "Full member early bird rate - " . $this->getAccessTypesDescription($transaction['access_type'], true);
+                            $rateTypeString = "Full member early bird rate" . $this->getAccessTypesDescription($transaction['access_type'], true);
                             $finalUnitPrice = $this->event->eb_full_member_rate;
                         } else {
-                            $rateTypeString = "Full member standard rate - " . $this->getAccessTypesDescription($transaction['access_type'], true);
+                            $rateTypeString = "Full member standard rate" . $this->getAccessTypesDescription($transaction['access_type'], true);
                             $finalUnitPrice = $this->event->std_full_member_rate;
                         }
                     } else if ($transaction['pass_type'] == "Member") {
                         $delegatePassType = 'member';
 
                         if ($transaction['rate_type'] == "earlyBird") {
-                            $rateTypeString = "Member early bird rate - " . $this->getAccessTypesDescription($transaction['access_type'], true);
+                            $rateTypeString = "Member early bird rate" . $this->getAccessTypesDescription($transaction['access_type'], true);
                             $finalUnitPrice = $this->event->eb_member_rate;
                         } else {
-                            $rateTypeString = "Member standard rate - " . $this->getAccessTypesDescription($transaction['access_type'], true);
+                            $rateTypeString = "Member standard rate" . $this->getAccessTypesDescription($transaction['access_type'], true);
                             $finalUnitPrice = $this->event->std_member_rate;
                         }
                     } else {
                         $delegatePassType = 'nonMember';
 
                         if ($transaction['rate_type'] == "earlyBird") {
-                            $rateTypeString = "Non-Member early bird rate - " . $this->getAccessTypesDescription($transaction['access_type'], true);
+                            $rateTypeString = "Non-Member early bird rate" . $this->getAccessTypesDescription($transaction['access_type'], true);
                             $finalUnitPrice = $this->event->eb_nmember_rate;
                         } else {
-                            $rateTypeString = "Non-Member standard rate - " . $this->getAccessTypesDescription($transaction['access_type'], true);
+                            $rateTypeString = "Non-Member standard rate" . $this->getAccessTypesDescription($transaction['access_type'], true);
                             $finalUnitPrice = $this->event->std_nmember_rate;
                         }
                     }
