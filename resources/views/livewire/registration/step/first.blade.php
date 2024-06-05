@@ -49,7 +49,7 @@
                 @endif --}}
 
                 <p class="mt-5">For inquiries or to speak with a member of our team, please contact <strong>Faheem
-                        Chowdhury</strong>, <em>Head of Events & Sales</em>, at <a
+                        Chowdhury</strong>, <em>Head of Events</em>, at <a
                         href="mailto:faheem@gpca.org.ae">faheem@gpca.org.ae</a> or call +971 4 451 0666 ext. 122.</p>
             </div>
         @endif
