@@ -48,13 +48,13 @@ Download invoice
             <li>Above rate is subject to availability. </li>
         </ul>
     </li>
-    <li style="margin-top: 5px;"><strong style="text-decoration: underline">Courtyard by Marriott Jubail</strong> <em>(<a href="https://maps.app.goo.gl/LJQVY8vmmhsumBGH7" target="_blank">Location</a>)</em>
+    <li style="margin-top: 10px;"><strong style="text-decoration: underline">Courtyard by Marriott Jubail</strong> <em>(<a href="https://maps.app.goo.gl/LJQVY8vmmhsumBGH7" target="_blank">Location</a>)</em>
         <ul class="event-list">
             <li style="margin-top: 5px">Single guest room – SAR 349++ per night.</li>
-            <li style="margin-top: 5px">Special hotel rate is only valid from October 06 to October 10, 2024</li>
-            <li style="margin-top: 5px">Special hotel rate includes breakfast and internet.</li>
-            <li style="margin-top: 5px">Above rate is subject to availability.</li>
-            <li style="margin-top: 5px">For Bookings kindly contact <a href="mailto:iftikhar.ahmed@marriott.com">iftikhar.ahmed@marriott.com</a> indicating “GPCA Process Safety Conference”. </li>
+            <li>Special hotel rate is only valid from October 06 to October 10, 2024</li>
+            <li>Special hotel rate includes breakfast and internet.</li>
+            <li>Above rate is subject to availability.</li>
+            <li>For Bookings kindly contact <a href="mailto:iftikhar.ahmed@marriott.com">iftikhar.ahmed@marriott.com</a> indicating “GPCA Process Safety Conference”. </li>
         </ul>
     </li>
 </ol>
