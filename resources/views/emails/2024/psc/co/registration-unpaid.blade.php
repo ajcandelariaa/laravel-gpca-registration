@@ -34,6 +34,31 @@ Download invoice
 
 <p class="sub" style="margin-top: 15px;">Invitation letter is available on request, only once payment has been made. Please contact <a href="mailto:jovelyn@gpca.org.ae">jovelyn@gpca.org.ae</a> for further assistance.</p>
 
+<p class="sub" style="margin-top: 20px; text-decoration: underline;"><strong>HOTEL BOOKING</strong></p>
+
+<p class="sub" style="margin-top: 5px;">For the hotel accommodation, please see below options where we have special hotel rate during the event. </p>
+
+<ol class="event-list">
+    <li style="margin-top: 15px; text-decoration: underline"><strong><em>InterContinental Al Jubail Resort (<a href="https://maps.app.goo.gl/3fGXkbmbkDeXoJTq8" target="_blank">Location</a>)</em></strong>
+        <ul class="event-list">
+            <li style="margin-top: 5px">Kindly click the booking <a href="https://www.ihg.com/intercontinental/hotels/us/en/al-jubail/dhahc/hoteldetail?fromRedirect=true&qSrt=sAV&qIta=99502056&icdv=99502056&qSlH=DHAHC&qCpid=958393848&qAAR=IPBTO&qRtP=IPBTO&setPMCookies=true&qSHBrC=IC&qDest=P.O.%2520Box%252010167%252C%2520AL%2520JUBAIL%252C%2520SA&srb_u=1" target="_blank">link</a> to avail the special hotel rate.</li>
+            <li>One King guest room – SAR 783++ per night.</li>
+            <li>Special hotel rate is only valid from October 06 to October 10, 2024</li>
+            <li>Special hotel rate includes breakfast and internet.</li>
+            <li>Above rate is subject to availability. </li>
+        </ul>
+    </li>
+    <li style="margin-top: 5px; text-decoration: underline"><strong><em>Courtyard by Marriott Jubail (<a href="https://maps.app.goo.gl/LJQVY8vmmhsumBGH7" target="_blank">Location</a>)</em></strong>
+        <ul class="event-list">
+            <li style="margin-top: 5px">Single guest room – SAR 349++ per night.</li>
+            <li style="margin-top: 5px">Special hotel rate is only valid from October 06 to October 10, 2024</li>
+            <li style="margin-top: 5px">Special hotel rate includes breakfast and internet.</li>
+            <li style="margin-top: 5px">Above rate is subject to availability.</li>
+            <li style="margin-top: 5px">For Bookings kindly contact <a href="mailto:iftikhar.ahmed@marriott.com">iftikhar.ahmed@marriott.com</a> indicating “GPCA Process Safety Conference”. </li>
+        </ul>
+    </li>
+</ol>
+
 <p class="sub" style="margin-top: 15px;">For any event related queries, please feel free to reach out to the following team members:</p>
 
 <p class="sub" style="margin-top: 15px;"><strong>For sponsorship, exhibition and membership inquiries please contact:</strong></p>
