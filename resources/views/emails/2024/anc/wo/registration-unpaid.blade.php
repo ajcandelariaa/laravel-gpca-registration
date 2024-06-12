@@ -31,6 +31,19 @@ Download invoice
 
 <p class="sub" style="margin-top: 15px;">Invitation letter is available on request, only once payment has been made. Please contact <a href="mailto:jovelyn@gpca.org.ae">jovelyn@gpca.org.ae</a> for further assistance.</p>
 
+<p class="sub" style="margin-top: 20px; text-decoration: underline;"><strong>HOTEL BOOKING</strong></p>
+
+<p class="sub" style="margin-top: 5px;">For the hotel accommodation, please click the booking <a href="https://www.marriott.com/event-reservations/reservation-link.mi?id=1717601167832&key=GRP&app=resvlink" target="_blank">link</a> to avail the special hotel rate in JW Marriot Hotel, Riyadh, Saudi Arabia. </p>
+
+<ul class="event-list">
+    <li style="margin-top: 5px;">One Deluxe guest room – SAR 1,500++ per night</li>
+    <li>Special hotel rate is only valid from September 09 to September 12, 2024</li>
+    <li>Special hotel rate includes breakfast and internet.</li>
+    <li>Above rate is subject to availability.</li>
+</ul>
+
+<p class="sub" style="margin-top: 15px;">If you have any questions or need assistance with the booking link kindly coordinate with Shady Rabea <a href="mailto:Shady.Ahmed2@marriott.com">Shady.Ahmed2@marriott.com</a>, +966 583916980.</p>
+
 <p class="sub" style="margin-top: 15px;">For any event related queries, please feel free to reach out to the following team members:</p>
 
 <p class="sub" style="margin-top: 15px;"><strong>For sponsorship, exhibition and membership inquiries please contact:</strong></p>
