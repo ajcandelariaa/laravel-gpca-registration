@@ -36,7 +36,7 @@ Download invoice
 <p class="sub" style="margin-top: 5px;">For the hotel accommodation, please see below options where we have special hotel rate during the event. </p>
 
 <ol class="event-list">
-    <li style="margin-top: 15px; text-decoration: underline"><strong><em>InterContinental Al Jubail Resort (<a href="https://maps.app.goo.gl/3fGXkbmbkDeXoJTq8" target="_blank">Location</a>)</em></strong>
+    <li style="margin-top: 15px;"><strong style="text-decoration: underline">InterContinental Al Jubail Resort</strong> <em>(<a href="https://maps.app.goo.gl/3fGXkbmbkDeXoJTq8" target="_blank">Location</a>)</em>
         <ul class="event-list">
             <li style="margin-top: 5px">Kindly click the booking <a href="https://www.ihg.com/intercontinental/hotels/us/en/al-jubail/dhahc/hoteldetail?fromRedirect=true&qSrt=sAV&qIta=99502056&icdv=99502056&qSlH=DHAHC&qCpid=958393848&qAAR=IPBTO&qRtP=IPBTO&setPMCookies=true&qSHBrC=IC&qDest=P.O.%2520Box%252010167%252C%2520AL%2520JUBAIL%252C%2520SA&srb_u=1" target="_blank">link</a> to avail the special hotel rate.</li>
             <li>One King guest room – SAR 783++ per night.</li>
@@ -45,7 +45,7 @@ Download invoice
             <li>Above rate is subject to availability. </li>
         </ul>
     </li>
-    <li style="margin-top: 5px; text-decoration: underline"><strong><em>Courtyard by Marriott Jubail (<a href="https://maps.app.goo.gl/LJQVY8vmmhsumBGH7" target="_blank">Location</a>)</em></strong>
+    <li style="margin-top: 5px;"><strong style="text-decoration: underline">Courtyard by Marriott Jubail</strong> <em>(<a href="https://maps.app.goo.gl/LJQVY8vmmhsumBGH7" target="_blank">Location</a>)</em>
         <ul class="event-list">
             <li style="margin-top: 5px">Single guest room – SAR 349++ per night.</li>
             <li style="margin-top: 5px">Special hotel rate is only valid from October 06 to October 10, 2024</li>
