@@ -1,5 +1,5 @@
 <x-mail::message>
-<img src="http://gpca.org.ae/conferences/anc/wp-content/uploads/2024/06/email-notif-banner5.jpg">
+<img src="http://gpca.org.ae/conferences/anc/wp-content/uploads/2024/06/email-notif-banner6.jpg">
     
 <p class="sub" style="margin-top: 15px;">Dear {{ $details['name'] }},</p>
 
