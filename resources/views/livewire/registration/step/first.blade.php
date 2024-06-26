@@ -1,12 +1,4 @@
 <div class="mx-5">
-    @if ($event->category == 'ANC' && $event->year == '2024')
-        <div class="flex justify-end">
-            <a href="https://gpca.org.ae/conferences/anc/pass-inclusions-and-access/"
-                class="bg-registrationPrimaryColorHover hover:bg-registrationPrimaryColor text-white font-bold py-2 px-5 rounded-lg"
-                target="_blank">VIEW PASS INCLUSIONS AND ACCESS</a>
-        </div>
-    @endif
-
     @if ($event->category != 'GLF' && $event->category != 'DFCLW1')
         @include('livewire.registration.step.rates_table.fe_rates')
 

@@ -11,7 +11,15 @@
         $event->wo_std_full_member_rate != null ||
         $event->wo_std_member_rate != null ||
         $event->wo_std_nmember_rate != null)
-    <div class="text-2xl text-registrationPrimaryColor font-montserrat mb-2">Full event</div>
+    <div class="flex gap-5 items-center mb-2">
+        <div class="text-2xl text-registrationPrimaryColor font-semibold">Full event access</div>
+
+        @if ($event->category == 'ANC' && $event->year == '2024')
+            <a href="https://gpca.org.ae/conferences/anc/pass-inclusions-and-access/"
+                class="bg-registrationPrimaryColorHover hover:bg-registrationPrimaryColor text-white font-bold py-1 px-5 rounded-lg"
+                target="_blank">View pass access</a>
+        @endif
+    </div>
 @endif
 <table class="w-full bg-registrationPrimaryColor text-white text-center" cellspacing="1" cellpadding="2">
     <thead>
