@@ -9,7 +9,7 @@
                 $event->co_std_full_member_rate != null ||
                 $event->co_std_member_rate != null ||
                 $event->co_std_nmember_rate != null)
-            <div class="mt-5"></div>
+            <div class="mt-8"></div>
             @include('livewire.registration.step.rates_table.co_rates')
         @endif
 
@@ -20,7 +20,7 @@
                 $event->wo_std_full_member_rate != null ||
                 $event->wo_std_member_rate != null ||
                 $event->wo_std_nmember_rate != null)
-            <div class="mt-5"></div>
+            <div class="mt-8"></div>
             @include('livewire.registration.step.rates_table.wo_rates')
         @endif
     @endif
@@ -168,7 +168,7 @@
                                 <div>
                                     <select wire:model.lazy="accessType"
                                         class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
-                                        <option value="fullEvent">Full event</option>
+                                        <option value="fullEvent">Full event access</option>
                                         @if (
                                             $event->co_eb_full_member_rate != null ||
                                                 $event->co_eb_member_rate != null ||

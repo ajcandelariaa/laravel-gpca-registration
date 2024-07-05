@@ -11,27 +11,56 @@
         $event->wo_std_full_member_rate != null ||
         $event->wo_std_member_rate != null ||
         $event->wo_std_nmember_rate != null)
-    <div class="flex gap-5 items-center mb-2">
+    <div class="mb-4">
         <div class="text-2xl text-registrationPrimaryColor font-semibold">Full event access</div>
-
+    
         @if ($event->category == 'ANC' && $event->year == '2024')
-            <a href="https://gpca.org.ae/conferences/anc/pass-inclusions-and-access/"
-                class="bg-registrationPrimaryColorHover hover:bg-registrationPrimaryColor text-white font-bold py-1 px-5 rounded-lg"
-                target="_blank">View pass access</a>
+            <p class="text-lg font-semibold mt-2">Delegate pass includes:</p>
+            <div class="grid grid-cols-2 gap-5 mt-2">
+                <ul class="list-disc col-span-1 ml-5">
+                    <li>Access to Operational Excellence Workshops on 10<sup>th</sup> September</li>
+                    <li>A site visit to Estidamah on 10<sup>th</sup> September</li>
+                    <li>Access to Conference Sessions from 11<sup>th</sup>-12<sup>th</sup> September</li>
+                    <li>Access to Exhibition halls</li>
+                </ul>
+                <ul class="list-disc col-span-1 ml-5">
+                    <li>Access to Luncheons and Networking Breaks from 10<sup>th</sup>-12<sup>th</sup> September</li>
+                    <li>Access to the Gala Dinner on 11<sup>th</sup> September</li>
+                    <li>Delegate bag and Stationery</li>
+                    <li>Access to event networking app</li>
+                </ul>
+            </div>
+        @endif
+    
+        @if ($event->category == 'PSC' && $event->year == '2024')
+            <p class="text-lg font-semibold mt-2">Delegate pass includes:</p>
+            <div class="grid grid-cols-2 gap-5 mt-2">
+                <ul class="list-disc col-span-1 ml-5">
+                    <li>3 full-day workshops on 7<sup>th</sup> October</li>
+                    <li>Conference sessions on 8<sup>th</sup>-10<sup>th</sup> October</li>
+                    <li>Workshop pass features</li>
+                    <li>Exhibition halls</li>
+                </ul>
+                <ul class="list-disc col-span-1 ml-5">
+                    <li>Networking breaks</li>
+                    <li>Networking reception on 7<sup>th</sup> October</li>
+                    <li>Gala dinner on 8<sup>th</sup> October</li>
+                </ul>
+            </div>
         @endif
     </div>
 @endif
 <table class="w-full bg-registrationPrimaryColor text-white text-center" cellspacing="1" cellpadding="2">
     <thead>
         <tr>
-            <td class="py-4 font-bold text-lg">Pass category</td>
+            <td class="py-2 font-bold text-lg">Pass category</td>
             @if ($finalEbEndDate != null)
-                <td class="py-4 font-bold text-lg">
+                <td class="py-2 font-bold text-lg">
                     <span>Early bird rate <br> <span class="font-normal text-base">(valid until
                             {{ $finalEbEndDate }})</span></span>
                 </td>
             @endif
-            <td class="py-4 font-bold text-lg">
+            <td class="py-2 font-bold text-lg">
                 @if ($finalEbEndDate != null)
                     <span>Standard rate <br> <span class="font-normal text-base">(starting
                             {{ $finalStdStartDate }})</span></span>
@@ -45,20 +74,20 @@
         @if ($event->eb_full_member_rate != null || $event->std_full_member_rate != null)
             <tr>
                 <td class="text-black">
-                    <div class="bg-white py-4 font-bold ml-1">
+                    <div class="bg-white py-2 font-bold ml-1">
                         Full member
                     </div>
                 </td>
                 @if ($finalEbEndDate != null)
                     <td class="text-black">
-                        <div class="bg-white py-4">
+                        <div class="bg-white py-2">
                             $ {{ number_format($event->eb_full_member_rate, 2, '.', ',') }}
                             {{ $event->event_vat == 0 ? '' : '+VAT (' . $event->event_vat . '%)' }}
                         </div>
                     </td>
                 @endif
                 <td class="text-black">
-                    <div class="bg-white py-4 mr-1">
+                    <div class="bg-white py-2 mr-1">
                         $ {{ number_format($event->std_full_member_rate, 2, '.', ',') }}
                         {{ $event->event_vat == 0 ? '' : '+VAT (' . $event->event_vat . '%)' }}
                     </div>
@@ -67,20 +96,20 @@
         @endif
         <tr>
             <td class="text-black">
-                <div class="bg-white py-4 font-bold ml-1">
+                <div class="bg-white py-2 font-bold ml-1">
                     Member
                 </div>
             </td>
             @if ($finalEbEndDate != null)
                 <td class="text-black">
-                    <div class="bg-white py-4">
+                    <div class="bg-white py-2">
                         $ {{ number_format($event->eb_member_rate, 2, '.', ',') }}
                         {{ $event->event_vat == 0 ? '' : '+VAT (' . $event->event_vat . '%)' }}
                     </div>
                 </td>
             @endif
             <td class="text-black">
-                <div class="bg-white py-4 mr-1">
+                <div class="bg-white py-2 mr-1">
                     $ {{ number_format($event->std_member_rate, 2, '.', ',') }}
                     {{ $event->event_vat == 0 ? '' : '+VAT (' . $event->event_vat . '%)' }}
                 </div>
@@ -88,20 +117,20 @@
         </tr>
         <tr>
             <td class="text-black">
-                <div class="bg-white py-4 font-bold mb-1 ml-1">
+                <div class="bg-white py-2 font-bold mb-1 ml-1">
                     Non-member
                 </div>
             </td>
             @if ($finalEbEndDate != null)
                 <td class="text-black">
-                    <div class="bg-white py-4 mb-1">
+                    <div class="bg-white py-2 mb-1">
                         $ {{ number_format($event->eb_nmember_rate, 2, '.', ',') }}
                         {{ $event->event_vat == 0 ? '' : '+VAT (' . $event->event_vat . '%)' }}
                     </div>
                 </td>
             @endif
             <td class="text-black">
-                <div class="bg-white py-4 mb-1 mr-1">
+                <div class="bg-white py-2 mb-1 mr-1">
                     $ {{ number_format($event->std_nmember_rate, 2, '.', ',') }}
                     {{ $event->event_vat == 0 ? '' : '+VAT (' . $event->event_vat . '%)' }}
                 </div>
