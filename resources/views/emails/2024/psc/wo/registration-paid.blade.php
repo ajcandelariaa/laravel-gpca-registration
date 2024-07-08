@@ -1,5 +1,7 @@
 <x-mail::message>
-<p class="sub">Dear {{ $details['name'] }},</p>
+<img src="http://gpca.org.ae/conferences/psc/wp-content/uploads/2024/07/email-notif-banner.jpg">
+    
+<p class="sub" style="margin-top: 15px;">Dear {{ $details['name'] }},</p>
 
 <p class="sub" style="margin-top: 15px;">Thank you for registering to attend the Process Safety Workshops, taking place on 07 October 2024 at the {{ $details['eventLocation'] }}. By registering as a delegate, you are subject to the terms & condition. </p>
 
