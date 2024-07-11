@@ -42,7 +42,7 @@ Download invoice
 
 <p class="sub" style="margin-top: 15px; text-decoration: underline;"><strong>Hotel Accommodation</strong></p>
 
-<p class="sub" style="margin-top: 5px;">To avail the special hotel rates kindly click <a href="https://www.gpcaforum.com/wp-content/uploads/2024/06/18th-Annual-GPCA-Forum-–-Partner-Hotels-2.pdf" target="_blank">here</a> for the list of partner hotels in Muscat Oman. Kindly indicate in your accommodation inquiry that you are attending the <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a>. </p>
+<p class="sub" style="margin-top: 5px;">To avail the special hotel rates kindly click <a href="https://www.gpcaforum.com/wp-content/uploads/2024/07/18th-Annual-GPCA-Forum-–-Partner-Hotels.pdf" target="_blank">here</a> for the list of partner hotels in Muscat Oman. Kindly indicate in your accommodation inquiry that you are attending the <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a>. </p>
 
 <p class="sub" style="margin-top: 15px;">For any event related queries, please feel free to reach out to the following team members:</p>
 
