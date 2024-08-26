@@ -57,12 +57,6 @@ Download invoice
 <p class="sub">Email: <a href="mailto:faheem@gpca.org.ae">faheem@gpca.org.ae</a></p>
 <p class="sub">Mob: +971 58 969 5448</p>
 
-<p class="sub" style="margin-top: 15px;"><strong>For conference program and speaking inquiries please contact:</strong></p>
-<p class="sub" style="margin-top: 5px;"><strong>Nakul Jain</strong></p>
-<p class="sub"><em>Conference Producer</em></p>
-<p class="sub">Email: <a href="mailto:nakul@gpca.org.ae">nakul@gpca.org.ae</a></p>
-<p class="sub">Tel: +971 4 451 0666 ext. 127</p>
-
 <p class="sub" style="margin-top: 15px;"><strong>For marketing related inquiries please contact:</strong></p>
 <p class="sub" style="margin-top: 5px;"><strong>Jhoanna Kilat</strong></p>
 <p class="sub"><em>Marketing Coordinator</em></p>
