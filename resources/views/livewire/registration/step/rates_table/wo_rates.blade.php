@@ -5,9 +5,9 @@
         <p class="text-lg font-semibold mt-2">Delegate pass includes:</p>
         <div class="grid grid-cols-2 gap-5 mt-2">
             <ul class="list-disc col-span-1 ml-5">
-                <li>Access to Operational Excellence Workshops on 10<sup>th</sup> September</li>
-                <li>A site visit to Estidamah on 10<sup>th</sup> September</li>
-                <li>Access to Luncheon and Networking Breaks on 10<sup>th</sup> September</li>
+                <li>Access to Operational Excellence Workshops on 10 September</li>
+                <li>A site visit to Estidamah Center on 10 September</li>
+                <li>Access to Luncheon and Networking breaks on 10 September</li>
             </ul>
             <ul class="list-disc col-span-1 ml-5">
                 <li>Delegate bag and Stationery</li>

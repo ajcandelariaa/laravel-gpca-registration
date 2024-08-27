@@ -5,13 +5,13 @@
         <p class="text-lg font-semibold mt-2">Delegate pass includes:</p>
         <div class="grid grid-cols-2 gap-5 mt-2">
             <ul class="list-disc col-span-1 ml-5">
-                <li>A site visit to Estidamah on 10<sup>th</sup> September</li>
-                <li>Access to Conference Sessions from 11<sup>th</sup>-12<sup>th</sup> September</li>
-                <li>Access to Exhibition halls</li>
-                <li>Access to Luncheons and Networking Breaks on 11<sup>th</sup>-12<sup>th</sup> September</li>
+                <li>A site visit to Estidamah Center on 10 September</li>
+                <li>Access to conference sessions from 11-12 September</li>
+                <li>Access to exhibition halls</li>
+                <li>Access to Luncheons and Networking Breaks on 11-12 September</li>
             </ul>
             <ul class="list-disc col-span-1 ml-5">
-                <li>Access to the Gala Dinner on 11<sup>th</sup> September</li>
+                <li>Access to the Gala dinner on 11 September at the Maiz Restaurant, Bujairi Terrace, Diriyah</li>
                 <li>Delegate bag and Stationery</li>
                 <li>Access to event networking app</li>
             </ul>
