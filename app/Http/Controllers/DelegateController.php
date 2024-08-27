@@ -203,9 +203,9 @@ class DelegateController extends Controller
                         $finalTransactionId = $eventYear . $eventCode . $lastDigit;
                         $invoiceNumber = $eventCategory . $tempYear . "/" . $lastDigit;
 
-                        if($tempDelegate->access_type == AccessTypes::CONFERENCE_ONLY->value){
+                        if ($tempDelegate->access_type == AccessTypes::CONFERENCE_ONLY->value) {
                             $finalAccessType = "Conference only";
-                        } else if ($tempDelegate->access_type == AccessTypes::WORKSHOP_ONLY->value){
+                        } else if ($tempDelegate->access_type == AccessTypes::WORKSHOP_ONLY->value) {
                             $finalAccessType = "Workshop only";
                         } else {
                             $finalAccessType = "Full event";
@@ -259,9 +259,9 @@ class DelegateController extends Controller
                         $finalTransactionId = $eventYear . $eventCode . $lastDigit;
                         $invoiceNumber = $eventCategory . $tempYear . "/" . $lastDigit2;
 
-                        if($tempDelegate->access_type == AccessTypes::CONFERENCE_ONLY->value){
+                        if ($tempDelegate->access_type == AccessTypes::CONFERENCE_ONLY->value) {
                             $finalAccessType = "Conference only";
-                        } else if ($tempDelegate->access_type == AccessTypes::WORKSHOP_ONLY->value){
+                        } else if ($tempDelegate->access_type == AccessTypes::WORKSHOP_ONLY->value) {
                             $finalAccessType = "Workshop only";
                         } else {
                             $finalAccessType = "Full event";
@@ -282,7 +282,7 @@ class DelegateController extends Controller
                             'job_title' => $tempDelegate->job_title,
                             'badge_type' => $tempDelegate->badge_type,
                             'country' => $tempDelegate->country,
-                            
+
                             'seat_number' => $tempDelegate->seat_number,
 
                             'access_type' => $finalAccessType,
@@ -361,7 +361,8 @@ class DelegateController extends Controller
         }
     }
 
-    public function scanQrView($eventCategory, $eventId){
+    public function scanQrView($eventCategory, $eventId)
+    {
         if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {
             return view('admin.events.scan-qr.scan_qr', [
                 "pageTitle" => "Scan QR",
@@ -884,6 +885,116 @@ class DelegateController extends Controller
             }
         } else {
             abort(404, 'The URL is incorrect');
+        }
+    }
+
+    // =========================================================
+    //                       RENDER APIS
+    // =========================================================
+    public function apiGetConfirmedDelegatesList($eventCategory, $eventYear)
+    {
+        $event = Event::where('category', $eventCategory)->where('year', $eventYear)->first();
+
+        if ($event) {
+            $delegateList = array();
+            $eventId = $event->id;
+
+            foreach (config('app.eventCategories') as $eventCategoryC => $code) {
+                if ($eventCategory == $eventCategoryC) {
+                    $eventCode = $code;
+                }
+            }
+
+            $mainDelegates = MainDelegate::where('event_id', $eventId)->get();
+            if (!$mainDelegates->isEmpty()) {
+                foreach ($mainDelegates as $mainDelegate) {
+                    $companyName = "";
+
+                    if ($mainDelegate->alternative_company_name != null) {
+                        $companyName = $mainDelegate->alternative_company_name;
+                    } else {
+                        $companyName = $mainDelegate->company_name;
+                    }
+
+                    if ($mainDelegate->delegate_replaced_by_id == null && (!$mainDelegate->delegate_refunded)) {
+                        if ($mainDelegate->registration_status == "confirmed") {
+
+                            $tempYear = Carbon::parse($mainDelegate->registered_date_time)->format('y');
+                            $transactionId = Transaction::where('event_id', $eventId)->where('delegate_id', $mainDelegate->id)->where('delegate_type', "main")->value('id');
+                            $lastDigit = 1000 + intval($transactionId);
+
+                            $finalTransactionId = $eventYear . $eventCode . $lastDigit;
+                            $invoiceNumber = $eventCategory . $tempYear . "/" . $lastDigit;
+
+                            array_push($delegateList, [
+                                'mainDelegateId' => $mainDelegate->id,
+                                'delegateId' => $mainDelegate->id,
+                                'delegateTransactionId' => $finalTransactionId,
+                                'delegateInvoiceNumber' => $invoiceNumber,
+                                'delegateType' => "main",
+                                'delegatePassType' => $mainDelegate->pass_type,
+                                'delegateCompany' => $companyName,
+                                'delegateJobTitle' => $mainDelegate->job_title,
+                                'delegateSalutation' => $mainDelegate->salutation,
+                                'delegateFName' => $mainDelegate->first_name,
+                                'delegateMName' => $mainDelegate->middle_name,
+                                'delegateLName' => $mainDelegate->last_name,
+                                'delegateEmailAddress' => $mainDelegate->email_address,
+                                'delegateBadgeType' => $mainDelegate->badge_type,
+                            ]);
+                        }
+                    }
+
+                    $subDelegates = AdditionalDelegate::where('main_delegate_id', $mainDelegate->id)->get();
+
+                    if (!$subDelegates->isEmpty()) {
+                        foreach ($subDelegates as $subDelegate) {
+
+                            if ($subDelegate->delegate_replaced_by_id == null && (!$subDelegate->delegate_refunded)) {
+                                if ($mainDelegate->registration_status == "confirmed") {
+
+                                    $tempYear = Carbon::parse($subDelegate->registered_date_time)->format('y');
+                                    $transactionId = Transaction::where('delegate_id', $subDelegate->id)->where('delegate_type', "sub")->value('id');
+                                    $lastDigit = 1000 + intval($transactionId);
+                                    $finalTransactionId = $eventYear . $eventCode . $lastDigit;
+
+                                    $transactionId2 = Transaction::where('event_id', $eventId)->where('delegate_id', $subDelegate->main_delegate_id)->where('delegate_type', "main")->value('id');
+                                    $lastDigit2 = 1000 + intval($transactionId2);
+                                    $invoiceNumber = $eventCategory . $tempYear . "/" . $lastDigit2;
+
+                                    array_push($delegateList, [
+                                        'mainDelegateId' => $mainDelegate->id,
+                                        'delegateId' => $subDelegate->id,
+                                        'delegateTransactionId' => $finalTransactionId,
+                                        'delegateInvoiceNumber' => $invoiceNumber,
+                                        'delegateType' => "sub",
+                                        'delegatePassType' => $mainDelegate->pass_type,
+                                        'delegateCompany' => $companyName,
+                                        'delegateJobTitle' => $subDelegate->job_title,
+                                        'delegateSalutation' => $subDelegate->salutation,
+                                        'delegateFName' => $subDelegate->first_name,
+                                        'delegateMName' => $subDelegate->middle_name,
+                                        'delegateLName' => $subDelegate->last_name,
+                                        'delegateEmailAddress' => $subDelegate->email_address,
+                                        'delegateBadgeType' => $subDelegate->badge_type,
+                                    ]);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return response()->json([
+                'status' => 200,
+                'message' => 'Confirmed attendees',
+                'data' => $delegateList,
+            ], 200);
+        } else {
+            return response()->json([
+                'status' => 404,
+                'message' => 'Event does not exist',
+                'data' => null,
+            ], 404);
         }
     }
 }

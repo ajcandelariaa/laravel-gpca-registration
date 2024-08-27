@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DelegateController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\FastTrackController;
 use App\Http\Controllers\MemberController;
@@ -22,6 +23,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::get('/event/{eventCategory}/{year}', [EventController::class, 'getRegistrationTypes']);
+Route::get('/event/{eventCategory}/{year}/attendees', [DelegateController::class, 'apiGetConfirmedDelegatesList']);
 Route::get('/members', [MemberController::class, 'getListOfMembers']);
 
 Route::get('/fast-track/{eventCategory}/{eventYear}', [FastTrackController::class, 'getFastTrackDetails']);
