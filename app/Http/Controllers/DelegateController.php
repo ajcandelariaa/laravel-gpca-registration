@@ -374,6 +374,19 @@ class DelegateController extends Controller
         }
     }
 
+    public function scanQrV2View($eventCategory, $eventId)
+    {
+        if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {
+            return view('admin.events.scan-qr-v2.scan_qr_v2', [
+                "pageTitle" => "Scan QR",
+                "eventCategory" => $eventCategory,
+                "eventId" => $eventId,
+            ]);
+        } else {
+            abort(404, 'The URL is incorrect');
+        }
+    }
+
     // =========================================================
     //                       RENDER LOGICS
     // =========================================================

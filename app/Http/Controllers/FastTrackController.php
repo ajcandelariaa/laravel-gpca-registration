@@ -9,6 +9,7 @@ use App\Models\Event;
 use App\Models\EventRegistrationType;
 use App\Models\MainDelegate;
 use App\Models\PrintedBadge;
+use App\Models\ScannedDelegate;
 use App\Models\Transaction;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -339,6 +340,145 @@ class FastTrackController extends Controller
         } else {
             return response()->json([
                 'message' => "Unauthorized!",
+            ], 401);
+        }
+    }
+
+    public function badgeScan(Request $request, $eventCategory, $eventYear)
+    {
+        $validator = Validator::make($request->all(), [
+            'code' => 'required|string',
+            'delegateId' => 'required|numeric',
+            'delegateType' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'scannedAttendee' => null,
+                'statusCode' => 422,
+                'message' => 'Validation failed',
+            ], 422);
+        }
+
+        if ($request->code == env("API_CODE")) {
+            $eventId = Event::where('category', $eventCategory)->where('year', $eventYear)->value('id');
+            if ($eventId != null) {
+                $delegateType = $request->delegateType;
+                $delegateId = $request->delegateId;
+
+                $delegate = ($delegateType == "main") ? MainDelegate::find($delegateId) : AdditionalDelegate::find($delegateId);
+
+                if ($delegate != null) {
+                    $name = null;
+                    $jobTitle = null;
+                    $companyName = null;
+                    $badgeType = null;
+                    $accessType = null;
+                    $transactionId = null;
+
+                    foreach (config('app.eventCategories') as $eventCategoryC => $code) {
+                        if ($eventCategory == $eventCategoryC) {
+                            $eventCode = $code;
+                        }
+                    }
+                    
+                    ScannedDelegate::create([
+                        'event_id' => $eventId,
+                        'event_category' => $eventCategory,
+                        'delegate_id' => $delegateId,
+                        'delegate_type' => $delegateType,
+                        'scanned_date_time' => Carbon::now(),
+                    ]);
+
+                    if ($delegateType == "main") {
+                        $delegateDetails = MainDelegate::where('event_id', $eventId)->where('id', $delegateId)->first();
+
+                        if ($delegateDetails->alternative_company_name != null) {
+                            $companyName = $delegateDetails->alternative_company_name;
+                        } else {
+                            $companyName = $delegateDetails->company_name;
+                        }
+
+                        if ($delegateDetails->salutation == "Dr." || $delegateDetails->salutation == "Prof.") {
+                            $delegateSalutation = $delegateDetails->salutation;
+                        } else {
+                            $delegateSalutation = null;
+                        }
+
+                        $name = $delegateSalutation . ' ' . $delegateDetails->first_name . ' ' . $delegateDetails->middle_name . ' ' . $delegateDetails->last_name;
+                        $jobTitle = $delegateDetails->job_title;
+                        $companyName = $companyName;
+                        $badgeType = $delegateDetails->badge_type;
+                        $accessType = $delegateDetails->access_type;
+                    } else {
+                        $delegateDetails = AdditionalDelegate::where('id', $delegateId)->first();
+                        $mainDelegate = MainDelegate::where('event_id', $eventId)->where('id', $delegateDetails->main_delegate_id)->first();
+
+                        if ($mainDelegate->alternative_company_name != null) {
+                            $companyName = $mainDelegate->alternative_company_name;
+                        } else {
+                            $companyName = $mainDelegate->company_name;
+                        }
+
+
+                        if ($delegateDetails->salutation == "Dr." || $delegateDetails->salutation == "Prof.") {
+                            $delegateSalutation = $delegateDetails->salutation;
+                        } else {
+                            $delegateSalutation = null;
+                        }
+
+                        $name = $delegateSalutation . ' ' . $delegateDetails->first_name . ' ' . $delegateDetails->middle_name . ' ' . $delegateDetails->last_name;
+                        $jobTitle = $delegateDetails->job_title;
+                        $companyName = $companyName;
+                        $badgeType = $delegateDetails->badge_type;
+                        $accessType = $delegateDetails->access_type;
+                    }
+
+                    if ($accessType == AccessTypes::CONFERENCE_ONLY->value) {
+                        $finalAccessType = "CO";
+                    } else if ($accessType == AccessTypes::WORKSHOP_ONLY->value) {
+                        $finalAccessType = "WO";
+                    } else {
+                        $finalAccessType = "FE";
+                    }
+
+                    $transactionId = Transaction::where('event_id', $eventId)->where('delegate_id', $delegateId)->where('delegate_type', $delegateType)->value('id');
+                    $lastDigit = 1000 + intval($transactionId);
+                    $finalTransactionId = $eventYear . $eventCode . $lastDigit;
+
+                    $data = [
+                        'accessType' => $finalAccessType,
+                        'transactionId' => $finalTransactionId,
+                        'fullName' => $name,
+                        'jobTitle' => $jobTitle,
+                        'companyName' => $companyName,
+                        'badgeType' => $badgeType,
+                    ];
+
+                    return response()->json([
+                        'scannedAttendee' => $data,
+                        'statusCode' => 200,
+                        'message' => "Success!",
+                    ], 200);
+                } else {
+                    return response()->json([
+                        'scannedAttendee' => null,
+                        'statusCode' => 404,
+                        'message' => "Attendee doesn't exist",
+                    ], 404);
+                }
+            } else {
+                return response()->json([
+                    'scannedAttendee' => null,
+                    'statusCode' => 404,
+                    'message' => "Event doesn't exist",
+                ], 404);
+            }
+        } else {
+            return response()->json([
+                'scannedAttendee' => null,
+                'statusCode' => 401,
+                'message' => 'Unauthorized!',
             ], 401);
         }
     }
