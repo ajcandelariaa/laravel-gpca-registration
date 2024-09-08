@@ -387,7 +387,7 @@ class FastTrackController extends Controller
                         'event_category' => $eventCategory,
                         'delegate_id' => $delegateId,
                         'delegate_type' => $delegateType,
-                        'scanned_date_time' => Carbon::now(),
+                        'scanned_date_time' => Carbon::now('Asia/Riyadh'),
                     ]);
 
                     if ($delegateType == "main") {

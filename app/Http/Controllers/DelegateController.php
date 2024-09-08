@@ -347,6 +347,19 @@ class DelegateController extends Controller
         }
     }
 
+    public function scannedDelegateListCategorizedView($eventCategory, $eventId){
+        if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {
+            $pageTitle = "Scanned delegates";
+            return view('admin.events.scanned-delegate.categorized.scanned_delegate_list_categorized', [
+                "pageTitle" => $pageTitle,
+                "eventCategory" => $eventCategory,
+                "eventId" => $eventId,
+            ]);
+        } else {
+            abort(404, 'The URL is incorrect');
+        }
+    }
+
 
     public function eventEmailBroadcastView($eventCategory, $eventId)
     {

@@ -62,6 +62,7 @@ Route::prefix('admin')->group(function () {
 
                 Route::prefix('scanned-delegate')->group(function () {
                     Route::get('/', [DelegateController::class, 'scannedDelegateListView'])->name('admin.scanned.delegate.list.view');
+                    Route::get('/categorized', [DelegateController::class, 'scannedDelegateListCategorizedView'])->name('admin.scanned.delegate.categorized.list.view');
                 });
                 // Route::get('/onsite/register/', [RegistrationController::class, 'eventOnsiteRegistrationView'])->name('admin.event.onsite.register.view');
                 
