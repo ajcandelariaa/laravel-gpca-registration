@@ -548,41 +548,41 @@ return [
                 'end_time' => "10:35:00",
                 'date' => '2024-09-10',
             ],
-            'Networking break' => [
-                'start_time' => "10:35:00",
+            'After Networking break' => [
+                'start_time' => "11:25:00",
                 'end_time' => "12:00:00",
+                'date' => '2024-09-10',
+            ],
+            'After Lunch break' => [
+                'start_time' => "13:00:00",
+                'end_time' => "15:00:00",
                 'date' => '2024-09-10',
             ],
         ],
         'Day 1 - September 11, 2024' => [
             'Morning' => [
                 'start_time' => "08:00:00",
-                'end_time' => "10:35:00",
+                'end_time' => "11:00:00",
                 'date' => '2024-09-11',
             ],
-            'Networking break' => [
-                'start_time' => "10:35:00",
-                'end_time' => "13:00:00",
+            'After Networking break' => [
+                'start_time' => "11:45:00",
+                'end_time' => "13:20:00",
                 'date' => '2024-09-11',
             ],
-            'Lunch and Prayer' => [
-                'start_time' => "13:00:00",
-                'end_time' => "13:00:00",
-                'date' => '2024-09-11',
-            ],
-            'Gala dinner' => [
-                'start_time' => "19:30:00",
-                'end_time' => "22:00:00",
+            'After Lunch break' => [
+                'start_time' => "14:30:00",
+                'end_time' => "15:55:00",
                 'date' => '2024-09-11',
             ],
         ],
         'Day 2 - September 12, 2024' => [
             'Morning' => [
                 'start_time' => "08:00:00",
-                'end_time' => "11:20:00",
+                'end_time' => "11:10:00",
                 'date' => '2024-09-12',
             ],
-            'Networking break' => [
+            'After Networking break' => [
                 'start_time' => "11:20:00",
                 'end_time' => "15:00:00",
                 'date' => '2024-09-12',
