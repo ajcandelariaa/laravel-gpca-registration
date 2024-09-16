@@ -992,14 +992,13 @@ class DelegateController extends Controller
                             $start_time = $timings['start_time'];
                             $end_time = $timings['end_time'];
                             $date = $timings['date'];
-                            $delegateArrayTemp = array();
                             $startTime = Carbon::parse($start_time)->format('H:i:s');
                             $endTime = Carbon::parse($end_time)->format('H:i:s');
                             foreach ($finalListsOfScannedDelegates as $finalListsOfScannedDelegate) {
                                 if ($date == Carbon::parse($finalListsOfScannedDelegate['delegateScannedDate'])->format('Y-m-d')) {
                                     $delegateScannedTime = Carbon::parse($finalListsOfScannedDelegate['delegateScannedTime'])->format('H:i:s');
                                     if ($delegateScannedTime >= $startTime && $delegateScannedTime < $endTime) {
-                                        array_push($delegateArrayTemp, [
+                                        array_push($finalData, [
                                             'delegateDayName' => $dayName,
                                             'delegateTimeName' => $timeName,
                                             'delegateTransactionId' => $finalListsOfScannedDelegate['delegateTransactionId'],
@@ -1017,7 +1016,6 @@ class DelegateController extends Controller
                                     }
                                 }
                             }
-                            array_push($finalData, $delegateArrayTemp);
                         }
                     }
                 }
