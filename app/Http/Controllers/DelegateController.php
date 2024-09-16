@@ -1022,7 +1022,7 @@ class DelegateController extends Controller
                     }
                 }
             }
-
+            dd($finalData);
             $currentDate = Carbon::now()->format('Y-m-d');
             $fileName = $eventCategory . ' ' . $event->year . ' Categorized Scanned Delegates ' . '[' . $currentDate . '].csv';
             $headers = array(
