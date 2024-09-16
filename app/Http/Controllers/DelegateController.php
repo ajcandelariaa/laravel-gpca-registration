@@ -1049,11 +1049,11 @@ class DelegateController extends Controller
                 'Scanned time',
             );
 
-            $callback = function () use ($finalListsOfScannedDelegates, $columns) {
+            $callback = function () use ($finalData, $columns) {
                 $file = fopen('php://output', 'w');
                 fputcsv($file, $columns);
 
-                foreach ($finalListsOfScannedDelegates as $data) {
+                foreach ($finalData as $data) {
                     fputcsv(
                         $file,
                         array(
