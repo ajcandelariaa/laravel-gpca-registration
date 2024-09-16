@@ -405,19 +405,21 @@ class RegistrationForm extends Component
                     $this->delegatInvoiceDetails[$existingIndex]['totalDiscount'] = $totalDiscountTemp;
                     $this->delegatInvoiceDetails[$existingIndex]['totalNetAmount'] = $totalNetAmountTemp;
                 } else {
-                    $tempSubUnitPrice = $this->finalUnitPrice;
-                    $tempSubTotalDiscount = 0;
-                    $tempSubTotalNetAmount = $this->finalUnitPrice;
-
                     if ($this->additionalDelegates[$i]['subPromoCodeDiscount'] == null) {
                         $this->additionalDelegates[$i]['subPromoCode'] = null;
                         $delegateSubDescription = "Delegate registration fee - {$this->rateTypeString} - {$this->additionalDelegates[$i]['subBadgeType']}";
+                        
+                        $tempSubUnitPrice = $this->finalUnitPrice;
+                        $tempSubTotalDiscount = 0;
+                        $tempSubTotalNetAmount = $this->finalUnitPrice;
                     } else {
                         if ($this->additionalDelegates[$i]['subDiscountType'] == "percentage") {
+                            $tempSubUnitPrice = $this->finalUnitPrice;
                             $tempSubTotalDiscount = $this->finalUnitPrice * ($this->additionalDelegates[$i]['subPromoCodeDiscount'] / 100);
                             $tempSubTotalNetAmount = $this->finalUnitPrice - ($this->finalUnitPrice * ($this->additionalDelegates[$i]['subPromoCodeDiscount'] / 100));
                             $delegateSubDescription = "Delegate Registration Fee - {$this->rateTypeString} - {$this->additionalDelegates[$i]['subBadgeType']} - {$this->additionalDelegates[$i]['subPromoCodeDiscount']} % discount";
                         } else if ($this->additionalDelegates[$i]['subDiscountType'] == "price") {
+                            $tempSubUnitPrice = $this->finalUnitPrice;
                             $tempSubTotalDiscount = $this->additionalDelegates[$i]['subPromoCodeDiscount'];
                             $tempSubTotalNetAmount = $this->finalUnitPrice - $this->additionalDelegates[$i]['subPromoCodeDiscount'];
                             $delegateSubDescription = "Delegate Registration Fee - {$this->rateTypeString} - {$this->additionalDelegates[$i]['subBadgeType']} - $ {$this->additionalDelegates[$i]['subPromoCodeDiscount']} discount";
