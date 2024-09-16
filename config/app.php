@@ -487,7 +487,7 @@ return [
         'PSW' => "21",
         'DAW' => "22",
         'DFCLW1' => "23",
-
+        'CAIPW1' => "24",
     ],
 
     'bankDetails' => [

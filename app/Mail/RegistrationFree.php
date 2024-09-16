@@ -150,6 +150,10 @@ class RegistrationFree extends Mailable
                 return new Content(
                     markdown: 'emails.2024.ipaw.registration-free',
                 );
+            } else if ($this->details['eventCategory'] == "CAIPW1") {
+                return new Content(
+                    markdown: 'emails.2024.caipw1.registration-free',
+                );
             } else {
                 return new Content(
                     markdown: 'emails.registration-free',

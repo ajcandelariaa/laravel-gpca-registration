@@ -179,6 +179,10 @@ class RegistrationUnpaid extends Mailable
                 return new Content(
                     markdown: 'emails.2024.ipaw.registration-unpaid',
                 );
+            } else if ($this->details['eventCategory'] == "CAIPW1") {
+                return new Content(
+                    markdown: 'emails.2024.caipw1.registration-unpaid',
+                );
             } else {
                 return new Content(
                     markdown: 'emails.registration-unpaid',
