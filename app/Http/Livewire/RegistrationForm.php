@@ -425,6 +425,7 @@ class RegistrationForm extends Component
                             // FIXED RATE
                             $promoCode = PromoCodes::where('event_id', $this->event->id)->where('promo_code', $this->additionalDelegates[$i]['subPromoCode'])->first();
                             $tempSubTotalDiscount = 0;
+                            $tempSubUnitPrice = $promoCode->new_rate;
                             $tempSubTotalNetAmount = $promoCode->new_rate;
                             $delegateSubDescription = $promoCode->new_rate_description;
                         }
