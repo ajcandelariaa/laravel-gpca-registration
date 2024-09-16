@@ -17,10 +17,21 @@
                     </div>
                 </form>
 
-                <a href="{{ route('admin.scanned.delegate.categorized.list.view', ['eventCategory' => $event->category, 'eventId' => $event->id]) }}" class="bg-registrationPrimaryColorHover hover:bg-registrationPrimaryColor text-white py-2 px-5 rounded-md text-lg text-center" target="_blank">Go to Categorized Scanned</a>
+                <div class="flex gap-5 flex-row">
+                    <a href="{{ route('admin.scanned.delegate.categorized.list.view', ['eventCategory' => $event->category, 'eventId' => $event->id]) }}"
+                        class="bg-registrationPrimaryColorHover hover:bg-registrationPrimaryColor text-white py-2 px-5 rounded-md text-lg text-center"
+                        target="_blank">Go to Categorized Scanned</a>
+
+                    <a href="{{ route('admin.event.scanned.delegate.exportAllData', ['eventCategory' => $event->category, 'eventId' => $event->id]) }}"
+                        target="_blank"
+                        class="bg-green-600 hover:bg-green-700 text-white py-2 px-5 rounded-md text-lg text-center">Export
+                        Data</a>
+                </div>
             </div>
-    
-            <a href="{{ route('scan.qr', ['eventCategory' => $event->category, 'eventId' => $event->id]) }}" class="bg-green-600 hover:bg-green-700 text-white py-2 px-5 rounded-md text-lg text-center">Go to QR Code Scanner</a>
+
+            <a href="{{ route('scan.qr', ['eventCategory' => $event->category, 'eventId' => $event->id]) }}"
+                class="bg-green-600 hover:bg-green-700 text-white py-2 px-5 rounded-md text-lg text-center">Go to QR
+                Code Scanner</a>
         </div>
 
         <div class="shadow-lg my-5 pt-5 bg-white rounded-md">

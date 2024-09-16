@@ -26,7 +26,7 @@ class ScannedDelegateListCategorized extends Component
         $this->currentDate = null;
         $this->currentStartTime = null;
         $this->currentEndTime = null;
-        $this->choices = config('app.scanTimings');
+        $this->choices = config('app.scanTimings.2024.ANC');
 
         foreach (config('app.eventCategories') as $eventCategoryC => $code) {
             if ($eventCategory == $eventCategoryC) {

@@ -19,8 +19,6 @@ use App\Models\VisitorTransaction;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\Crypt;
 
 class DelegateController extends Controller
 {
@@ -347,7 +345,8 @@ class DelegateController extends Controller
         }
     }
 
-    public function scannedDelegateListCategorizedView($eventCategory, $eventId){
+    public function scannedDelegateListCategorizedView($eventCategory, $eventId)
+    {
         if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {
             $pageTitle = "Scanned delegates";
             return view('admin.events.scanned-delegate.categorized.scanned_delegate_list_categorized', [
@@ -912,6 +911,260 @@ class DelegateController extends Controller
         } else {
             abort(404, 'The URL is incorrect');
         }
+    }
+
+    public function scannedDelegateExportAllData($eventCategory, $eventId)
+    {
+        $event = Event::where('id', $eventId)->where('category', $eventCategory)->first();
+        if ($event) {
+            $finalListsOfScannedDelegates = $this->getScannedDelegates($event);
+            $currentDate = Carbon::now()->format('Y-m-d');
+            $fileName = $eventCategory . ' ' . $event->year . ' Scanned Delegates ' . '[' . $currentDate . '].csv';
+            $headers = array(
+                "Content-type"        => "text/csv",
+                "Content-Disposition" => "attachment; filename=$fileName",
+                "Pragma"              => "no-cache",
+                "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+                "Expires"             => "0"
+            );
+
+            $columns = array(
+                'Transaction Id',
+                'Company Name',
+                'Salutation',
+                'First name',
+                'Middle name',
+                'Last name',
+                'Job title',
+                'Email address',
+                'Registration type',
+                'Scanned date',
+                'Scanned time',
+            );
+
+            $callback = function () use ($finalListsOfScannedDelegates, $columns) {
+                $file = fopen('php://output', 'w');
+                fputcsv($file, $columns);
+
+                foreach ($finalListsOfScannedDelegates as $data) {
+                    fputcsv(
+                        $file,
+                        array(
+                            $data['delegateTransactionId'],
+                            $data['delegateCompany'],
+                            $data['delegateSalutation'],
+                            $data['delegateFirstName'],
+                            $data['delegateMiddleName'],
+                            $data['delegateLastName'],
+                            $data['delegateJobTitle'],
+                            $data['delegateEmailAddress'],
+                            $data['delegateBadgeType'],
+                            $data['delegateScannedDate'],
+                            $data['delegateScannedTime'],
+                        )
+                    );
+                }
+                fclose($file);
+            };
+
+            return response()->stream($callback, 200, $headers);
+        } else {
+            abort(404, 'The URL is incorrect');
+        }
+    }
+
+
+    public function scannedDelegateExportCategorizedData($eventCategory, $eventId)
+    {
+        $event = Event::where('id', $eventId)->where('category', $eventCategory)->first();
+        if ($event) {
+            $dayTimings = config('app.scanTimings.2024.ANC');
+            $finalListsOfScannedDelegates = $this->getScannedDelegates($event);
+
+            $finalData = array();
+
+            if (count($dayTimings) > 0) {
+                foreach ($dayTimings as $dayNameKey => $day) {
+                    $dayName = $dayNameKey;
+
+                    if (count($day) > 0) {
+                        foreach ($day as $timeNameKey => $timings) {
+                            $timeName = $timeNameKey;
+                            $start_time = $timings['start_time'];
+                            $end_time = $timings['end_time'];
+                            $date = $timings['date'];
+                            $delegateArrayTemp = array();
+
+                            $startTime = Carbon::parse($start_time)->format('H:i:s');
+                            $endTime = Carbon::parse($end_time)->format('H:i:s');
+
+                            foreach ($finalListsOfScannedDelegates as $finalListsOfScannedDelegate) {
+                                if ($date == $finalListsOfScannedDelegate['delegateScannedDate']) {
+                                    $delegateScannedTime = Carbon::parse($finalListsOfScannedDelegate['delegateScannedTime'])->format('H:i:s');
+                                    if ($delegateScannedTime >= $startTime && $delegateScannedTime < $endTime) {
+                                        array_push($delegateArrayTemp, [
+                                            'delegateDayName' => $dayName,
+                                            'delegateTimeName' => $timeName,
+                                            'delegateTransactionId' => $finalListsOfScannedDelegate['delegateTransactionId'],
+                                            'delegateCompany' => $finalListsOfScannedDelegate['delegateCompany'],
+                                            'delegateSalutation' => $finalListsOfScannedDelegate['delegateSalutation'],
+                                            'delegateFirstName' => $finalListsOfScannedDelegate['delegateFirstName'],
+                                            'delegateMiddleName' => $finalListsOfScannedDelegate['delegateMiddleName'],
+                                            'delegateLastName' => $finalListsOfScannedDelegate['delegateLastName'],
+                                            'delegateJobTitle' => $finalListsOfScannedDelegate['delegateJobTitle'],
+                                            'delegateEmailAddress' => $finalListsOfScannedDelegate['delegateEmailAddress'],
+                                            'delegateBadgeType' => $finalListsOfScannedDelegate['delegateBadgeType'],
+                                            'delegateScannedDate' => $finalListsOfScannedDelegate['delegateScannedDate'],
+                                            'delegateScannedTime' => $finalListsOfScannedDelegate['delegateScannedTime'],
+                                        ]);
+                                    }
+                                }
+                            }
+                            array_push($finalData, $delegateArrayTemp);
+                        }
+                    }
+                }
+            }
+
+
+            $currentDate = Carbon::now()->format('Y-m-d');
+            $fileName = $eventCategory . ' ' . $event->year . ' Categorized Scanned Delegates ' . '[' . $currentDate . '].csv';
+            $headers = array(
+                "Content-type"        => "text/csv",
+                "Content-Disposition" => "attachment; filename=$fileName",
+                "Pragma"              => "no-cache",
+                "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+                "Expires"             => "0"
+            );
+
+            $columns = array(
+                'Day name',
+                'Time name',
+                'Transaction Id',
+                'Company Name',
+                'Salutation',
+                'First name',
+                'Middle name',
+                'Last name',
+                'Job title',
+                'Email address',
+                'Registration type',
+                'Scanned date',
+                'Scanned time',
+            );
+
+            $callback = function () use ($finalListsOfScannedDelegates, $columns) {
+                $file = fopen('php://output', 'w');
+                fputcsv($file, $columns);
+
+                foreach ($finalListsOfScannedDelegates as $data) {
+                    fputcsv(
+                        $file,
+                        array(
+                            $data['delegateDayName'],
+                            $data['delegateTimeName'],
+                            $data['delegateTransactionId'],
+                            $data['delegateCompany'],
+                            $data['delegateSalutation'],
+                            $data['delegateFirstName'],
+                            $data['delegateMiddleName'],
+                            $data['delegateLastName'],
+                            $data['delegateJobTitle'],
+                            $data['delegateEmailAddress'],
+                            $data['delegateBadgeType'],
+                            $data['delegateScannedDate'],
+                            $data['delegateScannedTime'],
+                        )
+                    );
+                }
+                fclose($file);
+            };
+
+            return response()->stream($callback, 200, $headers);
+        } else {
+            abort(404, 'The URL is incorrect');
+        }
+    }
+
+    public function getScannedDelegates($event)
+    {
+        $eventCategory = $event->category;
+        $eventId = $event->id;
+        foreach (config('app.eventCategories') as $eventCategoryC => $code) {
+            if ($eventCategory == $eventCategoryC) {
+                $eventCode = $code;
+            }
+        }
+
+        $finalListsOfScannedDelegates = array();
+
+        $scannedDelegates = ScannedDelegate::where('event_id', $eventId)->get();
+        if ($scannedDelegates->isNotEmpty()) {
+            foreach ($scannedDelegates as $scannedDelegate) {
+                if ($scannedDelegate->delegate_type == "main") {
+                    $mainDelegate = MainDelegate::where('id', $scannedDelegate->delegate_id)->first();
+
+                    $transactionId = Transaction::where('event_id', $eventId)->where('delegate_id', $mainDelegate->id)->where('delegate_type', "main")->value('id');
+                    $lastDigit = 1000 + intval($transactionId);
+
+                    $finalTransactionId = $event->year . $eventCode . $lastDigit;
+
+                    if ($mainDelegate->alternative_company_name != null) {
+                        $companyName = $mainDelegate->alternative_company_name;
+                    } else {
+                        $companyName = $mainDelegate->company_name;
+                    }
+
+                    $carbonDateTime = Carbon::parse($scannedDelegate->scanned_date_time);
+
+                    array_push($finalListsOfScannedDelegates, [
+                        'delegateTransactionId' => $finalTransactionId,
+                        'delegateCompany' => $companyName,
+                        'delegateSalutation' => $mainDelegate->salutation,
+                        'delegateFirstName' => $mainDelegate->first_name,
+                        'delegateMiddleName' => $mainDelegate->middle_name,
+                        'delegateLastName' => $mainDelegate->last_name,
+                        'delegateJobTitle' => $mainDelegate->job_title,
+                        'delegateEmailAddress' => $mainDelegate->email_address,
+                        'delegateBadgeType' => $mainDelegate->badge_type,
+                        'delegateScannedDate' => $carbonDateTime->toDateString(),
+                        'delegateScannedTime' => $carbonDateTime->toTimeString(),
+                    ]);
+                } else {
+                    $additionalDelegate = AdditionalDelegate::where('id', $scannedDelegate->delegate_id)->first();
+
+                    $transactionId = Transaction::where('event_id', $eventId)->where('delegate_id', $additionalDelegate->id)->where('delegate_type', "sub")->value('id');
+                    $lastDigit = 1000 + intval($transactionId);
+
+                    $finalTransactionId = $event->year . $eventCode . $lastDigit;
+
+                    $mainDelegate = MainDelegate::where('id', $additionalDelegate->main_delegate_id)->first();
+
+                    if ($mainDelegate->alternative_company_name != null) {
+                        $mainDelegateCompany = $mainDelegate->alternative_company_name;
+                    } else {
+                        $mainDelegateCompany = $mainDelegate->company_name;
+                    }
+
+                    $carbonDateTime = Carbon::parse($scannedDelegate->scanned_date_time);
+
+                    array_push($finalListsOfScannedDelegates, [
+                        'delegateTransactionId' => $finalTransactionId,
+                        'delegateCompany' => $mainDelegateCompany,
+                        'delegateSalutation' => $additionalDelegate->salutation,
+                        'delegateFirstName' => $additionalDelegate->first_name,
+                        'delegateMiddleName' => $additionalDelegate->middle_name,
+                        'delegateLastName' => $additionalDelegate->last_name,
+                        'delegateJobTitle' => $additionalDelegate->job_title,
+                        'delegateEmailAddress' => $additionalDelegate->email_address,
+                        'delegateBadgeType' => $additionalDelegate->badge_type,
+                        'delegateScannedDate' => $carbonDateTime->toDateString(),
+                        'delegateScannedTime' => $carbonDateTime->toTimeString(),
+                    ]);
+                }
+            }
+        }
+        return $finalListsOfScannedDelegates;
     }
 
     // =========================================================
