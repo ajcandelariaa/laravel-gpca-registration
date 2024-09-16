@@ -986,7 +986,6 @@ class DelegateController extends Controller
             if (count($dayTimings) > 0) {
                 foreach ($dayTimings as $dayNameKey => $day) {
                     $dayName = $dayNameKey;
-
                     if (count($day) > 0) {
                         foreach ($day as $timeNameKey => $timings) {
                             $timeName = $timeNameKey;
@@ -994,12 +993,10 @@ class DelegateController extends Controller
                             $end_time = $timings['end_time'];
                             $date = $timings['date'];
                             $delegateArrayTemp = array();
-
                             $startTime = Carbon::parse($start_time)->format('H:i:s');
                             $endTime = Carbon::parse($end_time)->format('H:i:s');
-
                             foreach ($finalListsOfScannedDelegates as $finalListsOfScannedDelegate) {
-                                if ($date == $finalListsOfScannedDelegate['delegateScannedDate']) {
+                                if ($date == Carbon::parse($finalListsOfScannedDelegate['delegateScannedDate'])->format('Y-m-d')) {
                                     $delegateScannedTime = Carbon::parse($finalListsOfScannedDelegate['delegateScannedTime'])->format('H:i:s');
                                     if ($delegateScannedTime >= $startTime && $delegateScannedTime < $endTime) {
                                         array_push($delegateArrayTemp, [
@@ -1025,7 +1022,6 @@ class DelegateController extends Controller
                     }
                 }
             }
-
 
             $currentDate = Carbon::now()->format('Y-m-d');
             $fileName = $eventCategory . ' ' . $event->year . ' Categorized Scanned Delegates ' . '[' . $currentDate . '].csv';
