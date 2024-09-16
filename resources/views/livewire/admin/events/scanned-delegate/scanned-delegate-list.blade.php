@@ -25,7 +25,12 @@
                     <a href="{{ route('admin.event.scanned.delegate.exportAllData', ['eventCategory' => $event->category, 'eventId' => $event->id]) }}"
                         target="_blank"
                         class="bg-green-600 hover:bg-green-700 text-white py-2 px-5 rounded-md text-lg text-center">Export
-                        Data</a>
+                        All</a>
+
+                    <a href="{{ route('admin.event.scanned.delegate.exportCategorizedData', ['eventCategory' => $event->category, 'eventId' => $event->id]) }}"
+                        target="_blank"
+                        class="bg-green-600 hover:bg-green-700 text-white py-2 px-5 rounded-md text-lg text-center">Export
+                        Categorized</a>
                 </div>
             </div>
 
