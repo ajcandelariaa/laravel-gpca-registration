@@ -26,7 +26,7 @@
             @else
                 <div class="shadow-lg my-5 pt-5 bg-white rounded-md">
                     <h1 class="text-center text-2xl bg-registrationPrimaryColor text-white py-4">Scanned delegates</h1>
-                    <div class="grid grid-cols-9 gap-5 p-4 px-4 text-center items-center bg-blue-600 text-white ">
+                    <div class="grid grid-cols-10 gap-5 p-4 px-4 text-center items-center bg-blue-600 text-white ">
                         <div class="col-span-1 break-words">No.</div>
                         <div class="col-span-1 break-words">Transaction ID</div>
                         <div class="col-span-1 break-words">Invoice</div>
@@ -34,10 +34,11 @@
                         <div class="col-span-1 break-words">Company</div>
                         <div class="col-span-2 break-words">Email Address</div>
                         <div class="col-span-1 break-words">Registration type</div>
+                        <div class="col-span-1 break-words">Location</div>
                     </div>
                     @foreach ($currentListOfDelegates as $delegateIndex => $currentListOfDelegate)
                         <div
-                            class="grid grid-cols-9 gap-5 py-2 px-4 mb-1 text-center items-center  {{ $delegateIndex % 2 == 0 ? 'bg-registrationInputFieldsBGColor' : 'bg-registrationCardBGColor' }}">
+                            class="grid grid-cols-10 gap-5 py-2 px-4 mb-1 text-center items-center  {{ $delegateIndex % 2 == 0 ? 'bg-registrationInputFieldsBGColor' : 'bg-registrationCardBGColor' }}">
                             <div class="col-span-1 break-words">{{ $delegateIndex + 1 }}</div>
 
                             <div class="col-span-1 break-words">
@@ -68,6 +69,10 @@
 
                             <div class="col-span-1 break-words">
                                 {{ $currentListOfDelegate['delegateBadgeType'] }}
+                            </div>
+
+                            <div class="col-span-1 break-words">
+                                {{ $currentListOfDelegate['location'] }}
                             </div>
                         </div>
                     @endforeach

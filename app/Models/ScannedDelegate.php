@@ -14,6 +14,7 @@ class ScannedDelegate extends Model
         'event_category',
         'delegate_id',
         'delegate_type',
+        'scanner_location',
         'scanned_date_time',
     ];
 }

@@ -69,6 +69,7 @@ class ScannedDelegateListCategorized extends Component
                         'delegateBadgeType' => $mainDelegate->badge_type,
                         'delegateScannedDate' => $carbonDateTime->toDateString(),
                         'delegateScannedTime' => $carbonDateTime->toTimeString(),
+                        'location' => $scannedDelegate->scanner_location ?? 'N/A',
                     ]);
                 } else {
                     $additionalDelegate = AdditionalDelegates::where('id', $scannedDelegate->delegate_id)->first();
@@ -106,6 +107,7 @@ class ScannedDelegateListCategorized extends Component
                         'delegateScannedCount' => 1,
                         'delegateScannedDate' => $carbonDateTime->toDateString(),
                         'delegateScannedTime' => $carbonDateTime->toTimeString(),
+                        'location' => $scannedDelegate->scanner_location ?? 'N/A',
                     ]);
                 }
             }

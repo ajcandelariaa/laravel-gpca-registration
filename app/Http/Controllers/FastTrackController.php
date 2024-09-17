@@ -350,6 +350,7 @@ class FastTrackController extends Controller
             'code' => 'required|string',
             'delegateId' => 'required|numeric',
             'delegateType' => 'required|string',
+            'location' => 'required|string',
         ]);
 
         if ($validator->fails()) {
@@ -365,6 +366,7 @@ class FastTrackController extends Controller
             if ($eventId != null) {
                 $delegateType = $request->delegateType;
                 $delegateId = $request->delegateId;
+                $location = $request->location;
 
                 $delegate = ($delegateType == "main") ? MainDelegate::find($delegateId) : AdditionalDelegate::find($delegateId);
 
@@ -387,6 +389,7 @@ class FastTrackController extends Controller
                         'event_category' => $eventCategory,
                         'delegate_id' => $delegateId,
                         'delegate_type' => $delegateType,
+                        'scanner_location' => $location,
                         'scanned_date_time' => Carbon::now('Asia/Riyadh'),
                     ]);
 

@@ -940,6 +940,7 @@ class DelegateController extends Controller
                 'Registration type',
                 'Scanned date',
                 'Scanned time',
+                'Scanned location',
             );
 
             $callback = function () use ($finalListsOfScannedDelegates, $columns) {
@@ -961,6 +962,7 @@ class DelegateController extends Controller
                             $data['delegateBadgeType'],
                             $data['delegateScannedDate'],
                             $data['delegateScannedTime'],
+                            $data['delegateScannedLocation'],
                         )
                     );
                 }
@@ -1012,6 +1014,7 @@ class DelegateController extends Controller
                                             'delegateBadgeType' => $finalListsOfScannedDelegate['delegateBadgeType'],
                                             'delegateScannedDate' => $finalListsOfScannedDelegate['delegateScannedDate'],
                                             'delegateScannedTime' => $finalListsOfScannedDelegate['delegateScannedTime'],
+                                            'delegateScannedLocation' => $finalListsOfScannedDelegate['delegateScannedLocation'],
                                         ]);
                                     }
                                 }
@@ -1044,6 +1047,7 @@ class DelegateController extends Controller
                 'Registration type',
                 'Scanned date',
                 'Scanned time',
+                'Scanned location',
             );
 
             $callback = function () use ($finalData, $columns) {
@@ -1067,6 +1071,7 @@ class DelegateController extends Controller
                             $data['delegateBadgeType'],
                             $data['delegateScannedDate'],
                             $data['delegateScannedTime'],
+                            $data['delegateScannedLocation'],
                         )
                     );
                 }
@@ -1122,6 +1127,7 @@ class DelegateController extends Controller
                         'delegateBadgeType' => $mainDelegate->badge_type,
                         'delegateScannedDate' => $carbonDateTime->toDateString(),
                         'delegateScannedTime' => $carbonDateTime->toTimeString(),
+                        'delegateScannedLocation' => $scannedDelegate->scanner_location,
                     ]);
                 } else {
                     $additionalDelegate = AdditionalDelegate::where('id', $scannedDelegate->delegate_id)->first();
@@ -1153,6 +1159,7 @@ class DelegateController extends Controller
                         'delegateBadgeType' => $additionalDelegate->badge_type,
                         'delegateScannedDate' => $carbonDateTime->toDateString(),
                         'delegateScannedTime' => $carbonDateTime->toTimeString(),
+                        'delegateScannedLocation' => $scannedDelegate->scanner_location,
                     ]);
                 }
             }
