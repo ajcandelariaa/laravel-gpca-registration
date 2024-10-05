@@ -65,6 +65,7 @@ class ScannedDelegateList extends Component
                             'delegateEmailAddress' => $mainDelegate->email_address,
                             'delegateBadgeType' => $mainDelegate->badge_type,
                             'delegateScannedCount' => 1,
+                            'delegateScannedLocation' => $scannedDelegate->scanner_location,
                             'delegateScannedDateTime' => $scannedDelegate->scanned_date_time,
                         ]);
                     }
@@ -106,6 +107,7 @@ class ScannedDelegateList extends Component
                             'delegateEmailAddress' => $additionalDelegate->email_address,
                             'delegateBadgeType' => $additionalDelegate->badge_type,
                             'delegateScannedCount' => 1,
+                            'delegateScannedLocation' => $scannedDelegate->scanner_location,
                             'delegateScannedDateTime' => $scannedDelegate->scanned_date_time,
                         ]);
                     }

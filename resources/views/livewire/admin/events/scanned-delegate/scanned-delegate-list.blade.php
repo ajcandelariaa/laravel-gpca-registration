@@ -47,9 +47,10 @@
                 <div class="col-span-1 break-words">Invoice</div>
                 <div class="col-span-2 break-words">Name</div>
                 <div class="col-span-1 break-words">Company</div>
-                <div class="col-span-2 break-words">Email Address</div>
+                <div class="col-span-1 break-words">Email Address</div>
                 <div class="col-span-1 break-words">Registration type</div>
                 <div class="col-span-1 break-words">Scan Count</div>
+                <div class="col-span-1 break-words">Scan Location</div>
                 <div class="col-span-2 break-words">Scan Date Time</div>
             </div>
 
@@ -85,7 +86,7 @@
                             {{ $finalListsOfDelegate['delegateCompany'] }}
                         </div>
 
-                        <div class="col-span-2 break-words">
+                        <div class="col-span-1 break-words">
                             {{ $finalListsOfDelegate['delegateEmailAddress'] }}
                         </div>
 
@@ -95,6 +96,10 @@
 
                         <div class="col-span-1 break-words">
                             {{ $finalListsOfDelegate['delegateScannedCount'] }}
+                        </div>
+
+                        <div class="col-span-2 break-words">
+                            {{ $finalListsOfDelegate['delegateScannedLocation'] }}
                         </div>
 
                         <div class="col-span-2 break-words">
