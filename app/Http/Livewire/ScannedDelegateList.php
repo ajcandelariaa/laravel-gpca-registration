@@ -45,6 +45,7 @@ class ScannedDelegateList extends Component
                     $result = $this->checkIfBadgeScannedExist($finalTransactionId, $this->finalListsOfDelegatesTemp);
                     if ($result[0]) {
                         $this->finalListsOfDelegatesTemp[$result[1]]['delegateScannedCount'] += 1;
+                        $this->finalListsOfDelegatesTemp[$result[1]]['delegateScannedLocation'] = $scannedDelegate->scanner_location;
                         $this->finalListsOfDelegatesTemp[$result[1]]['delegateScannedDateTime'] = $scannedDelegate->scanned_date_time;
                     } else {
 
@@ -94,6 +95,7 @@ class ScannedDelegateList extends Component
                     $result = $this->checkIfBadgeScannedExist($finalTransactionId, $this->finalListsOfDelegatesTemp);
                     if ($result[0]) {
                         $this->finalListsOfDelegatesTemp[$result[1]]['delegateScannedCount'] += 1;
+                        $this->finalListsOfDelegatesTemp[$result[1]]['delegateScannedLocation'] = $scannedDelegate->scanner_location;
                         $this->finalListsOfDelegatesTemp[$result[1]]['delegateScannedDateTime'] = $scannedDelegate->scanned_date_time;
                     } else {
                         array_push($this->finalListsOfDelegatesTemp, [
