@@ -89,4 +89,9 @@ class MainDelegate extends Model
         'email_broadcast_sent_count',
         'email_broadcast_sent_datetime',
     ];
+
+
+    public function additionalDelegates(){
+        return $this->hasMany(AdditionalDelegate::class, 'main_delegate_id');
+    }
 }

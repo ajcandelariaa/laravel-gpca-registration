@@ -41,4 +41,9 @@ class AdditionalDelegate extends Model
         'email_broadcast_sent_count',
         'email_broadcast_sent_datetime',
     ];
+
+    public function mainDelegate()
+    {
+        return $this->belongsTo(MainDelegate::class, 'main_delegate_id');
+    }
 }

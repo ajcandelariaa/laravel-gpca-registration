@@ -58,7 +58,7 @@ class RegistrantsList extends Component
         $this->eventId = $eventId;
         $this->eventCategory = $eventCategory;
 
-        $mainDelegates = MainDelegates::where('event_id', $this->eventId)->orderBy('id', 'DESC')->get();
+        $mainDelegates = MainDelegates::with('additionalDelegates')->where('event_id', $this->eventId)->orderBy('id', 'DESC')->get();
 
         foreach (config('app.eventCategories') as $eventCategoryC => $code) {
             if ($this->event->category == $eventCategoryC) {
@@ -117,10 +117,11 @@ class RegistrantsList extends Component
                     $totalDelegates++;
                 }
 
-                $additionalDelegates = AdditionalDelegates::where('main_delegate_id', $mainDelegate->id)->get();
-                foreach ($additionalDelegates as $additionalDelegate) {
-                    if ($additionalDelegate->delegate_replaced_by_id == null && (!$additionalDelegate->delegate_refunded)) {
-                        $totalDelegates++;
+                if($mainDelegate->additionalDelegates->isNotEmpty()){
+                    foreach ($mainDelegate->additionalDelegates as $additionalDelegate) {
+                        if ($additionalDelegate->delegate_replaced_by_id == null && (!$additionalDelegate->delegate_refunded)) {
+                            $totalDelegates++;
+                        }
                     }
                 }
 
