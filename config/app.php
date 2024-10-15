@@ -553,7 +553,7 @@ return [
                     'Morning' => [
                         'start_time' => "08:00:00",
                         'end_time' => "10:35:00",
-                        'date' => '2024-09-10',
+                        'date' => '2024-09-10', //Year-Month-Day
                     ],
                     'After Networking break' => [
                         'start_time' => "11:25:00",
@@ -593,6 +593,61 @@ return [
                         'start_time' => "11:20:00",
                         'end_time' => "15:00:00",
                         'date' => '2024-09-12',
+                    ],
+                ],
+            ],
+            'PSC' => [
+                'Pre-Conference - October 7, 2024' => [
+                    'Whole day' => [
+                        'start_time' => "07:30:00",
+                        'end_time' => "10:35:00",
+                        'date' => '2024-10-07',
+                    ],
+                ],
+                'Day 1 - October 8, 2024' => [
+                    'Morning' => [
+                        'start_time' => "07:30:00",
+                        'end_time' => "10:45:00",
+                        'date' => '2024-10-08',
+                    ],
+                    'After Networking break - Technical presentations' => [
+                        'start_time' => "11:20:00",
+                        'end_time' => "12:45:00",
+                        'date' => '2024-10-08',
+                    ],
+                    'After Lunch break - Technical presentations' => [
+                        'start_time' => "13:30:00",
+                        'end_time' => "15:30:00",
+                        'date' => '2024-10-08',
+                    ],
+                ],
+                'Day 2 - October 9, 2024' => [
+                    'Morning' => [
+                        'start_time' => "07:30:00",
+                        'end_time' => "09:55:00",
+                        'date' => '2024-10-09',
+                    ],
+                    'After Networking break - Technical presentations' => [
+                        'start_time' => "10:30:00",
+                        'end_time' => "12:35:00",
+                        'date' => '2024-10-09',
+                    ],
+                    'After Lunch break - Technical presentations' => [
+                        'start_time' => "13:25:00",
+                        'end_time' => "15:45:00",
+                        'date' => '2024-10-09',
+                    ],
+                ],
+                'Day 3 - October 10, 2024' => [
+                    'Morning' => [
+                        'start_time' => "07:30:00",
+                        'end_time' => "09:45:00",
+                        'date' => '2024-10-09',
+                    ],
+                    'After Networking break - Technical presentations' => [
+                        'start_time' => "10:05:00",
+                        'end_time' => "12:20:00",
+                        'date' => '2024-10-09',
                     ],
                 ],
             ],

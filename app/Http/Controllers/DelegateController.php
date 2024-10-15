@@ -980,7 +980,7 @@ class DelegateController extends Controller
     {
         $event = Event::where('id', $eventId)->where('category', $eventCategory)->first();
         if ($event) {
-            $dayTimings = config('app.scanTimings.2024.ANC');
+            $dayTimings = config('app.scanTimings.2024.PSC');
             $finalListsOfScannedDelegates = $this->getScannedDelegates($event);
 
             $finalData = array();
