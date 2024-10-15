@@ -96,7 +96,7 @@ class EventDelegatesList extends Component
                                 $lastDigit = 1000 + intval($transactionId);
                                 $finalTransactionId = $this->event->year . $eventCode . $lastDigit;
 
-                                $transactionId2 = Transactions::where('event_id', $eventId)->where('delegate_id', $subDelegate->main_delegate_id)->where('delegate_type', "main")->value('id');
+                                $transactionId2 = $mainDelegate->transaction->id;
                                 $lastDigit2 = 1000 + intval($transactionId2);
                                 $invoiceNumber = $eventCategory . $tempYear . "/" . $lastDigit2;
 
