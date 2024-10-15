@@ -417,17 +417,17 @@ class RegistrantDetails extends Component
         ]);
 
         if ($this->rateType == "Standard") {
-            if ($this->accessType == "fullMember") {
+            if ($this->finalData['pass_type'] == "fullMember") {
                 $this->rateTypeString = "Full member standard rate" . $this->getAccessTypesDescription($this->accessType, true);
-            } else if ($this->accessType == "member") {
+            } else if ($this->finalData['pass_type'] == "member") {
                 $this->rateTypeString = "Member standard rate" . $this->getAccessTypesDescription($this->accessType, true);
             } else {
                 $this->rateTypeString = "Non-Member standard rate" . $this->getAccessTypesDescription($this->accessType, true);
             }
         } else {
-            if ($this->accessType == "fullMember") {
+            if ($this->finalData['pass_type'] == "fullMember") {
                 $this->rateTypeString = "Full member early bird rate" . $this->getAccessTypesDescription($this->accessType, true);
-            } else if ($this->accessType == "member") {
+            } else if ($this->finalData['pass_type'] == "member") {
                 $this->rateTypeString = "Member early bird rate" . $this->getAccessTypesDescription($this->accessType, true);
             } else {
                 $this->rateTypeString = "Non-Member early bird rate" . $this->getAccessTypesDescription($this->accessType, true);
