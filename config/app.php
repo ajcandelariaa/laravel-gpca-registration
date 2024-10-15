@@ -600,7 +600,7 @@ return [
                 'Pre-Conference - October 7, 2024' => [
                     'Whole day' => [
                         'start_time' => "07:30:00",
-                        'end_time' => "10:35:00",
+                        'end_time' => "16:00:00",
                         'date' => '2024-10-07',
                     ],
                 ],
