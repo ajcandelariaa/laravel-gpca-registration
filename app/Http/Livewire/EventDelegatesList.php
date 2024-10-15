@@ -33,7 +33,7 @@ class EventDelegatesList extends Component
     {
         $this->event = Events::where('id', $eventId)->where('category', $eventCategory)->first();
 
-        $mainDelegates = MainDelegates::with('additionalDelegates')->where('event_id', $eventId)->get();
+        $mainDelegates = MainDelegates::with(['additionalDelegates', 'transaction', 'printedBadge', 'scannedBadge'])->where('event_id', $eventId)->get();
 
         foreach (config('app.eventCategories') as $eventCategoryC => $code) {
             if ($eventCategory == $eventCategoryC) {
@@ -55,26 +55,14 @@ class EventDelegatesList extends Component
                     if ($mainDelegate->registration_status == "confirmed") {
 
                         $tempYear = Carbon::parse($mainDelegate->registered_date_time)->format('y');
-                        $transactionId = Transactions::where('event_id', $eventId)->where('delegate_id', $mainDelegate->id)->where('delegate_type', "main")->value('id');
+                        $transactionId = $mainDelegate->transaction->id;
                         $lastDigit = 1000 + intval($transactionId);
 
                         $finalTransactionId = $this->event->year . $eventCode . $lastDigit;
                         $invoiceNumber = $eventCategory . $tempYear . "/" . $lastDigit;
 
-                        $printedBadge = PrintedBadges::where('event_id', $eventId)->where('delegate_id', $mainDelegate->id)->where('delegate_type', "main")->first();
-
-                        if ($printedBadge != null) {
-                            $delegatePrinted = "Yes";
-                        } else {
-                            $delegatePrinted = "No";
-                        }
-
-                        $scannedBadge = ScannedDelegates::where('event_id', $eventId)->where('delegate_id', $mainDelegate->id)->where('delegate_type', "main")->first();
-                        if ($scannedBadge != null) {
-                            $delegateScanned = "Yes";
-                        } else {
-                            $delegateScanned = "No";
-                        }
+                        $delegatePrinted = $mainDelegate->printedBadge ? "Yes" : "No";
+                        $delegateScanned = $mainDelegate->scannedBadge ? "Yes" : "No";
 
                         array_push($this->finalListsOfDelegatesTemp, [
                             'mainDelegateId' => $mainDelegate->id,
@@ -104,7 +92,7 @@ class EventDelegatesList extends Component
                             if ($mainDelegate->registration_status == "confirmed") {
 
                                 $tempYear = Carbon::parse($subDelegate->registered_date_time)->format('y');
-                                $transactionId = Transactions::where('delegate_id', $subDelegate->id)->where('delegate_type', "sub")->value('id');
+                                $transactionId = $subDelegate->transaction->id;
                                 $lastDigit = 1000 + intval($transactionId);
                                 $finalTransactionId = $this->event->year . $eventCode . $lastDigit;
 
@@ -112,21 +100,8 @@ class EventDelegatesList extends Component
                                 $lastDigit2 = 1000 + intval($transactionId2);
                                 $invoiceNumber = $eventCategory . $tempYear . "/" . $lastDigit2;
 
-                                $printedBadge = PrintedBadges::where('event_id', $eventId)->where('delegate_id', $subDelegate->id)->where('delegate_type', "sub")->first();
-
-                                if ($printedBadge != null) {
-                                    $delegatePrinted = "Yes";
-                                } else {
-                                    $delegatePrinted = "No";
-                                }
-
-                                $scannedBadge = ScannedDelegates::where('event_id', $eventId)->where('delegate_id', $subDelegate->id)->where('delegate_type', "sub")->first();
-
-                                if ($scannedBadge != null) {
-                                    $delegateScanned = "Yes";
-                                } else {
-                                    $delegateScanned = "No";
-                                }
+                                $delegatePrinted = $subDelegate->printedBadge ? "Yes" : "No";
+                                $delegateScanned = $subDelegate->scannedBadge ? "Yes" : "No";
 
                                 array_push($this->finalListsOfDelegatesTemp, [
                                     'mainDelegateId' => $mainDelegate->id,

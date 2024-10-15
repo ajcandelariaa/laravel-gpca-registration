@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class MainDelegate extends Model
 {
     use HasFactory;
-    
+
     protected $fillable = [
         'event_id',
         'access_type',
@@ -25,7 +25,7 @@ class MainDelegate extends Model
         'company_mobile_number',
         'assistant_email_address',
         'alternative_company_name',
-        
+
         'salutation',
         'first_name',
         'middle_name',
@@ -91,7 +91,23 @@ class MainDelegate extends Model
     ];
 
 
-    public function additionalDelegates(){
+    public function additionalDelegates()
+    {
         return $this->hasMany(AdditionalDelegate::class, 'main_delegate_id');
+    }
+
+    public function transaction()
+    {
+        return $this->hasOne(Transaction::class, 'delegate_id')->where('delegate_type', 'main');
+    }
+
+    public function printedBadge()
+    {
+        return $this->hasOne(PrintedBadge::class, 'delegate_id')->where('delegate_type', 'main');
+    }
+
+    public function scannedBadge()
+    {
+        return $this->hasOne(ScannedDelegate::class, 'delegate_id')->where('delegate_type', 'main');
     }
 }
