@@ -1002,6 +1002,7 @@ class DelegateController extends Controller
                                     if ($delegateScannedTime >= $startTime && $delegateScannedTime < $endTime) {
                                         array_push($finalData, [
                                             'delegateDayName' => $dayName,
+                                            'delegateTime' => "$startTime - $endTime",
                                             'delegateTimeName' => $timeName,
                                             'delegateTransactionId' => $finalListsOfScannedDelegate['delegateTransactionId'],
                                             'delegateCompany' => $finalListsOfScannedDelegate['delegateCompany'],
@@ -1034,8 +1035,9 @@ class DelegateController extends Controller
             );
 
             $columns = array(
-                'Day name',
-                'Time name',
+                'Day',
+                'Time',
+                'Time description',
                 'Transaction Id',
                 'Company Name',
                 'Salutation',
@@ -1059,6 +1061,7 @@ class DelegateController extends Controller
                         $file,
                         array(
                             $data['delegateDayName'],
+                            $data['delegateTime'],
                             $data['delegateTimeName'],
                             $data['delegateTransactionId'],
                             $data['delegateCompany'],
