@@ -33,7 +33,7 @@ class EventDelegatesList extends Component
     {
         $this->event = Events::where('id', $eventId)->where('category', $eventCategory)->first();
 
-        $mainDelegates = MainDelegates::where('event_id', $eventId)->get();
+        $mainDelegates = MainDelegates::with('additionalDelegates')->where('event_id', $eventId)->get();
 
         foreach (config('app.eventCategories') as $eventCategoryC => $code) {
             if ($eventCategory == $eventCategoryC) {
@@ -97,10 +97,8 @@ class EventDelegatesList extends Component
                 }
 
 
-                $subDelegates = AdditionalDelegates::where('main_delegate_id', $mainDelegate->id)->get();
-
-                if (!$subDelegates->isEmpty()) {
-                    foreach ($subDelegates as $subDelegate) {
+                if (!$mainDelegate->additionalDelegates->isEmpty()) {
+                    foreach ($mainDelegate->additionalDelegates as $subDelegate) {
 
                         if ($subDelegate->delegate_replaced_by_id == null && (!$subDelegate->delegate_refunded)) {
                             if ($mainDelegate->registration_status == "confirmed") {
