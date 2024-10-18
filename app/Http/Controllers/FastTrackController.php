@@ -38,8 +38,8 @@ class FastTrackController extends Controller
     public function getConfirmedDelegates($eventId, $eventCategory, $eventYear)
     {
         $confirmedDelegates = array();
-        // $mainDelegates = MainDelegate::with(['additionalDelegates', 'transaction', 'printedBadge'])
-        $mainDelegates = MainDelegate::where('event_id', $eventId)->get();
+        $mainDelegates = MainDelegate::with(['additionalDelegates', 'transaction', 'printedBadge'])->where('event_id', $eventId)->get();
+
         foreach (config('app.eventCategories') as $eventCategoryC => $code) {
             if ($eventCategory == $eventCategoryC) {
                 $eventCode = $code;
@@ -52,7 +52,7 @@ class FastTrackController extends Controller
 
                     $registrationType = EventRegistrationType::where('event_id', $eventId)->where('event_category', $eventCategory)->where('registration_type', $mainDelegate->badge_type)->first();
 
-                    $transactionId = Transaction::where('event_id', $eventId)->where('delegate_id', $mainDelegate->id)->where('delegate_type', "main")->value('id');
+                    $transactionId = $mainDelegate->transaction->id;
                     $lastDigit = 1000 + intval($transactionId);
 
                     $finalTransactionId = $eventYear . $eventCode . $lastDigit;
@@ -126,7 +126,7 @@ class FastTrackController extends Controller
             }
 
             if ($mainDelegate->registration_status == "confirmed") {
-                $subDelegates = AdditionalDelegate::where('main_delegate_id', $mainDelegate->id)->get();
+                $subDelegates = $mainDelegate->additionalDelegates;
                 if (!$subDelegates->isEmpty()) {
                     foreach ($subDelegates as $subDelegate) {
 
@@ -134,11 +134,9 @@ class FastTrackController extends Controller
 
                             $registrationType = EventRegistrationType::where('event_id', $eventId)->where('event_category', $eventCategory)->where('registration_type', $subDelegate->badge_type)->first();
 
-                            $transactionId = Transaction::where('delegate_id', $subDelegate->id)->where('delegate_type', "sub")->value('id');
+                            $transactionId = $subDelegate->transaction->id;
                             $lastDigit = 1000 + intval($transactionId);
                             $finalTransactionId = $eventYear . $eventCode . $lastDigit;
-
-                            $mainDelegate = MainDelegate::select('alternative_company_name', 'company_name')->where('id', $subDelegate->main_delegate_id)->first();
 
                             if ($mainDelegate->alternative_company_name != null) {
                                 $companyName = $mainDelegate->alternative_company_name;
