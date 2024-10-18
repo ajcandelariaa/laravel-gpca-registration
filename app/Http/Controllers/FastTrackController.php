@@ -43,7 +43,6 @@ class FastTrackController extends Controller
         // ->where('delegate_replaced_by_id', null)
         // ->where('delegate_refunded', false)
         ->get();
-        dd(count($mainDelegates));
         foreach (config('app.eventCategories') as $eventCategoryC => $code) {
             if ($eventCategory == $eventCategoryC) {
                 $eventCode = $code;
@@ -214,6 +213,7 @@ class FastTrackController extends Controller
                 }
             }
         }
+        dd(count($confirmedDelegates));
         return $confirmedDelegates;
     }
 
