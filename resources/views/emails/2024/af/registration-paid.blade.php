@@ -1,5 +1,5 @@
 <x-mail::message>
-<img src="https://www.gpcaforum.com/wp-content/uploads/2024/07/email-notif-banner.jpg">
+<img src="https://www.gpcaforum.com/wp-content/uploads/2024/10/email-notif-banner.jpg">
     
 <p class="sub" style="margin-top: 15px;">Dear {{ $details['name'] }},</p>
 
@@ -10,15 +10,9 @@
 <p class="sub" style="margin-top: 20px;"><strong>Collection of badges</strong></p>
 <p class="sub" style="margin-top: 5px;">Upon your arrival, you can pick up your badge from the fast-track counter or from the relevant registration counter located at the Oman Convention & Exhibition Centre foyer.</p>
 
-<p class="sub" style="margin-top: 15px;">Use this QR code to print your own badge onsite.</p>
-
-<img src="data:image/png;base64, {!! base64_encode(
-    QrCode::format('png')->size(200)->generate($details['qrCodeForPrint']),
-) !!} " style="margin-top: 10px; display: block;">
-
 <p class="sub" style="margin-top: 15px;">Your registration details as follows:</p>
 
-<p class="title" style="margin-top: 20px;">Delegate Information:</p>
+<p class="sub" style="margin-top: 20px;"><strong>Delegate Information</strong></p>
 <p class="sub">Full name: {{  $details['name'] }}</p>
 <p class="sub">Job title: {{  $details['jobTitle'] }}</p>
 <p class="sub">Company name: {{  $details['companyName'] }}</p>
