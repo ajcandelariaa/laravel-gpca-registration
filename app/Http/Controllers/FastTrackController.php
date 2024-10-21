@@ -40,11 +40,7 @@ class FastTrackController extends Controller
         $confirmedDelegates = array();
         $mainDelegates = MainDelegate::with(['additionalDelegates', 'transaction', 'printedBadge'])->where('event_id', $eventId)->get();
 
-        foreach (config('app.eventCategories') as $eventCategoryC => $code) {
-            if ($eventCategory == $eventCategoryC) {
-                $eventCode = $code;
-            }
-        }
+        $eventCode = config('app.eventCategories')[$eventCategory];
 
         foreach ($mainDelegates as $mainDelegate) {
             if ($mainDelegate->delegate_replaced_by_id == null && (!$mainDelegate->delegate_refunded)) {
@@ -138,8 +134,6 @@ class FastTrackController extends Controller
                             $lastDigit = 1000 + intval($transactionId);
                             $finalTransactionId = $eventYear . $eventCode . $lastDigit;
 
-                            $mainDelegate = MainDelegate::select('alternative_company_name', 'company_name')->where('id', $subDelegate->main_delegate_id)->first();
-
                             if ($mainDelegate->alternative_company_name != null) {
                                 $companyName = $mainDelegate->alternative_company_name;
                             } else {
@@ -210,11 +204,6 @@ class FastTrackController extends Controller
                 }
             }
         }
-        $arrayTemp = [];
-        foreach($confirmedDelegates as $delegate){
-            $arrayTemp[] = $delegate['companyName'];
-        }
-        dd($arrayTemp);
         return $confirmedDelegates;
     }
 
