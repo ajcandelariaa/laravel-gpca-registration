@@ -27,25 +27,17 @@ class DigitalHelper extends Component
 
     public function optionClicked($option)
     {
-        $this->dispatchBrowserEvent('add-dh-loading-screen', [
-            'text' => 'Loading...',
-        ]);
         $this->currentOption = $option;
         $this->showCollectYourBadgeDetails = false;
-        $this->dispatchBrowserEvent('removed-dh-loading-screen');
         $this->showInputFormModal = true;
     }
 
     public function cancelClicked()
     {
-        $this->dispatchBrowserEvent('add-dh-loading-screen', [
-            'text' => 'Loading...',
-        ]);
         $this->showInputFormModal = false;
         $this->inputtedData = null;
         $this->currentOption = false;
         $this->resetValidation();
-        $this->dispatchBrowserEvent('removed-dh-loading-screen');
     }
 
     public function searchClicked()
