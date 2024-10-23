@@ -42,9 +42,6 @@ class DigitalHelper extends Component
 
     public function searchClicked()
     {
-        $this->dispatchBrowserEvent('add-dh-loading-screen', [
-            'text' => 'Loading...',
-        ]);
         $this->validate([
             'inputtedData' => 'required'
         ]);
@@ -64,7 +61,6 @@ class DigitalHelper extends Component
         if ($this->currentDelegate) {
             $this->showCollectYourBadgeDetails = true;
         }
-        $this->dispatchBrowserEvent('removed-dh-loading-screen');
     }
 
     public function searchViaName() {}
