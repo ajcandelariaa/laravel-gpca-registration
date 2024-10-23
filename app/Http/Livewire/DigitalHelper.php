@@ -300,6 +300,7 @@ class DigitalHelper extends Component
 
     public function fetchConfirmedDelgates()
     {
+        dd('running');
         $this->dispatchBrowserEvent('add-dh-loading-screen');
         $allDelegates = array();
         $mainDelegates = MainDelegates::with(['additionalDelegates', 'transaction', 'printedBadges', 'scannedBadges'])->where('event_id', $this->event->id)->get();
