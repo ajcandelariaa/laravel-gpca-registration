@@ -9,7 +9,7 @@ window.addEventListener("add-dh-loading-screen", (event) => {
     console.log(event);
     let dhLoadingScreen = document.getElementById('dh-loading-screen');
     let dhLoadingScreenText = document.getElementById('loading-text');
-    dhLoadingScreenText.innerText = event.text;
+    dhLoadingScreenText.innerText = event.detail.text;
     dhLoadingScreen.classList.remove('hidden');
     console.log("add dh loading screen");
 });
