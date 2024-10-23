@@ -32,8 +32,8 @@ class DigitalHelper extends Component
         ]);
         $this->currentOption = $option;
         $this->showCollectYourBadgeDetails = false;
-        $this->showInputFormModal = true;
         $this->dispatchBrowserEvent('removed-dh-loading-screen');
+        $this->showInputFormModal = true;
     }
 
     public function cancelClicked()
