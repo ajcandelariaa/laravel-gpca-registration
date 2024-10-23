@@ -27,6 +27,7 @@ class DigitalHelper extends Component
 
     public function optionClicked($option)
     {
+        dd($this->confirmedDelegates);
         $this->currentOption = $option;
         $this->showCollectYourBadgeDetails = false;
         $this->showInputFormModal = true;
@@ -424,6 +425,6 @@ class DigitalHelper extends Component
         });
 
         $this->confirmedDelegates = $allDelegates;
-        // $this->dispatchBrowserEvent('remove-dh-loading-screen');
+        $this->dispatchBrowserEvent('remove-dh-loading-screen');
     }
 }
