@@ -41,7 +41,7 @@ class RegistrationForm extends Component
     public $accessType, $delegatePassType, $rateType;
 
     // COMPANY INFO
-    public $companyName, $companySector, $companyAddress, $companyCountry, $companyCity, $companyLandlineNumber, $companyMobileNumber, $assistantEmailAddress, $heardWhere, $attendingTo = [], $optionalInterests;
+    public $companyName, $companySector, $companyAddress, $companyCountry, $companyCity, $companyLandlineNumber, $companyMobileNumber, $assistantEmailAddress, $heardWhere, $attendingTo = [], $optionalInterests, $receiveWhatsappNotification = [];
 
     // MAIN DELEGATE
     public $salutation, $firstName, $middleName, $lastName, $emailAddress, $mobileNumber, $nationality, $jobTitle, $badgeType, $promoCode, $promoCodeDiscount, $discountType, $isMainFree = false, $country;
@@ -408,7 +408,7 @@ class RegistrationForm extends Component
                     if ($this->additionalDelegates[$i]['subPromoCodeDiscount'] == null) {
                         $this->additionalDelegates[$i]['subPromoCode'] = null;
                         $delegateSubDescription = "Delegate registration fee - {$this->rateTypeString} - {$this->additionalDelegates[$i]['subBadgeType']}";
-                        
+
                         $tempSubUnitPrice = $this->finalUnitPrice;
                         $tempSubTotalDiscount = 0;
                         $tempSubTotalNetAmount = $this->finalUnitPrice;
@@ -490,7 +490,7 @@ class RegistrationForm extends Component
                 $this->delegatePassTypeError = "Delegate pass type is required";
             }
         } else if ($this->currentStep == 2) {
-            if ($this->event->category == "AF" && ($this->event->year == '2023')) {
+            if ($this->event->category == "AF" && ($this->event->year == '2023' || $this->event->year == '2024')) {
                 $this->validate(
                     [
                         'companySector' => 'required',
@@ -671,32 +671,34 @@ class RegistrationForm extends Component
         }
 
         $attending_plenary = false;
-        $attending_symposium = false;
+        $attending_sustainability = false;
         $attending_solxchange = false;
         $attending_yf = false;
         $attending_welcome_dinner = false;
         $attending_gala_dinner = false;
-
-        $attending_networking_dinner = null;
 
         if (count($this->attendingTo) > 0) {
             foreach ($this->attendingTo as $attendTo) {
                 if ($attendTo == 1) {
                     $attending_plenary = true;
                 } else if ($attendTo == 2) {
-                    $attending_symposium = true;
+                    $attending_sustainability = true;
                 } else if ($attendTo == 3) {
                     $attending_solxchange = true;
                 } else if ($attendTo == 4) {
                     $attending_yf = true;
-                } else if ($attendTo == 6) {
+                } else if ($attendTo == 5) {
                     $attending_welcome_dinner = true;
-                } else if ($attendTo == 7) {
+                } else if ($attendTo == 6) {
                     $attending_gala_dinner = true;
                 } else {
-                    $attending_networking_dinner = null;
                 }
             }
+        }
+
+        $receiveWhatsappNotification = false;
+        if (count($this->receiveWhatsappNotification) > 0) {
+            $receiveWhatsappNotification = true;
         }
 
         if ($this->accessType != AccessTypes::WORKSHOP_ONLY->value && $this->event->category == "PSC") {
@@ -736,12 +738,13 @@ class RegistrationForm extends Component
             'heard_where' => $this->heardWhere,
 
             'attending_plenary' => $attending_plenary,
-            'attending_symposium' => $attending_symposium,
+            'attending_sustainability' => $attending_sustainability,
             'attending_solxchange' => $attending_solxchange,
             'attending_yf' => $attending_yf,
-            'attending_networking_dinner' => $attending_networking_dinner,
             'attending_welcome_dinner' => $attending_welcome_dinner,
             'attending_gala_dinner' => $attending_gala_dinner,
+
+            'receive_whatsapp_notifications' => $receiveWhatsappNotification,
 
             'optional_interests' => $finalOptionalInterests,
 

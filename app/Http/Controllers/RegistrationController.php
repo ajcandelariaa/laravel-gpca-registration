@@ -679,11 +679,14 @@ class RegistrationController extends Controller
 
                 'attending_plenary' => $mainDelegate->attending_plenary,
                 'attending_symposium' => $mainDelegate->attending_symposium,
+                'attending_sustainability' => $mainDelegate->attending_sustainability,
                 'attending_solxchange' => $mainDelegate->attending_solxchange,
                 'attending_yf' => $mainDelegate->attending_yf,
                 'attending_networking_dinner' => $mainDelegate->attending_networking_dinner,
                 'attending_welcome_dinner' => $mainDelegate->attending_welcome_dinner,
                 'attending_gala_dinner' => $mainDelegate->attending_gala_dinner,
+
+                'receive_whatsapp_notifications' => $mainDelegate->receive_whatsapp_notifications,
 
                 'optional_interests' => $mainDelegate->optional_interests,
 
@@ -4888,6 +4891,9 @@ class RegistrationController extends Controller
                     'attending_networking_dinner' => $mainDelegate->attending_networking_dinner,
                     'attending_welcome_dinner' => $mainDelegate->attending_welcome_dinner,
                     'attending_gala_dinner' => $mainDelegate->attending_gala_dinner,
+                    'attending_sustainability' => $mainDelegate->attending_sustainability,
+
+                    'receive_whatsapp_notifications' => $mainDelegate->receive_whatsapp_notifications,
 
                     'optional_interests' => $mainDelegate->optional_interests,
 
@@ -5050,6 +5056,9 @@ class RegistrationController extends Controller
                             'attending_networking_dinner' => $mainDelegate->attending_networking_dinner,
                             'attending_welcome_dinner' => $mainDelegate->attending_welcome_dinner,
                             'attending_gala_dinner' => $mainDelegate->attending_gala_dinner,
+                            'attending_sustainability' => $mainDelegate->attending_sustainability,
+        
+                            'receive_whatsapp_notifications' => $mainDelegate->receive_whatsapp_notifications,
 
                             'optional_interests' => $mainDelegate->optional_interests,
 
@@ -5189,6 +5198,9 @@ class RegistrationController extends Controller
             'Attending to Networking Dinner',
             'Attending to Welcome Dinner',
             'Attending to Gala Dinner',
+            'Attending to Sustainability Pavilion',
+
+            'Would like to receive WhatsApp notifications',
 
             'Optional Interests'
         );
@@ -5281,6 +5293,9 @@ class RegistrationController extends Controller
                         $data['attending_networking_dinner'],
                         $data['attending_welcome_dinner'],
                         $data['attending_gala_dinner'],
+                        $data['attending_sustainability'],
+
+                        $data['receive_whatsapp_notifications'],
 
                         $data['optional_interests'],
                     )

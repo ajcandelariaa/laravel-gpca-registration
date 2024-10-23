@@ -57,8 +57,18 @@ class AdditionalDelegate extends Model
         return $this->hasOne(PrintedBadge::class, 'delegate_id')->where('delegate_type', 'sub');
     }
 
+    public function printedBadges()
+    {
+        return $this->hasMany(PrintedBadge::class, 'delegate_id')->where('delegate_type', 'sub');
+    }
+
     public function scannedBadge()
     {
         return $this->hasOne(ScannedDelegate::class, 'delegate_id')->where('delegate_type', 'sub');
+    }
+
+    public function scannedBadges()
+    {
+        return $this->hasMany(ScannedDelegate::class, 'delegate_id')->where('delegate_type', 'sub');
     }
 }

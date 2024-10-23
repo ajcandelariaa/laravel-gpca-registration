@@ -170,6 +170,63 @@
             </div>
         </div>
 
+        @if ($event->category == 'AF' && ($event->year == '2024'))
+            <div class="col-span-2 sm:col-span-1 space-y-2">
+                <div class="text-registrationPrimaryColor">
+                    Please select the sessions you will be attending from below: <span class="text-red-500">*</span>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" wire:model.lazy="attendingTo" value="1" id="1">
+                        <label for="1">18<sup>th</sup> Annual GPCA Forum Main Plenary | 2-5 December 2024</label>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" wire:model.lazy="attendingTo" value="2" id="2">
+                        <label for="2">GPCA Sustainability Pavilion | 3-5 December 2024</label>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" wire:model.lazy="attendingTo" value="3" id="3">
+                        <label for="3">Solutions XChange | 3-5 December 2024</label>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" wire:model.lazy="attendingTo" value="4" id="4">
+                        <label for="4">GPCA Youth Forum | 3-5 December 2024</label>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" wire:model.lazy="attendingTo" value="5" id="5">
+                        <label for="5">Welcome Dinner Sponsored by OQ | 3 December 2024</label>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" wire:model.lazy="attendingTo" value="6" id="6">
+                        <label for="6">Gala Dinner Sponsored by OQ | 4 December 2024</label>
+                    </div>
+
+                    @error('attendingTo')
+                        <div class="text-red-500 text-xs italic mt-1">
+                            {{ $message }}
+                        </div>
+                    @enderror
+                </div>
+            </div>
+
+            <div class="col-span-2 sm:col-span-1 space-y-2">
+                <div class="text-registrationPrimaryColor">
+                    WhatsApp notifications:
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" wire:model.lazy="receiveWhatsappNotification" value="1" id="whatsappYes">
+                        <label for="whatsappYes">I would like to receive WhatsApp notifications</label>
+                    </div>
+                </div>
+            </div>
+        @endif
+
         @if ($event->category == 'AF' && ($event->year == '2023'))
             <div class="col-span-2 sm:col-span-1 space-y-2">
                 <div class="text-registrationPrimaryColor">

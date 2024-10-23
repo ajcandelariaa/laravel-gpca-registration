@@ -399,6 +399,41 @@ class DelegateController extends Controller
         }
     }
 
+    public function digitalHelper($eventCategory, $eventId)
+    {
+        $event = Event::where('category', $eventCategory)->where('id', $eventId)->first();
+        if ($event) {
+            if ($eventCategory == "AF" && $event->year == "2024") {
+                return view('digital-helper.2024.af.af-digital-helper', [
+                    "pageTitle" => "Digital helper - " . $event->name,
+                    "event" => $event,
+                ]);
+            } else {
+                abort(404, 'The URL is incorrect');
+            }
+        } else {
+            abort(404, 'The URL is incorrect');
+        }
+    }
+
+    public function digitalHelperFAQ($eventCategory, $eventId)
+    {
+        $event = Event::where('category', $eventCategory)->where('id', $eventId)->first();
+        if ($event) {
+            if ($eventCategory == "AF" && $event->year == "2024") {
+                return view('digital-helper.2024.af.af-digital-helper-faq', [
+                    "pageTitle" => "Digital helper FAQs - " . $event->name,
+                    "eventCategory" => $eventCategory,
+                    "eventId" => $eventId,
+                ]);
+            } else {
+                abort(404, 'The URL is incorrect');
+            }
+        } else {
+            abort(404, 'The URL is incorrect');
+        }
+    }
+
     // =========================================================
     //                       RENDER LOGICS
     // =========================================================

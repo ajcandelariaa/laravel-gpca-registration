@@ -138,8 +138,64 @@
                                 <p class="font-bold">N/A</p>
                             @endif
                         @endif
+
+                        @if ($eventCategory == 'AF' && $event->year == '2024')
+                            <p>Would like to receive WhatsApp notifications?</p>
+                            <p class="font-bold">
+                                @if ($finalData['receive_whatsapp_notifications'])
+                                    Yes
+                                @else
+                                    No
+                                @endif
+                            </p>
+                        @endif
                     </div>
                 </div>
+
+                @if ($eventCategory == 'AF' && $event->year == '2024')
+                    <div
+                        class="bg-registrationCardBGColor text-lg text-center text-registrationPrimaryColor font-bold py-2 mt-3">
+                        Attending to:
+                    </div>
+                    <div class="font-semibold mt-2 bg-registrationInputFieldsBGColor py-2">
+                        @if (
+                            $finalData['attending_plenary'] ||
+                                $finalData['attending_sustainability'] ||
+                                $finalData['attending_solxchange'] ||
+                                $finalData['attending_yf'] ||
+                                $finalData['attending_welcome_dinner'] ||
+                                $finalData['attending_gala_dinner']
+                        )
+                            <ul class="list-disc ml-10">
+                                @if ($finalData['attending_plenary'])
+                                    <li>18<sup>th</sup> Annual GPCA Forum Main Plenary | 2-5 December 2024</li>
+                                @endif
+
+                                @if ($finalData['attending_sustainability'])
+                                    <li>GPCA Sustainability Pavilion | 3-5 December 2024</li>
+                                @endif
+
+                                @if ($finalData['attending_solxchange'])
+                                    <li>Solutions XChange | 3-5 December 2024</li>
+                                @endif
+
+                                @if ($finalData['attending_yf'])
+                                    <li>GPCA Youth Forum | 3-5 December 2024</li>
+                                @endif
+
+                                @if ($finalData['attending_welcome_dinner'])
+                                    <li>Welcome Dinner Sponsored by OQ | 3 December 2024</li>
+                                @endif
+
+                                @if ($finalData['attending_gala_dinner'])
+                                    <li>Gala Dinner Sponsored by OQ | 4 December 2024</li>
+                                @endif
+                            </ul>
+                        @else
+                            N/A
+                        @endif
+                    </div>
+                @endif
 
                 @if ($eventCategory == 'AF' && $event->year == '2023')
                     <div

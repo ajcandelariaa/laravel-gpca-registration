@@ -47,6 +47,9 @@ class MainDelegate extends Model
         'attending_networking_dinner',
         'attending_welcome_dinner',
         'attending_gala_dinner',
+        'attending_sustainability',
+
+        'receive_whatsapp_notifications',
 
         'optional_interests',
 
@@ -106,8 +109,18 @@ class MainDelegate extends Model
         return $this->hasOne(PrintedBadge::class, 'delegate_id')->where('delegate_type', 'main');
     }
 
+    public function printedBadges()
+    {
+        return $this->hasMany(PrintedBadge::class, 'delegate_id')->where('delegate_type', 'main');
+    }
+
     public function scannedBadge()
     {
         return $this->hasOne(ScannedDelegate::class, 'delegate_id')->where('delegate_type', 'main');
+    }
+
+    public function scannedBadges()
+    {
+        return $this->hasMany(ScannedDelegate::class, 'delegate_id')->where('delegate_type', 'main');
     }
 }

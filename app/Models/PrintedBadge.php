@@ -17,5 +17,8 @@ class PrintedBadge extends Model
         'printed_by_name',
         'printed_by_pc_number',
         'printed_date_time',
+        'collected',
+        'collected_by',
+        'collected_marked_datetime',
     ];
 }

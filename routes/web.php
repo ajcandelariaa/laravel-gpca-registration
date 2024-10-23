@@ -91,6 +91,13 @@ Route::prefix('register/{eventYear}/{eventCategory}/{eventId}')->group(function 
     Route::get('/{mainDelegateId}/failed', [RegistrationController::class, 'registrationFailedView'])->name('register.failed.view');
 });
 
+
+
+Route::prefix('event/{eventCategory}/{eventId}/digital-helper')->group(function (){
+    Route::get('/', [DelegateController::class, 'digitalHelper'])->name('digital.helper.view');
+    Route::get('/faq', [DelegateController::class, 'digitalHelperFAQ'])->name('digital.helper.faq.view');
+});
+
 Route::post('capturePayment', [RegistrationController::class, 'capturePayment'])->name('register.capture.payment');
 
 Route::get('/{eventCategory}/{eventId}/view-invoice/{registrantId}', [RegistrationController::class, 'generatePublicInvoice'])->name('generate-public-invoice');
