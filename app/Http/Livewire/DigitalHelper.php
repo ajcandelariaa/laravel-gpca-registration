@@ -181,7 +181,13 @@ class DigitalHelper extends Component
             }
 
             $howToCollectYourBadge = `Please proceed to the Exhibition Foyer and line up at counter "$counterGroup". You can find the counter assignment based on your company's first letter in the image below`;
-        } else {
+        } else if (strtoupper($badgeType) == "YOUTH COUNCIL" || strtoupper($badgeType) == "YOUTH FORUM"){
+            $imageLinks = [
+                'https://www.gpcaforum.com/wp-content/uploads/2024/10/Madinat-Al-Ifran-Theatre-Foyer.png',
+                'https://www.gpcaforum.com/wp-content/uploads/2024/10/Youth.png',
+            ];
+            $howToCollectYourBadge = `Please proceed to the Madinat Al Ifran Theatre Foyer and line up at counter "Youth". You can find the counter assignment in the image below:`;
+        } else  {
             $counterGroup = null;
             foreach ($letterCounters1 as $counterKey => $counter) {
                 $counterArrayOfLetters = str_split($counterKey);
