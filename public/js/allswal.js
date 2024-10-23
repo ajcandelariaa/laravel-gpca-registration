@@ -2,11 +2,13 @@
 window.addEventListener("remove-dh-loading-screen", () => {
     let dhLoadingScreen = document.getElementById('registration-loading-screen');
     dhLoadingScreen.classList.add('hidden');
+    console.log("removed dh loading screen");
 });
 
 window.addEventListener("add-dh-loading-screen", () => {
-  let dhLoadingScreen = document.getElementById('registration-loading-screen');
-  dhLoadingScreen.classList.remove('hidden');
+    let dhLoadingScreen = document.getElementById('registration-loading-screen');
+    dhLoadingScreen.classList.remove('hidden');
+    console.log("add dh loading screen");
 });
 
 
