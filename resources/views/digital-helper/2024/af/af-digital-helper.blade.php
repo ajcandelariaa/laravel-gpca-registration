@@ -26,6 +26,7 @@
     </div>
 
     <script src="{{ asset('js/allswal.js') }}"></script>
+    
     <script>
         document.addEventListener('livewire:load', function () {
             Livewire.emit('loadDelegates');
