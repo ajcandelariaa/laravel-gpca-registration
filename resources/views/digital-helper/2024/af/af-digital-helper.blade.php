@@ -29,7 +29,9 @@
 
     <script>
         document.addEventListener('livewire:load', function() {
-            let dhLoadingScreen = document.getElementById('registration-loading-screen');
+            let dhLoadingScreen = document.getElementById('dh-loading-screen');
+            let dhLoadingScreenText = document.getElementById('loading-text');
+            dhLoadingScreenText.innerText = "Fetching data...";
             dhLoadingScreen.classList.remove('hidden');
             console.log("add dh loading screen");
             Livewire.emit('loadDelegates');
@@ -37,7 +39,7 @@
     </script>
 
     <div>
-        @include('helpers.registration_loading_screen')
+        @include('helpers.dh_loading_screen')
     </div>
 
     @livewireScripts()

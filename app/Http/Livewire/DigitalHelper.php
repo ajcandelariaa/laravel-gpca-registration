@@ -27,21 +27,32 @@ class DigitalHelper extends Component
 
     public function optionClicked($option)
     {
+        $this->dispatchBrowserEvent('add-dh-loading-screen', [
+            'text' => 'Loading...',
+        ]);
         $this->currentOption = $option;
         $this->showCollectYourBadgeDetails = false;
         $this->showInputFormModal = true;
+        $this->dispatchBrowserEvent('removed-dh-loading-screen');
     }
 
     public function cancelClicked()
     {
+        $this->dispatchBrowserEvent('add-dh-loading-screen', [
+            'text' => 'Loading...',
+        ]);
         $this->showInputFormModal = false;
         $this->inputtedData = null;
         $this->currentOption = false;
         $this->resetValidation();
+        $this->dispatchBrowserEvent('removed-dh-loading-screen');
     }
 
     public function searchClicked()
     {
+        $this->dispatchBrowserEvent('add-dh-loading-screen', [
+            'text' => 'Loading...',
+        ]);
         $this->validate([
             'inputtedData' => 'required'
         ]);
@@ -58,14 +69,13 @@ class DigitalHelper extends Component
         $this->currentOption = false;
         $this->inputtedData = null;
 
-        if($this->currentDelegate){
+        if ($this->currentDelegate) {
             $this->showCollectYourBadgeDetails = true;
         }
+        $this->dispatchBrowserEvent('removed-dh-loading-screen');
     }
 
-    public function searchViaName() {
-
-    }
+    public function searchViaName() {}
 
     public function searchViaTransactionId()
     {

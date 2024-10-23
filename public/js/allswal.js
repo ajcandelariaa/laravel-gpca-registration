@@ -1,12 +1,14 @@
 //DIGITAL HELPER LOADING
 window.addEventListener("remove-dh-loading-screen", () => {
-    let dhLoadingScreen = document.getElementById('registration-loading-screen');
+    let dhLoadingScreen = document.getElementById('dh-loading-screen');
     dhLoadingScreen.classList.add('hidden');
     console.log("removed dh loading screen");
 });
 
-window.addEventListener("add-dh-loading-screen", () => {
-    let dhLoadingScreen = document.getElementById('registration-loading-screen');
+window.addEventListener("add-dh-loading-screen", (event) => {
+    let dhLoadingScreen = document.getElementById('dh-loading-screen');
+    let dhLoadingScreenText = document.getElementById('loading-text');
+    dhLoadingScreenText.innerText = event.text;
     dhLoadingScreen.classList.remove('hidden');
     console.log("add dh loading screen");
 });
