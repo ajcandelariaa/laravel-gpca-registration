@@ -20,7 +20,7 @@
 
 <body class="font-montserrat">
     <div class="mb-10">
-        <img src="https://www.gpcaforum.com/wp-content/uploads/2024/10/digital-helper-banner.png"
+        <img src="https://www.gpcaforum.com/wp-content/uploads/2024/10/digital-helper-banner-design-v2.jpg"
             class="w-full object-fill object-center md:hidden block">
 
         <img src="https://www.gpcaforum.com/wp-content/uploads/2024/10/af-reigstration-banner-latest-scaled.jpg"

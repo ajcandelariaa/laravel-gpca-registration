@@ -20,7 +20,7 @@
                             </div>
 
                             <div class="mt-2">
-                                <input placeholder="janedoe@gmail.com" type="text" wire:model.lazy="inputtedData"
+                                <input placeholder="janedoe@gmail.com" type="text" wire:model.debounce.300ms="inputtedData" wire:keydown.enter.prevent="searchClicked"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
 
                                 @error('inputtedData')
@@ -37,7 +37,7 @@
                             </div>
 
                             <div class="mt-2">
-                                <input placeholder="2024123456" type="text" wire:model.lazy="inputtedData"
+                                <input placeholder="2024123456" type="text" wire:model.debounce.300ms="inputtedData" wire:keydown.enter.prevent="searchClicked"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
 
                                 @error('inputtedData')
@@ -54,7 +54,7 @@
                             </div>
 
                             <div class="mt-2">
-                                <input placeholder="Jane Doe" type="text" wire:model.lazy="inputtedData"
+                                <input placeholder="Jane Doe" type="text" wire:model.debounce.300ms="inputtedData" wire:keydown.enter.prevent="searchClicked"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
 
                                 @error('inputtedData')

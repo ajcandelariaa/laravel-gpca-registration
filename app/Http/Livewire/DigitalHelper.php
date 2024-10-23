@@ -52,7 +52,7 @@ class DigitalHelper extends Component
         } else if ($this->currentOption == "transactionId") {
             $this->currentDelegate = $this->searchViaTransactionId();
         } else {
-            $this->currentDelegate = null;
+            $this->currentDelegate = $this->searchViaName();
         }
 
         if ($this->currentDelegate) {
@@ -76,7 +76,19 @@ class DigitalHelper extends Component
         $this->currentDelegate = null;
     }
 
-    public function searchViaName() {}
+    public function searchViaName()
+    {
+        $currentDelegate = null;
+
+        foreach ($this->confirmedDelegates as $delegate) {
+            if (strtolower(trim($delegate['name'])) == strtolower(trim($this->inputtedData))) {
+                $currentDelegate = $delegate;
+                break;
+            }
+        }
+
+        return $currentDelegate;
+    }
 
     public function searchViaTransactionId()
     {
@@ -208,7 +220,12 @@ class DigitalHelper extends Component
                         $lastDigit = 1000 + intval($transactionId);
                         $finalTransactionId = $this->event->year . $this->eventCode . $lastDigit;
 
-                        $name = $mainDelegate->salutation . ' ' . $mainDelegate->first_name . ' ' . $mainDelegate->middle_name . ' ' . $mainDelegate->last_name;
+                        $delegateSalutation = null;
+                        if ($mainDelegate->salutation == "Dr." || $mainDelegate->salutation == "Prof.") {
+                            $delegateSalutation = $mainDelegate->salutation;
+                        }
+
+                        $name = $delegateSalutation . ' ' . $mainDelegate->first_name . ' ' . $mainDelegate->middle_name . ' ' . $mainDelegate->last_name;
 
                         $isPrinted = false;
                         $isCollected = false;
@@ -263,7 +280,12 @@ class DigitalHelper extends Component
                                 $lastDigit = 1000 + intval($transactionId);
                                 $finalTransactionId = $this->event->year . $this->eventCode . $lastDigit;
 
-                                $name = $subDelegate->salutation . ' ' . $subDelegate->first_name . ' ' . $subDelegate->middle_name . ' ' . $subDelegate->last_name;
+                                $delegateSalutation = null;
+                                if ($subDelegate->salutation == "Dr." || $subDelegate->salutation == "Prof.") {
+                                    $delegateSalutation = $subDelegate->salutation;
+                                }
+        
+                                $name = $delegateSalutation . ' ' . $subDelegate->first_name . ' ' . $subDelegate->middle_name . ' ' . $subDelegate->last_name;
 
                                 $isPrinted = false;
                                 $isCollected = false;
