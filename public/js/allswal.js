@@ -6,6 +6,7 @@ window.addEventListener("remove-dh-loading-screen", () => {
 });
 
 window.addEventListener("add-dh-loading-screen", (event) => {
+    console.log(event);
     let dhLoadingScreen = document.getElementById('dh-loading-screen');
     let dhLoadingScreenText = document.getElementById('loading-text');
     dhLoadingScreenText.innerText = event.text;
