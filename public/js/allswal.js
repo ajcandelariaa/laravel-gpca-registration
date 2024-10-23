@@ -1,3 +1,14 @@
+//DIGITAL HELPER LOADING
+window.addEventListener("remove-dh-loading-screen", () => {
+    let dhLoadingScreen = document.getElementById('registration-loading-screen');
+    dhLoadingScreen.classList.add('hidden');
+});
+
+window.addEventListener("add-dh-loading-screen", () => {
+  let dhLoadingScreen = document.getElementById('registration-loading-screen');
+  dhLoadingScreen.classList.remove('hidden');
+});
+
 
 // BROADCAST EMAIL NOTIFICATION
 window.addEventListener("swal:broadcast-email-success", (event) => {

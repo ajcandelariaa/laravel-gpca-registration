@@ -12,11 +12,12 @@ class DigitalHelper extends Component
     public $showInputFormModal = false;
     public $showCollectYourBadgeDetails = false;
 
+    protected $listeners = ['loadDelegates' => 'fetchConfirmedDelgates'];
+
     public function mount($event)
     {
         $this->event = $event;
         $this->eventCode = config('app.eventCategories')[$event->category];
-        $this->confirmedDelegates = $this->fetchConfirmedDelgates();
     }
 
     public function render()
@@ -299,6 +300,7 @@ class DigitalHelper extends Component
 
     public function fetchConfirmedDelgates()
     {
+        $this->dispatchBrowserEvent('add-dh-loading-screen');
         $allDelegates = array();
         $mainDelegates = MainDelegates::with(['additionalDelegates', 'transaction', 'printedBadges', 'scannedBadges'])->where('event_id', $this->event->id)->get();
         if ($mainDelegates->isNotEmpty()) {
@@ -421,6 +423,7 @@ class DigitalHelper extends Component
             return strcmp($a['name'], $b['name']);
         });
 
-        return $allDelegates;
+        $this->confirmedDelegates = $allDelegates;
+        $this->dispatchBrowserEvent('remove-dh-loading-screen');
     }
 }

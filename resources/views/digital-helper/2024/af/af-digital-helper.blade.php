@@ -21,15 +21,19 @@
 
         <img src="https://www.gpcaforum.com/wp-content/uploads/2024/10/af-reigstration-banner-latest-scaled.jpg"
             class="w-full object-fill object-center md:block hidden">
-            
+
         @livewire('digital-helper', ['event' => $event])
     </div>
 
     <script src="{{ asset('js/allswal.js') }}"></script>
+    <script>
+        document.addEventListener('livewire:load', function () {
+            Livewire.emit('loadDelegates');
+        });
+    </script>
 
     <div>
         @include('helpers.registration_loading_screen')
-        @include('helpers.registration_loading_screen2')
     </div>
 
     @livewireScripts()
