@@ -26,9 +26,12 @@
     </div>
 
     <script src="{{ asset('js/allswal.js') }}"></script>
-    
+
     <script>
-        document.addEventListener('livewire:load', function () {
+        document.addEventListener('livewire:load', function() {
+            let dhLoadingScreen = document.getElementById('registration-loading-screen');
+            dhLoadingScreen.classList.remove('hidden');
+            console.log("add dh loading screen");
             Livewire.emit('loadDelegates');
         });
     </script>
