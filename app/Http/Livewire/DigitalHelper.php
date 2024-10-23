@@ -11,6 +11,7 @@ class DigitalHelper extends Component
     public $inputtedData, $currentOption, $currentDelegate;
     public $showInputFormModal = false;
     public $showCollectYourBadgeDetails = false;
+    public $showNotFoundText = false;
 
     protected $listeners = ['loadDelegates' => 'fetchConfirmedDelgates'];
 
@@ -54,13 +55,25 @@ class DigitalHelper extends Component
             $this->currentDelegate = null;
         }
 
-        $this->showInputFormModal = false;
-        $this->currentOption = false;
-        $this->inputtedData = null;
-
         if ($this->currentDelegate) {
+            $this->showInputFormModal = false;
+            $this->currentOption = false;
+            $this->inputtedData = null;
             $this->showCollectYourBadgeDetails = true;
+        } else {
+            $this->showNotFoundText = true;
         }
+    }
+
+    public function tryAgainClicked()
+    {
+        $this->showNotFoundText = false;
+    }
+
+    public function searchAgainClicked()
+    {
+        $this->showCollectYourBadgeDetails = false;
+        $this->currentDelegate = null;
     }
 
     public function searchViaName() {}
@@ -225,7 +238,7 @@ class DigitalHelper extends Component
 
                         $finalDelegate = [
                             'transactionId' => $finalTransactionId,
-                            'name' => trim($name),
+                            'name' => $this->formatFullName($name),
                             'jobTitle' => $mainDelegate->job_title,
                             'companyName' => $companyName,
                             'badgeType' => $mainDelegate->badge_type,
@@ -280,7 +293,7 @@ class DigitalHelper extends Component
 
                                 $finalDelegate = [
                                     'transactionId' => $finalTransactionId,
-                                    'name' => trim($name),
+                                    'name' => $this->formatFullName($name),
                                     'jobTitle' => $subDelegate->job_title,
                                     'companyName' => $companyName,
                                     'badgeType' => $subDelegate->badge_type,
@@ -305,5 +318,10 @@ class DigitalHelper extends Component
 
         $this->confirmedDelegates = $allDelegates;
         $this->dispatchBrowserEvent('remove-dh-loading-screen');
+    }
+
+    function formatFullName($name)
+    {
+        return preg_replace('/\s+/', ' ', trim($name));
     }
 }

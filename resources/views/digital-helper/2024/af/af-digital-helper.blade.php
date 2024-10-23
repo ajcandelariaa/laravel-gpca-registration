@@ -7,6 +7,10 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>{{ $pageTitle }}</title>
 
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&family=Roboto&display=swap"
+        rel="stylesheet">
+
     {{-- VITE --}}
     @vite('resources/css/app.css')
 
@@ -14,8 +18,8 @@
     @livewireStyles()
 </head>
 
-<body>
-    <div class="font-montserrat mb-10">
+<body class="font-montserrat">
+    <div class="mb-10">
         <img src="https://www.gpcaforum.com/wp-content/uploads/2024/10/digital-helper-banner.png"
             class="w-full object-fill object-center md:hidden block">
 

@@ -2,7 +2,7 @@
     @if ($showCollectYourBadgeDetails)
         @include('livewire.digital-helper.2024.af.digital_helper_details')
     @else
-        <div class="w-10/12 mx-auto md:w-full md:mx-10">
+        <div class="w-10/12 mx-auto md:w-full md:px-10">
             <p
                 class="text-registrationPrimaryColor text-2xl md:text-4xl text-center font-bold font-montserrat mt-5 md:mt-10">
                 How to collect your badge</p>
@@ -36,6 +36,10 @@
                 </div>
             </div>
         </div>
+    @endif
+
+    @if ($showNotFoundText)
+        @include('livewire.digital-helper.digital_helper_404')
     @endif
 
     @if ($showInputFormModal)

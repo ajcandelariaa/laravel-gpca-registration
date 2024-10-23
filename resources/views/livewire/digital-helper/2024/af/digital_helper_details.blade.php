@@ -1,5 +1,5 @@
 <div>
-    <div class="w-10/12 mx-auto md:w-full md:mx-10 text-center">
+    <div class="w-10/12 mx-auto md:w-full md:px-10 text-center">
         <p
             class="text-registrationPrimaryColor text-2xl md:text-4xl text-center font-bold font-montserrat mt-5 md:mt-10">
             How to collect your badge</p>
@@ -16,14 +16,14 @@
 
         <div class="mt-10">
             <p class="font-bold text-lg">Badge status:</p>
-            <p>Printed: 
+            <p>Printed:
                 @if ($currentDelegate['isPrinted'])
                     Yes
                 @else
                     No
                 @endif
             </p>
-            <p>Collected: 
+            <p>Collected:
                 @if ($currentDelegate['isCollected'])
                     Yes
                 @else
@@ -31,7 +31,7 @@
                 @endif
             </p>
         </div>
-        
+
 
         <div class="mt-10">
             <p class="font-bold text-lg">How to collect your badge:</p>
@@ -43,6 +43,12 @@
                     @endforeach
                 @endif
             </div>
+        </div>
+
+        <div class="mt-5 flex justify-center">
+            <button
+                class="bg-registrationPrimaryColor hover:bg-registrationPrimaryColor py-1 px-10 rounded-lg text-white"
+                wire:click.prevent="searchAgainClicked">Search again</button>
         </div>
     </div>
 </div>

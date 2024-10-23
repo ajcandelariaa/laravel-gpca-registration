@@ -7,19 +7,23 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>{{ $pageTitle }}</title>
 
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&family=Roboto&display=swap"
+        rel="stylesheet">
+
     {{-- VITE --}}
     @vite('resources/css/app.css')
 </head>
 
-<body>
-    <div class="font-montserrat mb-10">
+<body class="font-montserrat">
+    <div class="mb-10">
         <img src="https://www.gpcaforum.com/wp-content/uploads/2024/10/digital-helper-banner.png"
             class="w-full object-fill object-center md:hidden block">
 
         <img src="https://www.gpcaforum.com/wp-content/uploads/2024/10/af-reigstration-banner-latest-scaled.jpg"
             class="w-full object-fill object-center md:block hidden">
 
-        <div class="w-10/12 mx-auto md:w-full md:mx-10">
+        <div class="w-10/12 mx-auto md:w-full md:px-10">
             <p class="text-registrationPrimaryColor text-2xl md:text-4xl md:text-left text-center font-bold font-montserrat mt-5 md:mt-10">How to Find
                 Your Registration Details</p>
 
