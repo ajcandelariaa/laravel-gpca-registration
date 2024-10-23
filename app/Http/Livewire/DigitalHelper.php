@@ -27,7 +27,6 @@ class DigitalHelper extends Component
 
     public function optionClicked($option)
     {
-        dd($this->confirmedDelegates);
         $this->currentOption = $option;
         $this->showCollectYourBadgeDetails = false;
         $this->showInputFormModal = true;
@@ -94,123 +93,6 @@ class DigitalHelper extends Component
         }
 
         return $currentDelegate;
-        // $finalDelegate = null;
-
-        // $mainDelegate = MainDelegates::with(['transaction', 'printedBadges', 'scannedBadges'])->where('event_id', $this->event->id)->whereRaw('LOWER(email_address) = ?', [strtolower($this->inputtedData)])->first();
-
-        // if ($mainDelegate) {
-        //     if ($mainDelegate->delegate_replaced_by_id == null && (!$mainDelegate->delegate_refunded)) {
-        //         if ($mainDelegate->registration_status == "confirmed") {
-
-        //             $transactionId = $mainDelegate->transaction->id;
-        //             $lastDigit = 1000 + intval($transactionId);
-        //             $finalTransactionId = $this->event->year . $this->eventCode . $lastDigit;
-
-        //             $name = $mainDelegate->salutation . ' ' . $mainDelegate->first_name . ' ' . $mainDelegate->middle_name . ' ' . $mainDelegate->last_name;
-        //             $companyName = $mainDelegate->alternative_company_name ?? $mainDelegate->company_name;
-
-        //             $isPrinted = false;
-        //             $isCollected = false;
-        //             $isCollectedBy = null;
-
-        //             if ($mainDelegate->printedBadges->isNotEmpty()) {
-        //                 foreach ($mainDelegate->printedBadges as $printedBadge) {
-        //                     $isPrinted = true;
-
-        //                     if ($printedBadge->collected) {
-        //                         $isCollected = true;
-        //                         $isCollectedBy = $printedBadge->collected_by;
-        //                     }
-        //                 }
-        //             }
-        //             $visuals = [];
-        //             $howToCollectYourBadge = null;
-
-        //             if ($isCollected) {
-        //                 $howToCollectYourBadge = $isCollectedBy;
-        //             } else {
-        //                 $data = $this->getTextAndVisualDetails($companyName, $mainDelegate->badge_type);
-        //                 $howToCollectYourBadge = $data['howToCollectYourBadge'];
-        //                 $visuals = $data['imageLinks'];
-        //             }
-
-
-        //             $finalDelegate = [
-        //                 'transactionId' => $finalTransactionId,
-        //                 'name' => trim($name),
-        //                 'jobTitle' => $mainDelegate->job_title,
-        //                 'companyName' => $companyName,
-        //                 'badgeType' => $mainDelegate->badge_type,
-        //                 'emailAddress' => $mainDelegate->email_address,
-        //                 'isPrinted' => $isPrinted,
-        //                 'isCollected' => $isCollected,
-        //                 'howToCollectYourBadge' => $howToCollectYourBadge,
-        //                 'visuals' => $visuals,
-        //             ];
-        //         }
-        //     }
-        // } else {
-        //     $mainDelegates = MainDelegates::with('additionalDelegates')->where('event_id', $this->event->id)->get();
-        //     if ($mainDelegates->isNotEmpty()) {
-        //         if (!$mainDelegate->additionalDelegates->isEmpty()) {
-        //             foreach ($mainDelegate->additionalDelegates as $subDelegate) {
-        //                 if (strtolower($subDelegate->email_address) == strtolower($this->inputtedData)) {
-        //                     if ($subDelegate->delegate_replaced_by_id == null && (!$subDelegate->delegate_refunded)) {
-        //                         if ($mainDelegate->registration_status == "confirmed") {
-
-        //                             $transactionId = $subDelegate->transaction->id;
-        //                             $lastDigit = 1000 + intval($transactionId);
-        //                             $finalTransactionId = $this->event->year . $this->eventCode . $lastDigit;
-
-        //                             $name = $subDelegate->salutation . ' ' . $subDelegate->first_name . ' ' . $subDelegate->middle_name . ' ' . $subDelegate->last_name;
-        //                             $companyName = $mainDelegate->alternative_company_name ?? $mainDelegate->company_name;
-
-        //                             $isPrinted = false;
-        //                             $isCollected = false;
-        //                             $isCollectedBy = null;
-
-        //                             if ($subDelegate->printedBadges->isNotEmpty()) {
-        //                                 foreach ($subDelegate->printedBadges as $printedBadge) {
-        //                                     $isPrinted = true;
-
-        //                                     if ($printedBadge->collected) {
-        //                                         $isCollected = true;
-        //                                         $isCollectedBy = $printedBadge->collected_by;
-        //                                     }
-        //                                 }
-        //                             }
-        //                             $visuals = [];
-        //                             $howToCollectYourBadge = null;
-
-        //                             if ($isCollected) {
-        //                                 $howToCollectYourBadge = $isCollectedBy;
-        //                             } else {
-        //                                 $data = $this->getTextAndVisualDetails($companyName, $subDelegate->badge_type);
-        //                                 $howToCollectYourBadge = $data['howToCollectYourBadge'];
-        //                                 $visuals = $data['imageLinks'];
-        //                             }
-
-        //                             $finalDelegate = [
-        //                                 'transactionId' => $finalTransactionId,
-        //                                 'name' => trim($name),
-        //                                 'jobTitle' => $subDelegate->job_title,
-        //                                 'companyName' => $companyName,
-        //                                 'badgeType' => $subDelegate->badge_type,
-        //                                 'emailAddress' => $subDelegate->email_address,
-        //                                 'isPrinted' => $isPrinted,
-        //                                 'isCollected' => $isCollected,
-        //                                 'howToCollectYourBadge' => $howToCollectYourBadge,
-        //                                 'visuals' => $visuals,
-        //                             ];
-        //                         }
-        //                     }
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
-
-        // return $finalDelegate;
     }
 
 
@@ -301,7 +183,6 @@ class DigitalHelper extends Component
 
     public function fetchConfirmedDelgates()
     {
-        $this->dispatchBrowserEvent('add-dh-loading-screen');
         $allDelegates = array();
         $mainDelegates = MainDelegates::with(['additionalDelegates', 'transaction', 'printedBadges', 'scannedBadges'])->where('event_id', $this->event->id)->get();
         if ($mainDelegates->isNotEmpty()) {
