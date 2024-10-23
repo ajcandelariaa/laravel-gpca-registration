@@ -9,9 +9,9 @@
 
             <p class="text-center text-lg mt-5" style="color: #6C6C6C;">Please select one of the options below to search
                 for
-                your badge. If you do not know your details yet, please click <a
+                your badge. If you do not know your details yet, please <a
                     href="{{ route('digital.helper.faq.view', ['eventCategory' => $event->category, 'eventId' => $event->id]) }}"
-                    target="_blank" class="underline">here</a>.</p>
+                    target="_blank" class="underline text-blue-700">click here</a>.</p>
 
             <div class="flex flex-col gap-8 mt-10 justify-center md:w-1/2 mx-auto w-full">
                 <div wire:click.prevent="optionClicked('email')"
