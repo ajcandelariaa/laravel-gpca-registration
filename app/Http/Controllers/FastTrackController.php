@@ -46,24 +46,15 @@ class FastTrackController extends Controller
             if ($mainDelegate->delegate_replaced_by_id == null && (!$mainDelegate->delegate_refunded)) {
                 if ($mainDelegate->registration_status == "confirmed") {
 
-                    $registrationType = EventRegistrationType::where('event_id', $eventId)->where('event_category', $eventCategory)->where('registration_type', $mainDelegate->badge_type)->first();
-
                     $transactionId = $mainDelegate->transaction->id;
                     $lastDigit = 1000 + intval($transactionId);
-
                     $finalTransactionId = $eventYear . $eventCode . $lastDigit;
 
-                    if ($mainDelegate->alternative_company_name != null) {
-                        $companyName = $mainDelegate->alternative_company_name;
-                    } else {
-                        $companyName = $mainDelegate->company_name;
-                    }
+                    $companyName = $mainDelegate->alternative_company_name ?? $mainDelegate->company_name;
 
-
+                    $delegateSalutation = null;
                     if ($mainDelegate->salutation == "Dr." || $mainDelegate->salutation == "Prof.") {
                         $delegateSalutation = $mainDelegate->salutation;
-                    } else {
-                        $delegateSalutation = null;
                     }
 
                     $fullName = $delegateSalutation;
@@ -80,31 +71,18 @@ class FastTrackController extends Controller
                         $fullName .= ' ' . $mainDelegate->last_name;
                     }
 
-                    if ($eventCategory == "PC") {
-                        $finalFrontTextBGColor = "#ffffff";
-                        $finalFontTextColor = "#000000";
-                    } else if ($eventCategory == "SCC") {
-                        $finalFrontTextBGColor = "#ffffff";
-                        $finalFontTextColor = "#000000";
-                    } else {
-                        $finalFrontTextBGColor = $registrationType->badge_footer_front_bg_color;
-                        $finalFontTextColor = $registrationType->badge_footer_front_text_color;
-                    }
+                    $fullName = $this->formatFullName($fullName);
 
-                    if ($mainDelegate->access_type == AccessTypes::CONFERENCE_ONLY->value) {
-                        $finalAccessType = "CO";
-                    } else if ($mainDelegate->access_type == AccessTypes::WORKSHOP_ONLY->value) {
-                        $finalAccessType = "WO";
-                    } else {
-                        $finalAccessType = "FE";
-                    }
+                    $finalFrontTextBGColor = "#ffffff";
+                    $finalFontTextColor = "#000000";
+
+                    $delegatePrinted = $mainDelegate->printedBadge ? "Yes" : "No";
 
                     array_push($confirmedDelegates, [
-                        'accessType' => $finalAccessType,
                         'transactionId' => $finalTransactionId,
                         'id' => $mainDelegate->id,
                         'delegateType' => "main",
-                        'fullName' => trim($fullName),
+                        'fullName' => $fullName,
                         'salutation' => (empty($mainDelegate->salutation)) ? null : $mainDelegate->salutation,
                         'fname' => $mainDelegate->first_name,
                         'mname' => (empty($mainDelegate->middle_name)) ? null : $mainDelegate->middle_name,
@@ -113,10 +91,13 @@ class FastTrackController extends Controller
                         'companyName' => trim($companyName),
                         'badgeType' => Str::upper($mainDelegate->badge_type),
 
-                        'frontText' => $registrationType->badge_footer_front_name,
+                        'frontText' => Str::upper($mainDelegate->badge_type),
                         'frontTextColor' => $finalFontTextColor,
                         'frontTextBGColor' => $finalFrontTextBGColor,
                         'seatNumber' => $mainDelegate->seat_number ? $mainDelegate->seat_number : "N/A",
+
+                        'isPrinted' => $delegatePrinted,
+                        'confirmationDateTime' => $mainDelegate->confirmation_date_time,
                     ]);
                 }
             }
@@ -128,22 +109,15 @@ class FastTrackController extends Controller
 
                         if ($subDelegate->delegate_replaced_by_id == null && (!$subDelegate->delegate_refunded)) {
 
-                            $registrationType = EventRegistrationType::where('event_id', $eventId)->where('event_category', $eventCategory)->where('registration_type', $subDelegate->badge_type)->first();
-
                             $transactionId = $subDelegate->transaction->id;
                             $lastDigit = 1000 + intval($transactionId);
                             $finalTransactionId = $eventYear . $eventCode . $lastDigit;
 
-                            if ($mainDelegate->alternative_company_name != null) {
-                                $companyName = $mainDelegate->alternative_company_name;
-                            } else {
-                                $companyName = $mainDelegate->company_name;
-                            }
+                            $companyName = $mainDelegate->alternative_company_name ?? $mainDelegate->company_name;
 
+                            $delegateSalutation = null;
                             if ($subDelegate->salutation == "Dr." || $subDelegate->salutation == "Prof.") {
                                 $delegateSalutation = $subDelegate->salutation;
-                            } else {
-                                $delegateSalutation = null;
                             }
 
                             $fullName = $delegateSalutation;
@@ -160,32 +134,18 @@ class FastTrackController extends Controller
                                 $fullName .= ' ' . $subDelegate->last_name;
                             }
 
+                            $fullName = $this->formatFullName($fullName);
 
-                            if ($eventCategory == "PC") {
-                                $finalFrontTextBGColor = "#ffffff";
-                                $finalFontTextColor = "#000000";
-                            } else if ($eventCategory == "SCC") {
-                                $finalFrontTextBGColor = "#ffffff";
-                                $finalFontTextColor = "#000000";
-                            } else {
-                                $finalFrontTextBGColor = $registrationType->badge_footer_front_bg_color;
-                                $finalFontTextColor = $registrationType->badge_footer_front_text_color;
-                            }
+                            $finalFrontTextBGColor = "#ffffff";
+                            $finalFontTextColor = "#000000";
 
-                            if ($mainDelegate->access_type == AccessTypes::CONFERENCE_ONLY->value) {
-                                $finalAccessType = "CO";
-                            } else if ($mainDelegate->access_type == AccessTypes::WORKSHOP_ONLY->value) {
-                                $finalAccessType = "WO";
-                            } else {
-                                $finalAccessType = "FE";
-                            }
+                            $delegatePrinted = $subDelegate->printedBadge ? "Yes" : "No";
 
                             array_push($confirmedDelegates, [
-                                'accessType' => $finalAccessType,
                                 'transactionId' => $finalTransactionId,
                                 'id' => $subDelegate->id,
                                 'delegateType' => "sub",
-                                'fullName' => trim($fullName),
+                                'fullName' => $fullName,
                                 'salutation' => (empty($subDelegate->salutation)) ? null : $subDelegate->salutation,
                                 'fname' => $subDelegate->first_name,
                                 'mname' => (empty($subDelegate->middle_name)) ? null : $subDelegate->middle_name,
@@ -194,10 +154,13 @@ class FastTrackController extends Controller
                                 'companyName' => trim($companyName),
                                 'badgeType' => Str::upper($subDelegate->badge_type),
 
-                                'frontText' => $registrationType->badge_footer_front_name,
+                                'frontText' => Str::upper($mainDelegate->badge_type),
                                 'frontTextColor' => $finalFontTextColor,
                                 'frontTextBGColor' => $finalFrontTextBGColor,
                                 'seatNumber' => $subDelegate->seat_number ? $subDelegate->seat_number : "N/A",
+
+                                'isPrinted' => $delegatePrinted,
+                                'confirmationDateTime' => $mainDelegate->confirmation_date_time,
                             ]);
                         }
                     }
@@ -376,7 +339,7 @@ class FastTrackController extends Controller
                             $eventCode = $code;
                         }
                     }
-                    
+
                     ScannedDelegate::create([
                         'event_id' => $eventId,
                         'event_category' => $eventCategory,
@@ -477,5 +440,10 @@ class FastTrackController extends Controller
                 'message' => 'Unauthorized!',
             ], 401);
         }
+    }
+
+    function formatFullName($name)
+    {
+        return preg_replace('/\s+/', ' ', trim($name));
     }
 }
