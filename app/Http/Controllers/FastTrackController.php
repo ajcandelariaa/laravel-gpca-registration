@@ -160,7 +160,7 @@ class FastTrackController extends Controller
                                 'seatNumber' => $subDelegate->seat_number ? $subDelegate->seat_number : "N/A",
 
                                 'isPrinted' => $delegatePrinted,
-                                'confirmationDateTime' => $mainDelegate->confirmation_date_time,
+                                'confirmationDateTime' => $mainDelegate->paid_date_time,
                             ]);
                         }
                     }
