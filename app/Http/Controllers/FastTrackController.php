@@ -6,7 +6,6 @@ use App\Enums\AccessTypes;
 use App\Models\AdditionalDelegate;
 use App\Models\DelegateDetailsUpdateLog;
 use App\Models\Event;
-use App\Models\EventRegistrationType;
 use App\Models\MainDelegate;
 use App\Models\PrintedBadge;
 use App\Models\ScannedDelegate;
@@ -38,7 +37,7 @@ class FastTrackController extends Controller
     public function getConfirmedDelegates($eventId, $eventCategory, $eventYear)
     {
         $confirmedDelegates = array();
-        $mainDelegates = MainDelegate::with(['additionalDelegates', 'transaction', 'printedBadge'])->where('event_id', $eventId)->get();
+        $mainDelegates = MainDelegate::with(['additionalDelegates', 'transaction', 'printedBadge', 'printedBadges'])->where('event_id', $eventId)->limit(10)->get();
 
         $eventCode = config('app.eventCategories')[$eventCategory];
 
