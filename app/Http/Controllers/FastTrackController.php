@@ -97,6 +97,7 @@ class FastTrackController extends Controller
                         'seatNumber' => $mainDelegate->seat_number ? $mainDelegate->seat_number : "N/A",
 
                         'isPrinted' => $delegatePrinted,
+                        'printedCount' => count($mainDelegate->printedBadges),
                         'confirmationDateTime' => $mainDelegate->paid_date_time, //"Y-m-d H:i:s"
                     ]);
                 }
@@ -160,6 +161,7 @@ class FastTrackController extends Controller
                                 'seatNumber' => $subDelegate->seat_number ? $subDelegate->seat_number : "N/A",
 
                                 'isPrinted' => $delegatePrinted,
+                                'printedCount' => count($subDelegate->printedBadges),
                                 'confirmationDateTime' => $mainDelegate->paid_date_time,
                             ]);
                         }
