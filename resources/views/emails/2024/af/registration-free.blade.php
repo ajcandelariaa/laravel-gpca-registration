@@ -35,11 +35,11 @@ Download invoice
 
 <p class="sub" style="margin-top: 15px; text-decoration: underline;"><strong>Oman Visa</strong></p>
 
-<p class="sub" style="margin-top: 5px;">Non-GCC participants attending the <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a> must process their own visa. For your visa eligibility and visa application guidelines, please visit <a href="https://evisa.rop.gov.om/en/home?tabId=tyqwi7" target="_blank">Home - Evisa (rop.gov.om)</a>.</p>
+<p class="sub" style="margin-top: 5px;">Non-GCC participants attending the <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a> must process their own visa. For your visa eligibility and visa application guidelines, please visit <a href="https://evisa.rop.gov.om/visa-eligibility" target="_blank">Home - Evisa (rop.gov.om)</a>.</p>
 
 <p class="sub" style="margin-top: 15px; text-decoration: underline;"><strong>Hotel Accommodation</strong></p>
 
-<p class="sub" style="margin-top: 5px;">To avail the special hotel rates kindly click <a href="https://www.gpcaforum.com/wp-content/uploads/2024/08/18th-Annual-GPCA-Forum-–-Partner-Hotels_updated.pdf" target="_blank">here</a> for the list of partner hotels in Muscat Oman. Kindly indicate in your accommodation inquiry that you are attending the <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a>. </p>
+<p class="sub" style="margin-top: 5px;">To avail the special hotel rates kindly click <a href="https://www.gpcaforum.com/travel-and-accommodation/" target="_blank">here</a> for the list of partner hotels in Muscat Oman. Kindly indicate in your accommodation inquiry that you are attending the <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a>. </p>
 
 <p class="sub" style="margin-top: 15px;">For any event related queries, please feel free to reach out to the following team members:</p>
 
