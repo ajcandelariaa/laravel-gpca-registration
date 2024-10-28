@@ -50,6 +50,7 @@ Route::prefix('admin')->group(function () {
                 });
                 Route::prefix('delegate')->group(function () {
                     Route::get('/', [DelegateController::class, 'eventDelegateView'])->name('admin.event.delegates.view');
+                    Route::get('/add-to-grip', [DelegateController::class, 'addDelegatesToGripView'])->name('admin.add.delegates.to.grip.view');
                     Route::get('/{delegateType}/{delegateId}', [DelegateController::class, 'delegateDetailView'])->name('admin.event.delegates.detail.view');
                     Route::get('/{delegateType}/{delegateId}/print-badge', [DelegateController::class, 'delegateDetailPrintBadge'])->name('admin.event.delegates.detail.printBadge');
                     Route::get('/{delegateType}/{delegateId}/scan-badge', [DelegateController::class, 'delegateDetailScanBadge'])->name('admin.event.delegates.detail.scanBadge');

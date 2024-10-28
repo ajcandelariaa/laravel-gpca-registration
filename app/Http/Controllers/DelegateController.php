@@ -434,6 +434,22 @@ class DelegateController extends Controller
         }
     }
 
+    public function addDelegatesToGripView($eventCategory, $eventId){
+        $event = Event::where('category', $eventCategory)->where('id', $eventId)->first();
+        if ($event) {
+            if ($eventCategory == "AF" && $event->year == "2024") {
+                return view('admin.delegates.add-to-grip', [
+                    "pageTitle" => "Add delegates to Grip - " . $event->name,
+                    "event" => $event,
+                ]);
+            } else {
+                abort(404, 'The URL is incorrect');
+            }
+        } else {
+            abort(404, 'The URL is incorrect');
+        }
+    }
+
     // =========================================================
     //                       RENDER LOGICS
     // =========================================================
