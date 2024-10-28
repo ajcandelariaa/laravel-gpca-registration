@@ -126,7 +126,7 @@ class AddDelegatesToGrip extends Component
 
     public function formatHeadline($jobTitle, $companyName)
     {
-        $headline = $jobTitle . " - " . trim($companyName);
-        return $headline;
+        $headline = trim($jobTitle) . " - " . trim($companyName);
+        return trim($headline);
     }
 }
