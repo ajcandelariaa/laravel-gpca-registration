@@ -8,44 +8,147 @@ use Livewire\Component;
 
 class AddDelegatesToGrip extends Component
 {
-    public $event, $delegatesFromGrip, $confirmedDelegates;
+    public $event, $delegatesEmailFromGrip, $confirmedDelegates;
     public $eventCode;
+    public $countAlreadyAdded = 0;
+    public $activeSelectedIndex;
+
+    protected $listeners = ['addDelegateConfirmed' => 'addDelegate', 'addRemaniningDelegatesConfirmed' => 'addRemainingDelegates'];
 
     public function mount($event)
     {
         $this->event = $event;
         $this->eventCode = config('app.eventCategories')[$event->category];
-        $this->delegatesFromGrip = array();
+        $this->delegatesEmailFromGrip = array();
 
         $url = env('API_GRIP_URL') . '/thing/register/detail';
         $response = Http::withToken(env('API_GRIP_AUTH_TOKEN'))->get($url)->json();
         if ($response['success']) {
             foreach ($response['data'] as $apiDelegate) {
-                array_push($this->delegatesFromGrip, $apiDelegate);
+                array_push($this->delegatesEmailFromGrip, $apiDelegate['email']);
             }
         }
 
-        $this->confirmedDelegates = $this->getConfirmedDelegates($event->id, $event->category, $event->year);
-
-        dd($this->confirmedDelegates);
+        $this->confirmedDelegates = $this->getConfirmedDelegates();
     }
 
     public function render()
     {
-        return view('livewire.admin.delegates.add-delegates-to-grip');
+        return view('livewire.admin.events.delegates.add-delegates-to-grip');
+    }
+
+    public function addDelegateConfirmation($index)
+    {
+        $this->activeSelectedIndex = $index;
+        $this->dispatchBrowserEvent('swal:add-to-grip-confirmation', [
+            'type' => 'warning',
+            'message' => 'Are you sure you want to add this delegate to Grip?',
+            'text' => "",
+            'livewireEmit' => "addDelegateConfirmed",
+        ]);
+    }
+
+    public function addDelegate()
+    {
+        $selectedDelegate = $this->confirmedDelegates[$this->activeSelectedIndex];
+        $url = env('API_GRIP_URL') . '/thing/register';
+        $token = env('API_GRIP_AUTH_TOKEN');
+
+        $data = [
+            'registration_id' => $selectedDelegate['registration_id'],
+            'first_name' => $selectedDelegate['first_name'],
+            'last_name' => $selectedDelegate['last_name'],
+            'name' => $selectedDelegate['name'],
+            'email' => $selectedDelegate['email'],
+            'phone_number' => $selectedDelegate['phone_number'],
+            'location' => $selectedDelegate['location'],
+            'company_name' => $selectedDelegate['company_name'],
+            'job_title' => $selectedDelegate['job_title'],
+            'headline' => $selectedDelegate['headline'],
+            'picture_url' => $selectedDelegate['picture_url'],
+            'scan_id' => $selectedDelegate['scan_id'],
+        ];
+
+        try {
+            $response = Http::withToken($token)->post($url, $data)->json();
+
+            if (isset($response['success']) && $response['success']) {
+                $this->countAlreadyAdded++;
+                $this->confirmedDelegates[$this->activeSelectedIndex]['isDelegateAlreadyAdded'] = true;
+                $this->dispatchBrowserEvent('swal:add-to-grip', [
+                    'type' => 'success',
+                    'message' => 'Delegate added to Grip backend!',
+                    'text' => "",
+                ]);
+            } else {
+                $this->dispatchBrowserEvent('swal:add-to-grip', [
+                    'type' => 'error',
+                    'message' => 'An error occured while adding the delegate!',
+                    'text' => "",
+                ]);
+            }
+        } catch (\Exception $e){
+            $this->dispatchBrowserEvent('swal:add-to-grip', [
+                'type' => 'error',
+                'message' => 'An error occured while adding the delegate!',
+                'text' => "$e",
+            ]);
+        }
+    }
+
+    public function addRemainingDelegatesConfirmation(){
+        $this->dispatchBrowserEvent('swal:add-to-grip-confirmation', [
+            'type' => 'warning',
+            'message' => 'Are you sure you want add the remaining delegates to Grip?',
+            'text' => "",
+            'livewireEmit' => "addRemaniningDelegatesConfirmed",
+        ]);
+    }
+
+    public function addRemainingDelegates(){
+        $url = env('API_GRIP_URL') . '/thing/register';
+        $token = env('API_GRIP_AUTH_TOKEN');
+
+        foreach($this->confirmedDelegates as $index => $confirmedDelegate){
+            if(!$confirmedDelegate['isDelegateAlreadyAdded']){
+                $this->countAlreadyAdded++;
+                $this->confirmedDelegates[$index]['isDelegateAlreadyAdded'] = true;
+            }
+        }
+        
+        $this->dispatchBrowserEvent('swal:add-to-grip', [
+            'type' => 'success',
+            'message' => 'All remaning delegates are now added to Grip backend!',
+            'text' => "",
+        ]);
     }
 
 
-    public function getConfirmedDelegates($eventId, $eventCategory, $eventYear)
+
+
+
+
+
+
+
+
+
+
+    public function getConfirmedDelegates()
     {
         $confirmedDelegates = array();
-        $mainDelegates = MainDelegates::with(['additionalDelegates', 'transaction'])->where('event_id', $eventId)->get();
+        $mainDelegates = MainDelegates::with(['additionalDelegates', 'transaction'])->where('event_id', $this->event->id)->get();
 
         foreach ($mainDelegates as $mainDelegate) {
             $companyName = $mainDelegate->alternative_company_name ?? $mainDelegate->company_name;
 
             if ($mainDelegate->delegate_replaced_by_id == null && (!$mainDelegate->delegate_refunded)) {
                 if ($mainDelegate->registration_status == "confirmed") {
+
+                    if ($this->isDelegateAlreadyAdded($mainDelegate->email_address)) {
+                        $this->countAlreadyAdded++;
+                    }
+
                     array_push($confirmedDelegates, [
                         'registration_id' => $this->getRegistrationId($mainDelegate->transaction->id),
                         'first_name' => trim($mainDelegate->first_name),
@@ -54,11 +157,12 @@ class AddDelegatesToGrip extends Component
                         'email' => $mainDelegate->email_address,
                         'phone_number' => $mainDelegate->mobile_number,
                         'location' => $mainDelegate->country,
-                        'companyName' => trim($companyName),
-                        'jobTitle' => trim($mainDelegate->job_title),
+                        'company_name' => trim($companyName),
+                        'job_title' => trim($mainDelegate->job_title),
                         'headline' => $this->formatHeadline($mainDelegate->job_title, $companyName),
                         'picture_url' => "N/A",
                         'scan_id' => $this->getScanId($mainDelegate->id, 'main'),
+                        'isDelegateAlreadyAdded' => $this->isDelegateAlreadyAdded($mainDelegate->email_address),
                     ]);
                 }
             }
@@ -68,6 +172,11 @@ class AddDelegatesToGrip extends Component
                 if (!$subDelegates->isEmpty()) {
                     foreach ($subDelegates as $subDelegate) {
                         if ($subDelegate->delegate_replaced_by_id == null && (!$subDelegate->delegate_refunded)) {
+
+                            if ($this->isDelegateAlreadyAdded($subDelegate->email_address)) {
+                                $this->countAlreadyAdded++;
+                            }
+
                             array_push($confirmedDelegates, [
                                 'registration_id' => $this->getRegistrationId($subDelegate->transaction->id),
                                 'first_name' => trim($subDelegate->first_name),
@@ -76,11 +185,12 @@ class AddDelegatesToGrip extends Component
                                 'email' => $subDelegate->email_address,
                                 'phone_number' => $subDelegate->mobile_number,
                                 'location' => $subDelegate->country,
-                                'companyName' => trim($companyName),
-                                'jobTitle' => trim($subDelegate->job_title),
+                                'company_name' => trim($companyName),
+                                'job_title' => trim($subDelegate->job_title),
                                 'headline' => $this->formatHeadline($subDelegate->job_title, $companyName),
                                 'picture_url' => "N/A",
                                 'scan_id' => $this->getScanId($subDelegate->id, 'sub'),
+                                'isDelegateAlreadyAdded' => $this->isDelegateAlreadyAdded($subDelegate->email_address),
                             ]);
                         }
                     }
@@ -88,6 +198,14 @@ class AddDelegatesToGrip extends Component
             }
         }
         return $confirmedDelegates;
+    }
+
+    public function isDelegateAlreadyAdded($delegateEmailAddress)
+    {
+        $delegatesEmailFromGripUpper = array_map('strtoupper', $this->delegatesEmailFromGrip);
+        $delegateEmailAddressUpper = strtoupper($delegateEmailAddress);
+
+        return in_array($delegateEmailAddressUpper, $delegatesEmailFromGripUpper);
     }
 
     public function getScanId($delegeateId, $delegateType)

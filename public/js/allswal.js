@@ -1,3 +1,39 @@
+// ADD DELEGATE TO GRIP
+window.addEventListener("swal:add-to-grip", (event) => {
+    swal({
+        title: event.detail.message,
+        text: event.detail.text,
+        icon: event.detail.type,
+    });
+});
+
+window.addEventListener("swal:add-to-grip-confirmation", (event) => {
+    swal({
+        title: event.detail.message,
+        text: event.detail.text,
+        icon: event.detail.type,
+        buttons: {
+            confirm: {
+                text: "Yes, add it!",
+                value: true,
+                visible: true,
+                closeModal: true,
+            },
+            cancel: {
+                text: "Cancel",
+                value: null,
+                visible: true,
+                closeModal: true,
+            },
+        }
+    }).then((result) => {
+        console.log(result);
+        if (result) {
+            Livewire.emit(event.detail.livewireEmit)
+        }
+    });
+});
+
 //DIGITAL HELPER LOADING
 window.addEventListener("remove-dh-loading-screen", () => {
     let dhLoadingScreen = document.getElementById('dh-loading-screen');

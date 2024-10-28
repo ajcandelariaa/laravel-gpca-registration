@@ -441,6 +441,8 @@ class DelegateController extends Controller
                 return view('admin.delegates.add-to-grip', [
                     "pageTitle" => "Add delegates to Grip - " . $event->name,
                     "event" => $event,
+                    "eventCategory" => $eventCategory,
+                    "eventId" => $eventId,
                 ]);
             } else {
                 abort(404, 'The URL is incorrect');
