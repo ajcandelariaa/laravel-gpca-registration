@@ -16,7 +16,6 @@
 <p class="sub">Full name: {{  $details['name'] }}</p>
 <p class="sub">Job title: {{  $details['jobTitle'] }}</p>
 <p class="sub">Company name: {{  $details['companyName'] }}</p>
-<p class="sub">Badge type: {{  $details['badgeType'] }}</p>
 @if ($sendInvoice)
 <p class="sub">Amount paid: $ {{ number_format($details['amountPaid'], 2, '.', ',') }}</p>
 @endif
