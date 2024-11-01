@@ -98,6 +98,7 @@ class FastTrackController extends Controller
                         'isPrinted' => $delegatePrinted,
                         'printedCount' => count($mainDelegate->printedBadges),
                         'paidDateTime' => $mainDelegate->paid_date_time, //"Y-m-d H:i:s"
+                        'isSelectedForPrint' => true,
                     ]);
                 }
             }
@@ -162,6 +163,7 @@ class FastTrackController extends Controller
                                 'isPrinted' => $delegatePrinted,
                                 'printedCount' => count($subDelegate->printedBadges),
                                 'paidDateTime' => $mainDelegate->paid_date_time,
+                                'isSelectedForPrint' => true,
                             ]);
                         }
                     }
