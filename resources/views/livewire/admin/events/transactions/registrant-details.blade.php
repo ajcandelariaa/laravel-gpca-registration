@@ -188,7 +188,7 @@
                                 @endif
 
                                 @if ($finalData['attending_gala_dinner'])
-                                    <li>Gala Dinner Sponsored by OQ | 4 December 2024</li>
+                                    <li>Gala Dinner Sponsored by Sabic | 4 December 2024</li>
                                 @endif
                             </ul>
                         @else
