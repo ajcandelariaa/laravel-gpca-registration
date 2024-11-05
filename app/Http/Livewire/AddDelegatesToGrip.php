@@ -53,8 +53,15 @@ class AddDelegatesToGrip extends Component
         $selectedDelegate = $this->confirmedDelegates[$this->activeSelectedIndex];
         $url = env('API_GRIP_URL') . '/thing/register';
         $token = env('API_GRIP_AUTH_TOKEN');
+        $applicationId = env('API_GRIP_APP_ID');
+        $containerId = env('API_GRIP_CONTAINER_ID');
+        $typeId = env('API_GRIP_TYPE_ID');
 
         $data = [
+            'application_id' => $applicationId,
+            'new_event_join_type' => "join_and_patch",
+            'default_container_id' => $containerId,
+            'type_id' => $typeId,
             'registration_id' => $selectedDelegate['registration_id'],
             'first_name' => $selectedDelegate['first_name'],
             'last_name' => $selectedDelegate['last_name'],
@@ -66,12 +73,16 @@ class AddDelegatesToGrip extends Component
             'job_title' => $selectedDelegate['job_title'],
             'headline' => $selectedDelegate['headline'],
             'picture_url' => $selectedDelegate['picture_url'],
-            'scan_id' => $selectedDelegate['scan_id'],
+            'metadata_raw' => [
+                'scan_id' => [
+                    'en-gb' =>  $selectedDelegate['scan_id'],
+                ],
+            ],
+            'picture_url' => "https://www.gpcaforum.com/wp-content/uploads/2022/08/af-male2.jpg",
         ];
 
         try {
             $response = Http::withToken($token)->post($url, $data)->json();
-
             if (isset($response['success']) && $response['success']) {
                 $this->countAlreadyAdded++;
                 $this->confirmedDelegates[$this->activeSelectedIndex]['isDelegateAlreadyAdded'] = true;
@@ -87,7 +98,7 @@ class AddDelegatesToGrip extends Component
                     'text' => "",
                 ]);
             }
-        } catch (\Exception $e){
+        } catch (\Exception $e) {
             $this->dispatchBrowserEvent('swal:add-to-grip', [
                 'type' => 'error',
                 'message' => 'An error occured while adding the delegate!',
@@ -96,7 +107,8 @@ class AddDelegatesToGrip extends Component
         }
     }
 
-    public function addRemainingDelegatesConfirmation(){
+    public function addRemainingDelegatesConfirmation()
+    {
         $this->dispatchBrowserEvent('swal:add-to-grip-confirmation', [
             'type' => 'warning',
             'message' => 'Are you sure you want add the remaining delegates to Grip?',
@@ -105,17 +117,18 @@ class AddDelegatesToGrip extends Component
         ]);
     }
 
-    public function addRemainingDelegates(){
+    public function addRemainingDelegates()
+    {
         $url = env('API_GRIP_URL') . '/thing/register';
         $token = env('API_GRIP_AUTH_TOKEN');
 
-        foreach($this->confirmedDelegates as $index => $confirmedDelegate){
-            if(!$confirmedDelegate['isDelegateAlreadyAdded']){
+        foreach ($this->confirmedDelegates as $index => $confirmedDelegate) {
+            if (!$confirmedDelegate['isDelegateAlreadyAdded']) {
                 $this->countAlreadyAdded++;
                 $this->confirmedDelegates[$index]['isDelegateAlreadyAdded'] = true;
             }
         }
-        
+
         $this->dispatchBrowserEvent('swal:add-to-grip', [
             'type' => 'success',
             'message' => 'All remaning delegates are now added to Grip backend!',
