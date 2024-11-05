@@ -203,7 +203,7 @@
 
                     <div class="flex items-center gap-2">
                         <input type="checkbox" wire:model.lazy="attendingTo" value="6" id="6">
-                        <label for="6">Gala Dinner Sponsored by OQ | 4 December 2024</label>
+                        <label for="6">Gala Dinner Sponsored by Sabic | 4 December 2024</label>
                     </div>
 
                     @error('attendingTo')
