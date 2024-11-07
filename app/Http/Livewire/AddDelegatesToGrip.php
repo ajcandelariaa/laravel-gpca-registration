@@ -274,9 +274,9 @@ class AddDelegatesToGrip extends Component
 
     public function isDelegateAlreadyAdded($delegateEmailAddress)
     {
+        $formattedEmail = str_replace(" ", "", $delegateEmailAddress);
         $delegatesEmailFromGripUpper = array_map('strtoupper', $this->delegatesEmailFromGrip);
-        $delegateEmailAddressUpper = strtoupper(trim($delegateEmailAddress));
-
+        $delegateEmailAddressUpper = strtoupper($formattedEmail);
         return in_array($delegateEmailAddressUpper, $delegatesEmailFromGripUpper);
     }
 
