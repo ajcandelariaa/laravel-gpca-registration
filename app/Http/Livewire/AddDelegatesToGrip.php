@@ -203,7 +203,7 @@ class AddDelegatesToGrip extends Component
     public function getConfirmedDelegates()
     {
         $confirmedDelegates = array();
-        $mainDelegates = MainDelegates::with(['additionalDelegates', 'transaction'])->where('event_id', $this->event->id)->limit(200)->get();
+        $mainDelegates = MainDelegates::with(['additionalDelegates', 'transaction'])->where('event_id', $this->event->id)->limit(21)->get();
 
         foreach ($mainDelegates as $mainDelegate) {
             $companyName = $mainDelegate->alternative_company_name ?? $mainDelegate->company_name;
