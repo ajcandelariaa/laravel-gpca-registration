@@ -157,7 +157,7 @@ class AddDelegatesToGrip extends Component
                         $response = Http::withToken($token)->post($url, $data)->json();
                         if (isset($response['success']) && $response['success']) {
                             $this->countAlreadyAdded++;
-                            $this->confirmedDelegates[$this->activeSelectedIndex]['isDelegateAlreadyAdded'] = true;
+                            $this->confirmedDelegates[$index]['isDelegateAlreadyAdded'] = true;
                         } else {
                             $errorCount++;
                         }
@@ -203,7 +203,7 @@ class AddDelegatesToGrip extends Component
     public function getConfirmedDelegates()
     {
         $confirmedDelegates = array();
-        $mainDelegates = MainDelegates::with(['additionalDelegates', 'transaction'])->where('event_id', $this->event->id)->limit(21)->get();
+        $mainDelegates = MainDelegates::with(['additionalDelegates', 'transaction'])->where('event_id', $this->event->id)->limit(100)->get();
 
         foreach ($mainDelegates as $mainDelegate) {
             $companyName = $mainDelegate->alternative_company_name ?? $mainDelegate->company_name;
