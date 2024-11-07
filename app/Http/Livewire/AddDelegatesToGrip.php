@@ -121,19 +121,72 @@ class AddDelegatesToGrip extends Component
     {
         $url = env('API_GRIP_URL') . '/thing/register';
         $token = env('API_GRIP_AUTH_TOKEN');
+        $applicationId = env('API_GRIP_APP_ID');
+        $containerId = env('API_GRIP_CONTAINER_ID');
+        $typeId = env('API_GRIP_TYPE_ID');
+        $errorCount = 0;
 
-        foreach ($this->confirmedDelegates as $index => $confirmedDelegate) {
-            if (!$confirmedDelegate['isDelegateAlreadyAdded']) {
-                $this->countAlreadyAdded++;
-                $this->confirmedDelegates[$index]['isDelegateAlreadyAdded'] = true;
+        try {
+            foreach ($this->confirmedDelegates as $index => $confirmedDelegate) {
+                if (!$confirmedDelegate['isDelegateAlreadyAdded']) {
+                    $data = [
+                        'application_id' => $applicationId,
+                        'new_event_join_type' => "join_and_patch",
+                        'default_container_id' => $containerId,
+                        'type_id' => $typeId,
+                        'registration_id' => $confirmedDelegate['registration_id'],
+                        'first_name' => $confirmedDelegate['first_name'],
+                        'last_name' => $confirmedDelegate['last_name'],
+                        'name' => $confirmedDelegate['name'],
+                        'email' => $confirmedDelegate['email'],
+                        'phone_number' => $confirmedDelegate['phone_number'],
+                        'location' => $confirmedDelegate['location'],
+                        'company_name' => $confirmedDelegate['company_name'],
+                        'job_title' => $confirmedDelegate['job_title'],
+                        'headline' => $confirmedDelegate['headline'],
+                        'picture_url' => $confirmedDelegate['picture_url'],
+                        'metadata_raw' => [
+                            'scan_id' => [
+                                'en-gb' =>  $confirmedDelegate['scan_id'],
+                            ],
+                        ],
+                        'picture_url' => "https://www.gpcaforum.com/wp-content/uploads/2022/08/af-male2.jpg",
+                    ];
+    
+                    try {
+                        $response = Http::withToken($token)->post($url, $data)->json();
+                        if (isset($response['success']) && $response['success']) {
+                            $this->countAlreadyAdded++;
+                            $this->confirmedDelegates[$this->activeSelectedIndex]['isDelegateAlreadyAdded'] = true;
+                        } else {
+                            $errorCount++;
+                        }
+                    } catch (\Exception $e) {
+                        $errorCount++;
+                    }
+                }
             }
+            if($errorCount > 0){
+                $message = "$errorCount delegates are not added due to an error";
+                $this->dispatchBrowserEvent('swal:add-to-grip', [
+                    'type' => 'success',
+                    'message' => $message,
+                    'text' => "",
+                ]);
+            } else {
+                $this->dispatchBrowserEvent('swal:add-to-grip', [
+                    'type' => 'success',
+                    'message' => 'All remaning delegates are now added to the Grip backend!',
+                    'text' => "",
+                ]);
+            }
+        } catch (\Exception $e) {
+            $this->dispatchBrowserEvent('swal:add-to-grip', [
+                'type' => 'error',
+                'message' => 'An error occured while adding the remaining delegates!',
+                'text' => "$e",
+            ]);
         }
-
-        $this->dispatchBrowserEvent('swal:add-to-grip', [
-            'type' => 'success',
-            'message' => 'All remaning delegates are now added to Grip backend!',
-            'text' => "",
-        ]);
     }
 
 
@@ -150,7 +203,7 @@ class AddDelegatesToGrip extends Component
     public function getConfirmedDelegates()
     {
         $confirmedDelegates = array();
-        $mainDelegates = MainDelegates::with(['additionalDelegates', 'transaction'])->where('event_id', $this->event->id)->get();
+        $mainDelegates = MainDelegates::with(['additionalDelegates', 'transaction'])->where('event_id', $this->event->id)->limit(20)->get();
 
         foreach ($mainDelegates as $mainDelegate) {
             $companyName = $mainDelegate->alternative_company_name ?? $mainDelegate->company_name;
