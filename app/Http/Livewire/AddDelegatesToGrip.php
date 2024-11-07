@@ -226,7 +226,7 @@ class AddDelegatesToGrip extends Component
                         'first_name' => trim($mainDelegate->first_name),
                         'last_name' => trim($mainDelegate->last_name),
                         'name' => $this->formatFullName($mainDelegate->salutation, $mainDelegate->first_name, $mainDelegate->last_name),
-                        'email' => $mainDelegate->email_address,
+                        'email' => trim($mainDelegate->email_address),
                         'phone_number' => $mainDelegate->mobile_number,
                         'location' => $mainDelegate->country,
                         'company_name' => trim($companyName),
@@ -254,7 +254,7 @@ class AddDelegatesToGrip extends Component
                                 'first_name' => trim($subDelegate->first_name),
                                 'last_name' => trim($subDelegate->last_name),
                                 'name' => $this->formatFullName($subDelegate->salutation, $subDelegate->first_name, $subDelegate->last_name),
-                                'email' => $subDelegate->email_address,
+                                'email' => trim($subDelegate->email_address),
                                 'phone_number' => $subDelegate->mobile_number,
                                 'location' => $subDelegate->country,
                                 'company_name' => trim($companyName),
@@ -275,7 +275,7 @@ class AddDelegatesToGrip extends Component
     public function isDelegateAlreadyAdded($delegateEmailAddress)
     {
         $delegatesEmailFromGripUpper = array_map('strtoupper', $this->delegatesEmailFromGrip);
-        $delegateEmailAddressUpper = strtoupper($delegateEmailAddress);
+        $delegateEmailAddressUpper = strtoupper(trim($delegateEmailAddress));
 
         return in_array($delegateEmailAddressUpper, $delegatesEmailFromGripUpper);
     }
