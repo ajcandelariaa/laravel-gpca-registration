@@ -276,7 +276,7 @@ class AddDelegatesToGrip extends Component
     {
         $formattedEmail = str_replace(" ", "", $delegateEmailAddress);
         $delegatesEmailFromGripUpper = array_map('strtoupper', $this->delegatesEmailFromGrip);
-        $delegateEmailAddressUpper = strtoupper($formattedEmail);
+        $delegateEmailAddressUpper = strtoupper(trim($formattedEmail));
         return in_array($delegateEmailAddressUpper, $delegatesEmailFromGripUpper);
     }
 
