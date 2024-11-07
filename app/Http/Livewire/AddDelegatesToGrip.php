@@ -25,7 +25,7 @@ class AddDelegatesToGrip extends Component
         $response = Http::withToken(env('API_GRIP_AUTH_TOKEN'))->get($url)->json();
         if ($response['success']) {
             foreach ($response['data'] as $apiDelegate) {
-                array_push($this->delegatesEmailFromGrip, $apiDelegate['email']);
+                array_push($this->delegatesEmailFromGrip, $apiDelegate['registration_id']);
             }
         }
 
@@ -83,7 +83,6 @@ class AddDelegatesToGrip extends Component
 
         try {
             $response = Http::withToken($token)->post($url, $data)->json();
-            dd($response);
             if (isset($response['success']) && $response['success']) {
                 $this->countAlreadyAdded++;
                 $this->confirmedDelegates[$this->activeSelectedIndex]['isDelegateAlreadyAdded'] = true;
@@ -218,7 +217,7 @@ class AddDelegatesToGrip extends Component
             if ($mainDelegate->delegate_replaced_by_id == null && (!$mainDelegate->delegate_refunded)) {
                 if ($mainDelegate->registration_status == "confirmed") {
 
-                    if ($this->isDelegateAlreadyAdded($mainDelegate->email_address)) {
+                    if ($this->isDelegateAlreadyAdded($this->getRegistrationId($mainDelegate->transaction->id))) {
                         $this->countAlreadyAdded++;
                     }
 
@@ -235,7 +234,7 @@ class AddDelegatesToGrip extends Component
                         'headline' => $this->formatHeadline($mainDelegate->job_title, $companyName),
                         'picture_url' => "N/A",
                         'scan_id' => $this->getScanId($mainDelegate->id, 'main'),
-                        'isDelegateAlreadyAdded' => $this->isDelegateAlreadyAdded($mainDelegate->email_address),
+                        'isDelegateAlreadyAdded' => $this->isDelegateAlreadyAdded($this->getRegistrationId($mainDelegate->transaction->id)),
                     ]);
                 }
             }
@@ -246,7 +245,7 @@ class AddDelegatesToGrip extends Component
                     foreach ($subDelegates as $subDelegate) {
                         if ($subDelegate->delegate_replaced_by_id == null && (!$subDelegate->delegate_refunded)) {
 
-                            if ($this->isDelegateAlreadyAdded($subDelegate->email_address)) {
+                            if ($this->isDelegateAlreadyAdded($this->getRegistrationId($subDelegate->transaction->id))) {
                                 $this->countAlreadyAdded++;
                             }
 
@@ -263,7 +262,7 @@ class AddDelegatesToGrip extends Component
                                 'headline' => $this->formatHeadline($subDelegate->job_title, $companyName),
                                 'picture_url' => "N/A",
                                 'scan_id' => $this->getScanId($subDelegate->id, 'sub'),
-                                'isDelegateAlreadyAdded' => $this->isDelegateAlreadyAdded($subDelegate->email_address),
+                                'isDelegateAlreadyAdded' => $this->isDelegateAlreadyAdded($this->getRegistrationId($subDelegate->transaction->id)),
                             ]);
                         }
                     }
@@ -273,12 +272,12 @@ class AddDelegatesToGrip extends Component
         return $confirmedDelegates;
     }
 
-    public function isDelegateAlreadyAdded($delegateEmailAddress)
+    public function isDelegateAlreadyAdded($delegateTransactionId)
     {
-        $formattedEmail = str_replace(" ", "", $delegateEmailAddress);
         $delegatesEmailFromGripUpper = array_map('strtoupper', $this->delegatesEmailFromGrip);
-        $delegateEmailAddressUpper = strtoupper(trim($formattedEmail));
-        return in_array($delegateEmailAddressUpper, $delegatesEmailFromGripUpper);
+        $delegateTransactionIdUpper = strtoupper(trim($delegateTransactionId));
+
+        return in_array($delegateTransactionIdUpper, $delegatesEmailFromGripUpper);
     }
 
     public function getScanId($delegeateId, $delegateType)
