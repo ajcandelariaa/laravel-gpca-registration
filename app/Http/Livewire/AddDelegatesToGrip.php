@@ -129,7 +129,7 @@ class AddDelegatesToGrip extends Component
 
         try {
             foreach ($this->confirmedDelegates as $index => $confirmedDelegate) {
-                if ($addedCount == 100) {
+                if ($addedCount <= 100) {
                     if (!$confirmedDelegate['isDelegateAlreadyAdded']) {
                         $data = [
                             'application_id' => $applicationId,
