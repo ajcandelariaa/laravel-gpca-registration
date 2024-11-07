@@ -83,6 +83,7 @@ class AddDelegatesToGrip extends Component
 
         try {
             $response = Http::withToken($token)->post($url, $data)->json();
+            dd($response);
             if (isset($response['success']) && $response['success']) {
                 $this->countAlreadyAdded++;
                 $this->confirmedDelegates[$this->activeSelectedIndex]['isDelegateAlreadyAdded'] = true;
