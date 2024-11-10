@@ -270,6 +270,7 @@ class FastTrackController extends Controller
                         'middle_name' => $request->middleName,
                         'last_name' => $request->lastName,
                         'job_title' => $request->jobTitle,
+                        'seat_number' => $request->seatNumber,
                     ]);
 
                     DelegateDetailsUpdateLog::create([
