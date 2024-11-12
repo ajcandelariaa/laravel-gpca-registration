@@ -77,6 +77,13 @@ class FastTrackController extends Controller
 
                     $delegatePrinted = $mainDelegate->printedBadge ? "Yes" : "No";
 
+                    $badgeTypeSeatNumber = "";
+                    if($mainDelegate->seat_number){
+                        $badgeTypeSeatNumber = Str::upper($mainDelegate->badge_type) . ' - ' . $mainDelegate->seat_number;
+                    } else {
+                        $badgeTypeSeatNumber = Str::upper($mainDelegate->badge_type);
+                    }
+
                     array_push($confirmedDelegates, [
                         'transactionId' => $finalTransactionId,
                         'id' => $mainDelegate->id,
@@ -94,6 +101,7 @@ class FastTrackController extends Controller
                         'frontTextColor' => $finalFontTextColor,
                         'frontTextBGColor' => $finalFrontTextBGColor,
                         'seatNumber' => $mainDelegate->seat_number ? $mainDelegate->seat_number : "N/A",
+                        'badgeTypeSeatNumber' => $badgeTypeSeatNumber,
 
                         'isPrinted' => $delegatePrinted,
                         'printedCount' => count($mainDelegate->printedBadges),
@@ -141,6 +149,13 @@ class FastTrackController extends Controller
                             $finalFontTextColor = "#000000";
 
                             $delegatePrinted = $subDelegate->printedBadge ? "Yes" : "No";
+                            
+                            $badgeTypeSeatNumber = "";
+                            if($subDelegate->seat_number){
+                                $badgeTypeSeatNumber = Str::upper($subDelegate->badge_type) . ' - ' . $subDelegate->seat_number;
+                            } else {
+                                $badgeTypeSeatNumber = Str::upper($subDelegate->badge_type);
+                            }
 
                             array_push($confirmedDelegates, [
                                 'transactionId' => $finalTransactionId,
@@ -155,10 +170,11 @@ class FastTrackController extends Controller
                                 'companyName' => trim($companyName),
                                 'badgeType' => Str::upper($subDelegate->badge_type),
 
-                                'frontText' => Str::upper($mainDelegate->badge_type),
+                                'frontText' => Str::upper($subDelegate->badge_type),
                                 'frontTextColor' => $finalFontTextColor,
                                 'frontTextBGColor' => $finalFrontTextBGColor,
                                 'seatNumber' => $subDelegate->seat_number ? $subDelegate->seat_number : "N/A",
+                                'badgeTypeSeatNumber' => $badgeTypeSeatNumber,
 
                                 'isPrinted' => $delegatePrinted,
                                 'printedCount' => count($subDelegate->printedBadges),
