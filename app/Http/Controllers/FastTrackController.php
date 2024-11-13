@@ -37,7 +37,7 @@ class FastTrackController extends Controller
     public function getConfirmedDelegates($eventId, $eventCategory, $eventYear)
     {
         $confirmedDelegates = array();
-        $mainDelegates = MainDelegate::with(['additionalDelegates', 'transaction', 'printedBadge', 'printedBadges'])->where('event_id', $eventId)->limit(30)->get();
+        $mainDelegates = MainDelegate::with(['additionalDelegates', 'transaction', 'printedBadge', 'printedBadges'])->where('event_id', $eventId)->limit(200)->get();
 
         $eventCode = config('app.eventCategories')[$eventCategory];
 
