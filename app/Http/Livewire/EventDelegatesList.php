@@ -3,12 +3,9 @@
 namespace App\Http\Livewire;
 
 use App\Models\MainDelegate as MainDelegates;
-use App\Models\AdditionalDelegate as AdditionalDelegates;
 use App\Models\Event as Events;
 use App\Models\EventRegistrationType as EventRegistrationTypes;
 use App\Models\PrintedBadge as PrintedBadges;
-use App\Models\ScannedDelegate as ScannedDelegates;
-use App\Models\Transaction as Transactions;
 use Carbon\Carbon;
 use Livewire\Component;
 
@@ -24,8 +21,6 @@ class EventDelegatesList extends Component
     public $badgeView = false;
 
     public $name, $company, $jobTitle, $registrationType, $badgeViewFFText, $badgeViewFBText, $badgeViewFFBGColor, $badgeViewFBBGColor, $badgeViewFFTextColor, $badgeViewFBTextColor;
-
-    public $perPage, $currentPage, $startIndex, $showAll;
 
     protected $listeners = ['printBadgeConfirmed' => 'printBadge', 'broadcastEmailConfirmed' => 'sendBroadcastEmail'];
 
@@ -127,11 +122,6 @@ class EventDelegatesList extends Component
             }
         }
         $this->finalListsOfDelegates = $this->finalListsOfDelegatesTemp;
-        $this->currentPage = 1;
-        $this->startIndex = 0;
-        $this->perPage = 20;
-        $this->showAll = false;
-        $this->paginateData();
     }
 
     public function render()
@@ -139,59 +129,10 @@ class EventDelegatesList extends Component
         return view('livewire.admin.events.delegates.event-delegates-list');
     }
 
-    public function toggleShowAll()
-    {
-        $this->showAll = !$this->showAll;
-        $this->searchTerm = null;
-        $this->currentPage = 1;
-        $this->startIndex = 0;
-        $this->search();
-    }
-
-    public function totalPages()
-    {
-        return ceil(count($this->finalListsOfDelegatesTemp) / $this->perPage);
-    }
-
-    public function gotoPage($page)
-    {
-        if ($page >= 1 && $page <= $this->totalPages()) {
-            $this->currentPage = $page;
-            $this->paginateData();
-        }
-    }
-
-    public function paginateData()
-    {
-        $this->startIndex = ($this->currentPage - 1) * $this->perPage;
-        $pagedData = array_slice($this->finalListsOfDelegatesTemp, $this->startIndex, $this->perPage);
-        $this->finalListsOfDelegates = $pagedData;
-    }
-
-    public function previousPage()
-    {
-        if ($this->currentPage > 1) {
-            $this->currentPage--;
-            $this->paginateData();
-        }
-    }
-
-    public function nextPage()
-    {
-        if ($this->currentPage * $this->perPage < count($this->finalListsOfDelegatesTemp)) {
-            $this->currentPage++;
-            $this->paginateData();
-        }
-    }
-
     public function search()
     {
         if (empty($this->searchTerm)) {
-            if ($this->showAll) {
-                $this->finalListsOfDelegates = $this->finalListsOfDelegatesTemp;
-            } else {
-                $this->paginateData();
-            }
+            $this->finalListsOfDelegates = $this->finalListsOfDelegatesTemp;
         } else {
             $filteredData = collect($this->finalListsOfDelegatesTemp)
                 ->filter(function ($item) {
@@ -208,102 +149,9 @@ class EventDelegatesList extends Component
                 })
                 ->all();
 
-            if ($this->showAll) {
-                $this->finalListsOfDelegates = $filteredData;
-            } else {
-                $startIndex = ($this->currentPage - 1) * $this->perPage;
-                $endIndex = min($startIndex + $this->perPage, count($filteredData));
-                $this->finalListsOfDelegates = array_slice($filteredData, $startIndex, $endIndex - $startIndex);
-            }
+            $this->finalListsOfDelegates = $filteredData;
         }
     }
-
-    public function printBadgeClicked($delegateType, $delegateId, $arrayIndex)
-    {
-        $this->printDelegateType = $delegateType;
-        $this->printDelegateId = $delegateId;
-        $this->printArrayIndex = $arrayIndex;
-
-        $this->dispatchBrowserEvent('swal:print-badge-confirmation', [
-            'type' => 'warning',
-            'message' => 'Are you sure?',
-            'text' => "",
-        ]);
-    }
-
-    public function printBadge()
-    {
-        PrintedBadges::create([
-            'event_id' => $this->event->id,
-            'event_category' => $this->event->category,
-            'delegate_id' => $this->printDelegateId,
-            'delegate_type' => $this->printDelegateType,
-            'printed_date_time' => Carbon::now(),
-        ]);
-
-        $this->finalListsOfDelegates[$this->printArrayIndex]['delegatePrinted'] = "Yes";
-        $this->finalListsOfDelegatesTemp[$this->printArrayIndex]['delegatePrinted'] = "Yes";
-
-        $this->dispatchBrowserEvent('swal:print-badge-confirmed', [
-            'url' => route('admin.event.delegates.detail.printBadge', ['eventCategory' => $this->event->category, 'eventId' => $this->event->id, 'delegateId' => $this->printDelegateId, 'delegateType' => $this->printDelegateType]),
-
-            'type' => 'success',
-            'message' => 'Badge Printed Successfully!',
-            'text' => ''
-        ]);
-
-        $this->printDelegateType = null;
-        $this->printDelegateId = null;
-        $this->printArrayIndex = null;
-    }
-
-    public function previewBadge($delegateIndex)
-    {
-
-        if ($this->finalListsOfDelegates[$delegateIndex]['delegateSalutation'] == "Dr." || $this->finalListsOfDelegates[$delegateIndex]['delegateSalutation'] == "Prof.") {
-            $this->name = $this->finalListsOfDelegates[$delegateIndex]['delegateSalutation'] . ' ' . $this->finalListsOfDelegates[$delegateIndex]['delegateFName'] . ' ' . $this->finalListsOfDelegates[$delegateIndex]['delegateMName'] . ' ' . $this->finalListsOfDelegates[$delegateIndex]['delegateLName'];
-        } else {
-            $this->name = $this->finalListsOfDelegates[$delegateIndex]['delegateFName'] . ' ' . $this->finalListsOfDelegates[$delegateIndex]['delegateMName'] . ' ' . $this->finalListsOfDelegates[$delegateIndex]['delegateLName'];
-        }
-
-        $this->jobTitle = $this->finalListsOfDelegates[$delegateIndex]['delegateJobTitle'];
-        $this->company = $this->finalListsOfDelegates[$delegateIndex]['delegateCompany'];
-        $this->registrationType = $this->finalListsOfDelegates[$delegateIndex]['delegateBadgeType'];
-
-        $registrationType = EventRegistrationTypes::where('event_id', $this->event->id)->where('registration_type', $this->registrationType)->first();
-
-        $this->badgeViewFFText = $registrationType->badge_footer_front_name;
-        $this->badgeViewFBText = $registrationType->badge_footer_back_name;
-
-        $this->badgeViewFFBGColor = $registrationType->badge_footer_front_bg_color;
-        $this->badgeViewFBBGColor = $registrationType->badge_footer_back_bg_color;
-
-        $this->badgeViewFFTextColor = $registrationType->badge_footer_front_text_color;
-        $this->badgeViewFBTextColor = $registrationType->badge_footer_back_text_color;
-
-        $this->badgeView = true;
-    }
-
-
-    public function closePreviewBadge()
-    {
-        $this->name = null;
-        $this->jobTitle = null;
-        $this->company = null;
-        $this->registrationType = null;
-
-        $this->badgeViewFFText = null;
-        $this->badgeViewFBText = null;
-
-        $this->badgeViewFFBGColor = null;
-        $this->badgeViewFBBGColor = null;
-
-        $this->badgeViewFFTextColor = null;
-        $this->badgeViewFBTextColor = null;
-
-        $this->badgeView = false;
-    }
-
 
     public function sendBroadcastEmailShow()
     {
@@ -323,4 +171,101 @@ class EventDelegatesList extends Component
         ]);
         dd($this->finalListsOfDelegates);
     }
+
+
+
+
+
+
+
+
+
+
+
+
+    // public function printBadgeClicked($delegateType, $delegateId, $arrayIndex)
+    // {
+    //     $this->printDelegateType = $delegateType;
+    //     $this->printDelegateId = $delegateId;
+    //     $this->printArrayIndex = $arrayIndex;
+
+    //     $this->dispatchBrowserEvent('swal:print-badge-confirmation', [
+    //         'type' => 'warning',
+    //         'message' => 'Are you sure?',
+    //         'text' => "",
+    //     ]);
+    // }
+
+    // public function printBadge()
+    // {
+    //     PrintedBadges::create([
+    //         'event_id' => $this->event->id,
+    //         'event_category' => $this->event->category,
+    //         'delegate_id' => $this->printDelegateId,
+    //         'delegate_type' => $this->printDelegateType,
+    //         'printed_date_time' => Carbon::now(),
+    //     ]);
+
+    //     $this->finalListsOfDelegates[$this->printArrayIndex]['delegatePrinted'] = "Yes";
+    //     $this->finalListsOfDelegatesTemp[$this->printArrayIndex]['delegatePrinted'] = "Yes";
+
+    //     $this->dispatchBrowserEvent('swal:print-badge-confirmed', [
+    //         'url' => route('admin.event.delegates.detail.printBadge', ['eventCategory' => $this->event->category, 'eventId' => $this->event->id, 'delegateId' => $this->printDelegateId, 'delegateType' => $this->printDelegateType]),
+
+    //         'type' => 'success',
+    //         'message' => 'Badge Printed Successfully!',
+    //         'text' => ''
+    //     ]);
+
+    //     $this->printDelegateType = null;
+    //     $this->printDelegateId = null;
+    //     $this->printArrayIndex = null;
+    // }
+
+    // public function previewBadge($delegateIndex)
+    // {
+
+    //     if ($this->finalListsOfDelegates[$delegateIndex]['delegateSalutation'] == "Dr." || $this->finalListsOfDelegates[$delegateIndex]['delegateSalutation'] == "Prof.") {
+    //         $this->name = $this->finalListsOfDelegates[$delegateIndex]['delegateSalutation'] . ' ' . $this->finalListsOfDelegates[$delegateIndex]['delegateFName'] . ' ' . $this->finalListsOfDelegates[$delegateIndex]['delegateMName'] . ' ' . $this->finalListsOfDelegates[$delegateIndex]['delegateLName'];
+    //     } else {
+    //         $this->name = $this->finalListsOfDelegates[$delegateIndex]['delegateFName'] . ' ' . $this->finalListsOfDelegates[$delegateIndex]['delegateMName'] . ' ' . $this->finalListsOfDelegates[$delegateIndex]['delegateLName'];
+    //     }
+
+    //     $this->jobTitle = $this->finalListsOfDelegates[$delegateIndex]['delegateJobTitle'];
+    //     $this->company = $this->finalListsOfDelegates[$delegateIndex]['delegateCompany'];
+    //     $this->registrationType = $this->finalListsOfDelegates[$delegateIndex]['delegateBadgeType'];
+
+    //     $registrationType = EventRegistrationTypes::where('event_id', $this->event->id)->where('registration_type', $this->registrationType)->first();
+
+    //     $this->badgeViewFFText = $registrationType->badge_footer_front_name;
+    //     $this->badgeViewFBText = $registrationType->badge_footer_back_name;
+
+    //     $this->badgeViewFFBGColor = $registrationType->badge_footer_front_bg_color;
+    //     $this->badgeViewFBBGColor = $registrationType->badge_footer_back_bg_color;
+
+    //     $this->badgeViewFFTextColor = $registrationType->badge_footer_front_text_color;
+    //     $this->badgeViewFBTextColor = $registrationType->badge_footer_back_text_color;
+
+    //     $this->badgeView = true;
+    // }
+
+
+    // public function closePreviewBadge()
+    // {
+    //     $this->name = null;
+    //     $this->jobTitle = null;
+    //     $this->company = null;
+    //     $this->registrationType = null;
+
+    //     $this->badgeViewFFText = null;
+    //     $this->badgeViewFBText = null;
+
+    //     $this->badgeViewFFBGColor = null;
+    //     $this->badgeViewFBBGColor = null;
+
+    //     $this->badgeViewFFTextColor = null;
+    //     $this->badgeViewFBTextColor = null;
+
+    //     $this->badgeView = false;
+    // }
 }

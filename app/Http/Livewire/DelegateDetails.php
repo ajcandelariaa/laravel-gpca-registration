@@ -9,8 +9,8 @@ use App\Models\MainDelegate as MainDelegates;
 use App\Models\AdditionalDelegate as AdditionalDelegates;
 use App\Models\PrintedBadge as PrintedBadges;
 use App\Models\ScannedDelegate as ScannedDelegates;
+use App\Models\DelegateDetailsUpdateLog as DelegateDetailsUpdateLogs;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Crypt;
 
 
 class DelegateDetails extends Component
@@ -21,7 +21,7 @@ class DelegateDetails extends Component
 
     public $printDelegateType, $printDelegateId;
 
-    public $printedBadges, $scannedBadges;
+    public $printedBadges, $scannedBadges, $updateLogs;
 
     public $scanDelegateUrl, $printBadgeDelegateUrl;
 
@@ -59,7 +59,8 @@ class DelegateDetails extends Component
         $finalCryptStringPrint = base64_encode($combinedStringPrint);
         $this->printBadgeDelegateUrl = 'ca' . $finalCryptStringPrint . 'gp';
 
-        
+        $this->updateLogs = DelegateDetailsUpdateLogs::where('event_id', $eventId)->where('delegate_id', $finalDelegate['delegateId'])->where('delegate_type', $finalDelegate['delegateType'])->get();
+
         $this->showEditSeatNumber = false;
     }
 

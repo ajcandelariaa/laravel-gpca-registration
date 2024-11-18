@@ -261,5 +261,33 @@
         </div>
 
         <div class="my-10">&nbsp;</div>
+
+        <div
+            class="grid grid-cols-12 gap-5 py-2 px-4 text-center items-center bg-registrationPrimaryColor text-white mt-10 ">
+            <div class="col-span-1 break-words">No.</div>
+            <div class="col-span-1 break-words">PC Name</div>
+            <div class="col-span-1 break-words">PC Number</div>
+            <div class="col-span-7 break-words">Description</div>
+            <div class="col-span-2 break-words">Update Datetime</div>
+        </div>
+
+        @if ($updateLogs->isEmpty())
+                    <div class="bg-red-400 text-white text-center py-2 mt-1 rounded-md">
+                        There are no update logs yet.
+                    </div>
+                @else
+                    @foreach ($updateLogs as $updateLogIndex => $updateLog)
+                        <div class="grid grid-cols-12 gap-5 py-2 px-4 text-center items-center bg-gray-300">
+                            <div class="col-span-1 break-words">{{ $updateLogIndex + 1 }}</div>
+                            <div class="col-span-1 break-words"> {{ $updateLog['updated_by_name'] }} </div>
+                            <div class="col-span-1 break-words"> {{ $updateLog['updated_by_pc_number'] }} </div>
+                            <div class="col-span-1 break-words"> {{ $updateLog['description'] }} </div>
+                            <div class="col-span-1 break-words"> {{ $updateLog['updated_date_time'] }} </div>
+                        </div>
+                    @endforeach
+                @endif
+
+        <div class="my-10">&nbsp;</div>
     </div>
+
 </div>
