@@ -39,7 +39,7 @@ class DelegatesUpdateLogs extends Component
                 $lastDigit = 1000 + intval($transactionId);
                 $finalTransactionId = $this->event->year . $eventCode . $lastDigit;
                 
-                array_push($delegateLogs, [
+                array_push($this->delegateLogs, [
                     'transactionId' => $finalTransactionId,
                     'delegateId' => $delegateDetailsUpdateLog->delegate_id,
                     'delegateType' => $delegateDetailsUpdateLog->delegate_type,
