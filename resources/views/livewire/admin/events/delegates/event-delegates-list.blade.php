@@ -18,6 +18,9 @@
                         class="bg-registrationPrimaryColorHover hover:bg-registrationPrimaryColor text-white py-1 px-4 rounded-md">Search</button>
                 </div>
             </div>
+            
+            <a href="{{ route('admin.update.logs.view', ['eventCategory' => $event->category, 'eventId' => $event->id]) }}"
+            class="bg-registrationPrimaryColorHover hover:bg-registrationPrimaryColor text-white py-1 px-4 rounded-md flex items-center" target="_blank">Delegate Details Update Logs</a>
         </div>
 
         <div class="shadow-lg my-5 bg-white rounded-md">
@@ -124,9 +127,9 @@
                     </div>
                 @endforeach
 
-                @if ($badgeView)
+                {{-- @if ($badgeView)
                     @include('livewire.admin.events.delegates.view_badge_modal')
-                @endif
+                @endif --}}
             @endif
         </div>
     </div>

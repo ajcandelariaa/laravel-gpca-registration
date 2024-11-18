@@ -4,8 +4,6 @@ namespace App\Http\Livewire;
 
 use App\Models\MainDelegate as MainDelegates;
 use App\Models\Event as Events;
-use App\Models\EventRegistrationType as EventRegistrationTypes;
-use App\Models\PrintedBadge as PrintedBadges;
 use Carbon\Carbon;
 use Livewire\Component;
 

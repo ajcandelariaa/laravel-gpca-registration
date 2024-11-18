@@ -434,7 +434,8 @@ class DelegateController extends Controller
         }
     }
 
-    public function addDelegatesToGripView($eventCategory, $eventId){
+    public function addDelegatesToGripView($eventCategory, $eventId)
+    {
         $event = Event::where('category', $eventCategory)->where('id', $eventId)->first();
         if ($event) {
             if ($eventCategory == "AF" && $event->year == "2024") {
@@ -447,6 +448,21 @@ class DelegateController extends Controller
             } else {
                 abort(404, 'The URL is incorrect');
             }
+        } else {
+            abort(404, 'The URL is incorrect');
+        }
+    }
+
+    public function updateLogsView($eventCategory, $eventId)
+    {
+        $event = Event::where('category', $eventCategory)->where('id', $eventId)->first();
+        if ($event) {
+            return view('admin.delegates.update-logs', [
+                "pageTitle" => "Delgate details update logs - " . $event->name,
+                "event" => $event,
+                "eventCategory" => $eventCategory,
+                "eventId" => $eventId,
+            ]);
         } else {
             abort(404, 'The URL is incorrect');
         }
