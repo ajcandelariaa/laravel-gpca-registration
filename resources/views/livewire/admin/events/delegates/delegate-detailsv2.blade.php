@@ -281,8 +281,8 @@
                             <div class="col-span-1 break-words">{{ $updateLogIndex + 1 }}</div>
                             <div class="col-span-1 break-words"> {{ $updateLog['updated_by_name'] }} </div>
                             <div class="col-span-1 break-words"> {{ $updateLog['updated_by_pc_number'] }} </div>
-                            <div class="col-span-1 break-words"> {{ $updateLog['description'] }} </div>
-                            <div class="col-span-1 break-words"> {{ $updateLog['updated_date_time'] }} </div>
+                            <div class="col-span-7 break-words"> {{ $updateLog['description'] }} </div>
+                            <div class="col-span-2 break-words"> {{ $updateLog['updated_date_time'] }} </div>
                         </div>
                     @endforeach
                 @endif
