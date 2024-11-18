@@ -18,7 +18,7 @@ class DelegatesUpdateLogs extends Component
     public function mount($eventId, $eventCategory){
         $this->event = Events::where('id', $eventId)->where('category', $eventCategory)->first();
 
-        $delegateDetailsUpdateLogs = DelegateDetailsUpdateLog::where('event_id', $eventId)->where('event_category', $eventCategory)->orderBy('updated_date_time', 'ASC')->get();
+        $delegateDetailsUpdateLogs = DelegateDetailsUpdateLog::where('event_id', $eventId)->where('event_category', $eventCategory)->orderBy('updated_date_time', 'DESC')->get();
 
         foreach (config('app.eventCategories') as $eventCategoryC => $code) {
             if ($eventCategory == $eventCategoryC) {
