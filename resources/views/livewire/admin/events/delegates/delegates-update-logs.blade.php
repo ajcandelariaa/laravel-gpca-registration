@@ -26,7 +26,7 @@
                         <div class="col-span-1 break-words text-sm">
                             <a href="{{ route('admin.event.delegates.detail.view', ['eventCategory' => $event->category, 'eventId' => $event->id, 'delegateType' => $delegateLog['delegateType'], 'delegateId' => $delegateLog['delegateId']]) }}"
                                 target="_blank" class="text-blue-700 font-semibold hover:underline">
-                                {{ $delegateLog['delegateTransactionId'] }}
+                                {{ $delegateLog['transactionId'] }}
                             </a>
                         </div>
 
