@@ -181,7 +181,7 @@ class DigitalHelper extends Component
                     }
                 }
     
-                $howToCollectYourBadge = `Please proceed to the Exhibition Foyer and line up at counter "$counterGroup". You can find the counter assignment based on your company's first letter in the image below`;
+                $howToCollectYourBadge = "Please proceed to the Exhibition Foyer and line up at counter '{$counterKey}'. You can find the counter assignment based on your company's first letter in the image below";
             } else {
                 $howToCollectYourBadge = "Please proceed to the Exhibition Foyer and you can look for the fast track counter to print your badge";
             }
@@ -244,7 +244,7 @@ class DigitalHelper extends Component
                         $isPrinted = false;
                         $isCollected = false;
                         $isCollectedBy = null;
-
+                        dd($mainDelegate->printedBadges);
                         if ($mainDelegate->printedBadges->isNotEmpty()) {
                             foreach ($mainDelegate->printedBadges as $printedBadge) {
                                 $isPrinted = true;
@@ -259,7 +259,7 @@ class DigitalHelper extends Component
                         $visuals = [];
                         $howToCollectYourBadge = null;
 
-                        if ($isCollected) {
+                        if ($isCollectedBy != null) {
                             $howToCollectYourBadge = $isCollectedBy;
                         } else {
                             $data = $this->getTextAndVisualDetails($companyName, $mainDelegate->badge_type, $isPrinted);
@@ -318,7 +318,7 @@ class DigitalHelper extends Component
                                 $visuals = [];
                                 $howToCollectYourBadge = null;
 
-                                if ($isCollected) {
+                                if ($isCollectedBy != null) {
                                     $howToCollectYourBadge = $isCollectedBy;
                                 } else {
                                     $data = $this->getTextAndVisualDetails($companyName, $subDelegate->badge_type, $isPrinted);
