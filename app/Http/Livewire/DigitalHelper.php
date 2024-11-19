@@ -354,6 +354,7 @@ class DigitalHelper extends Component
 
         $this->confirmedDelegates = $allDelegates;
         $this->dispatchBrowserEvent('remove-dh-loading-screen');
+        dd($this->confirmedDelegates);
     }
 
     function formatFullName($name)
