@@ -204,7 +204,7 @@ class DigitalHelper extends Component
                 $howToCollectYourBadge = "Please proceed to the Madinat Al Ifran Theatre Foyer and line up at counter '$counterGroup'. You can find the counter assignment based on your company's first letter in the image below";
             }
         } else {
-            $howToCollectYourBadge = `Please proceed to the Exhibition Foyer and you can look for the fast track counter to print your badge`;
+            $howToCollectYourBadge = "Please proceed to the Exhibition Foyer and you can look for the fast track counter to print your badge";
         }
         
 
