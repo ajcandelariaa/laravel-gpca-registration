@@ -160,7 +160,7 @@ class DigitalHelper extends Component
             'ABCDEFGHIJ' => [],
             'KLMNOPQRSTUVWXYZ' => [],
         ];
-
+        dd($isPrinted);
         if($isPrinted){
             if (strtoupper($badgeType) == "VIP" || strtoupper($badgeType) == "SPEAKER") {
                 $imageLinks = [
