@@ -244,12 +244,11 @@ class DigitalHelper extends Component
                         $isPrinted = false;
                         $isCollected = false;
                         $isCollectedBy = null;
-                        dd($mainDelegate->printedBadges);
                         if ($mainDelegate->printedBadges->isNotEmpty()) {
                             foreach ($mainDelegate->printedBadges as $printedBadge) {
                                 $isPrinted = true;
-
-                                if ($printedBadge->collected) {
+                                dd($printedBadge->collected_by);
+                                if ($printedBadge->collected_by) {
                                     $isCollected = true;
                                     $isCollectedBy = $printedBadge->collected_by;
                                 }
@@ -354,7 +353,6 @@ class DigitalHelper extends Component
 
         $this->confirmedDelegates = $allDelegates;
         $this->dispatchBrowserEvent('remove-dh-loading-screen');
-        dd($this->confirmedDelegates);
     }
 
     function formatFullName($name)
