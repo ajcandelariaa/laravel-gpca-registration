@@ -119,7 +119,7 @@ class DigitalHelper extends Component
     }
 
 
-    public function getTextAndVisualDetails($companyName, $badgeType)
+    public function getTextAndVisualDetails($companyName, $badgeType, $isPrinted)
     {
         $firstLetter = strtoupper(substr($companyName, 0, 1));
         $howToCollectYourBadge = null;
@@ -161,47 +161,52 @@ class DigitalHelper extends Component
             'KLMNOPQRSTUVWXYZ' => [],
         ];
 
-        if (strtoupper($badgeType) == "VIP" || strtoupper($badgeType) == "SPEAKER") {
-            $imageLinks = [
-                'https://www.gpcaforum.com/wp-content/uploads/2024/10/Madinat-Al-Ifran-Theatre-Foyer.png',
-                'https://www.gpcaforum.com/wp-content/uploads/2024/10/VIP-and-Speakers.png',
-            ];
-            $howToCollectYourBadge = `Please proceed to the Madinat Al Ifran Theatre Foyer and line up at counter "VIP/SPEAKERS". You can find the counter assignment in the image below:`;
-        } else if (strtoupper($badgeType) == "EXHIBITOR") {
-            $counterGroup = null;
-            foreach ($letterCounters2 as $counterKey => $counter) {
-                $counterArrayOfLetters = str_split($counterKey);
-                foreach ($counterArrayOfLetters as $letter) {
-                    if ($firstLetter == $letter) {
-                        $counterGroup = $counterKey;
-                        $imageLinks = $counter;
-                        break;
+        if($isPrinted){
+            if (strtoupper($badgeType) == "VIP" || strtoupper($badgeType) == "SPEAKER") {
+                $imageLinks = [
+                    'https://www.gpcaforum.com/wp-content/uploads/2024/10/Madinat-Al-Ifran-Theatre-Foyer.png',
+                    'https://www.gpcaforum.com/wp-content/uploads/2024/10/VIP-and-Speakers.png',
+                ];
+                $howToCollectYourBadge = `Please proceed to the Madinat Al Ifran Theatre Foyer and line up at counter "VIP/SPEAKERS". You can find the counter assignment in the image below:`;
+            } else if (strtoupper($badgeType) == "EXHIBITOR") {
+                $counterGroup = null;
+                foreach ($letterCounters2 as $counterKey => $counter) {
+                    $counterArrayOfLetters = str_split($counterKey);
+                    foreach ($counterArrayOfLetters as $letter) {
+                        if ($firstLetter == $letter) {
+                            $counterGroup = $counterKey;
+                            $imageLinks = $counter;
+                            break;
+                        }
                     }
                 }
-            }
-
-            $howToCollectYourBadge = `Please proceed to the Exhibition Foyer and line up at counter "$counterGroup". You can find the counter assignment based on your company's first letter in the image below`;
-        } else if (strtoupper($badgeType) == "YOUTH COUNCIL" || strtoupper($badgeType) == "YOUTH FORUM"){
-            $imageLinks = [
-                'https://www.gpcaforum.com/wp-content/uploads/2024/10/Madinat-Al-Ifran-Theatre-Foyer.png',
-                'https://www.gpcaforum.com/wp-content/uploads/2024/10/Youth.png',
-            ];
-            $howToCollectYourBadge = `Please proceed to the Madinat Al Ifran Theatre Foyer and line up at counter "Youth". You can find the counter assignment in the image below:`;
-        } else  {
-            $counterGroup = null;
-            foreach ($letterCounters1 as $counterKey => $counter) {
-                $counterArrayOfLetters = str_split($counterKey);
-                foreach ($counterArrayOfLetters as $letter) {
-                    if ($firstLetter == $letter) {
-                        $counterGroup = $counterKey;
-                        $imageLinks = $counter;
-                        break;
+    
+                $howToCollectYourBadge = `Please proceed to the Exhibition Foyer and line up at counter "$counterGroup". You can find the counter assignment based on your company's first letter in the image below`;
+            } else if (strtoupper($badgeType) == "YOUTH COUNCIL" || strtoupper($badgeType) == "YOUTH FORUM"){
+                $imageLinks = [
+                    'https://www.gpcaforum.com/wp-content/uploads/2024/10/Madinat-Al-Ifran-Theatre-Foyer.png',
+                    'https://www.gpcaforum.com/wp-content/uploads/2024/10/Youth.png',
+                ];
+                $howToCollectYourBadge = `Please proceed to the Madinat Al Ifran Theatre Foyer and line up at counter "Youth". You can find the counter assignment in the image below:`;
+            } else  {
+                $counterGroup = null;
+                foreach ($letterCounters1 as $counterKey => $counter) {
+                    $counterArrayOfLetters = str_split($counterKey);
+                    foreach ($counterArrayOfLetters as $letter) {
+                        if ($firstLetter == $letter) {
+                            $counterGroup = $counterKey;
+                            $imageLinks = $counter;
+                            break;
+                        }
                     }
                 }
+    
+                $howToCollectYourBadge = "Please proceed to the Madinat Al Ifran Theatre Foyer and line up at counter '$counterGroup'. You can find the counter assignment based on your company's first letter in the image below";
             }
-
-            $howToCollectYourBadge = "Please proceed to the Madinat Al Ifran Theatre Foyer and line up at counter '$counterGroup'. You can find the counter assignment based on your company's first letter in the image below";
+        } else {
+            $howToCollectYourBadge = `Please proceed to the Exhibition Foyer and you can look for the fast track counter to print your badge`;
         }
+        
 
         return [
             'howToCollectYourBadge' => $howToCollectYourBadge,
@@ -254,7 +259,7 @@ class DigitalHelper extends Component
                         if ($isCollected) {
                             $howToCollectYourBadge = $isCollectedBy;
                         } else {
-                            $data = $this->getTextAndVisualDetails($companyName, $mainDelegate->badge_type);
+                            $data = $this->getTextAndVisualDetails($companyName, $mainDelegate->badge_type, $isPrinted);
                             $howToCollectYourBadge = $data['howToCollectYourBadge'];
                             $visuals = $data['imageLinks'];
                         }
@@ -310,10 +315,10 @@ class DigitalHelper extends Component
                                 $visuals = [];
                                 $howToCollectYourBadge = null;
 
-                                if ($isCollectedBy != null) {
+                                if ($isCollected) {
                                     $howToCollectYourBadge = $isCollectedBy;
                                 } else {
-                                    $data = $this->getTextAndVisualDetails($companyName, $subDelegate->badge_type);
+                                    $data = $this->getTextAndVisualDetails($companyName, $subDelegate->badge_type, $isPrinted);
                                     $howToCollectYourBadge = $data['howToCollectYourBadge'];
                                     $visuals = $data['imageLinks'];
                                 }
