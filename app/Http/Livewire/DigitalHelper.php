@@ -121,8 +121,6 @@ class DigitalHelper extends Component
 
     public function getTextAndVisualDetails($companyName, $badgeType, $isPrinted)
     {
-        $firstLetter = strtoupper(substr($companyName, 0, 1));
-
         $letterCounters1 = [
             'ABCD' => [
                 'https://www.gpcaforum.com/wp-content/uploads/2024/10/Madinat-Al-Ifran-Theatre-Foyer.png',
@@ -161,6 +159,7 @@ class DigitalHelper extends Component
 
         $howToCollectYourBadge = null;
         $imageLinks = [];
+        $firstLetter = strtoupper(substr($companyName, 0, 1));
 
         if (strtoupper($badgeType) == "VIP" || strtoupper($badgeType) == "SPEAKER") {
             $imageLinks = [
@@ -179,6 +178,9 @@ class DigitalHelper extends Component
                             $imageLinks = $counter;
                             break;
                         }
+                    }
+                    if($counter != null){
+                        break;
                     }
                 }
     
@@ -204,6 +206,9 @@ class DigitalHelper extends Component
                             $imageLinks = $counter;
                             break;
                         }
+                    }
+                    if($counter != null){
+                        break;
                     }
                 }
     
