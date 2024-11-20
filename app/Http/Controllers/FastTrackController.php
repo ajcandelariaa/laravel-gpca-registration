@@ -234,6 +234,58 @@ class FastTrackController extends Controller
         }
     }
 
+    public function markAsCollected(Request $request, $eventCategory, $eventYear)
+    {
+        $validator = Validator::make($request->all(), [
+            'code' => 'required|string',
+            'delegateId' => 'required|numeric',
+            'delegateType' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        if ($request->code == env("API_CODE")) {
+            $eventId = Event::where('category', $eventCategory)->where('year', $eventYear)->value('id');
+            if ($eventId != null) {
+                $delegateType = $request->delegateType;
+                $delegateId = $request->delegateId;
+                $collectedBy = $request->collectedBy;
+
+                $printedDelegate = PrintedBadge::where('event_id', $eventId)->where('delegate_id', $delegateId)->where('delegate_type', $delegateType)->first();
+
+                if ($printedDelegate != null) {
+                    PrintedBadge::where('event_id', $eventId)->where('delegate_id', $delegateId)->where('delegate_type', $delegateType)
+                    ->update([
+                        'collected' => true,
+                        'collected_by' => $collectedBy,
+                        'collected_marked_datetime' => Carbon::now(),
+                    ]);
+                    
+                    return response()->json([
+                        'message' => 'Success',
+                    ], 200);
+                } else {
+                    return response()->json([
+                        'message' => "Badge is not yet printed",
+                    ], 404);
+                }
+            } else {
+                return response()->json([
+                    'message' => "Event doesn't exist",
+                ], 404);
+            }
+        } else {
+            return response()->json([
+                'message' => "Unauthorized!",
+            ], 401);
+        }
+    }
+
     public function updateDetails(Request $request, $eventCategory, $eventYear)
     {
         $validator = Validator::make($request->all(), [
