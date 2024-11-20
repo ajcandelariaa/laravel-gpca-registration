@@ -122,8 +122,6 @@ class DigitalHelper extends Component
     public function getTextAndVisualDetails($companyName, $badgeType, $isPrinted)
     {
         $firstLetter = strtoupper(substr($companyName, 0, 1));
-        $howToCollectYourBadge = null;
-        $imageLinks = [];
 
         $letterCounters1 = [
             'ABCD' => [
@@ -161,14 +159,17 @@ class DigitalHelper extends Component
             'KLMNOPQRSTUVWXYZ' => [],
         ];
 
+        $howToCollectYourBadge = null;
+        $imageLinks = [];
+
         if (strtoupper($badgeType) == "VIP" || strtoupper($badgeType) == "SPEAKER") {
             $imageLinks = [
                 'https://www.gpcaforum.com/wp-content/uploads/2024/10/Madinat-Al-Ifran-Theatre-Foyer.png',
                 'https://www.gpcaforum.com/wp-content/uploads/2024/10/VIP-and-Speakers.png',
             ];
-            $howToCollectYourBadge = `Please proceed to the Madinat Al Ifran Theatre Foyer and line up at counter "VIP/SPEAKERS". You can find the counter assignment in the image below:`;
+            $howToCollectYourBadge = "Please proceed to the Madinat Al Ifran Theatre Foyer and line up at counter \"VIP/SPEAKERS\". You can find the counter assignment in the image below:";
         } else if (strtoupper($badgeType) == "EXHIBITOR") {
-            if($isPrinted){
+            if($isPrinted == true){
                 $counterGroup = null;
                 foreach ($letterCounters2 as $counterKey => $counter) {
                     $counterArrayOfLetters = str_split($counterKey);
@@ -183,6 +184,7 @@ class DigitalHelper extends Component
     
                 $howToCollectYourBadge = "Please proceed to the Exhibition Foyer and line up at counter '{$counterKey}'. You can find the counter assignment based on your company's first letter in the image below";
             } else {
+                $imageLinks = [];
                 $howToCollectYourBadge = "Please proceed to the Exhibition Foyer and you can look for the fast track counter to print your badge";
             }
         } else if (strtoupper($badgeType) == "YOUTH COUNCIL" || strtoupper($badgeType) == "YOUTH FORUM") {
@@ -190,9 +192,9 @@ class DigitalHelper extends Component
                 'https://www.gpcaforum.com/wp-content/uploads/2024/10/Madinat-Al-Ifran-Theatre-Foyer.png',
                 'https://www.gpcaforum.com/wp-content/uploads/2024/10/Youth.png',
             ];
-            $howToCollectYourBadge = `Please proceed to the Madinat Al Ifran Theatre Foyer and line up at counter "Youth". You can find the counter assignment in the image below:`;
+            $howToCollectYourBadge = "Please proceed to the Madinat Al Ifran Theatre Foyer and line up at counter \"Youth\". You can find the counter assignment in the image below:";
         } else {
-            if($isPrinted){
+            if($isPrinted == true){
                 $counterGroup = null;
                 foreach ($letterCounters1 as $counterKey => $counter) {
                     $counterArrayOfLetters = str_split($counterKey);
@@ -207,6 +209,7 @@ class DigitalHelper extends Component
     
                 $howToCollectYourBadge = "Please proceed to the Madinat Al Ifran Theatre Foyer and line up at counter '$counterGroup'. You can find the counter assignment based on your company's first letter in the image below";
             } else {
+                $imageLinks = [];
                 $howToCollectYourBadge = "Please proceed to the Exhibition Foyer and you can look for the fast track counter to print your badge";
             }
         }
@@ -221,7 +224,7 @@ class DigitalHelper extends Component
     public function fetchConfirmedDelgates()
     {
         $allDelegates = array();
-        $mainDelegates = MainDelegates::with(['additionalDelegates', 'transaction', 'printedBadges', 'scannedBadges'])->where('event_id', $this->event->id)->get();
+        $mainDelegates = MainDelegates::with(['additionalDelegates', 'transaction', 'printedBadges', 'scannedBadges'])->where('event_id', $this->event->id)->limit(400)->get();
         if ($mainDelegates->isNotEmpty()) {
             foreach ($mainDelegates as $mainDelegate) {
 
@@ -247,7 +250,7 @@ class DigitalHelper extends Component
                         if ($mainDelegate->printedBadges->isNotEmpty()) {
                             foreach ($mainDelegate->printedBadges as $printedBadge) {
                                 $isPrinted = true;
-                                dd($printedBadge->collected_by);
+
                                 if ($printedBadge->collected_by) {
                                     $isCollected = true;
                                     $isCollectedBy = $printedBadge->collected_by;
@@ -325,7 +328,6 @@ class DigitalHelper extends Component
                                     $visuals = $data['imageLinks'];
                                 }
 
-
                                 $finalDelegate = [
                                     'transactionId' => $finalTransactionId,
                                     'name' => $this->formatFullName($name),
@@ -352,6 +354,7 @@ class DigitalHelper extends Component
         });
 
         $this->confirmedDelegates = $allDelegates;
+        dd($this->confirmedDelegates);
         $this->dispatchBrowserEvent('remove-dh-loading-screen');
     }
 
