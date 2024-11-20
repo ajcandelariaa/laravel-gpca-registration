@@ -77,6 +77,7 @@ class FastTrackController extends Controller
 
                     $delegatePrinted = $mainDelegate->printedBadge ? "Yes" : "No";
 
+                    $delegateBadgeCollected = "No";
                     if($delegatePrinted == "Yes"){
                         $delegateBadgeCollected = $mainDelegate->printedBadge->collected ? "Yes" : "No";
                     }
@@ -147,6 +148,7 @@ class FastTrackController extends Controller
 
                             $delegatePrinted = $subDelegate->printedBadge ? "Yes" : "No";
 
+                            $delegateBadgeCollected = "No";
                             if($delegatePrinted == "Yes"){
                                 $delegateBadgeCollected = $subDelegate->printedBadge->collected ? "Yes" : "No";
                             }
