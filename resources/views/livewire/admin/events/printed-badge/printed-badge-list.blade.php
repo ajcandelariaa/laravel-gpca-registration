@@ -24,10 +24,12 @@
                 <div class="col-span-1 break-words">Invoice</div>
                 <div class="col-span-2 break-words">Name</div>
                 <div class="col-span-1 break-words">Company</div>
-                <div class="col-span-2 break-words">Email Address</div>
+                <div class="col-span-1 break-words">Email Address</div>
                 <div class="col-span-1 break-words">Registration type</div>
                 <div class="col-span-1 break-words">Print Count</div>
-                <div class="col-span-2 break-words">Printed Date Time</div>
+                <div class="col-span-1 break-words">Is Collected</div>
+                <div class="col-span-1 break-words">Collected by</div>
+                <div class="col-span-1 break-words">Printed Date Time</div>
             </div>
 
             @if (empty($finalListsOfDelegates))
@@ -60,7 +62,7 @@
                             {{ $finalListsOfDelegate['delegateCompany'] }}
                         </div>
 
-                        <div class="col-span-2 break-words">
+                        <div class="col-span-1 break-words">
                             {{ $finalListsOfDelegate['delegateEmailAddress'] }}
                         </div>
 
@@ -72,7 +74,15 @@
                             {{ $finalListsOfDelegate['delegatePrintBadgeCount'] }}
                         </div>
 
-                        <div class="col-span-2 break-words">
+                        <div class="col-span-1 break-words">
+                            {{ $finalListsOfDelegate['delegateBadgeIsCollected'] }}
+                        </div>
+
+                        <div class="col-span-1 break-words">
+                            {{ $finalListsOfDelegate['delegateBadgeCollectedBy'] }}
+                        </div>
+
+                        <div class="col-span-1 break-words">
                             {{ $finalListsOfDelegate['delegatePrintedDateTime'] }}
                         </div>
                     </div>

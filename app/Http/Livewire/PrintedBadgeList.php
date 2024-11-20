@@ -66,6 +66,8 @@ class PrintedBadgeList extends Component
                             'delegateBadgeType' => $mainDelegate->badge_type,
                             'delegatePrintBadgeCount' => 1,
                             'delegatePrintedDateTime' => $printedBadge->printed_date_time,
+                            'delegateBadgeIsCollected' => $printedBadge->collected,
+                            'delegateBadgeCollectedBy' => $printedBadge->collected_by ?? "N/A",
                         ]);
                     }
 
@@ -107,6 +109,8 @@ class PrintedBadgeList extends Component
                             'delegateBadgeType' => $additionalDelegate->badge_type,
                             'delegatePrintBadgeCount' => 1,
                             'delegatePrintedDateTime' => $printedBadge->printed_date_time,
+                            'delegateBadgeIsCollected' => $printedBadge->collected,
+                            'delegateBadgeCollectedBy' => $printedBadge->collected_by ?? "N/A",
                         ]);
                     }
                 }
