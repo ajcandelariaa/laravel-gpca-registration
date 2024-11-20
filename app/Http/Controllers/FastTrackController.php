@@ -283,7 +283,7 @@ class FastTrackController extends Controller
                     } else {
                         PrintedBadge::where('event_id', $eventId)->where('delegate_id', $delegateId)->where('delegate_type', $delegateType)
                         ->update([
-                            'collected' => null,
+                            'collected' => false,
                             'collected_by' => null,
                             'collected_marked_datetime' => null,
                         ]);
