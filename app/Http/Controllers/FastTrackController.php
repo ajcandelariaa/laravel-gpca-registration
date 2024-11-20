@@ -77,6 +77,10 @@ class FastTrackController extends Controller
 
                     $delegatePrinted = $mainDelegate->printedBadge ? "Yes" : "No";
 
+                    if($delegatePrinted == "Yes"){
+                        $delegateBadgeCollected = $mainDelegate->printedBadge->collected ? "Yes" : "No";
+                    }
+
                     array_push($confirmedDelegates, [
                         'transactionId' => $finalTransactionId,
                         'id' => $mainDelegate->id,
@@ -95,6 +99,7 @@ class FastTrackController extends Controller
                         'frontTextBGColor' => $finalFrontTextBGColor,
                         'seatNumber' => $mainDelegate->seat_number ? $mainDelegate->seat_number : "N/A",
 
+                        'isCollected' => $delegateBadgeCollected,
                         'isPrinted' => $delegatePrinted,
                         'printedCount' => count($mainDelegate->printedBadges),
                         'paidDateTime' => $mainDelegate->paid_date_time, //"Y-m-d H:i:s"
@@ -142,6 +147,10 @@ class FastTrackController extends Controller
 
                             $delegatePrinted = $subDelegate->printedBadge ? "Yes" : "No";
 
+                            if($delegatePrinted == "Yes"){
+                                $delegateBadgeCollected = $subDelegate->printedBadge->collected ? "Yes" : "No";
+                            }
+
                             array_push($confirmedDelegates, [
                                 'transactionId' => $finalTransactionId,
                                 'id' => $subDelegate->id,
@@ -160,6 +169,7 @@ class FastTrackController extends Controller
                                 'frontTextBGColor' => $finalFrontTextBGColor,
                                 'seatNumber' => $subDelegate->seat_number ? $subDelegate->seat_number : "N/A",
 
+                                'isCollected' => $delegateBadgeCollected,
                                 'isPrinted' => $delegatePrinted,
                                 'printedCount' => count($subDelegate->printedBadges),
                                 'paidDateTime' => $mainDelegate->paid_date_time,
