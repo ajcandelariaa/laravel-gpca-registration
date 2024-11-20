@@ -246,12 +246,13 @@ class FastTrackController extends Controller
         }
     }
 
-    public function markAsCollected(Request $request, $eventCategory, $eventYear)
+    public function toggleBadgeCollected(Request $request, $eventCategory, $eventYear)
     {
         $validator = Validator::make($request->all(), [
             'code' => 'required|string',
             'delegateId' => 'required|numeric',
             'delegateType' => 'required|string',
+            'isBeingCollected' => 'required|string',
         ]);
 
         if ($validator->fails()) {
@@ -266,17 +267,27 @@ class FastTrackController extends Controller
             if ($eventId != null) {
                 $delegateType = $request->delegateType;
                 $delegateId = $request->delegateId;
+                $isBeingCollected = $request->isBeingCollected;
                 $collectedBy = $request->collectedBy;
 
                 $printedDelegate = PrintedBadge::where('event_id', $eventId)->where('delegate_id', $delegateId)->where('delegate_type', $delegateType)->first();
 
                 if ($printedDelegate != null) {
-                    PrintedBadge::where('event_id', $eventId)->where('delegate_id', $delegateId)->where('delegate_type', $delegateType)
-                    ->update([
-                        'collected' => true,
-                        'collected_by' => $collectedBy,
-                        'collected_marked_datetime' => Carbon::now(),
-                    ]);
+                    if($isBeingCollected == "Yes"){
+                        PrintedBadge::where('event_id', $eventId)->where('delegate_id', $delegateId)->where('delegate_type', $delegateType)
+                        ->update([
+                            'collected' => true,
+                            'collected_by' => $collectedBy,
+                            'collected_marked_datetime' => Carbon::now(),
+                        ]);
+                    } else {
+                        PrintedBadge::where('event_id', $eventId)->where('delegate_id', $delegateId)->where('delegate_type', $delegateType)
+                        ->update([
+                            'collected' => null,
+                            'collected_by' => null,
+                            'collected_marked_datetime' => null,
+                        ]);
+                    }
                     
                     return response()->json([
                         'message' => 'Success',
