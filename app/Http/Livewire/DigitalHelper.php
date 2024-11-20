@@ -229,7 +229,7 @@ class DigitalHelper extends Component
     public function fetchConfirmedDelgates()
     {
         $allDelegates = array();
-        $mainDelegates = MainDelegates::with(['additionalDelegates', 'transaction', 'printedBadges', 'scannedBadges'])->where('event_id', $this->event->id)->limit(400)->get();
+        $mainDelegates = MainDelegates::with(['additionalDelegates', 'transaction', 'printedBadges', 'scannedBadges'])->where('event_id', $this->event->id)->get();
         if ($mainDelegates->isNotEmpty()) {
             foreach ($mainDelegates as $mainDelegate) {
 
