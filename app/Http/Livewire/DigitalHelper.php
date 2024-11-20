@@ -179,7 +179,7 @@ class DigitalHelper extends Component
                             break;
                         }
                     }
-                    if($counter != null){
+                    if($counterGroup != null){
                         break;
                     }
                 }
@@ -207,7 +207,7 @@ class DigitalHelper extends Component
                             break;
                         }
                     }
-                    if($counter != null){
+                    if($counterGroup != null){
                         break;
                     }
                 }
