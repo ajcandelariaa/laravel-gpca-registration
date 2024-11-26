@@ -29,11 +29,12 @@ class EmailBroadcast extends Component
     {
         $this->event = Events::where('id', $eventId)->where('category', $eventCategory)->first();
 
-        if ($eventCategory == "AFV") {
-            $this->allDelegates = $this->getAllVisitors();
-        } else {
-            $this->allDelegates = $this->getAllDelegates();
-        }
+        // if ($eventCategory == "AFV") {
+        //     $this->allDelegates = $this->getAllVisitors();
+        // } else {
+        //     $this->allDelegates = $this->getAllDelegates();
+        // }
+        $this->allDelegates = $this->getAllDelegates();
     }
 
     public function render()
@@ -89,7 +90,8 @@ class EmailBroadcast extends Component
                 'registrationStatus' => $this->allDelegates[$i]['registrationStatus'],
                 'fullName' => $this->allDelegates[$i]['fullName'],
                 'companyName' => $this->allDelegates[$i]['companyName'],
-                'jobTitle' => $this->allDelegates[$i]['jobTitle'],
+                'companyName' => $this->allDelegates[$i]['companyName'],
+                'badgeType' => $this->allDelegates[$i]['badgeType'],
                 'transactionId' => $this->allDelegates[$i]['transactionId'],
                 'qrCodeForPrint' => $this->allDelegates[$i]['qrCodeForPrint'],
                 'emailAddress' => $this->allDelegates[$i]['emailAddress'],
@@ -101,36 +103,52 @@ class EmailBroadcast extends Component
                 Mail::to(config('app.ccEmailNotif.error'))->send(new MailEmailBroadcast($details));
             }
 
-            if($this->event->category == "AFV"){
-                $visitorId = $this->allDelegates[$i]['delegateId'];
-                $visitorType = $this->allDelegates[$i]['delegateType'];
-    
-                if($visitorType == "main"){
-                    MainVisitors::find($visitorId)->fill([
-                        'email_broadcast_sent_count' => $this->allDelegates[$i]['emailBroadcastSentCount'] + 1,
-                        'email_broadcast_sent_datetime' => Carbon::now(),
-                    ])->save();
-                } else {
-                    AdditionalVisitors::find($visitorId)->fill([
-                        'email_broadcast_sent_count' => $this->allDelegates[$i]['emailBroadcastSentCount'] + 1,
-                        'email_broadcast_sent_datetime' => Carbon::now(),
-                    ])->save();
-                }
+            // if($this->event->category == "AFV"){
+            //     $visitorId = $this->allDelegates[$i]['delegateId'];
+            //     $visitorType = $this->allDelegates[$i]['delegateType'];
+
+            //     if($visitorType == "main"){
+            //         MainVisitors::find($visitorId)->fill([
+            //             'email_broadcast_sent_count' => $this->allDelegates[$i]['emailBroadcastSentCount'] + 1,
+            //             'email_broadcast_sent_datetime' => Carbon::now(),
+            //         ])->save();
+            //     } else {
+            //         AdditionalVisitors::find($visitorId)->fill([
+            //             'email_broadcast_sent_count' => $this->allDelegates[$i]['emailBroadcastSentCount'] + 1,
+            //             'email_broadcast_sent_datetime' => Carbon::now(),
+            //         ])->save();
+            //     }
+            // } else {
+            //     $delegateId = $this->allDelegates[$i]['delegateId'];
+            //     $delegateType = $this->allDelegates[$i]['delegateType'];
+
+            //     if($delegateType == "main"){
+            //         MainDelegates::find($delegateId)->fill([
+            //             'email_broadcast_sent_count' => $this->allDelegates[$i]['emailBroadcastSentCount'] + 1,
+            //             'email_broadcast_sent_datetime' => Carbon::now(),
+            //         ])->save();
+            //     } else {
+            //         AdditionalDelegates::find($delegateId)->fill([
+            //             'email_broadcast_sent_count' => $this->allDelegates[$i]['emailBroadcastSentCount'] + 1,
+            //             'email_broadcast_sent_datetime' => Carbon::now(),
+            //         ])->save();
+            //     }
+            // }
+
+
+            $delegateId = $this->allDelegates[$i]['delegateId'];
+            $delegateType = $this->allDelegates[$i]['delegateType'];
+
+            if ($delegateType == "main") {
+                MainDelegates::find($delegateId)->fill([
+                    'email_broadcast_sent_count' => $this->allDelegates[$i]['emailBroadcastSentCount'] + 1,
+                    'email_broadcast_sent_datetime' => Carbon::now(),
+                ])->save();
             } else {
-                $delegateId = $this->allDelegates[$i]['delegateId'];
-                $delegateType = $this->allDelegates[$i]['delegateType'];
-    
-                if($delegateType == "main"){
-                    MainDelegates::find($delegateId)->fill([
-                        'email_broadcast_sent_count' => $this->allDelegates[$i]['emailBroadcastSentCount'] + 1,
-                        'email_broadcast_sent_datetime' => Carbon::now(),
-                    ])->save();
-                } else {
-                    AdditionalDelegates::find($delegateId)->fill([
-                        'email_broadcast_sent_count' => $this->allDelegates[$i]['emailBroadcastSentCount'] + 1,
-                        'email_broadcast_sent_datetime' => Carbon::now(),
-                    ])->save();
-                }
+                AdditionalDelegates::find($delegateId)->fill([
+                    'email_broadcast_sent_count' => $this->allDelegates[$i]['emailBroadcastSentCount'] + 1,
+                    'email_broadcast_sent_datetime' => Carbon::now(),
+                ])->save();
             }
 
             $this->allDelegates[$i]['highlight'] = false;
@@ -150,7 +168,6 @@ class EmailBroadcast extends Component
     }
 
 
-
     public function sendEmailConfirmation($arrayIndex)
     {
         $this->sendOneEmailArrayIndex = $arrayIndex;
@@ -163,6 +180,7 @@ class EmailBroadcast extends Component
             'companyName' => $this->allDelegates[$this->sendOneEmailArrayIndex]['companyName'],
             'jobTitle' => $this->allDelegates[$this->sendOneEmailArrayIndex]['jobTitle'],
             'transactionId' => $this->allDelegates[$this->sendOneEmailArrayIndex]['transactionId'],
+            'badgeType' => $this->allDelegates[$this->sendOneEmailArrayIndex]['badgeType'],
             'qrCodeForPrint' => $this->allDelegates[$this->sendOneEmailArrayIndex]['qrCodeForPrint'],
             'emailAddress' => $this->allDelegates[$this->sendOneEmailArrayIndex]['emailAddress'],
         ];
@@ -173,11 +191,11 @@ class EmailBroadcast extends Component
             Mail::to(config('app.ccEmailNotif.error'))->send(new MailEmailBroadcast($details));
         }
 
-        if($this->event->category == "AFV"){
+        if ($this->event->category == "AFV") {
             $visitorId = $this->allDelegates[$this->sendOneEmailArrayIndex]['delegateId'];
             $visitorType = $this->allDelegates[$this->sendOneEmailArrayIndex]['delegateType'];
 
-            if($visitorType == "main"){
+            if ($visitorType == "main") {
                 MainVisitors::find($visitorId)->fill([
                     'email_broadcast_sent_count' => $this->allDelegates[$this->sendOneEmailArrayIndex]['emailBroadcastSentCount'] + 1,
                     'email_broadcast_sent_datetime' => Carbon::now(),
@@ -192,7 +210,7 @@ class EmailBroadcast extends Component
             $delegateId = $this->allDelegates[$this->sendOneEmailArrayIndex]['delegateId'];
             $delegateType = $this->allDelegates[$this->sendOneEmailArrayIndex]['delegateType'];
 
-            if($delegateType == "main"){
+            if ($delegateType == "main") {
                 MainDelegates::find($delegateId)->fill([
                     'email_broadcast_sent_count' => $this->allDelegates[$this->sendOneEmailArrayIndex]['emailBroadcastSentCount'] + 1,
                     'email_broadcast_sent_datetime' => Carbon::now(),
@@ -273,6 +291,7 @@ class EmailBroadcast extends Component
                     'jobTitle' => $mainDelegate->job_title,
                     'emailAddress' => $mainDelegate->email_address,
                     'transactionId' => $finalTransactionId,
+                    'badgeType' => $mainDelegate->badge_type,
                     'qrCodeForPrint' => $qrCodeForPrint,
                     'emailBroadcastSentCount' => $mainDelegate->email_broadcast_sent_count,
                     'emailBroadcastLastSent' => $lastEmailSent,
@@ -310,6 +329,7 @@ class EmailBroadcast extends Component
                                 'jobTitle' => $additionalDelegate->job_title,
                                 'emailAddress' => $additionalDelegate->email_address,
                                 'transactionId' => $finalTransactionId,
+                                'badgeType' => $additionalDelegate->badge_type,
                                 'qrCodeForPrint' => $qrCodeForPrint,
                                 'emailBroadcastSentCount' => $additionalDelegate->email_broadcast_sent_count,
                                 'emailBroadcastLastSent' => $lastEmailSent,
@@ -330,101 +350,101 @@ class EmailBroadcast extends Component
 
 
 
-    public function getAllVisitors()
-    {
-        $tempArray = array();
+    // public function getAllVisitors()
+    // {
+    //     $tempArray = array();
 
-        foreach (config('app.eventCategories') as $eventCategoryC => $code) {
-            if ($this->event->category == $eventCategoryC) {
-                $eventCode = $code;
-            }
-        }
+    //     foreach (config('app.eventCategories') as $eventCategoryC => $code) {
+    //         if ($this->event->category == $eventCategoryC) {
+    //             $eventCode = $code;
+    //         }
+    //     }
 
-        $mainVisitors = MainVisitors::where('event_id', $this->event->id)->whereIn('registration_status', ['confirmed', 'pending'])->get();
+    //     $mainVisitors = MainVisitors::where('event_id', $this->event->id)->whereIn('registration_status', ['confirmed', 'pending'])->get();
 
-        foreach ($mainVisitors as $mainVisitor) {
-            if ($mainVisitor->alternative_company_name != null) {
-                $companyName = $mainVisitor->alternative_company_name;
-            } else {
-                $companyName = $mainVisitor->company_name;
-            }
-
-
-            if (!$mainVisitor->visitor_cancelled) {
-                $fullNameMain = $mainVisitor->first_name . ' ' . $mainVisitor->middle_name . ' ' . $mainVisitor->last_name;
-
-                $transactionId = VisitorTransactions::where('event_id', $this->event->id)->where('visitor_id', $mainVisitor->id)->where('visitor_type', "main")->value('id');
-                $lastDigit = 1000 + intval($transactionId);
-                $finalTransactionId = $this->event->year . $eventCode . $lastDigit;
+    //     foreach ($mainVisitors as $mainVisitor) {
+    //         if ($mainVisitor->alternative_company_name != null) {
+    //             $companyName = $mainVisitor->alternative_company_name;
+    //         } else {
+    //             $companyName = $mainVisitor->company_name;
+    //         }
 
 
-                $combinedStringPrint = "gpca@reg" . ',' . $this->event->id . ',' . $this->event->category . ',' . $mainVisitor->id . ',' . 'main';
-                $finalCryptStringPrint = Crypt::encryptString($combinedStringPrint);
-                $qrCodeForPrint = 'ca' . $finalCryptStringPrint . 'gp';
+    //         if (!$mainVisitor->visitor_cancelled) {
+    //             $fullNameMain = $mainVisitor->first_name . ' ' . $mainVisitor->middle_name . ' ' . $mainVisitor->last_name;
 
-                if ($mainVisitor->email_broadcast_sent_datetime != null) {
-                    $lastEmailSent = Carbon::parse($mainVisitor->email_broadcast_sent_datetime)->format('M j, Y g:iA');
-                } else {
-                    $lastEmailSent = 'N/A';
-                }
-
-                array_push($tempArray, [
-                    'delegateId' => $mainVisitor->id,
-                    'delegateType' => "main",
-                    'fullName' => $fullNameMain,
-                    'companyName' => $companyName,
-                    'jobTitle' => $mainVisitor->job_title,
-                    'emailAddress' => $mainVisitor->email_address,
-                    'transactionId' => $finalTransactionId,
-                    'qrCodeForPrint' => $qrCodeForPrint,
-                    'emailBroadcastSentCount' => $mainVisitor->email_broadcast_sent_count,
-                    'emailBroadcastLastSent' => $lastEmailSent,
-                    'registrationStatus' => $mainVisitor->registration_status,
-                    'highlight' => false,
-                ]);
-
-                $additionalVisitors = AdditionalVisitors::where('main_visitor_id', $mainVisitor->id)->get();
-
-                if ($additionalVisitors->isNotEmpty()) {
-                    foreach ($additionalVisitors as $additionalVisitor) {
-                        if (!$additionalVisitor->visitor_cancelled) {
-                            $fullNameSub = $additionalVisitor->first_name . ' ' . $additionalVisitor->middle_name . ' ' . $additionalVisitor->last_name;
-
-                            $transactionId = VisitorTransactions::where('event_id', $this->event->id)->where('visitor_id', $additionalVisitor->id)->where('visitor_type', "sub")->value('id');
-                            $lastDigit = 1000 + intval($transactionId);
-                            $finalTransactionId = $this->event->year . $eventCode . $lastDigit;
+    //             $transactionId = VisitorTransactions::where('event_id', $this->event->id)->where('visitor_id', $mainVisitor->id)->where('visitor_type', "main")->value('id');
+    //             $lastDigit = 1000 + intval($transactionId);
+    //             $finalTransactionId = $this->event->year . $eventCode . $lastDigit;
 
 
-                            $combinedStringPrint = "gpca@reg" . ',' . $this->event->id . ',' . $this->event->category . ',' . $additionalVisitor->id . ',' . 'sub';
-                            $finalCryptStringPrint = Crypt::encryptString($combinedStringPrint);
-                            $qrCodeForPrint = 'ca' . $finalCryptStringPrint . 'gp';
+    //             $combinedStringPrint = "gpca@reg" . ',' . $this->event->id . ',' . $this->event->category . ',' . $mainVisitor->id . ',' . 'main';
+    //             $finalCryptStringPrint = Crypt::encryptString($combinedStringPrint);
+    //             $qrCodeForPrint = 'ca' . $finalCryptStringPrint . 'gp';
 
-                            if ($additionalVisitor->email_broadcast_sent_datetime != null) {
-                                $lastEmailSent = Carbon::parse($additionalVisitor->email_broadcast_sent_datetime)->format('M j, Y g:iA');
-                            } else {
-                                $lastEmailSent = 'N/A';
-                            }
+    //             if ($mainVisitor->email_broadcast_sent_datetime != null) {
+    //                 $lastEmailSent = Carbon::parse($mainVisitor->email_broadcast_sent_datetime)->format('M j, Y g:iA');
+    //             } else {
+    //                 $lastEmailSent = 'N/A';
+    //             }
 
-                            array_push($tempArray, [
-                                'delegateId' => $additionalVisitor->id,
-                                'delegateType' => "sub",
-                                'fullName' => $fullNameSub,
-                                'companyName' => $companyName,
-                                'jobTitle' => $additionalVisitor->job_title,
-                                'emailAddress' => $additionalVisitor->email_address,
-                                'transactionId' => $finalTransactionId,
-                                'qrCodeForPrint' => $qrCodeForPrint,
-                                'emailBroadcastSentCount' => $additionalVisitor->email_broadcast_sent_count,
-                                'emailBroadcastLastSent' => $lastEmailSent,
-                                'registrationStatus' => $mainVisitor->registration_status,
-                                'highlight' => false,
-                            ]);
-                        }
-                    }
-                }
-            }
-        }
+    //             array_push($tempArray, [
+    //                 'delegateId' => $mainVisitor->id,
+    //                 'delegateType' => "main",
+    //                 'fullName' => $fullNameMain,
+    //                 'companyName' => $companyName,
+    //                 'jobTitle' => $mainVisitor->job_title,
+    //                 'emailAddress' => $mainVisitor->email_address,
+    //                 'transactionId' => $finalTransactionId,
+    //                 'qrCodeForPrint' => $qrCodeForPrint,
+    //                 'emailBroadcastSentCount' => $mainVisitor->email_broadcast_sent_count,
+    //                 'emailBroadcastLastSent' => $lastEmailSent,
+    //                 'registrationStatus' => $mainVisitor->registration_status,
+    //                 'highlight' => false,
+    //             ]);
 
-        return $tempArray;
-    }
+    //             $additionalVisitors = AdditionalVisitors::where('main_visitor_id', $mainVisitor->id)->get();
+
+    //             if ($additionalVisitors->isNotEmpty()) {
+    //                 foreach ($additionalVisitors as $additionalVisitor) {
+    //                     if (!$additionalVisitor->visitor_cancelled) {
+    //                         $fullNameSub = $additionalVisitor->first_name . ' ' . $additionalVisitor->middle_name . ' ' . $additionalVisitor->last_name;
+
+    //                         $transactionId = VisitorTransactions::where('event_id', $this->event->id)->where('visitor_id', $additionalVisitor->id)->where('visitor_type', "sub")->value('id');
+    //                         $lastDigit = 1000 + intval($transactionId);
+    //                         $finalTransactionId = $this->event->year . $eventCode . $lastDigit;
+
+
+    //                         $combinedStringPrint = "gpca@reg" . ',' . $this->event->id . ',' . $this->event->category . ',' . $additionalVisitor->id . ',' . 'sub';
+    //                         $finalCryptStringPrint = Crypt::encryptString($combinedStringPrint);
+    //                         $qrCodeForPrint = 'ca' . $finalCryptStringPrint . 'gp';
+
+    //                         if ($additionalVisitor->email_broadcast_sent_datetime != null) {
+    //                             $lastEmailSent = Carbon::parse($additionalVisitor->email_broadcast_sent_datetime)->format('M j, Y g:iA');
+    //                         } else {
+    //                             $lastEmailSent = 'N/A';
+    //                         }
+
+    //                         array_push($tempArray, [
+    //                             'delegateId' => $additionalVisitor->id,
+    //                             'delegateType' => "sub",
+    //                             'fullName' => $fullNameSub,
+    //                             'companyName' => $companyName,
+    //                             'jobTitle' => $additionalVisitor->job_title,
+    //                             'emailAddress' => $additionalVisitor->email_address,
+    //                             'transactionId' => $finalTransactionId,
+    //                             'qrCodeForPrint' => $qrCodeForPrint,
+    //                             'emailBroadcastSentCount' => $additionalVisitor->email_broadcast_sent_count,
+    //                             'emailBroadcastLastSent' => $lastEmailSent,
+    //                             'registrationStatus' => $mainVisitor->registration_status,
+    //                             'highlight' => false,
+    //                         ]);
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
+
+    //     return $tempArray;
+    // }
 }

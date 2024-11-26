@@ -39,8 +39,10 @@ class EmailBroadcast extends Mailable
             } else {
                 $subject = '17ᵗʰ Annual GPCA Forum - Registration & Badge Information';
             }
+        } else if ($this->details['eventYear'] == '2024') {
+            $subject = '18ᵗʰ Annual GPCA Forum - Registration & Badge Information';
         } else {
-            $subject = '17ᵗʰ Annual GPCA Forum - Registration & Badge Information';
+            $subject = 'Annual GPCA Forum - Registration & Badge Information';
         }
 
         return new Envelope(
@@ -75,6 +77,22 @@ class EmailBroadcast extends Mailable
                 } else {
                     return new Content(
                         markdown: 'emails.2023.visitor.pending-email-broadcast',
+                    );
+                }
+            } else {
+                return new Content(
+                    markdown: 'emails.email-broadcast',
+                );
+            }
+        } else if ($this->details['eventYear'] == '2024') {
+            if ($this->details['eventCategory'] == "AF") {
+                if($this->details['registrationStatus'] == "confirmed"){
+                    return new Content(
+                        markdown: 'emails.2024.af.confirm-email-broadcast',
+                    );
+                } else {
+                    return new Content(
+                        markdown: 'emails.2024.af.pending-email-broadcast',
                     );
                 }
             } else {
