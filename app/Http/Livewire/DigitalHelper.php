@@ -122,7 +122,7 @@ class DigitalHelper extends Component
     public function getTextAndVisualDetails($companyName, $badgeType, $isPrinted)
     {
         $letterCounters1 = [
-            'ABCD' => [
+            '3ABCD' => [
                 'https://www.gpcaforum.com/wp-content/uploads/2024/10/Madinat-Al-Ifran-Theatre-Foyer.png',
                 'https://www.gpcaforum.com/wp-content/uploads/2024/10/ABCD.png',
             ],
