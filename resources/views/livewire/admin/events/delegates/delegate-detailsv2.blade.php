@@ -105,13 +105,13 @@
                 <div class="grid grid-cols-delegateDetailGrid2 gap-y-2 items-center">
 
                     <p class="font-bold">Is Collected:</p>
-                    <p>{{ $finalDelegate['isCollected'] ? 'Yes' : 'No' }}</p>
+                    <p>{{ $isCollected ? 'Yes' : 'No' }}</p>
 
                     <p class="font-bold">Collected by:</p>
-                    <p>{{ $finalDelegate['collectedBy'] }}</p>
+                    <p>{{ $collectedBy }}</p>
 
                     <p class="font-bold">Collected Date & Time:</p>
-                    <p>{{ $finalDelegate['collectedDateTime'] }}</p>
+                    <p>{{ $collectedDateTime }}</p>
                 </div>
 
                 <hr class="my-6">
