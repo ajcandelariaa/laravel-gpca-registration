@@ -122,7 +122,7 @@ class DigitalHelper extends Component
     public function getTextAndVisualDetails($companyName, $badgeType, $isPrinted)
     {
         $letterCounters1 = [
-            '3ABCD' => [
+            'ABCD' => [
                 'https://www.gpcaforum.com/wp-content/uploads/2024/10/Madinat-Al-Ifran-Theatre-Foyer.png',
                 'https://www.gpcaforum.com/wp-content/uploads/2024/10/ABCD.png',
             ],
@@ -167,7 +167,7 @@ class DigitalHelper extends Component
                 'https://www.gpcaforum.com/wp-content/uploads/2024/10/VIP-and-Speakers.png',
             ];
             $howToCollectYourBadge = "Please proceed to the Madinat Al Ifran Theatre Foyer and line up at counter \"VIP/SPEAKERS\". You can find the counter assignment in the image below:";
-        } else if (strtoupper($badgeType) == "EXHIBITOR") {
+        } else if (strtoupper($badgeType) == "EXHIBITOR" || strtoupper($badgeType) == "MEDIA") {
             if($isPrinted == true){
                 $counterGroup = null;
                 foreach ($letterCounters2 as $counterKey => $counter) {
@@ -197,22 +197,31 @@ class DigitalHelper extends Component
             $howToCollectYourBadge = "Please proceed to the Madinat Al Ifran Theatre Foyer and line up at counter \"Youth\". You can find the counter assignment in the image below:";
         } else {
             if($isPrinted == true){
-                $counterGroup = null;
-                foreach ($letterCounters1 as $counterKey => $counter) {
-                    $counterArrayOfLetters = str_split($counterKey);
-                    foreach ($counterArrayOfLetters as $letter) {
-                        if ($firstLetter == $letter) {
-                            $counterGroup = $counterKey;
-                            $imageLinks = $counter;
+                if(strtoupper($companyName) == "3P GULF GROUP"){
+                    $imageLinks = [
+                        'https://www.gpcaforum.com/wp-content/uploads/2024/10/Madinat-Al-Ifran-Theatre-Foyer.png',
+                        'https://www.gpcaforum.com/wp-content/uploads/2024/10/OPQ.png',
+                    ];
+                    
+                    $howToCollectYourBadge = "Please proceed to the Madinat Al Ifran Theatre Foyer and line up at counter 'OPQ'. You can find the counter assignment based on your company's first letter in the image below";
+                } else {
+                    $counterGroup = null;
+                    foreach ($letterCounters1 as $counterKey => $counter) {
+                        $counterArrayOfLetters = str_split($counterKey);
+                        foreach ($counterArrayOfLetters as $letter) {
+                            if ($firstLetter == $letter) {
+                                $counterGroup = $counterKey;
+                                $imageLinks = $counter;
+                                break;
+                            }
+                        }
+                        if($counterGroup != null){
                             break;
                         }
                     }
-                    if($counterGroup != null){
-                        break;
-                    }
+        
+                    $howToCollectYourBadge = "Please proceed to the Madinat Al Ifran Theatre Foyer and line up at counter '$counterGroup'. You can find the counter assignment based on your company's first letter in the image below";
                 }
-    
-                $howToCollectYourBadge = "Please proceed to the Madinat Al Ifran Theatre Foyer and line up at counter '$counterGroup'. You can find the counter assignment based on your company's first letter in the image below";
             } else {
                 $imageLinks = [];
                 $howToCollectYourBadge = "Please proceed to the Exhibition Foyer and you can look for the fast track counter to print your badge";
