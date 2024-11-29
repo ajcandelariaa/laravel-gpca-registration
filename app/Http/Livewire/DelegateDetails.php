@@ -23,6 +23,8 @@ class DelegateDetails extends Component
 
     public $printedBadges, $scannedBadges, $updateLogs;
 
+    public $isCollected = false, $collectedBy = "N/A", $collectedDateTime = "N/A";
+
     public $scanDelegateUrl, $printBadgeDelegateUrl;
 
     public $seatNumber, $showEditSeatNumber;
@@ -35,7 +37,6 @@ class DelegateDetails extends Component
         $this->finalDelegate = $finalDelegate;
 
         $this->printedBadges = PrintedBadges::where('event_id', $eventId)->where('delegate_id', $finalDelegate['delegateId'])->where('delegate_type', $finalDelegate['delegateType'])->get();
-
 
         $this->scannedBadges = ScannedDelegates::where('event_id', $eventId)->where('delegate_id', $finalDelegate['delegateId'])->where('delegate_type', $finalDelegate['delegateType'])->get();
 
@@ -54,12 +55,22 @@ class DelegateDetails extends Component
         $finalCryptStringScan = base64_encode($combinedStringScan);
         $this->scanDelegateUrl = 'gpca'.$finalCryptStringScan;
 
-
         $combinedStringPrint = "gpca@reg" . ',' . $eventId . ',' . $eventCategory . ',' . $finalDelegate['delegateId'] . ',' . $finalDelegate['delegateType'];
         $finalCryptStringPrint = base64_encode($combinedStringPrint);
         $this->printBadgeDelegateUrl = 'ca' . $finalCryptStringPrint . 'gp';
 
         $this->updateLogs = DelegateDetailsUpdateLogs::where('event_id', $eventId)->where('delegate_id', $finalDelegate['delegateId'])->where('delegate_type', $finalDelegate['delegateType'])->get();
+
+        if($this->printedBadges->isNotEmpty()){
+            foreach($this->printedBadges as $printedBadge){
+                if($printedBadge->collected){
+                    $this->isCollected = true;
+                    $this->collectedBy = $printedBadge->collected_by;
+                    $this->collectedDateTime = $printedBadge->collected_marked_datetime;
+                    break;
+                }
+            }
+        }
 
         $this->showEditSeatNumber = false;
     }
