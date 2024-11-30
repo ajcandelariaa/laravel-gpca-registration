@@ -75,7 +75,14 @@ class FastTrackController extends Controller
                     $finalFrontTextBGColor = "#ffffff";
                     $finalFontTextColor = "#000000";
 
-                    $delegatePrinted = $mainDelegate->printedBadge ? "Yes" : "No";
+                    // $delegatePrinted = $mainDelegate->printedBadge ? "Yes" : "No";
+
+                    if($mainDelegate->printedBadges->isNotEmpty()){
+                        $delegatePrinted = "Yes";
+                    } else {
+                        $delegatePrinted = "No";
+                    }
+
 
                     $delegateBadgeCollected = "No";
                     if($delegatePrinted == "Yes"){
@@ -147,6 +154,14 @@ class FastTrackController extends Controller
                             $finalFontTextColor = "#000000";
 
                             $delegatePrinted = $subDelegate->printedBadge ? "Yes" : "No";
+
+                            // $delegatePrinted = $mainDelegate->printedBadge ? "Yes" : "No";
+        
+                            if($subDelegate->printedBadges->isNotEmpty()){
+                                $delegatePrinted = "Yes";
+                            } else {
+                                $delegatePrinted = "No";
+                            }
 
                             $delegateBadgeCollected = "No";
                             if($delegatePrinted == "Yes"){
