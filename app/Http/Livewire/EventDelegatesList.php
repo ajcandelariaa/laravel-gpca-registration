@@ -4,6 +4,7 @@ namespace App\Http\Livewire;
 
 use App\Models\MainDelegate as MainDelegates;
 use App\Models\Event as Events;
+use App\Models\PrintedBadge as PrintedBadges;
 use Carbon\Carbon;
 use Livewire\Component;
 
@@ -171,7 +172,21 @@ class EventDelegatesList extends Component
     }
 
 
+    public function markAsPrint($arrayIndex){
+        $delegateId = $this->finalListsOfDelegates[$arrayIndex]['delegateId'];
+        $delegateType = $this->finalListsOfDelegates[$arrayIndex]['delegateType'];
 
+        PrintedBadges::create([
+            'event_id' => $this->event->id,
+            'event_category' => $this->event->category,
+            'delegate_id' => $delegateId,
+            'delegate_type' => $delegateType,
+            'printed_date_time' => Carbon::now(),
+        ]);
+
+        $this->finalListsOfDelegates[$arrayIndex]['delegatePrinted'] = "Yes";
+        $this->finalListsOfDelegatesTemp[$arrayIndex]['delegatePrinted'] = "Yes";
+    }
 
 
 
