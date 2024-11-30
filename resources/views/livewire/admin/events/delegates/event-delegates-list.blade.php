@@ -96,6 +96,13 @@
                                 <span class="text-red-600">
                                     {{ $finalListsOfDelegate['delegatePrinted'] }}
                                 </span>
+                                <br>
+                                
+                                <button type="button"
+                                    wire:click="markAsPrint({{ $delegateIndex }})"
+                                    class="bg-green-800 hover:bg-green-900 text-white py-1 px-2 w-full rounded-md text-xs text-center mt-2">
+                                    Mark as print
+                                </button>
                             @endif
                         </div>
 
