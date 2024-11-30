@@ -89,6 +89,7 @@ class EmailBroadcast extends Component
                 'eventCategory' => $this->event->category,
                 'registrationStatus' => $this->allDelegates[$i]['registrationStatus'],
                 'fullName' => $this->allDelegates[$i]['fullName'],
+                'jobTitle' => $this->allDelegates[$i]['jobTitle'],
                 'companyName' => $this->allDelegates[$i]['companyName'],
                 'companyName' => $this->allDelegates[$i]['companyName'],
                 'badgeType' => $this->allDelegates[$i]['badgeType'],
