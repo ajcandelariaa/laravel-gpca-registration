@@ -123,38 +123,44 @@ class DigitalHelper extends Component
     {
         $letterCounters1 = [
             'ABCD' => [
-                'https://www.gpcaforum.com/wp-content/uploads/2024/10/Madinat-Al-Ifran-Theatre-Foyer.png',
-                'https://www.gpcaforum.com/wp-content/uploads/2024/10/ABCD.png',
+                'https://www.gpcaforum.com/wp-content/uploads/2024/12/madinat-foyer-counters.png',
+                'https://www.gpcaforum.com/wp-content/uploads/2024/12/madinat-a-to-d.png',
             ],
             'EFGHI' => [
-                'https://www.gpcaforum.com/wp-content/uploads/2024/10/Madinat-Al-Ifran-Theatre-Foyer.png',
-                'https://www.gpcaforum.com/wp-content/uploads/2024/10/EFGHI.png',
+                'https://www.gpcaforum.com/wp-content/uploads/2024/12/madinat-foyer-counters.png',
+                'https://www.gpcaforum.com/wp-content/uploads/2024/12/madinat-e-to-i.png',
             ],
             'JKLMN' => [
-                'https://www.gpcaforum.com/wp-content/uploads/2024/10/Madinat-Al-Ifran-Theatre-Foyer.png',
-                'https://www.gpcaforum.com/wp-content/uploads/2024/10/JKLMN.png',
+                'https://www.gpcaforum.com/wp-content/uploads/2024/12/madinat-foyer-counters.png',
+                'https://www.gpcaforum.com/wp-content/uploads/2024/12/madinat-j-to-n.png',
             ],
             'OPQ' => [
-                'https://www.gpcaforum.com/wp-content/uploads/2024/10/Madinat-Al-Ifran-Theatre-Foyer.png',
-                'https://www.gpcaforum.com/wp-content/uploads/2024/10/OPQ.png',
+                'https://www.gpcaforum.com/wp-content/uploads/2024/12/madinat-foyer-counters.png',
+                'https://www.gpcaforum.com/wp-content/uploads/2024/12/madinat-o-to-q.png',
             ],
             'S' => [
-                'https://www.gpcaforum.com/wp-content/uploads/2024/10/Madinat-Al-Ifran-Theatre-Foyer.png',
-                'https://www.gpcaforum.com/wp-content/uploads/2024/10/S.png',
+                'https://www.gpcaforum.com/wp-content/uploads/2024/12/madinat-foyer-counters.png',
+                'https://www.gpcaforum.com/wp-content/uploads/2024/12/madinat-s.png',
             ],
             'RT' => [
-                'https://www.gpcaforum.com/wp-content/uploads/2024/10/Madinat-Al-Ifran-Theatre-Foyer.png',
-                'https://www.gpcaforum.com/wp-content/uploads/2024/10/RT.png',
+                'https://www.gpcaforum.com/wp-content/uploads/2024/12/madinat-foyer-counters.png',
+                'https://www.gpcaforum.com/wp-content/uploads/2024/12/madinat-rt.png',
             ],
             'UVWXYZ' => [
-                'https://www.gpcaforum.com/wp-content/uploads/2024/10/Madinat-Al-Ifran-Theatre-Foyer.png',
-                'https://www.gpcaforum.com/wp-content/uploads/2024/10/UVWXYZ.png',
+                'https://www.gpcaforum.com/wp-content/uploads/2024/12/madinat-foyer-counters.png',
+                'https://www.gpcaforum.com/wp-content/uploads/2024/12/madinat-u-to-z.png',
             ],
         ];
 
         $letterCounters2 = [
-            'ABCDEFGHIJ' => [],
-            'KLMNOPQRSTUVWXYZ' => [],
+            'ABCDEFGHIJ' => [
+                'https://www.gpcaforum.com/wp-content/uploads/2024/12/exhibitor-counter.png',
+                'https://www.gpcaforum.com/wp-content/uploads/2024/12/exhibitor-a-to-j.png'
+            ],
+            'KLMNOPQRSTUVWXYZ' => [
+                'https://www.gpcaforum.com/wp-content/uploads/2024/12/exhibitor-counter.png',
+                'https://www.gpcaforum.com/wp-content/uploads/2024/12/exhibitor-k-to-z.png',
+            ],
         ];
 
         $howToCollectYourBadge = null;
@@ -163,8 +169,8 @@ class DigitalHelper extends Component
 
         if (strtoupper($badgeType) == "VIP" || strtoupper($badgeType) == "SPEAKER") {
             $imageLinks = [
-                'https://www.gpcaforum.com/wp-content/uploads/2024/10/Madinat-Al-Ifran-Theatre-Foyer.png',
-                'https://www.gpcaforum.com/wp-content/uploads/2024/10/VIP-and-Speakers.png',
+                'https://www.gpcaforum.com/wp-content/uploads/2024/12/vip-counter-2.png',
+                'https://www.gpcaforum.com/wp-content/uploads/2024/12/vip-counter-1.png',
             ];
             $howToCollectYourBadge = "Please proceed to the Madinat Al Ifran Theatre Foyer and line up at counter \"VIP/SPEAKERS\". You can find the counter assignment in the image below:";
         } else if (strtoupper($badgeType) == "EXHIBITOR" || strtoupper($badgeType) == "MEDIA") {
@@ -186,21 +192,24 @@ class DigitalHelper extends Component
     
                 $howToCollectYourBadge = "Please proceed to the Exhibition Foyer and line up at counter '{$counterKey}'. You can find the counter assignment based on your company's first letter in the image below";
             } else {
-                $imageLinks = [];
+                $imageLinks = [
+                    'https://www.gpcaforum.com/wp-content/uploads/2024/12/fast-track-1.png',
+                    'https://www.gpcaforum.com/wp-content/uploads/2024/12/fast-track-2.png'
+                ];
                 $howToCollectYourBadge = "Please proceed to the Exhibition Foyer and you can look for the fast track counter to print your badge";
             }
         } else if (strtoupper($badgeType) == "YOUTH COUNCIL" || strtoupper($badgeType) == "YOUTH FORUM") {
             $imageLinks = [
-                'https://www.gpcaforum.com/wp-content/uploads/2024/10/Madinat-Al-Ifran-Theatre-Foyer.png',
-                'https://www.gpcaforum.com/wp-content/uploads/2024/10/Youth.png',
+                'https://www.gpcaforum.com/wp-content/uploads/2024/12/madinat-foyer-counters.png',
+                'https://www.gpcaforum.com/wp-content/uploads/2024/12/madinat-yf.png',
             ];
             $howToCollectYourBadge = "Please proceed to the Madinat Al Ifran Theatre Foyer and line up at counter \"Youth\". You can find the counter assignment in the image below:";
         } else {
             if($isPrinted == true){
                 if(strtoupper($companyName) == "3P GULF GROUP"){
                     $imageLinks = [
-                        'https://www.gpcaforum.com/wp-content/uploads/2024/10/Madinat-Al-Ifran-Theatre-Foyer.png',
-                        'https://www.gpcaforum.com/wp-content/uploads/2024/10/OPQ.png',
+                        'https://www.gpcaforum.com/wp-content/uploads/2024/12/madinat-foyer-counters.png',
+                        'https://www.gpcaforum.com/wp-content/uploads/2024/12/madinat-o-to-q.png',
                     ];
                     
                     $howToCollectYourBadge = "Please proceed to the Madinat Al Ifran Theatre Foyer and line up at counter 'OPQ'. You can find the counter assignment based on your company's first letter in the image below";
@@ -223,7 +232,10 @@ class DigitalHelper extends Component
                     $howToCollectYourBadge = "Please proceed to the Madinat Al Ifran Theatre Foyer and line up at counter '$counterGroup'. You can find the counter assignment based on your company's first letter in the image below";
                 }
             } else {
-                $imageLinks = [];
+                $imageLinks = [
+                    'https://www.gpcaforum.com/wp-content/uploads/2024/12/fast-track-1.png',
+                    'https://www.gpcaforum.com/wp-content/uploads/2024/12/fast-track-2.png'
+                ];
                 $howToCollectYourBadge = "Please proceed to the Exhibition Foyer and you can look for the fast track counter to print your badge";
             }
         }
