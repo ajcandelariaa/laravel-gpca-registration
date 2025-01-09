@@ -59,7 +59,11 @@
 
         <div class="flex gap-3 items-center mt-2 text-registrationPrimaryColor">
             <i class="fa-solid fa-calendar-days"></i>
-            <p>{{ $finalEventStartDate . ' - ' . $finalEventEndDate }}</p>
+            @if ($finalEventStartDate == $finalEventEndDate)
+                <p>{{ $finalEventStartDate }}</p>
+            @else
+                <p>{{ $finalEventStartDate . ' - ' . $finalEventEndDate }}</p>
+            @endif
         </div>
 
         <div class="mt-5">
@@ -81,7 +85,7 @@
         </div>
     </div>
 
-    <div class="w-10/12 mb-20 grid grid-cols-3 mx-auto gap-10"> 
+    <div class="w-10/12 mb-20 grid grid-cols-3 mx-auto gap-10">
         <div class="col-span-1">
             @include('admin.events.details.fe_rate')
         </div>
