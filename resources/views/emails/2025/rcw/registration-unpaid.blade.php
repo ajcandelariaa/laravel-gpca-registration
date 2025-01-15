@@ -27,6 +27,9 @@ Download invoice
 </x-mail::button>
 @endif
 
+<p class="sub" style="margin-top: 15px;"><strong>HOTEL BOOKING</strong></p>
+<p class="sub" style="margin-top: 5px;">We have secured a special discount rate for our attendees during the Workshop. Kindly click the <a href="https://www.gpca.org.ae/wp-content/uploads/2025/01/ROOM-RESERVATION-FORM-GPCA-RC-Codes-Workshop.pdf" target="_blank">link</a> to finalize your booking and send your request to <a href="mailto:reservation@gulfhotelbahrain.com">reservation@gulfhotelbahrain.com</a>.</p>
+
 <p class="sub" style="margin-top: 15px;">To request any updates on your registration details, kindly contact <a href="mailto:jovelyn@gpca.org.ae">jovelyn@gpca.org.ae</a> to rectify your badge. </p>
 
 <p class="sub" style="margin-top: 15px;">For the latest updates on the event, please visit the event website at <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a>.</p>
