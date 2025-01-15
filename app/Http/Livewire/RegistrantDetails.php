@@ -535,24 +535,12 @@ class RegistrantDetails extends Component
             $paymentStatus = "paid";
         }
 
-        if ($this->mapSendEmailNotif == "yes") {
-            MainDelegates::find($this->finalData['mainDelegateId'])->fill([
-                'registration_status' => "confirmed",
-                'payment_status' => $paymentStatus,
-                'mode_of_payment' => $this->mapPaymentMethod,
-                'paid_date_time' => Carbon::now(),
-
-                'registration_confirmation_sent_count' => $this->finalData['registration_confirmation_sent_count'] + 1,
-                'registration_confirmation_sent_datetime' => Carbon::now(),
-            ])->save();
-        } else {
-            MainDelegates::find($this->finalData['mainDelegateId'])->fill([
-                'registration_status' => "confirmed",
-                'payment_status' => $paymentStatus,
-                'mode_of_payment' => $this->mapPaymentMethod,
-                'paid_date_time' => Carbon::now(),
-            ])->save();
-        }
+        MainDelegates::find($this->finalData['mainDelegateId'])->fill([
+            'registration_status' => "confirmed",
+            'payment_status' => $paymentStatus,
+            'mode_of_payment' => $this->mapPaymentMethod,
+            'paid_date_time' => Carbon::now(),
+        ])->save();
 
         $eventFormattedData = Carbon::parse($this->event->event_start_date)->format('d') . '-' . Carbon::parse($this->event->event_end_date)->format('d M Y');
         $invoiceLink = env('APP_URL') . '/' . $this->event->category . '/' . $this->event->id . '/view-invoice/' . $this->finalData['mainDelegateId'];
@@ -562,7 +550,7 @@ class RegistrantDetails extends Component
 
         if ($this->mapSendEmailNotif == "yes") {
             foreach ($this->finalData['allDelegates'] as $delegatesIndex => $delegates) {
-                foreach ($delegates as $innerDelegate) {
+                foreach ($delegates as $innerDelegateIndex => $innerDelegate) {
                     if (end($delegates) == $innerDelegate) {
                         if (!$innerDelegate['delegate_cancelled']) {
 
@@ -638,10 +626,27 @@ class RegistrantDetails extends Component
 
                             try {
                                 Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaid($details1, $this->sendInvoice));
+
+                                if ($innerDelegate['delegateType'] == "main") {
+                                    MainDelegates::find($innerDelegate['delegateId'])->fill([
+                                        'registration_confirmation_sent_count' => $innerDelegate['registration_confirmation_sent_count'] + 1,
+                                        'registration_confirmation_sent_datetime' => Carbon::now(),
+                                    ])->save();
+                                } else {
+                                    AdditionalDelegates::find($innerDelegate['delegateId'])->fill([
+                                        'registration_confirmation_sent_count' => $innerDelegate['registration_confirmation_sent_count'] + 1,
+                                        'registration_confirmation_sent_datetime' => Carbon::now(),
+                                    ])->save();
+                                }
+
+                                $this->finalData['allDelegates'][$delegatesIndex][$innerDelegateIndex]['registration_confirmation_sent_count'] = $this->finalData['allDelegates'][$delegatesIndex][$innerDelegateIndex]['registration_confirmation_sent_count'] + 1;
+                                $this->finalData['allDelegates'][$delegatesIndex][$innerDelegateIndex]['registration_confirmation_sent_datetime'] = Carbon::parse(Carbon::now())->format('M j, Y g:i A');
                             } catch (\Exception $e) {
                                 Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaid($details1, $this->sendInvoice));
                             }
-                            if ($this->event->category != "GLF" && $this->event->category != "DFCLW1") {
+
+                            //$this->event->category != "GLF" && $this->event->category != "DFCLW1"
+                            if ($this->event->category != "DFCLW1") {
                                 if ($this->sendInvoice) {
                                     if ($delegatesIndex == 0) {
                                         try {
@@ -667,7 +672,8 @@ class RegistrantDetails extends Component
                 } catch (\Exception $e) {
                     Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaid($assistantDetails1, $this->sendInvoice));
                 }
-                if ($this->event->category != "GLF" && $this->event->category != "DFCLW1") {
+                //$this->event->category != "GLF" && $this->event->category != "DFCLW1"
+                if ($this->event->category != "DFCLW1") {
                     if ($this->sendInvoice) {
                         try {
                             Mail::to($this->finalData['assistant_email_address'])->send(new RegistrationPaymentConfirmation($assistantDetails2, $this->sendInvoice));
@@ -683,12 +689,6 @@ class RegistrantDetails extends Component
         $this->finalData['payment_status'] = $paymentStatus;
         $this->finalData['mode_of_payment'] = $this->mapPaymentMethod;
         $this->finalData['paid_date_time'] = Carbon::parse(Carbon::now())->format('M j, Y g:i A');
-
-        if ($this->mapSendEmailNotif == "yes") {
-            $this->finalData['registration_confirmation_sent_count'] = $this->finalData['registration_confirmation_sent_count'] + 1;
-            $this->finalData['registration_confirmation_sent_datetime'] = Carbon::parse(Carbon::now())->format('M j, Y g:i A');
-        }
-
         $this->showMarkAsPaidModal = false;
         $this->mapPaymentMethod = null;
         $this->mapSendEmailNotif = null;
@@ -1132,7 +1132,7 @@ class RegistrantDetails extends Component
             if ($amountPaid == 0) {
                 try {
                     Mail::to($delegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationFree($details1, $this->sendInvoice));
-                    if($delegate['delegateType'] == "main"){
+                    if ($delegate['delegateType'] == "main") {
                         MainDelegates::find($delegate['delegateId'])->fill([
                             'registration_confirmation_sent_count' => $delegate['registration_confirmation_sent_count'] + 1,
                             'registration_confirmation_sent_datetime' => Carbon::now(),
@@ -1149,7 +1149,7 @@ class RegistrantDetails extends Component
             } else {
                 try {
                     Mail::to($delegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationUnpaid($details1, $this->sendInvoice));
-                    if($delegate['delegateType'] == "main"){
+                    if ($delegate['delegateType'] == "main") {
                         MainDelegates::find($delegate['delegateId'])->fill([
                             'registration_confirmation_sent_count' => $delegate['registration_confirmation_sent_count'] + 1,
                             'registration_confirmation_sent_datetime' => Carbon::now(),
@@ -1167,7 +1167,7 @@ class RegistrantDetails extends Component
         } else if ($this->finalData['payment_status'] == "free" && $this->finalData['registration_status'] == "pending") {
             try {
                 Mail::to($delegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationFree($details1, $this->sendInvoice));
-                if($delegate['delegateType'] == "main"){
+                if ($delegate['delegateType'] == "main") {
                     MainDelegates::find($delegate['delegateId'])->fill([
                         'registration_confirmation_sent_count' => $delegate['registration_confirmation_sent_count'] + 1,
                         'registration_confirmation_sent_datetime' => Carbon::now(),
@@ -1184,7 +1184,7 @@ class RegistrantDetails extends Component
         } else {
             try {
                 Mail::to($delegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaid($details1, $this->sendInvoice));
-                if($delegate['delegateType'] == "main"){
+                if ($delegate['delegateType'] == "main") {
                     MainDelegates::find($delegate['delegateId'])->fill([
                         'registration_confirmation_sent_count' => $delegate['registration_confirmation_sent_count'] + 1,
                         'registration_confirmation_sent_datetime' => Carbon::now(),
@@ -1313,7 +1313,7 @@ class RegistrantDetails extends Component
                                 try {
                                     Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationFree($details1, $this->sendInvoice));
 
-                                    if($innerDelegate['delegateType'] == "main"){
+                                    if ($innerDelegate['delegateType'] == "main") {
                                         MainDelegates::find($innerDelegate['delegateId'])->fill([
                                             'registration_confirmation_sent_count' => $innerDelegate['registration_confirmation_sent_count'] + 1,
                                             'registration_confirmation_sent_datetime' => Carbon::now(),
@@ -1334,7 +1334,7 @@ class RegistrantDetails extends Component
                                 try {
                                     Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationUnpaid($details1, $this->sendInvoice));
 
-                                    if($innerDelegate['delegateType'] == "main"){
+                                    if ($innerDelegate['delegateType'] == "main") {
                                         MainDelegates::find($innerDelegate['delegateId'])->fill([
                                             'registration_confirmation_sent_count' => $innerDelegate['registration_confirmation_sent_count'] + 1,
                                             'registration_confirmation_sent_datetime' => Carbon::now(),
@@ -1356,7 +1356,7 @@ class RegistrantDetails extends Component
                             try {
                                 Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationFree($details1, $this->sendInvoice));
 
-                                if($innerDelegate['delegateType'] == "main"){
+                                if ($innerDelegate['delegateType'] == "main") {
                                     MainDelegates::find($innerDelegate['delegateId'])->fill([
                                         'registration_confirmation_sent_count' => $innerDelegate['registration_confirmation_sent_count'] + 1,
                                         'registration_confirmation_sent_datetime' => Carbon::now(),
@@ -1377,7 +1377,7 @@ class RegistrantDetails extends Component
                             try {
                                 Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaid($details1, $this->sendInvoice));
 
-                                if($innerDelegate['delegateType'] == "main"){
+                                if ($innerDelegate['delegateType'] == "main") {
                                     MainDelegates::find($innerDelegate['delegateId'])->fill([
                                         'registration_confirmation_sent_count' => $innerDelegate['registration_confirmation_sent_count'] + 1,
                                         'registration_confirmation_sent_datetime' => Carbon::now(),
@@ -1433,7 +1433,8 @@ class RegistrantDetails extends Component
                 } catch (\Exception $e) {
                     Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaid($assistantDetails1, $this->sendInvoice));
                 }
-                if ($this->event->category != "GLF" && $this->event->category != "DFCLW1") {
+                //$this->event->category != "GLF" && $this->event->category != "DFCLW1"
+                if ($this->event->category != "DFCLW1") {
                     if ($this->sendInvoice) {
                         try {
                             Mail::to($this->finalData['assistant_email_address'])->send(new RegistrationPaymentConfirmation($assistantDetails2, $this->sendInvoice));
