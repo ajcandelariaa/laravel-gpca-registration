@@ -134,7 +134,6 @@
                             @if ($finalData['optional_interests'] != null)
                                 <p class="font-bold"> {{ $finalData['optional_interests'] }} </p>
                             @else
-                                
                                 <p class="font-bold">N/A</p>
                             @endif
                         @endif
@@ -301,9 +300,6 @@
 
                     <p>Payment date & time:</p>
                     <p class="font-bold">{{ $finalData['paid_date_time'] }}</p>
-
-                    <p>Last registration confirmation sent:</p>
-                    <p class="font-bold">{{ $finalData['registration_confirmation_sent_datetime'] }}</p>
                 </div>
 
 
@@ -355,8 +351,8 @@
 
                     @if ($finalData['registration_status'] == 'confirmed' || $finalData['registration_status'] == 'pending')
                         <button wire:click="sendEmailRegistrationConfirmationConfirmation"
-                            class="col-span-1 {{ $finalData['registration_confirmation_sent_count'] > 0 ? 'bg-gray-400' : 'bg-yellow-600 hover:bg-yellow-700' }}  text-white py-2 rounded-md text-lg text-center">Send
-                            Registration Confirmation</button>
+                            class="col-span-1 bg-yellow-600 hover:bg-yellow-700 text-white py-2 rounded-md text-lg text-center">Send
+                            Registration Confirmation to All</button>
                     @endif
                 </div>
             </div>
@@ -443,6 +439,13 @@
                                             @endif
                                         @endif
 
+                                        <p>Registration confirmation count sent:</p>
+                                        <p class="font-bold">
+                                            {{ $innerDelegate['registration_confirmation_sent_count'] }}</p>
+
+                                        <p>Last registration confirmation sent:</p>
+                                        <p class="font-bold">
+                                            {{ $innerDelegate['registration_confirmation_sent_datetime'] }}</p>
 
                                         @if ($innerDelegate['delegate_cancelled'])
                                             <p>Status: </p>
@@ -459,10 +462,16 @@
                                             <p class="font-bold">{{ $innerDelegate['delegate_cancelled_datetime'] }}
                                             </p>
                                         @else
-                                            <button
-                                                wire:click="openDelegateCancellationModal({{ $index }}, {{ $innerIndex }})"
-                                                class="bg-yellow-600 hover:bg-yellow-700 text-white py-1 rounded-md text-center w-40 mt-2">Mark
-                                                as cancelled</button>
+                                            <div class="flex gap-5 col-span-2">
+                                                <button
+                                                    wire:click="sendEmailRegistrationConfirmationConfirmationSingle({{ $index }}, {{ $innerIndex }})"
+                                                    class="{{ $innerDelegate['registration_confirmation_sent_count'] > 0 ? 'bg-gray-400' : 'bg-yellow-600 hover:bg-yellow-700'}} text-white py-1 rounded-md text-center px-14 mt-2">Send registration confirmation</button>
+
+                                                <button
+                                                    wire:click="openDelegateCancellationModal({{ $index }}, {{ $innerIndex }})"
+                                                    class="bg-red-600 hover:bg-red-700 text-white py-1 rounded-md text-center px-14 mt-2">Mark
+                                                    as cancelled</button>
+                                            </div>
                                         @endif
                                     </div>
                                 </div>

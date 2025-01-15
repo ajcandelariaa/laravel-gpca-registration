@@ -93,6 +93,8 @@ class RegistrationForm extends Component
 
         if ($data->category == "DAW") {
             $this->ccEmailNotif = config('app.ccEmailNotif.daw');
+        } else if ($data->category == "GLF") {
+            $this->ccEmailNotif = config('app.ccEmailNotif.glf');
         } else {
             $this->ccEmailNotif = config('app.ccEmailNotif.default');
         }
@@ -910,8 +912,8 @@ class RegistrationForm extends Component
         ];
 
 
-
-        if ($this->event->category != "GLF" && $this->event->category != "DFCLW1") {
+        //$this->event->category != "GLF" && $this->event->category != "DFCLW1"
+        if ($this->event->category != "DFCLW1") {
             if ($this->isMainFree) {
                 try {
                     Mail::to($this->emailAddress)->cc($this->ccEmailNotif)->send(new RegistrationFree($details1));
@@ -1009,12 +1011,20 @@ class RegistrationForm extends Component
                     if ($isSubFree) {
                         try {
                             Mail::to($additionalDelegate->email_address)->cc($this->ccEmailNotif)->send(new RegistrationFree($details1));
+                            AdditionalDelegates::find($additionalDelegate->id)->fill([
+                                'registration_confirmation_sent_count' => 1,
+                                'registration_confirmation_sent_datetime' => Carbon::now(),
+                            ])->save();
                         } catch (\Exception $e) {
                             Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationFree($details1));
                         }
                     } else {
                         try {
                             Mail::to($additionalDelegate->email_address)->cc($this->ccEmailNotif)->send(new RegistrationUnpaid($details1));
+                            AdditionalDelegates::find($additionalDelegate->id)->fill([
+                                'registration_confirmation_sent_count' => 1,
+                                'registration_confirmation_sent_datetime' => Carbon::now(),
+                            ])->save();
                         } catch (\Exception $e) {
                             Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationUnpaid($details1));
                         }

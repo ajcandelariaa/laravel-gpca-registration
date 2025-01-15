@@ -43,6 +43,9 @@ class RegistrantDetails extends Component
 
     public $mapPaymentMethod, $mapSendEmailNotif, $sendInvoice;
 
+    public $sendEmailActiveIndex, $sendEmailActiveInnerIndex;
+
+
     // MODALS
     public $showDelegateModal = false;
     public $showCompanyModal = false;
@@ -53,7 +56,7 @@ class RegistrantDetails extends Component
 
     public $ccEmailNotif;
 
-    protected $listeners = ['paymentReminderConfirmed' => 'sendEmailReminder', 'sendEmailRegistrationConfirmationConfirmed' => 'sendEmailRegistrationConfirmation', 'cancelRefundDelegateConfirmed' => 'cancelOrRefundDelegate', 'cancelReplaceDelegateConfirmed' => 'addReplaceDelegate', 'markAsPaidConfirmed' => 'markAsPaid'];
+    protected $listeners = ['paymentReminderConfirmed' => 'sendEmailReminder', 'sendEmailRegistrationConfirmationConfirmed' => 'sendEmailRegistrationConfirmation', 'sendEmailRegistrationConfirmationSingleConfirmed' => 'sendEmailRegistrationConfirmationSingle', 'cancelRefundDelegateConfirmed' => 'cancelOrRefundDelegate', 'cancelReplaceDelegateConfirmed' => 'addReplaceDelegate', 'markAsPaidConfirmed' => 'markAsPaid'];
 
     public function mount($eventCategory, $eventId, $registrantId, $finalData)
     {
@@ -76,6 +79,8 @@ class RegistrantDetails extends Component
 
         if ($eventCategory == "DAW") {
             $this->ccEmailNotif = config('app.ccEmailNotif.daw');
+        } else if ($eventCategory == "GLF") {
+            $this->ccEmailNotif = config('app.ccEmailNotif.glf');
         } else {
             $this->ccEmailNotif = config('app.ccEmailNotif.default');
         }
@@ -1047,6 +1052,164 @@ class RegistrantDetails extends Component
         return $formatter->format($number);
     }
 
+    public function sendEmailRegistrationConfirmationConfirmationSingle($index, $innerIndex)
+    {
+        $this->sendEmailActiveIndex = $index;
+        $this->sendEmailActiveInnerIndex = $innerIndex;
+        $this->dispatchBrowserEvent('swal:send-email-registration-confirmation-confirmation-single', [
+            'type' => 'warning',
+            'message' => 'Are you sure?',
+            'text' => "",
+        ]);
+    }
+
+    public function sendEmailRegistrationConfirmationSingle()
+    {
+        $delegate = $this->finalData['allDelegates'][$this->sendEmailActiveIndex][$this->sendEmailActiveInnerIndex];
+
+        $eventFormattedData = Carbon::parse($this->event->event_start_date)->format('d') . '-' . Carbon::parse($this->event->event_end_date)->format('d M Y');
+        $invoiceLink = env('APP_URL') . '/' . $this->event->category . '/' . $this->event->id . '/view-invoice/' . $delegate['mainDelegateId'];
+
+        if ($this->event->eb_end_date == null) {
+            $earlyBirdValidityDate = Carbon::createFromFormat('Y-m-d', $this->event->std_start_date)->subDay();
+        } else {
+            $earlyBirdValidityDate = Carbon::createFromFormat('Y-m-d', $this->event->eb_end_date);
+        }
+
+        $delegateVatPrice = $this->finalData['invoiceData']['unit_price'] * ($this->event->event_vat / 100);
+        $amountPaid = $this->finalData['invoiceData']['unit_price'] + $delegateVatPrice;
+
+        $promoCode = PromoCodes::where('event_id', $this->event->id)->where('promo_code', $delegate['pcode_used'])->first();
+
+        if ($promoCode != null) {
+            if ($promoCode->discount_type == "percentage") {
+                $delegateDiscountPrice = $this->finalData['invoiceData']['unit_price'] * ($promoCode->discount / 100);
+                $delegateDiscountedPrice = $this->finalData['invoiceData']['unit_price'] - $delegateDiscountPrice;
+                $delegateVatPrice = $delegateDiscountedPrice * ($this->event->event_vat / 100);
+                $amountPaid = $delegateDiscountedPrice + $delegateVatPrice;
+            } else if ($promoCode->discount_type == "price") {
+                $delegateDiscountedPrice = $this->finalData['invoiceData']['unit_price'] - $promoCode->discount;
+                $delegateVatPrice = $delegateDiscountedPrice * ($this->event->event_vat / 100);
+                $amountPaid = $delegateDiscountedPrice + $delegateVatPrice;
+            } else {
+                $delegateVatPrice = $promoCode->new_rate * ($this->event->event_vat / 100);
+                $amountPaid = $promoCode->new_rate + $delegateVatPrice;
+            }
+        }
+
+        if ($this->finalData['alternative_company_name'] == null) {
+            $finalCompanyName = $this->finalData['company_name'];
+        } else {
+            $finalCompanyName = $this->finalData['alternative_company_name'];
+        }
+
+        $combinedStringPrint = "gpca@reg" . ',' . $this->event->id . ',' . $this->event->category . ',' . $delegate['delegateId'] . ',' . $delegate['delegateType'];
+        $finalCryptStringPrint = base64_encode($combinedStringPrint);
+        $qrCodeForPrint = 'ca' . $finalCryptStringPrint . 'gp';
+
+        $details1 = [
+            'name' => $delegate['name'],
+            'eventLink' => $this->event->link,
+            'eventName' => $this->event->name,
+            'eventDates' => $eventFormattedData,
+            'eventLocation' => $this->event->location,
+            'eventCategory' => $this->event->category,
+            'eventYear' => $this->event->year,
+
+            'accessType' => $this->finalData['access_type'],
+            'jobTitle' => $delegate['job_title'],
+            'companyName' => $finalCompanyName,
+            'badgeType' => $delegate['badge_type'],
+            'amountPaid' => $amountPaid,
+            'transactionId' => $delegate['transactionId'],
+            'invoiceLink' => $invoiceLink,
+            'earlyBirdValidityDate' => $earlyBirdValidityDate->format('jS F'),
+            'badgeLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-badge" . "/" . $delegate['delegateType'] . "/" . $delegate['delegateId'],
+            'qrCodeForPrint' => $qrCodeForPrint,
+        ];
+
+        if ($this->finalData['payment_status'] == "unpaid") {
+            if ($amountPaid == 0) {
+                try {
+                    Mail::to($delegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationFree($details1, $this->sendInvoice));
+                    if($delegate['delegateType'] == "main"){
+                        MainDelegates::find($delegate['delegateId'])->fill([
+                            'registration_confirmation_sent_count' => $delegate['registration_confirmation_sent_count'] + 1,
+                            'registration_confirmation_sent_datetime' => Carbon::now(),
+                        ])->save();
+                    } else {
+                        AdditionalDelegates::find($delegate['delegateId'])->fill([
+                            'registration_confirmation_sent_count' => $delegate['registration_confirmation_sent_count'] + 1,
+                            'registration_confirmation_sent_datetime' => Carbon::now(),
+                        ])->save();
+                    }
+                } catch (\Exception $e) {
+                    Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationFree($details1, $this->sendInvoice));
+                }
+            } else {
+                try {
+                    Mail::to($delegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationUnpaid($details1, $this->sendInvoice));
+                    if($delegate['delegateType'] == "main"){
+                        MainDelegates::find($delegate['delegateId'])->fill([
+                            'registration_confirmation_sent_count' => $delegate['registration_confirmation_sent_count'] + 1,
+                            'registration_confirmation_sent_datetime' => Carbon::now(),
+                        ])->save();
+                    } else {
+                        AdditionalDelegates::find($delegate['delegateId'])->fill([
+                            'registration_confirmation_sent_count' => $delegate['registration_confirmation_sent_count'] + 1,
+                            'registration_confirmation_sent_datetime' => Carbon::now(),
+                        ])->save();
+                    }
+                } catch (\Exception $e) {
+                    Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationUnpaid($details1, $this->sendInvoice));
+                }
+            }
+        } else if ($this->finalData['payment_status'] == "free" && $this->finalData['registration_status'] == "pending") {
+            try {
+                Mail::to($delegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationFree($details1, $this->sendInvoice));
+                if($delegate['delegateType'] == "main"){
+                    MainDelegates::find($delegate['delegateId'])->fill([
+                        'registration_confirmation_sent_count' => $delegate['registration_confirmation_sent_count'] + 1,
+                        'registration_confirmation_sent_datetime' => Carbon::now(),
+                    ])->save();
+                } else {
+                    AdditionalDelegates::find($delegate['delegateId'])->fill([
+                        'registration_confirmation_sent_count' => $delegate['registration_confirmation_sent_count'] + 1,
+                        'registration_confirmation_sent_datetime' => Carbon::now(),
+                    ])->save();
+                }
+            } catch (\Exception $e) {
+                Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationFree($details1, $this->sendInvoice));
+            }
+        } else {
+            try {
+                Mail::to($delegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaid($details1, $this->sendInvoice));
+                if($delegate['delegateType'] == "main"){
+                    MainDelegates::find($delegate['delegateId'])->fill([
+                        'registration_confirmation_sent_count' => $delegate['registration_confirmation_sent_count'] + 1,
+                        'registration_confirmation_sent_datetime' => Carbon::now(),
+                    ])->save();
+                } else {
+                    AdditionalDelegates::find($delegate['delegateId'])->fill([
+                        'registration_confirmation_sent_count' => $delegate['registration_confirmation_sent_count'] + 1,
+                        'registration_confirmation_sent_datetime' => Carbon::now(),
+                    ])->save();
+                }
+            } catch (\Exception $e) {
+                Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaid($details1, $this->sendInvoice));
+            }
+        }
+
+        $this->finalData['allDelegates'][$this->sendEmailActiveIndex][$this->sendEmailActiveInnerIndex]['registration_confirmation_sent_count'] = $this->finalData['allDelegates'][$this->sendEmailActiveIndex][$this->sendEmailActiveInnerIndex]['registration_confirmation_sent_count'] + 1;
+        $this->finalData['allDelegates'][$this->sendEmailActiveIndex][$this->sendEmailActiveInnerIndex]['registration_confirmation_sent_datetime'] = Carbon::parse(Carbon::now())->format('M j, Y g:i A');
+
+        $this->dispatchBrowserEvent('swal:send-email-registration-success', [
+            'type' => 'success',
+            'message' => 'Registration Confirmation sent!',
+            'text' => "",
+        ]);
+    }
+
     public function sendEmailRegistrationConfirmationConfirmation()
     {
         $this->dispatchBrowserEvent('swal:send-email-registration-confirmation-confirmation', [
@@ -1067,16 +1230,11 @@ class RegistrantDetails extends Component
             $earlyBirdValidityDate = Carbon::createFromFormat('Y-m-d', $this->event->eb_end_date);
         }
 
-        MainDelegates::find($this->finalData['mainDelegateId'])->fill([
-            'registration_confirmation_sent_count' => $this->finalData['registration_confirmation_sent_count'] + 1,
-            'registration_confirmation_sent_datetime' => Carbon::now(),
-        ])->save();
-
         $assistantDetails1 = [];
         $assistantDetails2 = [];
 
         foreach ($this->finalData['allDelegates'] as $delegatesIndex => $delegates) {
-            foreach ($delegates as $innerDelegate) {
+            foreach ($delegates as $innerDelegateIndex => $innerDelegate) {
                 if (end($delegates) == $innerDelegate) {
                     if (!$innerDelegate['delegate_cancelled']) {
 
@@ -1154,12 +1312,42 @@ class RegistrantDetails extends Component
                             if ($amountPaid == 0) {
                                 try {
                                     Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationFree($details1, $this->sendInvoice));
+
+                                    if($innerDelegate['delegateType'] == "main"){
+                                        MainDelegates::find($innerDelegate['delegateId'])->fill([
+                                            'registration_confirmation_sent_count' => $innerDelegate['registration_confirmation_sent_count'] + 1,
+                                            'registration_confirmation_sent_datetime' => Carbon::now(),
+                                        ])->save();
+                                    } else {
+                                        AdditionalDelegates::find($innerDelegate['delegateId'])->fill([
+                                            'registration_confirmation_sent_count' => $innerDelegate['registration_confirmation_sent_count'] + 1,
+                                            'registration_confirmation_sent_datetime' => Carbon::now(),
+                                        ])->save();
+                                    }
+
+                                    $this->finalData['allDelegates'][$delegatesIndex][$innerDelegateIndex]['registration_confirmation_sent_count'] = $this->finalData['allDelegates'][$delegatesIndex][$innerDelegateIndex]['registration_confirmation_sent_count'] + 1;
+                                    $this->finalData['allDelegates'][$delegatesIndex][$innerDelegateIndex]['registration_confirmation_sent_datetime'] = Carbon::parse(Carbon::now())->format('M j, Y g:i A');
                                 } catch (\Exception $e) {
                                     Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationFree($details1, $this->sendInvoice));
                                 }
                             } else {
                                 try {
                                     Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationUnpaid($details1, $this->sendInvoice));
+
+                                    if($innerDelegate['delegateType'] == "main"){
+                                        MainDelegates::find($innerDelegate['delegateId'])->fill([
+                                            'registration_confirmation_sent_count' => $innerDelegate['registration_confirmation_sent_count'] + 1,
+                                            'registration_confirmation_sent_datetime' => Carbon::now(),
+                                        ])->save();
+                                    } else {
+                                        AdditionalDelegates::find($innerDelegate['delegateId'])->fill([
+                                            'registration_confirmation_sent_count' => $innerDelegate['registration_confirmation_sent_count'] + 1,
+                                            'registration_confirmation_sent_datetime' => Carbon::now(),
+                                        ])->save();
+                                    }
+
+                                    $this->finalData['allDelegates'][$delegatesIndex][$innerDelegateIndex]['registration_confirmation_sent_count'] = $this->finalData['allDelegates'][$delegatesIndex][$innerDelegateIndex]['registration_confirmation_sent_count'] + 1;
+                                    $this->finalData['allDelegates'][$delegatesIndex][$innerDelegateIndex]['registration_confirmation_sent_datetime'] = Carbon::parse(Carbon::now())->format('M j, Y g:i A');
                                 } catch (\Exception $e) {
                                     Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationUnpaid($details1, $this->sendInvoice));
                                 }
@@ -1167,16 +1355,47 @@ class RegistrantDetails extends Component
                         } else if ($this->finalData['payment_status'] == "free" && $this->finalData['registration_status'] == "pending") {
                             try {
                                 Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationFree($details1, $this->sendInvoice));
+
+                                if($innerDelegate['delegateType'] == "main"){
+                                    MainDelegates::find($innerDelegate['delegateId'])->fill([
+                                        'registration_confirmation_sent_count' => $innerDelegate['registration_confirmation_sent_count'] + 1,
+                                        'registration_confirmation_sent_datetime' => Carbon::now(),
+                                    ])->save();
+                                } else {
+                                    AdditionalDelegates::find($innerDelegate['delegateId'])->fill([
+                                        'registration_confirmation_sent_count' => $innerDelegate['registration_confirmation_sent_count'] + 1,
+                                        'registration_confirmation_sent_datetime' => Carbon::now(),
+                                    ])->save();
+                                }
+
+                                $this->finalData['allDelegates'][$delegatesIndex][$innerDelegateIndex]['registration_confirmation_sent_count'] = $this->finalData['allDelegates'][$delegatesIndex][$innerDelegateIndex]['registration_confirmation_sent_count'] + 1;
+                                $this->finalData['allDelegates'][$delegatesIndex][$innerDelegateIndex]['registration_confirmation_sent_datetime'] = Carbon::parse(Carbon::now())->format('M j, Y g:i A');
                             } catch (\Exception $e) {
                                 Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationFree($details1, $this->sendInvoice));
                             }
                         } else {
                             try {
                                 Mail::to($innerDelegate['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaid($details1, $this->sendInvoice));
+
+                                if($innerDelegate['delegateType'] == "main"){
+                                    MainDelegates::find($innerDelegate['delegateId'])->fill([
+                                        'registration_confirmation_sent_count' => $innerDelegate['registration_confirmation_sent_count'] + 1,
+                                        'registration_confirmation_sent_datetime' => Carbon::now(),
+                                    ])->save();
+                                } else {
+                                    AdditionalDelegates::find($innerDelegate['delegateId'])->fill([
+                                        'registration_confirmation_sent_count' => $innerDelegate['registration_confirmation_sent_count'] + 1,
+                                        'registration_confirmation_sent_datetime' => Carbon::now(),
+                                    ])->save();
+                                }
+
+                                $this->finalData['allDelegates'][$delegatesIndex][$innerDelegateIndex]['registration_confirmation_sent_count'] = $this->finalData['allDelegates'][$delegatesIndex][$innerDelegateIndex]['registration_confirmation_sent_count'] + 1;
+                                $this->finalData['allDelegates'][$delegatesIndex][$innerDelegateIndex]['registration_confirmation_sent_datetime'] = Carbon::parse(Carbon::now())->format('M j, Y g:i A');
                             } catch (\Exception $e) {
                                 Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaid($details1, $this->sendInvoice));
                             }
-                            if ($this->event->category != "GLF" && $this->event->category != "DFCLW1") {
+                            //$this->event->category != "GLF" && $this->event->category != "DFCLW1"
+                            if ($this->event->category != "DFCLW1") {
                                 if ($this->sendInvoice) {
                                     if ($delegatesIndex == 0) {
                                         try {
@@ -1225,10 +1444,6 @@ class RegistrantDetails extends Component
                 }
             }
         }
-
-
-        $this->finalData['registration_confirmation_sent_count'] = $this->finalData['registration_confirmation_sent_count'] + 1;
-        $this->finalData['registration_confirmation_sent_datetime'] = Carbon::parse(Carbon::now())->format('M j, Y g:i A');
 
         $this->dispatchBrowserEvent('swal:send-email-registration-success', [
             'type' => 'success',

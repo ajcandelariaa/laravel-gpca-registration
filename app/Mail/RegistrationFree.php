@@ -159,6 +159,20 @@ class RegistrationFree extends Mailable
                     markdown: 'emails.registration-free',
                 );
             }
+        } else if ($this->details['eventYear'] == '2025') {
+            if ($this->details['eventCategory'] == "GLF") {
+                return new Content(
+                    markdown: 'emails.2025.glf.registration-free',
+                );
+            } else if ($this->details['eventCategory'] == "RCW") {
+                return new Content(
+                    markdown: 'emails.2025.rcw.registration-free',
+                );
+            } else {
+                return new Content(
+                    markdown: 'emails.registration-free',
+                );
+            }
         } else {
             return new Content(
                 markdown: 'emails.registration-free',

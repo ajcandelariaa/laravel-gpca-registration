@@ -38,6 +38,9 @@ class AdditionalDelegate extends Model
         'delegate_refunded_datetime',
         'delegate_replaced_datetime',
 
+        'registration_confirmation_sent_count',
+        'registration_confirmation_sent_datetime',
+
         'email_broadcast_sent_count',
         'email_broadcast_sent_datetime',
     ];

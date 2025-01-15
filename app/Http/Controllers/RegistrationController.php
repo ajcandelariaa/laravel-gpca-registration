@@ -430,6 +430,9 @@ class RegistrationController extends Controller
                             'delegate_cancelled_datetime' => $subDelegate->delegate_cancelled_datetime,
                             'delegate_refunded_datetime' => $subDelegate->delegate_refunded_datetime,
                             'delegate_replaced_datetime' => $subDelegate->delegate_replaced_datetime,
+
+                            'registration_confirmation_sent_count' => $subDelegate->registration_confirmation_sent_count,
+                            'registration_confirmation_sent_datetime' => $subDelegate->registration_confirmation_sent_datetime,
                         ]);
                     } else {
                         array_push($subDelegatesArray, [
@@ -461,6 +464,9 @@ class RegistrationController extends Controller
                             'delegate_cancelled_datetime' => $subDelegate->delegate_cancelled_datetime,
                             'delegate_refunded_datetime' => $subDelegate->delegate_refunded_datetime,
                             'delegate_replaced_datetime' => $subDelegate->delegate_replaced_datetime,
+
+                            'registration_confirmation_sent_count' => $subDelegate->registration_confirmation_sent_count,
+                            'registration_confirmation_sent_datetime' => $subDelegate->registration_confirmation_sent_datetime,
                         ]);
                     }
                 }
@@ -503,6 +509,9 @@ class RegistrationController extends Controller
                 'delegate_cancelled_datetime' => ($mainDelegate->delegate_cancelled_datetime == null) ? "N/A" : Carbon::parse($mainDelegate->delegate_cancelled_datetime)->format('M j, Y g:i A'),
                 'delegate_refunded_datetime' => ($mainDelegate->delegate_refunded_datetime == null) ? "N/A" : Carbon::parse($mainDelegate->delegate_refunded_datetime)->format('M j, Y g:i A'),
                 'delegate_replaced_datetime' => ($mainDelegate->delegate_replaced_datetime == null) ? "N/A" : Carbon::parse($mainDelegate->delegate_replaced_datetime)->format('M j, Y g:i A'),
+
+                'registration_confirmation_sent_count' => $mainDelegate->registration_confirmation_sent_count,
+                'registration_confirmation_sent_datetime' => ($mainDelegate->registration_confirmation_sent_datetime == null) ? "N/A" : Carbon::parse($mainDelegate->registration_confirmation_sent_datetime)->format('M j, Y g:i A'),
             ]);
 
             if ($mainDelegate->delegate_replaced_by_id != null) {
@@ -547,6 +556,9 @@ class RegistrationController extends Controller
                             'delegate_cancelled_datetime' => ($subDelegateReplacement['delegate_cancelled_datetime'] == null) ? "N/A" : Carbon::parse($subDelegateReplacement['delegate_cancelled_datetime'])->format('M j, Y g:i A'),
                             'delegate_refunded_datetime' => ($subDelegateReplacement['delegate_refunded_datetime'] == null) ? "N/A" : Carbon::parse($subDelegateReplacement['delegate_refunded_datetime'])->format('M j, Y g:i A'),
                             'delegate_replaced_datetime' => ($subDelegateReplacement['delegate_replaced_datetime'] == null) ? "N/A" : Carbon::parse($subDelegateReplacement['delegate_replaced_datetime'])->format('M j, Y g:i A'),
+
+                            'registration_confirmation_sent_count' => $subDelegateReplacement['registration_confirmation_sent_count'],
+                            'registration_confirmation_sent_datetime' => ($subDelegateReplacement['registration_confirmation_sent_datetime'] == null) ? "N/A" : Carbon::parse($subDelegateReplacement['registration_confirmation_sent_datetime'])->format('M j, Y g:i A'),
                         ]);
                     }
                 }
@@ -597,6 +609,9 @@ class RegistrationController extends Controller
                     'delegate_cancelled_datetime' => ($subDelegate['delegate_cancelled_datetime'] == null) ? "N/A" : Carbon::parse($subDelegate['delegate_cancelled_datetime'])->format('M j, Y g:i A'),
                     'delegate_refunded_datetime' => ($subDelegate['delegate_refunded_datetime'] == null) ? "N/A" : Carbon::parse($subDelegate['delegate_refunded_datetime'])->format('M j, Y g:i A'),
                     'delegate_replaced_datetime' => ($subDelegate['delegate_replaced_datetime'] == null) ? "N/A" : Carbon::parse($subDelegate['delegate_replaced_datetime'])->format('M j, Y g:i A'),
+
+                    'registration_confirmation_sent_count' => $subDelegate['registration_confirmation_sent_count'],
+                    'registration_confirmation_sent_datetime' => ($subDelegate['registration_confirmation_sent_datetime'] == null) ? "N/A" : Carbon::parse($subDelegate['registration_confirmation_sent_datetime'])->format('M j, Y g:i A'),
                 ]);
 
                 if ($subDelegate['delegate_replaced_by_id'] != null) {
@@ -641,6 +656,9 @@ class RegistrationController extends Controller
                                 'delegate_cancelled_datetime' => ($subDelegateReplacement['delegate_cancelled_datetime'] == null) ? "N/A" : Carbon::parse($subDelegateReplacement['delegate_cancelled_datetime'])->format('M j, Y g:i A'),
                                 'delegate_refunded_datetime' => ($subDelegateReplacement['delegate_refunded_datetime'] == null) ? "N/A" : Carbon::parse($subDelegateReplacement['delegate_refunded_datetime'])->format('M j, Y g:i A'),
                                 'delegate_replaced_datetime' => ($subDelegateReplacement['delegate_replaced_datetime'] == null) ? "N/A" : Carbon::parse($subDelegateReplacement['delegate_replaced_datetime'])->format('M j, Y g:i A'),
+
+                                'registration_confirmation_sent_count' => $subDelegateReplacement['registration_confirmation_sent_count'],
+                                'registration_confirmation_sent_datetime' => ($subDelegateReplacement['registration_confirmation_sent_datetime'] == null) ? "N/A" : Carbon::parse($subDelegateReplacement['registration_confirmation_sent_datetime'])->format('M j, Y g:i A'),
                             ]);
                         }
                     }
@@ -698,9 +716,6 @@ class RegistrationController extends Controller
 
                 'registration_method' => $mainDelegate->registration_method,
                 'transaction_remarks' => $mainDelegate->transaction_remarks,
-
-                'registration_confirmation_sent_count' => $mainDelegate->registration_confirmation_sent_count,
-                'registration_confirmation_sent_datetime' => ($mainDelegate->registration_confirmation_sent_datetime == null) ? "N/A" : Carbon::parse($mainDelegate->registration_confirmation_sent_datetime)->format('M j, Y g:i A'),
 
                 'invoiceNumber' => $invoiceNumber,
                 'allDelegates' => $allDelegatesArray,
@@ -2001,9 +2016,6 @@ class RegistrationController extends Controller
                         'registration_status' => "confirmed",
                         'payment_status' => "paid",
                         'paid_date_time' => Carbon::now(),
-
-                        'registration_confirmation_sent_count' => 1,
-                        'registration_confirmation_sent_datetime' => Carbon::now(),
                     ])->save();
 
                     $mainDelegate = MainDelegate::where('id', $mainDelegateId)->first();
@@ -2091,6 +2103,10 @@ class RegistrationController extends Controller
                     try {
                         Mail::to($mainDelegate->email_address)->cc($ccEmailNotif)->send(new RegistrationPaid($details1));
                         Mail::to($mainDelegate->email_address)->cc($ccEmailNotif)->send(new RegistrationPaymentConfirmation($details2));
+                        MainDelegate::find($mainDelegateId)->fill([
+                            'registration_confirmation_sent_count' => 1,
+                            'registration_confirmation_sent_datetime' => Carbon::now(),
+                        ])->save();
                     } catch (\Exception $e) {
                         Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaid($details1));
                         Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaymentConfirmation($details2));
@@ -2164,6 +2180,10 @@ class RegistrationController extends Controller
                             ];
                             try {
                                 Mail::to($additionalDelegate->email_address)->cc($ccEmailNotif)->send(new RegistrationPaid($details1));
+                                AdditionalDelegate::find($additionalDelegate->id)->fill([
+                                    'registration_confirmation_sent_count' => 1,
+                                    'registration_confirmation_sent_datetime' => Carbon::now(),
+                                ])->save();
                             } catch (\Exception $e) {
                                 Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaid($details1));
                             }

@@ -188,6 +188,20 @@ class RegistrationUnpaid extends Mailable
                     markdown: 'emails.registration-unpaid',
                 );
             }
+        } else if ($this->details['eventYear'] == '2025') {
+            if ($this->details['eventCategory'] == "GLF") {
+                return new Content(
+                    markdown: 'emails.2025.glf.registration-unpaid',
+                );
+            } else if ($this->details['eventCategory'] == "RCW") {
+                return new Content(
+                    markdown: 'emails.2025.rcw.registration-unpaid',
+                );
+            } else {
+                return new Content(
+                    markdown: 'emails.registration-unpaid',
+                );
+            }
         } else {
             return new Content(
                 markdown: 'emails.registration-unpaid',

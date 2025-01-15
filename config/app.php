@@ -486,6 +486,7 @@ return [
         'SCEA' => "11",
         'RCCA' => "51",
         'RCCW1' => "52",
+        'RCW' => "53",
         'AFS' => "61",
         'AFV' => "62",
         'IPAW' => "20",
@@ -512,6 +513,7 @@ return [
         'daw' => ['aastha@gpca.org.ae', 'analee@gpca.org.ae', 'jovelyn@gpca.org.ae', 'forumregistration@gpca.org.ae'],
         'scea' => ['analee@gpca.org.ae', 'nasim@gpca.org.ae', 'zaman@gpca.org.ae'],
         'error' => ['forumregistration@gpca.org.ae'],
+        'glf' => ['jovelyn@gpca.org.ae'],
     ],
 
     // 'ccEmailNotif' => [
@@ -520,6 +522,7 @@ return [
     //     'daw' => ['aj@gpca.org.ae'],
     //     'scea' => ['aj@gpca.org.ae'],
     //     'error' => ['aj@gpca.org.ae'],
+    //     'glf' => ['aj@gpca.org.ae'],
     // ],
 
     'rccAwardsCategories' => [
