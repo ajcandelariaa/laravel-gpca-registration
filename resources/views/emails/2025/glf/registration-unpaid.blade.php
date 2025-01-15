@@ -24,8 +24,8 @@
 
 <p class="sub" style="margin-top: 20px; text-decoration: underline;"><strong>Hotel Contact Information:</strong></p>
 <p class="sub" style="margin-top: 5px;">Rakan Hussein</p>
-<p class="sub" style="margin-top: 5px;">Email: <a href="mailto:Rakan.Hussein@sheraton.com">Rakan.Hussein@sheraton.com</a></p>
-<p class="sub" style="margin-top: 5px;">Mobile: +973 3888 27165</p>
+<p class="sub">Email: <a href="mailto:Rakan.Hussein@sheraton.com">Rakan.Hussein@sheraton.com</a></p>
+<p class="sub">Mobile: +973 3888 27165</p>
 
 <p class="sub" style="margin-top: 15px;">For any queries or further assistance, please contact <a href="mailto:forumregistration@gpca.org.ae">forumregistration@gpca.org.ae</a> or call +971 4 451 0666 ext. 153</p>
 
