@@ -317,6 +317,7 @@ class RegistrationForm extends Component
 
     public function calculateAmount()
     {
+        $tempTotalNetAmount = 0;
         if ($this->promoCodeDiscount == null) {
             $this->promoCode = null;
             $delegateDescription = "Delegate registration fee - {$this->rateTypeString} - {$this->badgeType}";
@@ -344,12 +345,11 @@ class RegistrationForm extends Component
                 $tempTotalNetAmount = $promoCode->new_rate;
                 $delegateDescription = $promoCode->new_rate_description;
             }
-
-            if ($tempTotalNetAmount == 0) {
-                $this->isMainFree = true;
-            }
         }
 
+        if ($tempTotalNetAmount == 0) {
+            $this->isMainFree = true;
+        }
 
         array_push($this->delegatInvoiceDetails, [
             'delegateDescription' => $delegateDescription,
