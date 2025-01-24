@@ -52,6 +52,12 @@ class RegistrationPaid extends Mailable
             } else {
                 $subject = 'Registration confirmation for the ' . $this->details['eventName'];
             }
+        } else if ($this->details['eventYear'] == '2025') {
+            if ($this->details['eventCategory'] == "SCEA") {
+                $subject = 'Thank you for your entry submission to the ' . $this->details['eventName'];
+            } else {
+                $subject = 'Registration confirmation for the ' . $this->details['eventName'];
+            }
         } else {
             $subject = 'Registration confirmation for the ' . $this->details['eventName'];
         }
@@ -197,6 +203,10 @@ class RegistrationPaid extends Mailable
             } else if ($this->details['eventCategory'] == "RCW") {
                 return new Content(
                     markdown: 'emails.2025.rcw.registration-paid',
+                );
+            } else if ($this->details['eventCategory'] == "SCEA") {
+                return new Content(
+                    markdown: 'emails.2025.scea.registration-paid',
                 );
             } else {
                 return new Content(
