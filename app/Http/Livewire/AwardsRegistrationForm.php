@@ -226,6 +226,7 @@ class AwardsRegistrationForm extends Component
             }
 
             if (count($this->supportingDocumentsError) == 0) {
+                $this->paymentMethod = 'creditCard';
                 $this->dispatchBrowserEvent('swal:add-step3-registration-loading-screen');
             }
         } else if ($this->currentStep == 3) {

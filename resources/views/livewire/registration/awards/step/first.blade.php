@@ -97,7 +97,7 @@
                 </div>
             </div>
 
-            <p class="mt-5 italic text-red-600">Note: Credit card payments only (Mastercard / VISA)</p>
+            <p class="mt-5 italic font-semibold text-red-600">Note: Only Mastercard and VISA credit card payments are accepted.</p>
         </div>
 
         <div class="col-span-2 lg:col-span-1 flex flex-col gap-5">
