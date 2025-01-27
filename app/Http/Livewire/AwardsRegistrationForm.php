@@ -226,7 +226,6 @@ class AwardsRegistrationForm extends Component
             }
 
             if (count($this->supportingDocumentsError) == 0) {
-                $this->paymentMethod = 'creditCard';
                 $this->dispatchBrowserEvent('swal:add-step3-registration-loading-screen');
             }
         } else if ($this->currentStep == 3) {
@@ -254,7 +253,8 @@ class AwardsRegistrationForm extends Component
     {
         $this->checkUnitPrice();
         $this->calculateAmount();
-        $this->paymentMethod = null;
+        // $this->paymentMethod = null;
+        $this->paymentMethod = 'creditCard';
         $this->currentStep += 1;
 
         $this->dispatchBrowserEvent('swal:remove-registration-loading-screen');
