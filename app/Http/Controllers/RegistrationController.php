@@ -418,6 +418,8 @@ class RegistrationController extends Controller
                             'discount_type' => $subDiscountType,
                             'country' => $subDelegate->country,
 
+                            'interests' => $subDelegate->interests ? json_decode($subDelegate->interests, true) : [],
+
                             'delegate_cancelled' => $subDelegate->delegate_cancelled,
                             'delegate_replaced' => $subDelegate->delegate_replaced,
                             'delegate_refunded' => $subDelegate->delegate_refunded,
@@ -451,6 +453,8 @@ class RegistrationController extends Controller
                             'discount' => $subDiscount,
                             'discount_type' => $subDiscountType,
                             'country' => $subDelegate->country,
+
+                            'interests' => $subDelegate->interests ? json_decode($subDelegate->interests, true) : [],
 
                             'delegate_cancelled' => $subDelegate->delegate_cancelled,
                             'delegate_replaced' => $subDelegate->delegate_replaced,
@@ -495,6 +499,8 @@ class RegistrationController extends Controller
                 'discount' => $mainDiscount,
                 'discount_type' => $mainDiscountType,
                 'country' => $mainDelegate->country,
+
+                'interests' => $mainDelegate->interests ? json_decode($mainDelegate->interests, true) : [],
 
                 'is_replacement' => false,
                 'delegate_cancelled' => $mainDelegate->delegate_cancelled,
@@ -542,6 +548,8 @@ class RegistrationController extends Controller
                             'discount' => $subDelegateReplacement['discount'],
                             'discount_type' => $subDelegateReplacement['discount_type'],
                             'country' => $subDelegateReplacement['country'],
+
+                            'interests' => $subDelegateReplacement['interests'],
 
                             'is_replacement' => true,
                             'delegate_cancelled' => $subDelegateReplacement['delegate_cancelled'],
@@ -596,6 +604,8 @@ class RegistrationController extends Controller
                     'discount_type' => $subDelegate['discount_type'],
                     'country' => $subDelegate['country'],
 
+                    'interests' => $subDelegate['interests'],
+
                     'is_replacement' => false,
                     'delegate_cancelled' => $subDelegate['delegate_cancelled'],
                     'delegate_replaced' => $subDelegate['delegate_replaced'],
@@ -642,6 +652,8 @@ class RegistrationController extends Controller
                                 'discount' => $subDelegateReplacement['discount'],
                                 'discount_type' => $subDelegateReplacement['discount_type'],
                                 'country' => $subDelegateReplacement['country'],
+
+                                'interests' => $subDelegateReplacement['interests'],
 
                                 'is_replacement' => true,
                                 'delegate_cancelled' => $subDelegateReplacement['delegate_cancelled'],
@@ -4900,6 +4912,8 @@ class RegistrationController extends Controller
                     'pcode_used' => $mainDelegate->pcode_used,
                     'country' => $mainDelegate->country,
 
+                    'interests' => $mainDelegate->interests,
+
                     'heard_where' => $mainDelegate->heard_where,
 
                     'seat_number' => $mainDelegate->seat_number,
@@ -5066,6 +5080,8 @@ class RegistrationController extends Controller
                             'country' => $subDelegate->country,
 
                             'heard_where' => $mainDelegate->heard_where,
+                            
+                            'interests' => $subDelegate->interests,
 
                             'seat_number' => $subDelegate->seat_number,
 
@@ -5077,7 +5093,7 @@ class RegistrationController extends Controller
                             'attending_welcome_dinner' => $mainDelegate->attending_welcome_dinner,
                             'attending_gala_dinner' => $mainDelegate->attending_gala_dinner,
                             'attending_sustainability' => $mainDelegate->attending_sustainability,
-        
+
                             'receive_whatsapp_notifications' => $mainDelegate->receive_whatsapp_notifications,
 
                             'optional_interests' => $mainDelegate->optional_interests,
@@ -5137,7 +5153,6 @@ class RegistrationController extends Controller
             "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
             "Expires"             => "0"
         );
-
         $columns = array(
             'Transaction Id',
             'ID',
@@ -5209,6 +5224,8 @@ class RegistrationController extends Controller
 
             'Heard Where',
 
+            'Interests',
+
             'Seat Number',
 
             'Attending to Plenary',
@@ -5228,7 +5245,6 @@ class RegistrationController extends Controller
         $callback = function () use ($finalExcelData, $columns) {
             $file = fopen('php://output', 'w');
             fputcsv($file, $columns);
-
             foreach ($finalExcelData as $data) {
                 fputcsv(
                     $file,
@@ -5248,7 +5264,7 @@ class RegistrationController extends Controller
                         $data['first_name'],
                         $data['last_name'],
                         $data['email_address'],
-                        "\t" . $data['mobile_number'], 
+                        "\t" . $data['mobile_number'],
                         $data['country'],
                         $data['job_title'],
                         $data['nationality'],
@@ -5303,6 +5319,8 @@ class RegistrationController extends Controller
                         $data['delegate_replaced_datetime'],
 
                         $data['heard_where'],
+
+                        $data['interests'],
 
                         $data['seat_number'],
 

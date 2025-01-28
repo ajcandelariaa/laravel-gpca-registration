@@ -439,6 +439,21 @@
                                             @endif
                                         @endif
 
+                                        @if ($event->category == 'RCW')
+                                            <p>Interests:</p>
+                                            <p>
+                                                @if (count($innerDelegate['interests']) > 0)
+                                                    @foreach ($innerDelegate['interests'] as $innerDelegateInterestIndex => $innerDelegateInterest)
+                                                        @if ($innerDelegateInterestIndex == count($innerDelegate['interests']) - 1)
+                                                            {{ $innerDelegateInterest }}
+                                                        @else
+                                                            {{ $innerDelegateInterest }},
+                                                        @endif
+                                                    @endforeach
+                                                @endif
+                                            </p>
+                                        @endif
+
                                         <p>Registration confirmation count sent:</p>
                                         <p class="font-bold">
                                             {{ $innerDelegate['registration_confirmation_sent_count'] }}</p>
@@ -465,7 +480,8 @@
                                             <div class="flex gap-5 col-span-2">
                                                 <button
                                                     wire:click="sendEmailRegistrationConfirmationConfirmationSingle({{ $index }}, {{ $innerIndex }})"
-                                                    class="{{ $innerDelegate['registration_confirmation_sent_count'] > 0 ? 'bg-gray-400' : 'bg-yellow-600 hover:bg-yellow-700'}} text-white py-1 rounded-md text-center px-14 mt-2">Send registration confirmation</button>
+                                                    class="{{ $innerDelegate['registration_confirmation_sent_count'] > 0 ? 'bg-gray-400' : 'bg-yellow-600 hover:bg-yellow-700' }} text-white py-1 rounded-md text-center px-14 mt-2">Send
+                                                    registration confirmation</button>
 
                                                 <button
                                                     wire:click="openDelegateCancellationModal({{ $index }}, {{ $innerIndex }})"

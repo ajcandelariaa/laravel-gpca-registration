@@ -23,6 +23,8 @@ class AdditionalDelegate extends Model
         'pcode_used',
         'country',
 
+        'interests',
+
         'seat_number',
 
         'delegate_cancelled',
@@ -43,6 +45,10 @@ class AdditionalDelegate extends Model
 
         'email_broadcast_sent_count',
         'email_broadcast_sent_datetime',
+    ];
+
+    protected $casts = [
+        'interests' => 'array',
     ];
 
     public function mainDelegate()

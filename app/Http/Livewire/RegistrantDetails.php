@@ -35,11 +35,11 @@ class RegistrantDetails extends Component
     public $delegatePassType, $rateTypeString, $companyName, $alternativeCompanyName, $companySector, $companyAddress, $companyCountry, $companyCity, $companyLandlineNumber, $assistantEmailAddress, $companyMobileNumber;
 
     // DELEGATE DETAILS
-    public $mainDelegateId, $delegateId, $salutation, $firstName, $middleName, $lastName, $emailAddress, $mobileNumber, $nationality, $jobTitle, $badgeType, $promoCode, $promoCodeDiscount, $discountType, $promoCodeSuccess, $promoCodeFail, $type, $delegateIndex, $delegateInnerIndex, $country;
+    public $mainDelegateId, $delegateId, $salutation, $firstName, $middleName, $lastName, $emailAddress, $mobileNumber, $nationality, $jobTitle, $badgeType, $promoCode, $promoCodeDiscount, $discountType, $promoCodeSuccess, $promoCodeFail, $type, $delegateIndex, $delegateInnerIndex, $country, $interests = [];
 
     public $transactionRemarks, $delegateCancellationStep = 1, $replaceDelegate, $delegateRefund;
 
-    public $replaceDelegateIndex, $replaceDelegateInnerIndex, $replaceSalutation, $replaceFirstName, $replaceMiddleName, $replaceLastName, $replaceEmailAddress, $replaceMobileNumber, $replaceNationality, $replaceJobTitle, $replaceBadgeType, $replacePromoCode, $replaceDiscountType, $replacePromoCodeDiscount, $replacePromoCodeSuccess, $replacePromoCodeFail, $replaceEmailAlreadyUsedError, $replaceCountry;
+    public $replaceDelegateIndex, $replaceDelegateInnerIndex, $replaceSalutation, $replaceFirstName, $replaceMiddleName, $replaceLastName, $replaceEmailAddress, $replaceMobileNumber, $replaceNationality, $replaceJobTitle, $replaceBadgeType, $replacePromoCode, $replaceDiscountType, $replacePromoCodeDiscount, $replacePromoCodeSuccess, $replacePromoCodeFail, $replaceEmailAlreadyUsedError, $replaceCountry, $replaceInterests = [];
 
     public $mapPaymentMethod, $mapSendEmailNotif, $sendInvoice;
 
@@ -84,7 +84,6 @@ class RegistrantDetails extends Component
         } else {
             $this->ccEmailNotif = config('app.ccEmailNotif.default');
         }
-
         $this->eventFormattedDate = Carbon::parse($this->event->event_start_date)->format('j') . '-' . Carbon::parse($this->event->event_end_date)->format('j F Y');
     }
 
@@ -140,6 +139,7 @@ class RegistrantDetails extends Component
                 'badge_type' => $this->badgeType,
                 'pcode_used' => $this->promoCode,
                 'country' => $this->country,
+                'interests' => json_encode($this->interests),
             ])->save();
         } else {
             AdditionalDelegates::find($this->delegateId)->fill([
@@ -154,6 +154,7 @@ class RegistrantDetails extends Component
                 'badge_type' => $this->badgeType,
                 'pcode_used' => $this->promoCode,
                 'country' => $this->country,
+                'interests' => json_encode($this->interests),
             ])->save();
         }
 
@@ -171,6 +172,7 @@ class RegistrantDetails extends Component
         $this->finalData['allDelegates'][$this->delegateIndex][$this->delegateInnerIndex]['discount'] = $this->promoCodeDiscount;
         $this->finalData['allDelegates'][$this->delegateIndex][$this->delegateInnerIndex]['discount_type'] = $this->discountType;
         $this->finalData['allDelegates'][$this->delegateIndex][$this->delegateInnerIndex]['country'] = $this->country;
+        $this->finalData['allDelegates'][$this->delegateIndex][$this->delegateInnerIndex]['interests'] = $this->interests;
 
         $this->calculateTotal();
 
@@ -199,6 +201,7 @@ class RegistrantDetails extends Component
         $this->discountType = $this->finalData['allDelegates'][$index][$innerIndex]['discount_type'];
         $this->type = $this->finalData['allDelegates'][$index][$innerIndex]['delegateType'];
         $this->country = $this->finalData['allDelegates'][$index][$innerIndex]['country'];
+        $this->interests = $this->finalData['allDelegates'][$index][$innerIndex]['interests'];
 
         if ($this->discountType == "fixed") {
             $this->promoCodeSuccess = "Fixed rate applied";
@@ -304,6 +307,7 @@ class RegistrantDetails extends Component
         $this->promoCodeFail = null;
         $this->type = null;
         $this->country = null;
+        $this->interests = null;
     }
 
 
@@ -1788,6 +1792,7 @@ class RegistrantDetails extends Component
             'badge_type' => $this->replaceBadgeType,
             'pcode_used' => $this->replacePromoCode,
             'country' => $this->replaceCountry,
+            'interests' => json_encode($this->replaceInterests),
 
             'delegate_replaced_type' => $this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['delegate_replaced_type'],
             'delegate_replaced_from_id' => $this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['delegateId'],
@@ -1830,6 +1835,7 @@ class RegistrantDetails extends Component
             'discount' => $subDiscount,
             'discount_type' => $subDiscountType,
             'country' => $this->replaceCountry,
+            'interests' => $this->replaceInterests,
 
             'is_replacement' => true,
             'delegate_cancelled' => false,
@@ -1844,6 +1850,9 @@ class RegistrantDetails extends Component
             'delegate_cancelled_datetime' => null,
             'delegate_refunded_datetime' => null,
             'delegate_replaced_datetime' => null,
+            
+            'registration_confirmation_sent_count' => $this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['registration_confirmation_sent_count'],
+            'registration_confirmation_sent_datetime' => $this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['registration_confirmation_sent_datetime'],
         ]);
 
         if ($this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['delegateType'] == "main") {
@@ -1871,6 +1880,9 @@ class RegistrantDetails extends Component
         $this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['delegate_replaced'] = true;
         $this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['delegate_cancelled_datetime'] = Carbon::parse(Carbon::now())->format('M j, Y g:i A');
         $this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['delegate_replaced_datetime'] = Carbon::parse(Carbon::now())->format('M j, Y g:i A');
+        $this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['registration_confirmation_sent_count'] = 0;
+        $this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['registration_confirmation_sent_datetime'] = null;
+    
 
         $this->dispatchBrowserEvent('swal:delegate-cancel-replace-success', [
             'type' => 'success',
@@ -1972,6 +1984,7 @@ class RegistrantDetails extends Component
 
         $this->replaceEmailAlreadyUsedError = null;
         $this->replaceCountry = null;
+        $this->replaceInterests = null;
     }
 
     public function getAccessTypesDescription($accessType, $enableNullForFullEvent)

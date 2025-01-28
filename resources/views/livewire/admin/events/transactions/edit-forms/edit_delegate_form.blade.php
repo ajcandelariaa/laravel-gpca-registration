@@ -118,7 +118,7 @@
                                                 {{ $countryChoice }}</option>
                                         @endforeach
                                     </select>
-                    
+
                                     @error('country')
                                         <div class="text-red-500 text-xs italic mt-1">
                                             {{ $message }}
@@ -235,6 +235,24 @@
                                     @endif
                                 @endif
                             </div>
+
+                            @if ($event->category == 'RCW')
+                                <div class="space-y-2 col-span-2">
+                                    <div class="text-registrationPrimaryColor">
+                                        Which RC code are you interested in?
+                                    </div>
+                                    <div>
+                                        @foreach (['Community Awareness and Emergency Management', 'Distribution', 'Product Stewardship', 'Process Safety', 'Health & Safety', 'Security', 'Environmental Protection'] as $interestIndex => $interest)
+                                            <div class="flex items-center gap-2">
+                                                <input type="checkbox" wire:model.lazy="interests"
+                                                    value="{{ $interest }}" id="interest-{{ $interestIndex }}">
+                                                <label
+                                                    for="interest-{{ $interestIndex }}">{{ $interest }}</label>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>

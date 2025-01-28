@@ -88,7 +88,7 @@
                                     </div>
                                 @enderror
 
-                                
+
                                 @if ($emailSubExistingError != null)
                                     <div class="text-red-500 text-xs italic mt-1">
                                         {{ $emailSubExistingError }}
@@ -125,7 +125,7 @@
                                 Nationality <span class="text-red-500">*</span>
                             </div>
                             <div>
-                                
+
                                 <select wire:model.lazy="subNationalityEdit"
                                     class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                                     <option value=""></option>
@@ -223,6 +223,68 @@
                                 @endif
                             @endif
                         </div>
+
+
+                        @if ($event->category == 'RCW')
+                            {{-- ROW 7 --}}
+                            <div class="space-y-2 col-span-2">
+                                <div class="text-registrationPrimaryColor">
+                                    Which RC code are you interested in?
+                                </div>
+                                <div>
+                                    @foreach (['Community Awareness and Emergency Management', 'Distribution', 'Product Stewardship', 'Process Safety', 'Health & Safety', 'Security', 'Environmental Protection'] as $interestIndex => $interest)
+                                        <div class="flex items-center gap-2">
+                                            <input type="checkbox" wire:model.lazy="subDelegateInterestsEdit"
+                                                value="{{ $interest }}"
+                                                id="subDelegateEditOption-{{ $interestIndex }}">
+                                            <label
+                                                for="subDelegateEditOption-{{ $interestIndex }}">{{ $interest }}</label>
+                                        </div>
+                                    @endforeach
+                                    {{-- <div class="flex items-center gap-2">
+                                        <input type="checkbox" wire:model.lazy="subDelegateInterestsEdit"
+                                            value="Community Awareness and Emergency Management" id="subDelegateEditOpt1">
+                                        <label for="subDelegateEditOpt1">Community Awareness and Emergency Management</label>
+                                    </div>
+
+                                    <div class="flex items-center gap-2">
+                                        <input type="checkbox" wire:model.lazy="subDelegateInterestsEdit"
+                                            value="Distribution" id="subDelegateEditOpt2">
+                                        <label for="subDelegateEditOpt2">Distribution</label>
+                                    </div>
+
+                                    <div class="flex items-center gap-2">
+                                        <input type="checkbox" wire:model.lazy="subDelegateInterestsEdit"
+                                            value="Product Stewardship" id="subDelegateEditOpt3">
+                                        <label for="subDelegateEditOpt3">Product Stewardship</label>
+                                    </div>
+
+                                    <div class="flex items-center gap-2">
+                                        <input type="checkbox" wire:model.lazy="subDelegateInterestsEdit"
+                                            value="Process Safety" id="subDelegateEditOpt4">
+                                        <label for="subDelegateEditOpt4">Process Safety</label>
+                                    </div>
+
+                                    <div class="flex items-center gap-2">
+                                        <input type="checkbox" wire:model.lazy="subDelegateInterestsEdit"
+                                            value="Health & Safety" id="subDelegateEditOpt5">
+                                        <label for="subDelegateEditOpt5">Health & Safety</label>
+                                    </div>
+
+                                    <div class="flex items-center gap-2">
+                                        <input type="checkbox" wire:model.lazy="subDelegateInterestsEdit"
+                                            value="Security" id="subDelegateEditOpt6">
+                                        <label for="subDelegateEditOpt6">Security</label>
+                                    </div>
+
+                                    <div class="flex items-center gap-2">
+                                        <input type="checkbox" wire:model.lazy="subDelegateInterestsEdit"
+                                            value="Environmental Protection" id="subDelegateEditOpt7">
+                                        <label for="subDelegateEditOpt7">Environmental Protection</label>
+                                    </div> --}}
+                                </div>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>

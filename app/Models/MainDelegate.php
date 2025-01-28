@@ -53,6 +53,8 @@ class MainDelegate extends Model
 
         'optional_interests',
 
+        'interests',
+
         'seat_number',
 
         'quantity',
@@ -93,6 +95,9 @@ class MainDelegate extends Model
         'email_broadcast_sent_datetime',
     ];
 
+    protected $casts = [
+        'interests' => 'array',
+    ];
 
     public function additionalDelegates()
     {

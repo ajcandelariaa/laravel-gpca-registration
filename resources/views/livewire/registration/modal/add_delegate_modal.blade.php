@@ -9,9 +9,11 @@
             <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                 {{-- SUB DELEGATE --}}
                 <div>
-                    <div class="text-registrationPrimaryColor italic font-bold text-xl flex md:flex-row flex-col md:items-center gap-2">
+                    <div
+                        class="text-registrationPrimaryColor italic font-bold text-xl flex md:flex-row flex-col md:items-center gap-2">
                         <span style="width: 200px; text-align: left">Add delegate </span>
-                        <span class="text-red-500 text-xs font-normal">Note: Additional delegates should be from the same company as the primary delegate</span>
+                        <span class="text-red-500 text-xs font-normal">Note: Additional delegates should be from the
+                            same company as the primary delegate</span>
                     </div>
 
                     <div class="mt-5 grid grid-cols-2 gap-y-3 gap-x-5">
@@ -87,7 +89,7 @@
                                     </div>
                                 @enderror
 
-                                
+
                                 @if ($emailSubExistingError != null)
                                     <div class="text-red-500 text-xs italic mt-1">
                                         {{ $emailSubExistingError }}
@@ -134,7 +136,7 @@
                                         </option>
                                     @endforeach
                                 </select>
-                                
+
                                 @error('subNationality')
                                     <div class="text-red-500 text-xs italic mt-1">
                                         {{ $message }}
@@ -219,6 +221,68 @@
                                 </div>
                             @endif
                         </div>
+
+                        @if ($event->category == 'RCW')
+                            {{-- ROW 7 --}}
+                            <div class="space-y-2 col-span-2">
+                                <div class="text-registrationPrimaryColor">
+                                    Which RC code are you interested in?
+                                </div>
+                                <div>
+                                    @foreach (['Community Awareness and Emergency Management', 'Distribution', 'Product Stewardship', 'Process Safety', 'Health & Safety', 'Security', 'Environmental Protection'] as $interestIndex => $interest)
+                                        <div class="flex items-center gap-2">
+                                            <input type="checkbox" wire:model.lazy="subDelegateInterests"
+                                                value="{{ $interest }}"
+                                                id="subDelegateOption-{{ $interestIndex }}">
+                                            <label
+                                                for="subDelegateOption-{{ $interestIndex }}">{{ $interest }}</label>
+                                        </div>
+                                    @endforeach
+
+                                    {{-- <div class="flex items-center gap-2">
+                                        <input type="checkbox" wire:model.lazy="subDelegateInterests"
+                                            value="Community Awareness and Emergency Management" id="subDelegateOpt1">
+                                        <label for="subDelegateOpt1">Community Awareness and Emergency Management</label>
+                                    </div>
+
+                                    <div class="flex items-center gap-2">
+                                        <input type="checkbox" wire:model.lazy="subDelegateInterests"
+                                            value="Distribution" id="subDelegateOpt2">
+                                        <label for="subDelegateOpt2">Distribution</label>
+                                    </div>
+
+                                    <div class="flex items-center gap-2">
+                                        <input type="checkbox" wire:model.lazy="subDelegateInterests"
+                                            value="Product Stewardship" id="subDelegateOpt3">
+                                        <label for="subDelegateOpt3">Product Stewardship</label>
+                                    </div>
+
+                                    <div class="flex items-center gap-2">
+                                        <input type="checkbox" wire:model.lazy="subDelegateInterests"
+                                            value="Process Safety" id="subDelegateOpt4">
+                                        <label for="subDelegateOpt4">Process Safety</label>
+                                    </div>
+
+                                    <div class="flex items-center gap-2">
+                                        <input type="checkbox" wire:model.lazy="subDelegateInterests"
+                                            value="Health & Safety" id="subDelegateOpt5">
+                                        <label for="subDelegateOpt5">Health & Safety</label>
+                                    </div>
+
+                                    <div class="flex items-center gap-2">
+                                        <input type="checkbox" wire:model.lazy="subDelegateInterests"
+                                            value="Security" id="subDelegateOpt6">
+                                        <label for="subDelegateOpt6">Security</label>
+                                    </div>
+
+                                    <div class="flex items-center gap-2">
+                                        <input type="checkbox" wire:model.lazy="subDelegateInterests"
+                                            value="Environmental Protection" id="subDelegateOpt7">
+                                        <label for="subDelegateOpt7">Environmental Protection</label>
+                                    </div> --}}
+                                </div>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>

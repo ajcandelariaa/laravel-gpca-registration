@@ -114,7 +114,7 @@
                         @enderror
                     </div>
                 </div>
-                
+
                 <div class="col-span-3 sm:col-span-1">
                     <div class="text-registrationPrimaryColor">
                         Country <span class="text-red-500">*</span>
@@ -223,6 +223,24 @@
                 @endif
             </div>
         </div>
+
+        @if ($event->category == 'RCW')
+            {{-- ROW 4 --}}
+            <div class="space-y-2 col-span-2">
+                <div class="text-registrationPrimaryColor">
+                    Which RC code are you interested in?
+                </div>
+                <div>
+                    @foreach (['Community Awareness and Emergency Management', 'Distribution', 'Product Stewardship', 'Process Safety', 'Health & Safety', 'Security', 'Environmental Protection'] as $interestIndex => $interest)
+                        <div class="flex items-center gap-2">
+                            <input type="checkbox" wire:model.lazy="mainDelegateInterests"
+                                value="{{ $interest }}" id="mainDelegateOption-{{ $interestIndex }}">
+                            <label for="mainDelegateOption-{{ $interestIndex }}">{{ $interest }}</label>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        @endif
     </div>
 
     {{-- @if ($event->category == 'AF' && $event->year == '2023')
@@ -268,6 +286,20 @@
                                         class="font-bold">{{ $additionalDelegate['subPromoCode'] }}</span>
                                     <span
                                         class="text-green-500 text-xs italic mt-1">({{ $additionalDelegate['promoCodeSuccessSub'] }})</span>
+                                </p>
+                            @endif
+
+                            @if ($event->category == 'RCW')
+                                <p>Interests:
+                                    @if (count($additionalDelegate['subDelegateInterests']) > 0)
+                                        @foreach ($additionalDelegate['subDelegateInterests'] as $subDelegateInterestIndex => $subDelegateInterest)
+                                            @if ($subDelegateInterestIndex == count($additionalDelegate['subDelegateInterests']) - 1)
+                                                {{ $subDelegateInterest }}
+                                            @else
+                                                {{ $subDelegateInterest }},
+                                            @endif
+                                        @endforeach
+                                    @endif
                                 </p>
                             @endif
                         </div>

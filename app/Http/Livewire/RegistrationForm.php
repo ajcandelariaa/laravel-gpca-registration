@@ -44,13 +44,13 @@ class RegistrationForm extends Component
     public $companyName, $companySector, $companyAddress, $companyCountry, $companyCity, $companyLandlineNumber, $companyMobileNumber, $assistantEmailAddress, $heardWhere, $attendingTo = [], $optionalInterests, $receiveWhatsappNotification = [];
 
     // MAIN DELEGATE
-    public $salutation, $firstName, $middleName, $lastName, $emailAddress, $mobileNumber, $nationality, $jobTitle, $badgeType, $promoCode, $promoCodeDiscount, $discountType, $isMainFree = false, $country;
+    public $salutation, $firstName, $middleName, $lastName, $emailAddress, $mobileNumber, $nationality, $jobTitle, $badgeType, $promoCode, $promoCodeDiscount, $discountType, $isMainFree = false, $country, $mainDelegateInterests = [];
 
     // SUB DELEGATE
-    public $subSalutation, $subFirstName, $subMiddleName, $subLastName, $subEmailAddress, $subMobileNumber, $subNationality, $subJobTitle, $subBadgeType, $subPromoCode, $subPromoCodeDiscount, $subDiscountType, $subCountry;
+    public $subSalutation, $subFirstName, $subMiddleName, $subLastName, $subEmailAddress, $subMobileNumber, $subNationality, $subJobTitle, $subBadgeType, $subPromoCode, $subPromoCodeDiscount, $subDiscountType, $subCountry, $subDelegateInterests = [];
 
     // SUB DELEGATE EDIT
-    public $subIdEdit, $subSalutationEdit, $subFirstNameEdit, $subMiddleNameEdit, $subLastNameEdit, $subEmailAddressEdit, $subMobileNumberEdit, $subNationalityEdit, $subJobTitleEdit, $subBadgeTypeEdit, $subPromoCodeEdit, $subPromoCodeDiscountEdit, $subDiscountTypeEdit, $subCountryEdit;
+    public $subIdEdit, $subSalutationEdit, $subFirstNameEdit, $subMiddleNameEdit, $subLastNameEdit, $subEmailAddressEdit, $subMobileNumberEdit, $subNationalityEdit, $subJobTitleEdit, $subBadgeTypeEdit, $subPromoCodeEdit, $subPromoCodeDiscountEdit, $subDiscountTypeEdit, $subCountryEdit, $subDelegateInterestsEdit = [];
 
     // 3RD PAGE
     public $paymentMethod, $finalEventStartDate, $finalEventEndDate, $finalQuantity, $finalUnitPrice, $finalNetAmount, $finalDiscount, $finalVat, $finalTotal;
@@ -750,6 +750,8 @@ class RegistrationForm extends Component
 
             'optional_interests' => $finalOptionalInterests,
 
+            'interests' => json_encode($this->mainDelegateInterests),
+
             'quantity' => $this->finalQuantity,
             'unit_price' => $this->finalUnitPrice,
             'net_amount' => $this->finalNetAmount,
@@ -799,6 +801,7 @@ class RegistrationForm extends Component
                     'badge_type' => $additionalDelegate['subBadgeType'],
                     'pcode_used' => $additionalDelegate['subPromoCode'],
                     'country' => $additionalDelegate['subCountry'],
+                    'interests' => json_encode($additionalDelegate['subDelegateInterests']),
                 ]);
 
                 Transactions::create([
@@ -1285,68 +1288,13 @@ class RegistrationForm extends Component
         $this->emailSubAlreadyUsedError = null;
 
         $this->subCountry = null;
+        $this->subDelegateInterests = [];
     }
 
     public function closeAddModal()
     {
         $this->showAddDelegateModal = false;
         $this->resetAddModalFields();
-    }
-
-    public function openEditModal($subDelegateId)
-    {
-        $this->showEditDelegateModal = true;
-        foreach ($this->additionalDelegates as $additionalDelegate) {
-            if ($additionalDelegate['subDelegateId'] == $subDelegateId) {
-                $this->subIdEdit = $additionalDelegate['subDelegateId'];
-                $this->subSalutationEdit = $additionalDelegate['subSalutation'];
-                $this->subFirstNameEdit = $additionalDelegate['subFirstName'];
-                $this->subMiddleNameEdit = $additionalDelegate['subMiddleName'];
-                $this->subLastNameEdit = $additionalDelegate['subLastName'];
-                $this->subEmailAddressEdit = $additionalDelegate['subEmailAddress'];
-                $this->subMobileNumberEdit = $additionalDelegate['subMobileNumber'];
-                $this->subNationalityEdit = $additionalDelegate['subNationality'];
-                $this->subJobTitleEdit = $additionalDelegate['subJobTitle'];
-                $this->subBadgeTypeEdit = $additionalDelegate['subBadgeType'];
-                $this->subPromoCodeEdit = $additionalDelegate['subPromoCode'];
-                $this->subPromoCodeDiscountEdit = $additionalDelegate['subPromoCodeDiscount'];
-                $this->subDiscountTypeEdit = $additionalDelegate['subDiscountType'];
-                $this->promoCodeSuccessSubEdit = $additionalDelegate['promoCodeSuccessSub'];
-                $this->promoCodeFailSubEdit = $additionalDelegate['promoCodeFailSub'];
-
-                $this->subCountryEdit = $additionalDelegate['subCountry'];
-            }
-        }
-    }
-
-    public function resetEditModalFields()
-    {
-        $this->subIdEdit = null;
-        $this->subSalutationEdit = null;
-        $this->subFirstNameEdit = null;
-        $this->subMiddleNameEdit = null;
-        $this->subLastNameEdit = null;
-        $this->subEmailAddressEdit = null;
-        $this->subMobileNumberEdit = null;
-        $this->subNationalityEdit = null;
-        $this->subJobTitleEdit = null;
-        $this->subBadgeTypeEdit = "Delegate";
-        $this->subPromoCodeEdit = null;
-        $this->subPromoCodeDiscountEdit = null;
-        $this->subDiscountTypeEdit = null;
-        $this->promoCodeSuccessSubEdit = null;
-        $this->promoCodeFailSubEdit = null;
-
-        $this->emailSubExistingError = null;
-        $this->emailSubAlreadyUsedError = null;
-
-        $this->subCountryEdit = null;
-    }
-
-    public function closeEditModal()
-    {
-        $this->showEditDelegateModal = false;
-        $this->resetEditModalFields();
     }
 
     public function saveAdditionalDelegate()
@@ -1406,6 +1354,7 @@ class RegistrationForm extends Component
                     'promoCodeSuccessSub' => $this->promoCodeSuccessSub,
                     'promoCodeFailSub' => $this->promoCodeFailSub,
                     'subCountry' => $this->subCountry,
+                    'subDelegateInterests' => $this->subDelegateInterests,
                 ]);
 
                 $this->resetAddModalFields();
@@ -1413,6 +1362,65 @@ class RegistrationForm extends Component
             }
         }
     }
+
+    public function openEditModal($subDelegateId)
+    {
+        $this->showEditDelegateModal = true;
+        foreach ($this->additionalDelegates as $additionalDelegate) {
+            if ($additionalDelegate['subDelegateId'] == $subDelegateId) {
+                $this->subIdEdit = $additionalDelegate['subDelegateId'];
+                $this->subSalutationEdit = $additionalDelegate['subSalutation'];
+                $this->subFirstNameEdit = $additionalDelegate['subFirstName'];
+                $this->subMiddleNameEdit = $additionalDelegate['subMiddleName'];
+                $this->subLastNameEdit = $additionalDelegate['subLastName'];
+                $this->subEmailAddressEdit = $additionalDelegate['subEmailAddress'];
+                $this->subMobileNumberEdit = $additionalDelegate['subMobileNumber'];
+                $this->subNationalityEdit = $additionalDelegate['subNationality'];
+                $this->subJobTitleEdit = $additionalDelegate['subJobTitle'];
+                $this->subBadgeTypeEdit = $additionalDelegate['subBadgeType'];
+                $this->subPromoCodeEdit = $additionalDelegate['subPromoCode'];
+                $this->subPromoCodeDiscountEdit = $additionalDelegate['subPromoCodeDiscount'];
+                $this->subDiscountTypeEdit = $additionalDelegate['subDiscountType'];
+                $this->promoCodeSuccessSubEdit = $additionalDelegate['promoCodeSuccessSub'];
+                $this->promoCodeFailSubEdit = $additionalDelegate['promoCodeFailSub'];
+
+                $this->subCountryEdit = $additionalDelegate['subCountry'];
+                $this->subDelegateInterestsEdit = $additionalDelegate['subDelegateInterests'];
+            }
+        }
+    }
+
+    public function resetEditModalFields()
+    {
+        $this->subIdEdit = null;
+        $this->subSalutationEdit = null;
+        $this->subFirstNameEdit = null;
+        $this->subMiddleNameEdit = null;
+        $this->subLastNameEdit = null;
+        $this->subEmailAddressEdit = null;
+        $this->subMobileNumberEdit = null;
+        $this->subNationalityEdit = null;
+        $this->subJobTitleEdit = null;
+        $this->subBadgeTypeEdit = "Delegate";
+        $this->subPromoCodeEdit = null;
+        $this->subPromoCodeDiscountEdit = null;
+        $this->subDiscountTypeEdit = null;
+        $this->promoCodeSuccessSubEdit = null;
+        $this->promoCodeFailSubEdit = null;
+
+        $this->emailSubExistingError = null;
+        $this->emailSubAlreadyUsedError = null;
+
+        $this->subCountryEdit = null;
+        $this->subDelegateInterestsEdit = [];
+    }
+
+    public function closeEditModal()
+    {
+        $this->showEditDelegateModal = false;
+        $this->resetEditModalFields();
+    }
+
 
     public function removeAdditionalDelegate($subDelegateId)
     {
@@ -1497,6 +1505,7 @@ class RegistrationForm extends Component
                         $this->additionalDelegates[$i]['promoCodeSuccessSub'] = $this->promoCodeSuccessSubEdit;
                         $this->additionalDelegates[$i]['promoCodeFailSub'] = $this->promoCodeFailSubEdit;
                         $this->additionalDelegates[$i]['subCountry'] = $this->subCountryEdit;
+                        $this->additionalDelegates[$i]['subDelegateInterests'] = $this->subDelegateInterestsEdit;
 
                         $this->resetEditModalFields();
                         $this->showEditDelegateModal = false;
