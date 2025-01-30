@@ -203,6 +203,10 @@ class RegistrationUnpaid extends Mailable
                 return new Content(
                     markdown: 'emails.2025.scea.registration-unpaid',
                 );
+            } else if ($this->details['eventCategory'] == "PC") {
+                return new Content(
+                    markdown: 'emails.2025.pc.registration-unpaid',
+                );
             } else {
                 return new Content(
                     markdown: 'emails.registration-unpaid',

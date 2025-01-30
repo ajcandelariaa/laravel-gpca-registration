@@ -36,7 +36,7 @@ class RegistrationFree extends Mailable
      */
     public function envelope()
     {
-        $subject = 'Registration confirmation for the ' . $this->details['eventName'];
+        $subject = 'Pending Registration confirmation for the ' . $this->details['eventName'];
 
         return new Envelope(
             from: new Address('forumregistration@gpca.org.ae', 'GPCA Events Registration'),
@@ -167,6 +167,10 @@ class RegistrationFree extends Mailable
             } else if ($this->details['eventCategory'] == "RCW") {
                 return new Content(
                     markdown: 'emails.2025.rcw.registration-free',
+                );
+            } else if ($this->details['eventCategory'] == "PC") {
+                return new Content(
+                    markdown: 'emails.2025.pc.registration-free',
                 );
             } else {
                 return new Content(

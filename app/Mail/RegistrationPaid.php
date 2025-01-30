@@ -208,6 +208,10 @@ class RegistrationPaid extends Mailable
                 return new Content(
                     markdown: 'emails.2025.scea.registration-paid',
                 );
+            } else if ($this->details['eventCategory'] == "PC") {
+                return new Content(
+                    markdown: 'emails.2025.pc.registration-paid',
+                );
             } else {
                 return new Content(
                     markdown: 'emails.registration-paid',
