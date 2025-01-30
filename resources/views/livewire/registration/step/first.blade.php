@@ -52,7 +52,7 @@
                         Chowdhury</strong>, <em>Head of Events</em>, at <a
                         href="mailto:faheem@gpca.org.ae">faheem@gpca.org.ae</a> or call +971 4 451 0666 ext. 122.</p>
 
-                @if ($eventCategory == 'PC')
+                @if ($event->category == 'PC')
                     <p class="font-bold mt-5">If you have registered within the early bird time frame, payment must be
                         completed before the deadline. Otherwise, the registration fee will automatically reflect the
                         standard rate. </p>
@@ -214,7 +214,7 @@
                 Chowdhury</strong>, <em>Head of Events</em>, at <a
                 href="mailto:faheem@gpca.org.ae">faheem@gpca.org.ae</a> or call +971 4 451 0666 ext. 122.</p>
 
-        @if ($eventCategory == 'PC')
+        @if ($event->category == 'PC')
             <p class="col-span-2 font-bold mt-5">If you have registered within the early bird time frame, payment must
                 be completed before the deadline. Otherwise, the registration fee will automatically reflect the
                 standard rate. </p>
