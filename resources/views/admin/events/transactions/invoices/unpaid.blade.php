@@ -185,7 +185,7 @@
             <li> For any cancellation, please notify us within 15 days from the receipt of the invoice. Any cancellation
                 made after 15 days shall not be accepted hence the invoice has to be settled</li>
             <li> If any delegate is unable to attend, we will accept a substitute delegate at no extra cost. Please notify
-                us in writing an email to: registration@gpca.org.ae with the name, job title, email address and telephone
+                us in writing an email to: forumregistration@gpca.org.ae with the name, job title, email address and telephone
                 number of both the registered and substitute delegate.</li>
             <li>Refund Policy
                 <p class="inside-li">3.1 If delegate/s cancelled their registration 31 days before the event, they will get
