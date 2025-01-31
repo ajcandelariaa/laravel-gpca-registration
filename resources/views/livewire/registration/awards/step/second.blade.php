@@ -283,6 +283,8 @@
                         @if ($category == "Best LSP of the Year")
                             Please submit the following files and supporting documents:
                             <br>
+                            <span class="italic text-xs text-red-600">(.PDF, .doc, .docx format only)</span>
+                            <br>
                             <ul class="italic text-sm list-decimal ml-10">
                                 <li>LSP assessment report</li>
                                 <li>Improvement action plan</li>
@@ -303,7 +305,6 @@
                             @endforeach
                         @endif
                     </div>
-                    <span class="italic text-xs text-red-600">(.PDF, .doc, .docx format only)</span>
                 </div>
             </div>
         </div>
