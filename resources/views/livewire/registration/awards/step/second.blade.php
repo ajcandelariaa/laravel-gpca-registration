@@ -281,13 +281,12 @@
                 <div class="col-span-2 sm:col-span-1">
                     <div class="text-registrationPrimaryColor">
                         @if ($category == "Best LSP of the Year")
-                            Supporting documents <span class="italic text-xs text-red-600">(You can choose up to 4 files in .PDF, .doc, .docx format only)</span>
+                            Please submit the following documents: <span class="italic text-xs text-red-600">(.PDF, .doc, .docx format only)</span>
                             <br>
-                            <span>Please submit the following documents:</span>
-                            <ul>
-                                <li>LSP assessment report</li>
-                                <li>Improvement action plan</li>
-                                <li>Pre-assessment document</li>
+                            <ul class="italic text-sm">
+                                <ol>LSP assessment report</ol>
+                                <ol>Improvement action plan</ol>
+                                <ol>Pre-assessment document</ol>
                             </ul>
                         @else
                             Supporting documents <span class="italic text-xs text-red-600">(You can choose up to 4 files in .PDF, .doc, .docx format only)</span>
