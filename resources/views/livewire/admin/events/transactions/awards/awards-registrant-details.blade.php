@@ -82,7 +82,7 @@
                         @if (count($finalData['supportingDocumentsDownloadId']) > 0)
                             <div class="grid grid-cols-1 gap-4">
                                 @foreach ($finalData['supportingDocumentsDownloadId'] as $index => $documentId)
-                                    <a href="{{ route('download-file', ['documentId' => $documentId]) }}"
+                                    <a href="{{ route('event-download-file', ['eventCategory' => $event->category, 'eventId' => $event->id, 'documentId' => $documentId]) }}"
                                         target="_blank"
                                         class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-center">
                                         <i class="fas fa-file-download mr-2"></i>
