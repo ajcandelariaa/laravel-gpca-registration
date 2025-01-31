@@ -8,7 +8,7 @@
         </div>
 
         <div class="text-registrationPrimaryColor font-bold text-xl">
-            Submission summary
+            Submission category
         </div>
     </div>
 
@@ -39,7 +39,7 @@
         </div>
 
         <div class="text-registrationPrimaryColor font-bold text-xl">
-            Package summary
+            Submission summary
         </div>
     </div>
 
