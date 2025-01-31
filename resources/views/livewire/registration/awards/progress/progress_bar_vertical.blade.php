@@ -8,7 +8,7 @@
         </div>
 
         <div class="text-registrationPrimaryColor font-bold text-xl">
-            Submission type
+            Submission summary
         </div>
     </div>
 

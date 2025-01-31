@@ -2,7 +2,7 @@
     <table class="w-full bg-registrationPrimaryColor text-white text-center" cellspacing="1" cellpadding="2">
         <thead>
             <tr>
-                <td class="py-4 font-bold text-lg">Pass category</td>
+                <td class="py-4 font-bold text-lg">Cost per submission</td>
                 @if ($finalEbEndDate != null)
                     <td class="py-4 font-bold text-lg">
                         <span>Early Bird Rate <br> <span class="font-normal text-base">(valid until
@@ -97,7 +97,9 @@
                 </div>
             </div>
 
-            <p class="mt-5 italic font-semibold text-red-600">Note: Only Mastercard and VISA credit card payments are accepted.</p>
+            <p class="mt-5 font-semibold text-red-600">Note: </p>
+            <p class="italic text-red-600">1. Only Mastercard and VISA credit card payments are accepted.</p>
+            <p class="italic text-red-600">2. You can only submit your entry for one category at a time.</p>
         </div>
 
         <div class="col-span-2 lg:col-span-1 flex flex-col gap-5">

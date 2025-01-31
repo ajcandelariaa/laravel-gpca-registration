@@ -280,7 +280,18 @@
 
                 <div class="col-span-2 sm:col-span-1">
                     <div class="text-registrationPrimaryColor">
-                        Supporting documents <span class="italic text-xs text-red-600">(You can choose up to 4 files in .PDF, .doc, .docx format only)</span>
+                        @if ($category == "Best LSP of the Year")
+                            Supporting documents <span class="italic text-xs text-red-600">(You can choose up to 4 files in .PDF, .doc, .docx format only)</span>
+                            <br>
+                            <span>Please submit the following documents:</span>
+                            <ul>
+                                <li>LSP assessment report</li>
+                                <li>Improvement action plan</li>
+                                <li>Pre-assessment document</li>
+                            </ul>
+                        @else
+                            Supporting documents <span class="italic text-xs text-red-600">(You can choose up to 4 files in .PDF, .doc, .docx format only)</span>
+                        @endif
                     </div>
                     <div>
                         <input type="file" wire:model.lazy="supportingDocuments" multiple
