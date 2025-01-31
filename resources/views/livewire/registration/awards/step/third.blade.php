@@ -27,7 +27,7 @@
             </div>
         </div>
 
-        <div class="mt-5 flex flex-col">
+        <div class="mt-5 flex">
             <button wire:click.prevent="ccClicked" type="button"
                 class="{{ $paymentMethod == 'creditCard' ? 'bg-registrationSecondaryColor text-white' : 'hover:bg-registrationSecondaryColor hover:text-white border-registrationSecondaryColor border-2 bg-white text-registrationSecondaryColor' }} font-bold w-52 rounded-md py-5 ">
                 <i class="fa-solid fa-credit-card mr-2"></i> Credit card</button>
