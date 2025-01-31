@@ -38,7 +38,7 @@
     
     <div class="grid grid-cols-horizontalProgressBarGridRCCAwards mt-5">
         <div class="text-sm md:text-base font-bold text-registrationPrimaryColor text-center flex justify-center">
-            Submission type
+            Submission category
         </div>
 
         <div class="w-full"></div>
