@@ -191,12 +191,12 @@
    <div class="terms-and-condition">
        <p>Terms and Conditions</p>
        <ol>
-           <li> For any cancellation, please notify us within 15 days from the receipt of the invoice. Any cancellation made after 15 days shall not be accepted hence the invoice has to be settled</li>
-           <li> If any delegate is unable to attend, we will accept a substitute delegate at no extra cost. Please notify us in writing an email to: forumregistration@gpca.org.ae with the name, job title, email address and telephone number of both the registered and substitute delegate.</li>
+           <li>Cancellations must be made in writing within 15 days of receiving the invoice. Cancellations received after this deadline will not be accepted, and the full invoice amount must be settled.</li>
+           <li>If a delegate is unable to attend, a substitute delegate can be nominated at no additional cost. Please notify us in writing via email at forumregistration@gpca.org.ae with the full name, job title, email address, and phone number of both the registered and substitute delegates.</li>
+           <li>If you have registered within the early bird time frame, payment must be completed before the deadline. Otherwise, the registration fee will automatically reflect the standard rate. </li>
            <li>Refund Policy
-               <p class="inside-li">3.1 If delegate/s cancelled their registration 31 days before the event, they will get a refund of 75% on the amount paid for the registration fee.</p>
-               <p class="inside-li">3.2 If delegate/s cancelled their registration less than 31 days before the event, NO refund will be given.</p>
-               <p class="inside-li">3.3 The refund will be on the net amount excluding 5% VAT.</p>
+               <p class="inside-li">4.1 If a delegate cancels their registration 31 days or more before the event, they will receive a refund of 75% of the paid registration fee.</p>
+               <p class="inside-li">4.2 If a delegate cancels their registration less than 31 days before the event, no refund will be issued.</p>
            </li>
        </ol>
    </div>
