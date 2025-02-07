@@ -100,6 +100,7 @@
             <p class="mt-5 font-semibold text-red-600">Note: </p>
             <p class="italic text-red-600">1. Only Mastercard and VISA credit card payments are accepted.</p>
             <p class="italic text-red-600">2. You can only submit your entry for one category at a time.</p>
+            <p class="italic text-red-600">3. To receive the entry form for your preferred award category/categories, please contact the GPCA team at <a href="mailto:nasim@gpca.org.ae.">nasim@gpca.org.ae.</a></p>
         </div>
 
         <div class="col-span-2 lg:col-span-1 flex flex-col gap-5">
