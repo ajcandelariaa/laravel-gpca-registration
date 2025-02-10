@@ -38,7 +38,7 @@ class RegistrationForm extends Component
 
 
     // DELEGATE PASS TYPE
-    public $accessType, $delegatePassType, $rateType;
+    public $accessType, $delegatePassType, $rateType, $termsCondition;
 
     // COMPANY INFO
     public $companyName, $companySector, $companyAddress, $companyCountry, $companyCity, $companyLandlineNumber, $companyMobileNumber, $assistantEmailAddress, $heardWhere, $attendingTo = [], $optionalInterests, $receiveWhatsappNotification = [];
@@ -481,10 +481,12 @@ class RegistrationForm extends Component
                     [
                         'companyName' => 'required',
                         'accessType' => 'required',
+                        'termsCondition' => 'required',
                     ],
                     [
                         'companyName.required' => "Company name is required",
                         'accessType.required' => "Access type is required",
+                        'termsCondition.required' => "You must agree to the Terms and Conditions to proceed",
                     ]
                 );
                 $this->currentStep += 1;
