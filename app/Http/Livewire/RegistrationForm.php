@@ -481,7 +481,7 @@ class RegistrationForm extends Component
                     [
                         'companyName' => 'required',
                         'accessType' => 'required',
-                        'termsCondition' => 'required',
+                        'termsCondition' => 'accepted',
                     ],
                     [
                         'companyName.required' => "Company name is required",
