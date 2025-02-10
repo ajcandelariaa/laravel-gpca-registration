@@ -48,15 +48,16 @@
                             class="text-blue-600 hover:underline font-semibold">register.</a></p>
                 @endif --}}
 
+                <div class="mt-5">
+                    <input type="checkbox" wire:model.lazy="termsCondition" id="terms-condition">
+                    <label for="terms-condition">I agree to the <a href="https://www.gpca.org.ae/terms-and-conditions/"
+                            target="_blank">Terms and Conditions</a> and <a href="https://www.gpca.org.ae/privacy-policy/"
+                            target="_blank">Privacy Policy</a>.</label>
+                </div>
+
                 <p class="mt-5">For inquiries or to speak with a member of our team, please contact <strong>Faheem
                         Chowdhury</strong>, <em>Head of Events</em>, at <a
                         href="mailto:faheem@gpca.org.ae">faheem@gpca.org.ae</a> or call +971 4 451 0666 ext. 122.</p>
-
-                @if ($event->category == 'PC')
-                    <p class="font-bold mt-5">If you have registered within the early bird time frame, payment must be
-                        completed before the deadline. Otherwise, the registration fee will automatically reflect the
-                        standard rate. </p>
-                @endif
             </div>
         @endif
 
@@ -210,14 +211,15 @@
         </div>
     </div>
     @if ($delegateFees->isEmpty())
+        <div class="col-span-2 mt-5">
+            <input type="checkbox" wire:model.lazy="termsCondition" id="terms-condition">
+            <label for="terms-condition">I agree to the <a href="https://www.gpca.org.ae/terms-and-conditions/"
+                    target="_blank">Terms and Conditions</a> and <a href="https://www.gpca.org.ae/privacy-policy/"
+                    target="_blank">Privacy Policy</a>.</label>
+        </div>
+
         <p class="col-span-2 mt-5">For inquiries or to speak with a member of our team, please contact <strong>Faheem
                 Chowdhury</strong>, <em>Head of Events</em>, at <a
                 href="mailto:faheem@gpca.org.ae">faheem@gpca.org.ae</a> or call +971 4 451 0666 ext. 122.</p>
-
-        @if ($event->category == 'PC')
-            <p class="col-span-2 font-bold mt-5">If you have registered within the early bird time frame, payment must
-                be completed before the deadline. Otherwise, the registration fee will automatically reflect the
-                standard rate. </p>
-        @endif
     @endif
 </div>
