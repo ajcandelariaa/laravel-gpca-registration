@@ -50,9 +50,9 @@
 
                 <div class="mt-5">
                     <input type="checkbox" wire:model.lazy="termsCondition" id="terms-condition">
-                    <label for="terms-condition">I agree to the <a href="https://www.gpca.org.ae/terms-and-conditions/"
-                            target="_blank" class="underline">Terms and Conditions</a> and <a
-                            href="https://www.gpca.org.ae/privacy-policy/" target="_blank" class="underline">Privacy Policy</a>.</label>
+                    <label for="terms-condition">I agree to the <a href="https://www.gpca.org.ae/terms-and-condition-events-registration/"
+                            target="_blank" class="text-registrationPrimaryColor underline">Terms and Conditions</a> and <a
+                            href="https://www.gpca.org.ae/privacy-policy/" target="_blank" class="text-registrationPrimaryColor underline">Privacy Policy</a>.</label>
 
                     @error('termsCondition')
                         <div class="text-red-500 text-xs italic mt-1">
@@ -219,9 +219,9 @@
     @if ($delegateFees->isEmpty())
         <div class="col-span-2 mt-5">
             <input type="checkbox" wire:model.lazy="termsCondition" id="terms-condition">
-            <label for="terms-condition">I agree to the <a href="https://www.gpca.org.ae/terms-and-conditions/"
-                    target="_blank" class="underline">Terms and Conditions</a> and <a href="https://www.gpca.org.ae/privacy-policy/"
-                    target="_blank" class="underline">Privacy Policy</a>.</label>
+            <label for="terms-condition">I agree to the <a href="https://www.gpca.org.ae/terms-and-condition-events-registration/"
+                    target="_blank" class="text-registrationPrimaryColor underline">Terms and Conditions</a> and <a href="https://www.gpca.org.ae/privacy-policy/"
+                    target="_blank" class="text-registrationPrimaryColor underline">Privacy Policy</a>.</label>
 
             @error('termsCondition')
                 <div class="text-red-500 text-xs italic mt-1">
