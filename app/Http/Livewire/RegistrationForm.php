@@ -486,7 +486,7 @@ class RegistrationForm extends Component
                     [
                         'companyName.required' => "Company name is required",
                         'accessType.required' => "Access type is required",
-                        'termsCondition.required' => "You must agree to the Terms and Conditions to proceed",
+                        'termsCondition.accepted' => "You must agree to the Terms and Conditions to proceed",
                     ]
                 );
                 $this->currentStep += 1;
