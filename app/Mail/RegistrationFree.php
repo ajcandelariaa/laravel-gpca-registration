@@ -172,6 +172,10 @@ class RegistrationFree extends Mailable
                 return new Content(
                     markdown: 'emails.2025.pc.registration-free',
                 );
+            } else if ($this->details['eventCategory'] == "SCC") {
+                return new Content(
+                    markdown: 'emails.2025.scc.registration-free',
+                );
             } else {
                 return new Content(
                     markdown: 'emails.registration-free',
