@@ -7,7 +7,7 @@
 
 <p class="sub" style="margin-top: 15px;">The GPCA team will contact you if your entry is shortlisted and will invite you to the Awards ceremony where the winners and runners-up will be announced. </p>
 
-<p class="sub" style="margin-top: 15px;">Please note the Awards ceremony is scheduled to take place on 26<sup>th</sup> May 2025 in Dubai, UAE, during the gala dinner of the 16<sup>th</sup> GPCA Supply Chain Conference.</p>
+<p class="sub" style="margin-top: 15px;">Please note the Awards ceremony is scheduled to take place on 27<sup>th</sup> May 2025 in Dubai, UAE, during the gala dinner of the 16<sup>th</sup> GPCA Supply Chain Conference.</p>
 
 <p class="sub" style="margin-top: 15px;">We have received the following details you provided, which have been shared with the GPCA team:</p>
 
