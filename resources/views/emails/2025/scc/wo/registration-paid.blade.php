@@ -1,9 +1,9 @@
 <x-mail::message>
 <p class="sub">Dear {{ $details['name'] }},</p>
 
-<p class="sub" style="margin-top: 15px;">Thank you for registering to attend the <a href="https://www.gulfsqas.com/Index.aspx">GULF SQAS Driving Supply Chain Sustainability Workshop</a>, taking place on 26 May 2025 at the Sofitel Dubai Downtown and <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a>, scheduled for {{ $details['eventDates'] }} at the {{ $details['eventLocation'] }}. By registering as a delegate, you are subject to the terms and conditions outlined in the invoice.</p>
+<p class="sub" style="margin-top: 15px;">Thank you for registering to attend the <a href="https://www.gulfsqas.com/Index.aspx" target="_blank">GULF SQAS Driving Supply Chain Sustainability Workshop</a>, taking place on 26 May 2025 at the Sofitel Dubai Downtown. By registering as a workshop attendee, you are subject to the terms and conditions outlined in the invoice.</p>
 
-<p class="sub" style="margin-top: 15px; color: red;">Please be advised that your registration is not yet confirmed. To avoid any inconvenience during onsite badge collection, please settle your payment or contact our finance team at <a href="mailto:analee@gpca.org.ae">analee@gpca.org.ae</a>. If you have registered within the early bird time frame, payment must be completed before the deadline. Otherwise, the registration fee will automatically reflect the standard rate. </p>
+<p class="sub" style="margin-top: 15px;">Your registration has been confirmed, and your workshop pass can be accessed during the <strong><em>workshop only</em></strong>. You will have access to the networking break and networking lunch. Please find below the summary of your booking confirmation.</p>
 
 <p class="title" style="margin-top: 20px;">Your registration details as follows:</p>
 <p class="sub">Full name: {{  $details['name'] }}</p>

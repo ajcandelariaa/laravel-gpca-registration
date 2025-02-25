@@ -54,6 +54,14 @@ class RegistrationUnpaid extends Mailable
         } else if ($this->details['eventYear'] == '2025') {
             if ($this->details['eventCategory'] == "SCEA") {
                 $subject = 'Outstanding payment for your entry submission on the ' . $this->details['eventName'];
+            } else if ($this->details['eventCategory'] == "SCC") {
+                if ($this->details['accessType'] == AccessTypes::CONFERENCE_ONLY->value) {
+                    $subject = 'Pending Registration for the ' . $this->details['eventName'];
+                } else if ($this->details['accessType'] == AccessTypes::WORKSHOP_ONLY->value) {
+                    $subject = 'Pending Registration for the GULF SQAS Driving Supply Chain Sustainability Workshop ';
+                } else {
+                    $subject = 'Pending Registration for the ' . $this->details['eventName'];
+                }
             } else {
                 $subject = 'Outstanding payment for your ' . $this->details['eventName'] . ' registration';
             }
@@ -208,9 +216,19 @@ class RegistrationUnpaid extends Mailable
                     markdown: 'emails.2025.pc.registration-unpaid',
                 );
             } else if ($this->details['eventCategory'] == "SCC") {
-                return new Content(
-                    markdown: 'emails.2025.scc.registration-unpaid',
-                );
+                if ($this->details['accessType'] == AccessTypes::CONFERENCE_ONLY->value) {
+                    return new Content(
+                        markdown: 'emails.2025.scc.co.registration-unpaid',
+                    );
+                } else if ($this->details['accessType'] == AccessTypes::WORKSHOP_ONLY->value) {
+                    return new Content(
+                        markdown: 'emails.2025.scc.wo.registration-unpaid',
+                    );
+                } else {
+                    return new Content(
+                        markdown: 'emails.2025.scc.registration-unpaid',
+                    );
+                }
             } else {
                 return new Content(
                     markdown: 'emails.registration-unpaid',

@@ -173,9 +173,19 @@ class RegistrationFree extends Mailable
                     markdown: 'emails.2025.pc.registration-free',
                 );
             } else if ($this->details['eventCategory'] == "SCC") {
-                return new Content(
-                    markdown: 'emails.2025.scc.registration-free',
-                );
+                if ($this->details['accessType'] == AccessTypes::CONFERENCE_ONLY->value) {
+                    return new Content(
+                        markdown: 'emails.2025.scc.co.registration-free',
+                    );
+                } else if ($this->details['accessType'] == AccessTypes::WORKSHOP_ONLY->value) {
+                    return new Content(
+                        markdown: 'emails.2025.scc.wo.registration-free',
+                    );
+                } else {
+                    return new Content(
+                        markdown: 'emails.2025.scc.registration-free',
+                    );
+                }
             } else {
                 return new Content(
                     markdown: 'emails.registration-free',

@@ -1,9 +1,9 @@
 <x-mail::message>
 <p class="sub">Dear {{ $details['name'] }},</p>
 
-<p class="sub" style="margin-top: 15px;">Thank you for registering to attend the <a href="https://www.gulfsqas.com/Index.aspx">GULF SQAS Driving Supply Chain Sustainability Workshop</a>, taking place on 26 May 2025 at the Sofitel Dubai Downtown and <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a>, scheduled for {{ $details['eventDates'] }} at the {{ $details['eventLocation'] }}. By registering as a delegate, you are subject to the terms and conditions outlined in the invoice.</p>
+<p class="sub" style="margin-top: 15px;">Thank you for registering to attend the <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a>, taking place from {{ $details['eventDates'] }} at the {{ $details['eventLocation'] }}. By registering as a delegate, you are subject to the terms and conditions outlined in the invoice.</p>
 
-<p class="sub" style="margin-top: 15px; color: red;">Please be advised that your registration is not yet confirmed. To avoid any inconvenience during onsite badge collection, please settle your payment or contact our finance team at <a href="mailto:analee@gpca.org.ae">analee@gpca.org.ae</a>. If you have registered within the early bird time frame, payment must be completed before the deadline. Otherwise, the registration fee will automatically reflect the standard rate. </p>
+<p class="sub" style="margin-top: 15px;"><strong>Please note that your registration is subject to confirmation from one of our team members. We will review the registration details you've provided to ensure we have the accurate information to make the necessary badge arrangements.</strong></p>
 
 <p class="title" style="margin-top: 20px;">Your registration details as follows:</p>
 <p class="sub">Full name: {{  $details['name'] }}</p>
@@ -26,6 +26,15 @@ Download invoice
 <p class="sub" style="margin-top: 20px; text-decoration: underline;"><strong>Collection of Badges</strong></p>
 
 <p class="sub" style="margin-top: 5px;">Upon arrival, please proceed to the registration desk located in the Foyer to collect your event badge. Kindly present your ID or email confirmation for verification.</p>
+
+<p class="sub" style="margin-top: 20px; text-decoration: underline;"><strong>About GPCA Gulf SQAS Workshop</strong></p>
+
+<p class="sub" style="margin-top: 5px;">On 26<sup>th</sup> May in conjunction with the 16th GPCA Supply Chain Conference there will be a <a href="https://www.gulfsqas.com/Index.aspx">GULF SQAS Driving Supply Chain Sustainability Workshop</a>, the Workshop is tailored to be the hub for addressing the evolving needs of the Arabian Gulf’s logistics sector, with a focus on long-term sustainability, safety, and quality. Discover how this essential program empowers Logistic Service Providers (LSPs) to assess and continuously enhance their Environment, Health, Safety, Security, and Quality (EHSS&Q) performance. As one of the pioneering regions adopting this system, GPCA is proud to lead the way in establishing Gulf SQAS as the industry standard for land-based logistics operations.</p>
+
+<p class="sub" style="margin-top: 15px;">If you wish to upgrade from a conference pass to a full event pass, the following additional fees will apply:</p>
+<p class="sub" style="margin-top: 5px;">Member companies: $200</p>
+<p class="sub">Non-member companies registered at the Early Bird rate: $200</p>
+<p class="sub">Non-member companies registered at the Standard rate: $400</p>
 
 <p class="sub" style="margin-top: 15px;">For any event-related queries, please reach out to the following team members:</p>
 

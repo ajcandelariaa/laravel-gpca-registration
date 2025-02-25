@@ -55,6 +55,14 @@ class RegistrationPaid extends Mailable
         } else if ($this->details['eventYear'] == '2025') {
             if ($this->details['eventCategory'] == "SCEA") {
                 $subject = 'Thank you for your entry submission to the ' . $this->details['eventName'];
+            } else if ($this->details['eventCategory'] == "SCC") {
+                if ($this->details['accessType'] == AccessTypes::CONFERENCE_ONLY->value) {
+                    $subject = 'Registration confirmation for the ' . $this->details['eventName'];
+                } else if ($this->details['accessType'] == AccessTypes::WORKSHOP_ONLY->value) {
+                    $subject = 'Registration Confirmation for the GULF SQAS Driving Supply Chain Sustainability Workshop';
+                } else {
+                    $subject = 'Registration confirmation for the ' . $this->details['eventName'];
+                }
             } else {
                 $subject = 'Registration confirmation for the ' . $this->details['eventName'];
             }
@@ -213,9 +221,19 @@ class RegistrationPaid extends Mailable
                     markdown: 'emails.2025.pc.registration-paid',
                 );
             } else if ($this->details['eventCategory'] == "SCC") {
-                return new Content(
-                    markdown: 'emails.2025.scc.registration-paid',
-                );
+                if ($this->details['accessType'] == AccessTypes::CONFERENCE_ONLY->value) {
+                    return new Content(
+                        markdown: 'emails.2025.scc.co.registration-paid',
+                    );
+                } else if ($this->details['accessType'] == AccessTypes::WORKSHOP_ONLY->value) {
+                    return new Content(
+                        markdown: 'emails.2025.scc.wo.registration-paid',
+                    );
+                } else {
+                    return new Content(
+                        markdown: 'emails.2025.scc.registration-paid',
+                    );
+                }
             } else {
                 return new Content(
                     markdown: 'emails.registration-paid',
