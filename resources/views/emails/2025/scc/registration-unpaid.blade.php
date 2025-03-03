@@ -1,7 +1,7 @@
 <x-mail::message>
 <p class="sub">Dear {{ $details['name'] }},</p>
 
-<p class="sub" style="margin-top: 15px;">Thank you for registering to attend the <a href="https://www.gulfsqas.com/Index.aspx">GULF SQAS Driving Supply Chain Sustainability Workshop</a>, taking place on 26 May 2025 at the Sofitel Dubai Downtown and <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a>, scheduled for {{ $details['eventDates'] }} at the {{ $details['eventLocation'] }}. By registering as a delegate, you are subject to the terms and conditions outlined in the invoice.</p>
+<p class="sub" style="margin-top: 15px;">Thank you for registering to attend the <a href="https://gpca.org.ae/conferences/scc/gulf-sqas-workshop/" target="_blank">Gulf SQAS Workshop</a>, taking place on 26 May 2025 at the Sofitel Dubai Downtown and <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a>, scheduled for {{ $details['eventDates'] }} at the {{ $details['eventLocation'] }}. By registering as a delegate, you are subject to the terms and conditions outlined in the invoice.</p>
 
 <p class="sub" style="margin-top: 15px; color: red;">Please be advised that your registration is not yet confirmed. To avoid any inconvenience during onsite badge collection, please settle your payment or contact our finance team at <a href="mailto:analee@gpca.org.ae">analee@gpca.org.ae</a>. If you have registered within the early bird time frame, payment must be completed before the deadline. Otherwise, the registration fee will automatically reflect the standard rate. </p>
 

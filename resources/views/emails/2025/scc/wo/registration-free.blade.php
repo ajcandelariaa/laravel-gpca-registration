@@ -1,7 +1,7 @@
 <x-mail::message>
 <p class="sub">Dear {{ $details['name'] }},</p>
 
-<p class="sub" style="margin-top: 15px;">Thank you for registering to attend the <a href="https://www.gulfsqas.com/Index.aspx" target="_blank">GULF SQAS Driving Supply Chain Sustainability Workshop</a>, taking place on 26 May 2025 at the Sofitel Dubai Downtown. By registering as a workshop attendee, you are subject to the terms and conditions outlined in the invoice.</p>
+<p class="sub" style="margin-top: 15px;">Thank you for registering to attend the <a href="https://gpca.org.ae/conferences/scc/gulf-sqas-workshop/" target="_blank">Gulf SQAS Workshop</a>, taking place on 26 May 2025 at the Sofitel Dubai Downtown. By registering as a workshop attendee, you are subject to the terms and conditions outlined in the invoice.</p>
 
 <p class="sub" style="margin-top: 15px;"><strong>Please note that your registration is subject to confirmation from one of our team members. We will review the registration details you've provided to ensure we have the accurate information to make the necessary badge arrangements.</strong></p>
 
