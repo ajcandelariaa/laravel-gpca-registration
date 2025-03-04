@@ -469,6 +469,14 @@ class RegistrantDetails extends Component
             } else {
                 $this->finalData['invoiceData']['invoiceDescription'] = "Process Safety Workshops and " . $this->event->name . ' – ' . $this->eventFormattedDate . ' at ' . $this->event->location;
             }
+        } else if ($this->event->category == "SCC" && $this->event->year == "2025") {
+            if ($this->accessType == AccessTypes::CONFERENCE_ONLY->value) {
+                $this->finalData['invoiceData']['invoiceDescription'] = $this->event->name . ' – 27-28 May 2025 at ' . $this->event->location;
+            } else if ($this->accessType == AccessTypes::WORKSHOP_ONLY->value) {
+                $this->finalData['invoiceData']['invoiceDescription'] = "Gulf SQAS Workshop – 26th May 2025 at the Sofitel Dubai Downtown";
+            } else {
+                $this->finalData['invoiceData']['invoiceDescription'] = "Gulf SQAS Workshop – 26th May 2025 at the Sofitel Dubai Downtown and " . $this->event->name . ' – ' . $this->eventFormattedDate . ' at ' . $this->event->location;
+            }
         } else {
             $this->finalData['invoiceData']['invoiceDescription'] = $this->event->name . ' – ' . $this->eventFormattedDate . ' at ' . $this->event->location;
         }
@@ -1850,7 +1858,7 @@ class RegistrantDetails extends Component
             'delegate_cancelled_datetime' => null,
             'delegate_refunded_datetime' => null,
             'delegate_replaced_datetime' => null,
-            
+
             'registration_confirmation_sent_count' => $this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['registration_confirmation_sent_count'],
             'registration_confirmation_sent_datetime' => $this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['registration_confirmation_sent_datetime'],
         ]);
@@ -1882,7 +1890,7 @@ class RegistrantDetails extends Component
         $this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['delegate_replaced_datetime'] = Carbon::parse(Carbon::now())->format('M j, Y g:i A');
         $this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['registration_confirmation_sent_count'] = 0;
         $this->finalData['allDelegates'][$this->replaceDelegateIndex][$this->replaceDelegateInnerIndex]['registration_confirmation_sent_datetime'] = null;
-    
+
 
         $this->dispatchBrowserEvent('swal:delegate-cancel-replace-success', [
             'type' => 'success',

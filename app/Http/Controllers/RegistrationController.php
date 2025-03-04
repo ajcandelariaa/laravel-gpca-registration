@@ -4085,6 +4085,14 @@ class RegistrationController extends Controller
                 } else {
                     $invoiceDescription = "Process Safety Workshops and " . $event->name . ' – ' . $eventFormattedData . ' at ' . $event->location;
                 }
+            } else if ($event->category == "SCC" && $event->year == "2025") {
+                if ($mainDelegate->access_type == AccessTypes::CONFERENCE_ONLY->value) {
+                    $invoiceDescription = $event->name . ' – 27-28 May 2025 at ' . $event->location;
+                } else if ($mainDelegate->access_type == AccessTypes::WORKSHOP_ONLY->value) {
+                    $invoiceDescription = "Gulf SQAS Workshop – 26th May 2025 at the Sofitel Dubai Downtown";
+                } else {
+                    $invoiceDescription = "Gulf SQAS Workshop – 26th May 2025 at the Sofitel Dubai Downtown and " . $event->name . ' – ' . $eventFormattedData . ' at ' . $event->location;
+                }
             } else {
                 $invoiceDescription = $event->name . ' – ' . $eventFormattedData . ' at ' . $event->location;
             }
@@ -5080,7 +5088,7 @@ class RegistrationController extends Controller
                             'country' => $subDelegate->country,
 
                             'heard_where' => $mainDelegate->heard_where,
-                            
+
                             'interests' => $subDelegate->interests,
 
                             'seat_number' => $subDelegate->seat_number,

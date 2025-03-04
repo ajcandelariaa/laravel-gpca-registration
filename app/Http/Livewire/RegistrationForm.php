@@ -605,6 +605,14 @@ class RegistrationForm extends Component
                 } else {
                     $this->invoiceDescription = "Process Safety Workshops and " . $this->event->name . ' – ' . $this->eventFormattedDate . ' at ' . $this->event->location;
                 }
+            } else if ($this->event->category == "SCC" && $this->event->year == "2025") {
+                if ($this->accessType == AccessTypes::CONFERENCE_ONLY->value) {
+                    $this->invoiceDescription = $this->event->name . ' – 27-28 May 2025 at ' . $this->event->location;
+                } else if ($this->accessType == AccessTypes::WORKSHOP_ONLY->value) {
+                    $this->invoiceDescription = "Gulf SQAS Workshop – 26th May 2025 at the Sofitel Dubai Downtown";
+                } else {
+                    $this->invoiceDescription = "Gulf SQAS Workshop – 26th May 2025 at the Sofitel Dubai Downtown and " . $this->event->name . ' – ' . $this->eventFormattedDate . ' at ' . $this->event->location;
+                }
             } else {
                 $this->invoiceDescription = $this->event->name . ' – ' . $this->eventFormattedDate . ' at ' . $this->event->location;
             }
