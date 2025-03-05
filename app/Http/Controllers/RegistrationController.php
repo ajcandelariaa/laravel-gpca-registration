@@ -113,7 +113,7 @@ class RegistrationController extends Controller
                 if ($eventCategory == "GLF" || $eventCategory == "DFCLW1") {
                     $eventFormattedDate =  Carbon::parse($event->event_end_date)->format('d M Y');
                 } else if ($eventCategory == "ANC" && $event->year = "2025") {
-                    $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('d M') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');
+                    $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('d M') . ' - ' . Carbon::parse($event->event_end_date)->format('d M Y');
                 } else {
                     $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('d') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');
                 }
@@ -154,7 +154,7 @@ class RegistrationController extends Controller
                 if ($eventCategory == "GLF" || $eventCategory == "DFCLW1") {
                     $eventFormattedDate =  Carbon::parse($event->event_end_date)->format('d M Y');
                 } else if ($eventCategory == "ANC" && $event->year = "2025") {
-                    $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('d M') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');
+                    $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('d M') . ' - ' . Carbon::parse($event->event_end_date)->format('d M Y');
                 } else {
                     $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('d') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');
                 }
