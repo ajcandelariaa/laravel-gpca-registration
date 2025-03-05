@@ -108,6 +108,8 @@ class RegistrationController extends Controller
             } else if ($eventCategory == "SCEA") {
                 $finalData = $this->registrationFailedViewAwards($eventCategory, $eventId, $mainDelegateId);
                 $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('j F Y');
+            } else if ($eventCategory == "ANC" && $event->year = "2025") {
+                $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('d M') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');
             } else {
                 $finalData = $this->registrationFailedViewEvents($eventCategory, $eventId, $mainDelegateId);
                 if ($eventCategory == "GLF" || $eventCategory == "DFCLW1") {
@@ -147,6 +149,8 @@ class RegistrationController extends Controller
             } else if ($eventCategory == "SCEA") {
                 $finalData = $this->registrationSuccessViewAwards($eventCategory, $eventId, $mainDelegateId);
                 $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('j F Y');
+            } else if ($eventCategory == "ANC" && $event->year = "2025") {
+                $eventFormattedDate =  Carbon::parse($event->event_start_date)->format('d M') . '-' . Carbon::parse($event->event_end_date)->format('d M Y');
             } else {
                 $finalData = $this->registrationSuccessViewEvents($eventCategory, $eventId, $mainDelegateId);
                 if ($eventCategory == "GLF" || $eventCategory == "DFCLW1") {
