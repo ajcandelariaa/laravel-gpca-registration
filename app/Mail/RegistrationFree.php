@@ -186,6 +186,20 @@ class RegistrationFree extends Mailable
                         markdown: 'emails.2025.scc.registration-free',
                     );
                 }
+            } else if ($this->details['eventCategory'] == "ANC") {
+                if ($this->details['accessType'] == AccessTypes::CONFERENCE_ONLY->value) {
+                    return new Content(
+                        markdown: 'emails.2025.anc.co.registration-free',
+                    );
+                } else if ($this->details['accessType'] == AccessTypes::WORKSHOP_ONLY->value) {
+                    return new Content(
+                        markdown: 'emails.2025.anc.wo.registration-free',
+                    );
+                } else {
+                    return new Content(
+                        markdown: 'emails.2025.anc.registration-free',
+                    );
+                }
             } else {
                 return new Content(
                     markdown: 'emails.registration-free',

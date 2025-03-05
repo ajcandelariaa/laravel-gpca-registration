@@ -63,6 +63,14 @@ class RegistrationPaid extends Mailable
                 } else {
                     $subject = 'Registration confirmation for the ' . $this->details['eventName'];
                 }
+            } else if ($this->details['eventCategory'] == "ANC") {
+                if ($this->details['accessType'] == AccessTypes::CONFERENCE_ONLY->value) {
+                    $subject = 'Registration confirmation for the ' . $this->details['eventName'];
+                } else if ($this->details['accessType'] == AccessTypes::WORKSHOP_ONLY->value) {
+                    $subject = 'Registration Confirmation for the 3rd Operational Excellence Workshop';
+                } else {
+                    $subject = 'Registration confirmation for the ' . $this->details['eventName'];
+                }
             } else {
                 $subject = 'Registration confirmation for the ' . $this->details['eventName'];
             }
@@ -232,6 +240,20 @@ class RegistrationPaid extends Mailable
                 } else {
                     return new Content(
                         markdown: 'emails.2025.scc.registration-paid',
+                    );
+                }
+            } else if ($this->details['eventCategory'] == "ANC") {
+                if ($this->details['accessType'] == AccessTypes::CONFERENCE_ONLY->value) {
+                    return new Content(
+                        markdown: 'emails.2025.anc.co.registration-paid',
+                    );
+                } else if ($this->details['accessType'] == AccessTypes::WORKSHOP_ONLY->value) {
+                    return new Content(
+                        markdown: 'emails.2025.anc.wo.registration-paid',
+                    );
+                } else {
+                    return new Content(
+                        markdown: 'emails.2025.anc.registration-paid',
                     );
                 }
             } else {

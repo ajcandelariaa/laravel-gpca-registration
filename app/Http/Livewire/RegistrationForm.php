@@ -613,6 +613,14 @@ class RegistrationForm extends Component
                 } else {
                     $this->invoiceDescription = "Gulf SQAS Workshop – 26th May 2025 at the Sofitel Dubai Downtown and " . $this->event->name . ' – ' . $this->eventFormattedDate . ' at ' . $this->event->location;
                 }
+            } else  if ($this->event->category == "ANC" && $this->event->year == "2025") {
+                if ($this->accessType == AccessTypes::CONFERENCE_ONLY->value) {
+                    $this->invoiceDescription = $this->event->name . ' – 30 September-01 October 2025  at ' . $this->event->location;
+                } else if ($this->accessType == AccessTypes::WORKSHOP_ONLY->value) {
+                    $this->invoiceDescription = "3rd Operational Excellence Workshop – 29th September 2025 at " .  $this->event->location;
+                } else {
+                    $this->invoiceDescription = "3rd Operational Excellence Workshop – 29th September 2025 and " . $this->event->name . ' - 30 September-01 October 2025  at ' . $this->event->location;
+                }
             } else {
                 $this->invoiceDescription = $this->event->name . ' – ' . $this->eventFormattedDate . ' at ' . $this->event->location;
             }

@@ -62,6 +62,14 @@ class RegistrationUnpaid extends Mailable
                 } else {
                     $subject = 'Pending Registration for the ' . $this->details['eventName'];
                 }
+            } else if ($this->details['eventCategory'] == "ANC") {
+                if ($this->details['accessType'] == AccessTypes::CONFERENCE_ONLY->value) {
+                    $subject = 'Pending Registration for the ' . $this->details['eventName'];
+                } else if ($this->details['accessType'] == AccessTypes::WORKSHOP_ONLY->value) {
+                    $subject = 'Pending Registration for the 3rd Operational Excellence Workshop';
+                } else {
+                    $subject = 'Pending Registration for the ' . $this->details['eventName'];
+                }
             } else {
                 $subject = 'Outstanding payment for your ' . $this->details['eventName'] . ' registration';
             }
@@ -227,6 +235,20 @@ class RegistrationUnpaid extends Mailable
                 } else {
                     return new Content(
                         markdown: 'emails.2025.scc.registration-unpaid',
+                    );
+                }
+            } else if ($this->details['eventCategory'] == "ANC") {
+                if ($this->details['accessType'] == AccessTypes::CONFERENCE_ONLY->value) {
+                    return new Content(
+                        markdown: 'emails.2025.anc.co.registration-unpaid',
+                    );
+                } else if ($this->details['accessType'] == AccessTypes::WORKSHOP_ONLY->value) {
+                    return new Content(
+                        markdown: 'emails.2025.anc.wo.registration-unpaid',
+                    );
+                } else {
+                    return new Content(
+                        markdown: 'emails.2025.anc.registration-unpaid',
                     );
                 }
             } else {
