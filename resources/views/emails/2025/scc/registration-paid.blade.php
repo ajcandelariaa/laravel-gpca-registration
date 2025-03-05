@@ -27,7 +27,38 @@ Download invoice
 
 <p class="sub" style="margin-top: 5px;">Upon arrival, please proceed to the registration desk located in the Foyer to collect your event badge. Kindly present your ID or email confirmation for verification.</p>
 
-<p class="sub" style="margin-top: 15px;">For any event-related queries, please reach out to the following team members:</p>
+<p class="sub" style="margin-top: 20px; text-decoration: underline;"><strong>Hotel Booking</strong></p>
+
+<p class="sub" style="margin-top: 15px;"><strong>1. Address Sky View Hotel</strong></p>
+
+<p class="sub">For the hotel accommodation, please click the booking link <strong><a href="https://www.addresshotels.com/en/hotels/address-sky-view/">GPCA EVENT 2025</a></strong> and use the discount code: <strong>GPCA</strong>.</p>
+
+<p class="sub" style="margin-top: 5px;">Note: Upon clicking the code, choose promo code and enter <strong>GPCA</strong>.</p>
+
+<p class="sub" style="margin-top: 15px; text-decoration: underline;"><strong>Terms & Conditions:</strong></p>
+
+<ul class="event-list">
+    <li style="margin-top: 5px;">Booking dates from May 26 – 29, 2025</li>
+    <li>Discounted rate is valid for 3 nights pre and 3 nights post stay</li>
+    <li>Minimum length of stay for 2 nights, required for all bookings</li>
+    <li>Nonrefundable rate plan (full cancellation charges will apply)</li>
+    <li>Room will be subject to availability upon confirmation</li>
+</ul>
+
+<p class="sub" style="margin-top: 15px;"><strong>2. Sofitel Dubai Downtown</strong></p>
+
+<p class="sub" style="margin-top: 15px; text-decoration: underline;"><strong>Terms & Conditions:</strong></p>
+
+<ul class="event-list">
+    <li style="margin-top: 5px;">Luxury room rate – AED 861++ per night</li>
+    <li>Special hotel rate booking is valid until April 15, 2025</li>
+    <li>Special hotel rate includes breakfast and internet</li>
+    <li>Above rate is subject to availability</li>
+</ul>
+
+<p class="sub" style="margin-top: 5px;">For booking and other inquiry, kindly coordinate with Tamir Khilenbaatar at <a href="mailto:Tamir.KHILENBAATAR@sofitel.com">Tamir.KHILENBAATAR@sofitel.com</a> or call +971 54 581 2958.</p>
+
+<p class="sub" style="margin-top: 20px;">For any event-related queries, please reach out to the following team members:</p>
 
 <p class="sub" style="margin-top: 10px;"><strong>Sponsorship, Exhibition, and Delegate Inquiries: </strong></p>
 

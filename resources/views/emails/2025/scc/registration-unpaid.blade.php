@@ -58,7 +58,7 @@ Download invoice
 
 <p class="sub" style="margin-top: 5px;">For booking and other inquiry, kindly coordinate with Tamir Khilenbaatar at <a href="mailto:Tamir.KHILENBAATAR@sofitel.com">Tamir.KHILENBAATAR@sofitel.com</a> or call +971 54 581 2958.</p>
 
-<p class="sub" style="margin-top: 15px;">For any event-related queries, please reach out to the following team members:</p>
+<p class="sub" style="margin-top: 20px;">For any event-related queries, please reach out to the following team members:</p>
 
 <p class="sub" style="margin-top: 10px;"><strong>Sponsorship, Exhibition, and Delegate Inquiries: </strong></p>
 

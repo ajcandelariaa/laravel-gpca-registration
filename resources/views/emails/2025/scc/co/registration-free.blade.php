@@ -27,6 +27,37 @@ Download invoice
 
 <p class="sub" style="margin-top: 5px;">Upon arrival, please proceed to the registration desk located in the Foyer to collect your event badge. Kindly present your ID or email confirmation for verification.</p>
 
+<p class="sub" style="margin-top: 20px; text-decoration: underline;"><strong>Hotel Booking</strong></p>
+
+<p class="sub" style="margin-top: 15px;"><strong>1. Address Sky View Hotel</strong></p>
+
+<p class="sub">For the hotel accommodation, please click the booking link <strong><a href="https://www.addresshotels.com/en/hotels/address-sky-view/">GPCA EVENT 2025</a></strong> and use the discount code: <strong>GPCA</strong>.</p>
+
+<p class="sub" style="margin-top: 5px;">Note: Upon clicking the code, choose promo code and enter <strong>GPCA</strong>.</p>
+
+<p class="sub" style="margin-top: 15px; text-decoration: underline;"><strong>Terms & Conditions:</strong></p>
+
+<ul class="event-list">
+    <li style="margin-top: 5px;">Booking dates from May 26 – 29, 2025</li>
+    <li>Discounted rate is valid for 3 nights pre and 3 nights post stay</li>
+    <li>Minimum length of stay for 2 nights, required for all bookings</li>
+    <li>Nonrefundable rate plan (full cancellation charges will apply)</li>
+    <li>Room will be subject to availability upon confirmation</li>
+</ul>
+
+<p class="sub" style="margin-top: 15px;"><strong>2. Sofitel Dubai Downtown</strong></p>
+
+<p class="sub" style="margin-top: 15px; text-decoration: underline;"><strong>Terms & Conditions:</strong></p>
+
+<ul class="event-list">
+    <li style="margin-top: 5px;">Luxury room rate – AED 861++ per night</li>
+    <li>Special hotel rate booking is valid until April 15, 2025</li>
+    <li>Special hotel rate includes breakfast and internet</li>
+    <li>Above rate is subject to availability</li>
+</ul>
+
+<p class="sub" style="margin-top: 5px;">For booking and other inquiry, kindly coordinate with Tamir Khilenbaatar at <a href="mailto:Tamir.KHILENBAATAR@sofitel.com">Tamir.KHILENBAATAR@sofitel.com</a> or call +971 54 581 2958.</p>
+
 <p class="sub" style="margin-top: 20px; text-decoration: underline;"><strong>About GPCA Gulf SQAS Workshop</strong></p>
 
 <p class="sub" style="margin-top: 5px;">On 26<sup>th</sup> May in conjunction with the 16<sup>th</sup> GPCA Supply Chain Conference there will be a <a href="https://gpca.org.ae/conferences/scc/gulf-sqas-workshop/" target="_blank">Gulf SQAS Workshop</a>, the Workshop is tailored to be the hub for addressing the evolving needs of the Arabian Gulf’s logistics sector, with a focus on long-term sustainability, safety, and quality. Discover how this essential program empowers Logistic Service Providers (LSPs) to assess and continuously enhance their Environment, Health, Safety, Security, and Quality (EHSS&Q) performance. As one of the pioneering regions adopting this system, GPCA is proud to lead the way in establishing Gulf SQAS as the industry standard for land-based logistics operations.</p>
