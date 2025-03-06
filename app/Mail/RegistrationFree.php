@@ -200,6 +200,20 @@ class RegistrationFree extends Mailable
                         markdown: 'emails.2025.anc.registration-free',
                     );
                 }
+            } else if ($this->details['eventCategory'] == "RCC") {
+                if ($this->details['accessType'] == AccessTypes::CONFERENCE_ONLY->value) {
+                    return new Content(
+                        markdown: 'emails.2025.rcc.co.registration-free',
+                    );
+                } else if ($this->details['accessType'] == AccessTypes::WORKSHOP_ONLY->value) {
+                    return new Content(
+                        markdown: 'emails.2025.rcc.wo.registration-free',
+                    );
+                } else {
+                    return new Content(
+                        markdown: 'emails.2025.rcc.registration-free',
+                    );
+                }
             } else {
                 return new Content(
                     markdown: 'emails.registration-free',

@@ -4101,10 +4101,17 @@ class RegistrationController extends Controller
                 if ($mainDelegate->access_type == AccessTypes::CONFERENCE_ONLY->value) {
                     $invoiceDescription = $event->name . ' – 30 September-01 October 2025  at ' . $event->location;
                 } else if ($mainDelegate->access_type == AccessTypes::WORKSHOP_ONLY->value) {
-                    $invoiceDescription = "Operational Excellence in the GCC Agri-Nutrients Industry Workshop – 10th September 2024 at " .  $event->location;
                     $invoiceDescription = "3rd Operational Excellence Workshop – 29th September 2025 at " .  $event->location;
                 } else {
                     $invoiceDescription = "3rd Operational Excellence Workshop – 29th September 2025 and " . $event->name . ' - 30 September-01 October 2025  at ' . $event->location;
+                }
+            } else if ($event->category == "RCC" && $event->year == "2025") {
+                if ($mainDelegate->access_type == AccessTypes::CONFERENCE_ONLY->value) {
+                    $invoiceDescription = $event->name . ' – 28-29 October 2025 at ' . $event->location;
+                } else if ($mainDelegate->access_type == AccessTypes::WORKSHOP_ONLY->value) {
+                    $invoiceDescription = "Workshop – 27th October 2025 at " .  $event->location;
+                } else {
+                    $invoiceDescription = "Workshop – 27th October 2025 and " . $event->name . ' - 28-29 October 2025 at ' . $event->location;
                 }
             } else {
                 $invoiceDescription = $event->name . ' – ' . $eventFormattedData . ' at ' . $event->location;
