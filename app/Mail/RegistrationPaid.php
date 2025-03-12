@@ -272,6 +272,10 @@ class RegistrationPaid extends Mailable
                         markdown: 'emails.2025.rcc.registration-paid',
                     );
                 }
+            } else if ($this->details['eventCategory'] == "PSW") {
+                return new Content(
+                    markdown: 'emails.2025.psw.registration-paid',
+                );
             } else {
                 return new Content(
                     markdown: 'emails.registration-paid',

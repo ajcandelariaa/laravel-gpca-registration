@@ -214,6 +214,10 @@ class RegistrationFree extends Mailable
                         markdown: 'emails.2025.rcc.registration-free',
                     );
                 }
+            } else if ($this->details['eventCategory'] == "PSW") {
+                return new Content(
+                    markdown: 'emails.2025.psw.registration-free',
+                );
             } else {
                 return new Content(
                     markdown: 'emails.registration-free',

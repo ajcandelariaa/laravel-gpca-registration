@@ -267,6 +267,10 @@ class RegistrationUnpaid extends Mailable
                         markdown: 'emails.2025.rcc.registration-unpaid',
                     );
                 }
+            } else if ($this->details['eventCategory'] == "PSW") {
+                return new Content(
+                    markdown: 'emails.2025.psw.registration-unpaid',
+                );
             } else {
                 return new Content(
                     markdown: 'emails.registration-unpaid',
