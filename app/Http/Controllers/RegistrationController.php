@@ -4067,6 +4067,8 @@ class RegistrationController extends Controller
 
             if ($eventCategory == "GLF" || $eventCategory == "DFCLW1") {
                 $eventFormattedData = Carbon::parse($event->event_end_date)->format('j F Y');
+            } else if ($eventCategory == "PSW" && $event->year == "2025") { 
+                $eventFormattedData = Carbon::parse($event->event_start_date)->format('j F') . '-' . Carbon::parse($event->event_end_date)->format('j F Y');
             } else {
                 $eventFormattedData = Carbon::parse($event->event_start_date)->format('j') . '-' . Carbon::parse($event->event_end_date)->format('j F Y');
             }
