@@ -152,10 +152,9 @@ class RegistrationForm extends Component
         $this->finalEventEndDate = Carbon::parse($this->event->event_end_date)->format('d M Y');
 
         if ($this->event->category == "PSW" && $this->event->year == "2025") { 
-            // $this->eventFormattedDate = "April 30 to May 01, 2025";
-            $this->eventFormattedDate = Carbon::parse($this->event->event_start_date)->format('d M') . '-' . Carbon::parse($this->event->event_end_date)->format('d M Y');
+            $this->eventFormattedDate = Carbon::parse($this->event->event_start_date)->format('j F') . ' - ' . Carbon::parse($this->event->event_end_date)->format('j F Y');
         } else {
-            $this->eventFormattedDate = Carbon::parse($this->event->event_start_date)->format('d') . '-' . Carbon::parse($this->event->event_end_date)->format('d M Y');
+            $this->eventFormattedDate = Carbon::parse($this->event->event_start_date)->format('j') . '-' . Carbon::parse($this->event->event_end_date)->format('j F Y');
         }
     }
 
