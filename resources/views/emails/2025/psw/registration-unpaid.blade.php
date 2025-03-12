@@ -30,10 +30,9 @@ Download invoice
 <p class="sub" style="margin-top: 5px;">For the hotel accommodation, guests can send an email to reservations.pullmandubaidowntown@accor.com with details in order for the hotel’s reservations team to make the reservation in the system and send the booking confirmation along with the SecurePay Link (link for online card payment).</p>
 
 <ul class="event-list">
-    <li style="margin-top: 5px;">	Guests should mention the booking name <strong>“GPCA Process Safety Workshop”</strong> and booking code <a href="https://accorce2.oraclehospitality.eu-frankfurt-1.ocs.oraclecloud.com/OPERA9/opera/operacloud/faces/opera-cloud-index/OperaCloud"><strong>“2504GULFPE_001”</strong></a> to avail of the special rates.</li>
-    <li>	AED 820 – AED 870+++ per night includes breakfast and internet.</li>
-    <li>Special hotel rate includes breakfast and internet</li>
-    <li>	All room reservations must be completed at the latest by 31<sup>st</sup> March 2025.</li>
+    <li style="margin-top: 5px;">Guests should mention the booking name <strong>“GPCA Process Safety Workshop”</strong> and booking code <a href="https://accorce2.oraclehospitality.eu-frankfurt-1.ocs.oraclecloud.com/OPERA9/opera/operacloud/faces/opera-cloud-index/OperaCloud"><strong>“2504GULFPE_001”</strong></a> to avail of the special rates.</li>
+    <li>AED 820 – AED 870+++ per night includes breakfast and internet.</li>
+    <li>All room reservations must be completed at the latest by 31<sup>st</sup> March 2025.</li>
 </ul>
 
 <p class="sub" style="margin-top: 20px;">Best regards,</p>
