@@ -84,7 +84,13 @@ class RegistrantDetails extends Component
         } else {
             $this->ccEmailNotif = config('app.ccEmailNotif.default');
         }
-        $this->eventFormattedDate = Carbon::parse($this->event->event_start_date)->format('j') . '-' . Carbon::parse($this->event->event_end_date)->format('j F Y');
+
+        if ($this->event->category == "PSW" && $this->event->year == "2025") { 
+            // $this->eventFormattedDate = "April 30 to May 01, 2025";
+            $this->eventFormattedDate = Carbon::parse($this->event->event_start_date)->format('j F') . '-' . Carbon::parse($this->event->event_end_date)->format('j F Y');
+        } else {
+            $this->eventFormattedDate = Carbon::parse($this->event->event_start_date)->format('j') . '-' . Carbon::parse($this->event->event_end_date)->format('j F Y');
+        }
     }
 
     public function render()
