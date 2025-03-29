@@ -1,5 +1,7 @@
 <x-mail::message>
-<p class="sub">Dear {{ $details['name'] }},</p>
+<img src="http://gpca.org.ae/conferences/plastics/wp-content/uploads/2025/03/Reg_Banner-v2-scaled.jpg">
+        
+<p class="sub" style="margin-top: 15px;">Dear {{ $details['name'] }},</p>
 
 <p class="sub" style="margin-top: 15px;">Thank you for registering to attend the <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a>, taking place from {{ $details['eventDates'] }} at the {{ $details['eventLocation'] }}. By registering as a delegate, you are subject to the terms and conditions outlined in the invoice.</p>
 
