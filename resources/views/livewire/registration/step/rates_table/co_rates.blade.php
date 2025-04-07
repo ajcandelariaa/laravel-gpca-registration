@@ -1,5 +1,5 @@
 <div class="mb-4">
-    <div class="text-2xl text-registrationPrimaryColor font-semibold">Conference only</div>
+    <div class="text-2xl text-registrationPrimaryColor font-semibold">Conference Only Pass</div>
 
     @if ($event->category == 'ANC' && $event->year == '2024')
         <p class="text-lg font-semibold mt-2">Delegate pass includes:</p>
@@ -28,6 +28,19 @@
             <ul class="list-disc col-span-1 ml-5">
                 <li>Networking breaks</li>
                 <li>Gala dinner on 8<sup>th</sup> October</li>
+            </ul>
+        </div>
+    @endif
+
+    @if ($event->category == 'SCC' && $event->year == '2025')
+        <p class="text-lg font-semibold mt-2">Delegate pass includes:</p>
+        <div class="grid grid-cols-2 gap-5 mt-2">
+            <ul class="list-disc col-span-1 ml-5">
+                <li>Access to conference sessions on 27-28 May</li>
+                <li>Access to exhibition halls</li>
+                <li>Networking breaks on 27-28 May</li>
+                <li>Gala dinner on 27 May</li>
+                <li>Supply Chain Excellence Awards on 27 May</li>
             </ul>
         </div>
     @endif

@@ -1,5 +1,9 @@
 <div class="mb-4">
-    <div class="text-2xl text-registrationPrimaryColor font-semibold">Workshop only</div>
+    @if ($event->category == 'SCC' && $event->year == '2025')
+        <div class="text-2xl text-registrationPrimaryColor font-semibold">Gulf SQAS Workshop Pass</div>
+    @else
+        <div class="text-2xl text-registrationPrimaryColor font-semibold">Workshop only</div>
+    @endif
 
     @if ($event->category == 'ANC' && $event->year == '2024')
         <p class="text-lg font-semibold mt-2">Delegate pass includes:</p>
@@ -15,7 +19,7 @@
             </ul>
         </div>
     @endif
-    
+
     @if ($event->category == 'PSC' && $event->year == '2024')
         <p class="text-lg font-semibold mt-2">Delegate pass includes:</p>
         <div class="grid grid-cols-2 gap-5 mt-2">
@@ -26,6 +30,16 @@
             <ul class="list-disc col-span-1 ml-5">
                 <li>First-of-its-kind program, “Process Safety by Frontlines”</li>
                 <li>Networking reception on 7<sup>th</sup> October</li>
+            </ul>
+        </div>
+    @endif
+
+    @if ($event->category == 'SCC' && $event->year == '2025')
+        <p class="text-lg font-semibold mt-2">Delegate pass includes:</p>
+        <div class="grid grid-cols-2 gap-5 mt-2">
+            <ul class="list-disc col-span-1 ml-5">
+                <li>Access to Gulf SQAS Workshop on 26 May</li>
+                <li>Networking breaks on 26 May</li>
             </ul>
         </div>
     @endif

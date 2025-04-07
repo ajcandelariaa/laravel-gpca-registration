@@ -1,7 +1,16 @@
 <div class="mx-5">
     @if ($event->category != 'GLF' && $event->category != 'DFCLW1')
-        @include('livewire.registration.step.rates_table.fe_rates')
-
+        @if (
+            $event->wo_eb_full_member_rate != null ||
+                $event->wo_eb_member_rate != null ||
+                $event->wo_eb_nmember_rate != null ||
+                $event->wo_std_full_member_rate != null ||
+                $event->wo_std_member_rate != null ||
+                $event->wo_std_nmember_rate != null)
+            <div class="mt-8"></div>
+            @include('livewire.registration.step.rates_table.wo_rates')
+        @endif
+        
         @if (
             $event->co_eb_full_member_rate != null ||
                 $event->co_eb_member_rate != null ||
@@ -13,16 +22,7 @@
             @include('livewire.registration.step.rates_table.co_rates')
         @endif
 
-        @if (
-            $event->wo_eb_full_member_rate != null ||
-                $event->wo_eb_member_rate != null ||
-                $event->wo_eb_nmember_rate != null ||
-                $event->wo_std_full_member_rate != null ||
-                $event->wo_std_member_rate != null ||
-                $event->wo_std_nmember_rate != null)
-            <div class="mt-8"></div>
-            @include('livewire.registration.step.rates_table.wo_rates')
-        @endif
+        @include('livewire.registration.step.rates_table.fe_rates')
     @endif
 
 
@@ -50,9 +50,11 @@
 
                 <div class="mt-5">
                     <input type="checkbox" wire:model.lazy="termsCondition" id="terms-condition">
-                    <label for="terms-condition">I agree to the <a href="https://www.gpca.org.ae/terms-and-condition-events-registration/"
-                            target="_blank" class="text-registrationPrimaryColor underline">Terms and Conditions</a> and <a
-                            href="https://www.gpca.org.ae/privacy-policy/" target="_blank" class="text-registrationPrimaryColor underline">Privacy Policy</a>.</label>
+                    <label for="terms-condition">I agree to the <a
+                            href="https://www.gpca.org.ae/terms-and-condition-events-registration/" target="_blank"
+                            class="text-registrationPrimaryColor underline">Terms and Conditions</a> and <a
+                            href="https://www.gpca.org.ae/privacy-policy/" target="_blank"
+                            class="text-registrationPrimaryColor underline">Privacy Policy</a>.</label>
 
                     @error('termsCondition')
                         <div class="text-red-500 text-xs italic mt-1">
@@ -219,9 +221,11 @@
     @if ($delegateFees->isEmpty())
         <div class="col-span-2 mt-5">
             <input type="checkbox" wire:model.lazy="termsCondition" id="terms-condition">
-            <label for="terms-condition">I agree to the <a href="https://www.gpca.org.ae/terms-and-condition-events-registration/"
-                    target="_blank" class="text-registrationPrimaryColor underline">Terms and Conditions</a> and <a href="https://www.gpca.org.ae/privacy-policy/"
-                    target="_blank" class="text-registrationPrimaryColor underline">Privacy Policy</a>.</label>
+            <label for="terms-condition">I agree to the <a
+                    href="https://www.gpca.org.ae/terms-and-condition-events-registration/" target="_blank"
+                    class="text-registrationPrimaryColor underline">Terms and Conditions</a> and <a
+                    href="https://www.gpca.org.ae/privacy-policy/" target="_blank"
+                    class="text-registrationPrimaryColor underline">Privacy Policy</a>.</label>
 
             @error('termsCondition')
                 <div class="text-red-500 text-xs italic mt-1">
@@ -230,8 +234,8 @@
             @enderror
         </div>
 
-        <p class="col-span-2 mt-5">For inquiries or to speak with a member of our team, please contact <strong>Faheem
-                Chowdhury</strong>, <em>Head of Events</em>, at <a
-                href="mailto:faheem@gpca.org.ae">faheem@gpca.org.ae</a> or call +971 4 451 0666 ext. 122.</p>
+        <p class="col-span-2 mt-5">For inquiries or to speak with a member of our team, please contact our sales team at
+            <a href="mailto:sales@gpca.org.ae" class="underline">sales@gpca.org.ae</a> or call +971 4 451 0666 ext. 103,
+            106.</p>
     @endif
 </div>

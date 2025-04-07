@@ -12,8 +12,8 @@
         $event->wo_std_member_rate != null ||
         $event->wo_std_nmember_rate != null)
     <div class="mb-4">
-        <div class="text-2xl text-registrationPrimaryColor font-semibold">Full event access</div>
-    
+        <div class="text-2xl text-registrationPrimaryColor font-semibold">Full Event Access Pass</div>
+
         @if ($event->category == 'ANC' && $event->year == '2024')
             <p class="text-lg font-semibold mt-2">Delegate pass includes:</p>
             <div class="grid grid-cols-2 gap-5 mt-2">
@@ -31,7 +31,7 @@
                 </ul>
             </div>
         @endif
-    
+
         @if ($event->category == 'PSC' && $event->year == '2024')
             <p class="text-lg font-semibold mt-2">Delegate pass includes:</p>
             <div class="grid grid-cols-2 gap-5 mt-2">
@@ -45,6 +45,20 @@
                     <li>Networking breaks</li>
                     <li>Networking reception on 7<sup>th</sup> October</li>
                     <li>Gala dinner on 8<sup>th</sup> October</li>
+                </ul>
+            </div>
+        @endif
+
+        @if ($event->category == 'SCC' && $event->year == '2025')
+            <p class="text-lg font-semibold mt-2">Delegate pass includes:</p>
+            <div class="grid grid-cols-2 gap-5 mt-2">
+                <ul class="list-disc col-span-1 ml-5">
+                    <li>Access to Gulf SQAS Workshop on 26 May</li>
+                    <li>Access to conference sessions on 27-28 May</li>
+                    <li>Access to exhibition halls</li>
+                    <li>Networking breaks from 26-28 May</li>
+                    <li>Gala dinner on 27 May</li>
+                    <li>Supply Chain Excellence Awards on 27 May</li>
                 </ul>
             </div>
         @endif
