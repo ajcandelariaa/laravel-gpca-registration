@@ -7,10 +7,9 @@
                 $event->wo_std_full_member_rate != null ||
                 $event->wo_std_member_rate != null ||
                 $event->wo_std_nmember_rate != null)
-            <div class="mt-8"></div>
             @include('livewire.registration.step.rates_table.wo_rates')
         @endif
-        
+
         @if (
             $event->co_eb_full_member_rate != null ||
                 $event->co_eb_member_rate != null ||
@@ -22,6 +21,7 @@
             @include('livewire.registration.step.rates_table.co_rates')
         @endif
 
+        <div class="mt-8"></div>
         @include('livewire.registration.step.rates_table.fe_rates')
     @endif
 

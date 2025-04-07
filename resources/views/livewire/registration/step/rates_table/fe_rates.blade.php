@@ -56,6 +56,9 @@
                     <li>Access to Gulf SQAS Workshop on 26 May</li>
                     <li>Access to conference sessions on 27-28 May</li>
                     <li>Access to exhibition halls</li>
+                </ul>
+
+                <ul class="list-disc col-span-1 ml-5">
                     <li>Networking breaks from 26-28 May</li>
                     <li>Gala dinner on 27 May</li>
                     <li>Supply Chain Excellence Awards on 27 May</li>

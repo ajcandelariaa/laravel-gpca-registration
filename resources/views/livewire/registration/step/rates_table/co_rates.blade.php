@@ -39,6 +39,8 @@
                 <li>Access to conference sessions on 27-28 May</li>
                 <li>Access to exhibition halls</li>
                 <li>Networking breaks on 27-28 May</li>
+            </ul>
+            <ul class="list-disc col-span-1 ml-5">
                 <li>Gala dinner on 27 May</li>
                 <li>Supply Chain Excellence Awards on 27 May</li>
             </ul>
