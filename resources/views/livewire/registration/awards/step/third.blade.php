@@ -28,7 +28,7 @@
         </div>
 
         <div class="mt-5 flex gap-5 items-start">
-            @if ($companyName == "Almajdouie & De Rijke Limited Co.")
+            @if ($companyName == "Almajdouie & De Rijke Limited Co." || $companyName == "SABIC")
                 <button wire:click.prevent="btClicked" type="button"
                     class="{{ $paymentMethod == 'bankTransfer' ? 'bg-registrationSecondaryColor text-white' : 'hover:bg-registrationSecondaryColor hover:text-white border-registrationSecondaryColor border-2 bg-white text-registrationSecondaryColor' }} font-bold w-52 rounded-md py-5 ">
                     <i class="fa-solid fa-building-columns mr-2"></i> Bank transfer</button>
