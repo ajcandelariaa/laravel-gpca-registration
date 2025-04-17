@@ -434,14 +434,14 @@ class FastTrackController extends Controller
                         }
                     }
 
-                    // ScannedDelegate::create([
-                    //     'event_id' => $eventId,
-                    //     'event_category' => $eventCategory,
-                    //     'delegate_id' => $delegateId,
-                    //     'delegate_type' => $delegateType,
-                    //     'scanner_location' => $location,
-                    //     'scanned_date_time' => Carbon::now('Asia/Muscat'),
-                    // ]);
+                    ScannedDelegate::create([
+                        'event_id' => $eventId,
+                        'event_category' => $eventCategory,
+                        'delegate_id' => $delegateId,
+                        'delegate_type' => $delegateType,
+                        'scanner_location' => $location,
+                        'scanned_date_time' => Carbon::now('Asia/Muscat'),
+                    ]);
 
                     if ($delegateType == "main") {
                         $delegateDetails = MainDelegate::where('event_id', $eventId)->where('id', $delegateId)->first();
