@@ -1259,86 +1259,88 @@ class DelegateController extends Controller
             $mainDelegates = MainDelegate::where('event_id', $eventId)->get();
             if (!$mainDelegates->isEmpty()) {
                 foreach ($mainDelegates as $mainDelegate) {
-                    $companyName = "";
+                    if ($mainDelegate->access_type != AccessTypes::WORKSHOP_ONLY->value) {
+                        $companyName = "";
 
-                    if ($mainDelegate->alternative_company_name != null) {
-                        $companyName = $mainDelegate->alternative_company_name;
-                    } else {
-                        $companyName = $mainDelegate->company_name;
-                    }
-
-                    if ($mainDelegate->delegate_replaced_by_id == null && (!$mainDelegate->delegate_refunded)) {
-                        if ($mainDelegate->registration_status == "confirmed") {
-
-                            $tempYear = Carbon::parse($mainDelegate->registered_date_time)->format('y');
-                            $transactionId = Transaction::where('event_id', $eventId)->where('delegate_id', $mainDelegate->id)->where('delegate_type', "main")->value('id');
-                            $lastDigit = 1000 + intval($transactionId);
-
-                            $finalTransactionId = $eventYear . $eventCode . $lastDigit;
-                            $invoiceNumber = $eventCategory . $tempYear . "/" . $lastDigit;
-
-                            array_push($delegateList, [
-                                'mainDelegateId' => $mainDelegate->id,
-                                'delegateId' => $mainDelegate->id,
-                                'delegateTransactionId' => $finalTransactionId,
-                                'delegateInvoiceNumber' => $invoiceNumber,
-                                'delegateType' => "main",
-                                'delegatePassType' => $mainDelegate->pass_type,
-                                'delegateCompany' => $companyName,
-                                'delegateCompanyCountry' => $mainDelegate->company_country,
-                                'delegateCompanyMobileNumber' => $mainDelegate->company_mobile_number,
-                                'delegateJobTitle' => $mainDelegate->job_title,
-                                'delegateSalutation' => $mainDelegate->salutation,
-                                'delegateFName' => $mainDelegate->first_name,
-                                'delegateMName' => $mainDelegate->middle_name,
-                                'delegateLName' => $mainDelegate->last_name,
-                                'delegateEmailAddress' => $mainDelegate->email_address,
-                                'delegateMobileNumber' => $mainDelegate->mobile_number,
-                                'delegateNationality' => $mainDelegate->nationality,
-                                'delegateCountry' => $mainDelegate->country,
-                                'delegateBadgeType' => $mainDelegate->badge_type,
-                            ]);
+                        if ($mainDelegate->alternative_company_name != null) {
+                            $companyName = $mainDelegate->alternative_company_name;
+                        } else {
+                            $companyName = $mainDelegate->company_name;
                         }
-                    }
 
-                    $subDelegates = AdditionalDelegate::where('main_delegate_id', $mainDelegate->id)->get();
+                        if ($mainDelegate->delegate_replaced_by_id == null && (!$mainDelegate->delegate_refunded)) {
+                            if ($mainDelegate->registration_status == "confirmed") {
 
-                    if (!$subDelegates->isEmpty()) {
-                        foreach ($subDelegates as $subDelegate) {
+                                $tempYear = Carbon::parse($mainDelegate->registered_date_time)->format('y');
+                                $transactionId = Transaction::where('event_id', $eventId)->where('delegate_id', $mainDelegate->id)->where('delegate_type', "main")->value('id');
+                                $lastDigit = 1000 + intval($transactionId);
 
-                            if ($subDelegate->delegate_replaced_by_id == null && (!$subDelegate->delegate_refunded)) {
-                                if ($mainDelegate->registration_status == "confirmed") {
+                                $finalTransactionId = $eventYear . $eventCode . $lastDigit;
+                                $invoiceNumber = $eventCategory . $tempYear . "/" . $lastDigit;
 
-                                    $tempYear = Carbon::parse($subDelegate->registered_date_time)->format('y');
-                                    $transactionId = Transaction::where('delegate_id', $subDelegate->id)->where('delegate_type', "sub")->value('id');
-                                    $lastDigit = 1000 + intval($transactionId);
-                                    $finalTransactionId = $eventYear . $eventCode . $lastDigit;
+                                array_push($delegateList, [
+                                    'mainDelegateId' => $mainDelegate->id,
+                                    'delegateId' => $mainDelegate->id,
+                                    'delegateTransactionId' => $finalTransactionId,
+                                    'delegateInvoiceNumber' => $invoiceNumber,
+                                    'delegateType' => "main",
+                                    'delegatePassType' => $mainDelegate->pass_type,
+                                    'delegateCompany' => $companyName,
+                                    'delegateCompanyCountry' => $mainDelegate->company_country,
+                                    'delegateCompanyMobileNumber' => $mainDelegate->company_mobile_number,
+                                    'delegateJobTitle' => $mainDelegate->job_title,
+                                    'delegateSalutation' => $mainDelegate->salutation,
+                                    'delegateFName' => $mainDelegate->first_name,
+                                    'delegateMName' => $mainDelegate->middle_name,
+                                    'delegateLName' => $mainDelegate->last_name,
+                                    'delegateEmailAddress' => $mainDelegate->email_address,
+                                    'delegateMobileNumber' => $mainDelegate->mobile_number,
+                                    'delegateNationality' => $mainDelegate->nationality,
+                                    'delegateCountry' => $mainDelegate->country,
+                                    'delegateBadgeType' => $mainDelegate->badge_type,
+                                ]);
+                            }
+                        }
 
-                                    $transactionId2 = Transaction::where('event_id', $eventId)->where('delegate_id', $subDelegate->main_delegate_id)->where('delegate_type', "main")->value('id');
-                                    $lastDigit2 = 1000 + intval($transactionId2);
-                                    $invoiceNumber = $eventCategory . $tempYear . "/" . $lastDigit2;
+                        $subDelegates = AdditionalDelegate::where('main_delegate_id', $mainDelegate->id)->get();
 
-                                    array_push($delegateList, [
-                                        'mainDelegateId' => $mainDelegate->id,
-                                        'delegateId' => $subDelegate->id,
-                                        'delegateTransactionId' => $finalTransactionId,
-                                        'delegateInvoiceNumber' => $invoiceNumber,
-                                        'delegateType' => "sub",
-                                        'delegatePassType' => $mainDelegate->pass_type,
-                                        'delegateCompany' => $companyName,
-                                        'delegateCompanyCountry' => $mainDelegate->company_country,
-                                        'delegateCompanyMobileNumber' => $mainDelegate->company_mobile_number,
-                                        'delegateJobTitle' => $subDelegate->job_title,
-                                        'delegateSalutation' => $subDelegate->salutation,
-                                        'delegateFName' => $subDelegate->first_name,
-                                        'delegateMName' => $subDelegate->middle_name,
-                                        'delegateLName' => $subDelegate->last_name,
-                                        'delegateEmailAddress' => $subDelegate->email_address,
-                                        'delegateMobileNumber' => $subDelegate->mobile_number,
-                                        'delegateNationality' => $subDelegate->nationality,
-                                        'delegateCountry' => $subDelegate->country,
-                                        'delegateBadgeType' => $subDelegate->badge_type,
-                                    ]);
+                        if (!$subDelegates->isEmpty()) {
+                            foreach ($subDelegates as $subDelegate) {
+
+                                if ($subDelegate->delegate_replaced_by_id == null && (!$subDelegate->delegate_refunded)) {
+                                    if ($mainDelegate->registration_status == "confirmed") {
+
+                                        $tempYear = Carbon::parse($subDelegate->registered_date_time)->format('y');
+                                        $transactionId = Transaction::where('delegate_id', $subDelegate->id)->where('delegate_type', "sub")->value('id');
+                                        $lastDigit = 1000 + intval($transactionId);
+                                        $finalTransactionId = $eventYear . $eventCode . $lastDigit;
+
+                                        $transactionId2 = Transaction::where('event_id', $eventId)->where('delegate_id', $subDelegate->main_delegate_id)->where('delegate_type', "main")->value('id');
+                                        $lastDigit2 = 1000 + intval($transactionId2);
+                                        $invoiceNumber = $eventCategory . $tempYear . "/" . $lastDigit2;
+
+                                        array_push($delegateList, [
+                                            'mainDelegateId' => $mainDelegate->id,
+                                            'delegateId' => $subDelegate->id,
+                                            'delegateTransactionId' => $finalTransactionId,
+                                            'delegateInvoiceNumber' => $invoiceNumber,
+                                            'delegateType' => "sub",
+                                            'delegatePassType' => $mainDelegate->pass_type,
+                                            'delegateCompany' => $companyName,
+                                            'delegateCompanyCountry' => $mainDelegate->company_country,
+                                            'delegateCompanyMobileNumber' => $mainDelegate->company_mobile_number,
+                                            'delegateJobTitle' => $subDelegate->job_title,
+                                            'delegateSalutation' => $subDelegate->salutation,
+                                            'delegateFName' => $subDelegate->first_name,
+                                            'delegateMName' => $subDelegate->middle_name,
+                                            'delegateLName' => $subDelegate->last_name,
+                                            'delegateEmailAddress' => $subDelegate->email_address,
+                                            'delegateMobileNumber' => $subDelegate->mobile_number,
+                                            'delegateNationality' => $subDelegate->nationality,
+                                            'delegateCountry' => $subDelegate->country,
+                                            'delegateBadgeType' => $subDelegate->badge_type,
+                                        ]);
+                                    }
                                 }
                             }
                         }
