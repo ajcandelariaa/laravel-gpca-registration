@@ -89,7 +89,18 @@ class FastTrackController extends Controller
                         $delegateBadgeCollected = $mainDelegate->printedBadge->collected ? "Yes" : "No";
                     }
 
+
+                    $finalAccessType = "";
+                    if ($mainDelegate->access_type == AccessTypes::CONFERENCE_ONLY->value) {
+                        $finalAccessType = "CO";
+                    } else if ($mainDelegate->access_type == AccessTypes::WORKSHOP_ONLY->value) {
+                        $finalAccessType = "WO";
+                    } else {
+                        $finalAccessType = "FE";
+                    }
+
                     array_push($confirmedDelegates, [
+                        'accessType' => $finalAccessType,
                         'transactionId' => $finalTransactionId,
                         'id' => $mainDelegate->id,
                         'delegateType' => "main",
@@ -169,6 +180,7 @@ class FastTrackController extends Controller
                             }
 
                             array_push($confirmedDelegates, [
+                                'accessType' => $finalAccessType,
                                 'transactionId' => $finalTransactionId,
                                 'id' => $subDelegate->id,
                                 'delegateType' => "sub",
