@@ -1,7 +1,7 @@
 <x-mail::message>
 <p class="sub">Dear {{ $details['name'] }},</p>
 
-<p class="sub" style="margin-top: 15px;">Thank you for registering to attend the workshop, taking place on 27 October 2025 in {{ $details['eventLocation'] }}. By registering as a workshop attendee, you are subject to the terms and conditions outlined in the invoice.</p>
+<p class="sub" style="margin-top: 15px;">Thank you for registering to attend the workshop, taking place on 13 October 2025 in {{ $details['eventLocation'] }}. By registering as a workshop attendee, you are subject to the terms and conditions outlined in the invoice.</p>
 
 <p class="sub" style="margin-top: 15px; color: red;">Please be advised that your registration is not yet confirmed. To avoid any inconvenience during onsite badge collection, please settle your payment or contact our finance team at <a href="mailto:analee@gpca.org.ae">analee@gpca.org.ae</a>.</p>
 

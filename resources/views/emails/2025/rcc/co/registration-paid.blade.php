@@ -1,7 +1,7 @@
 <x-mail::message>
 <p class="sub">Dear {{ $details['name'] }},</p>
 
-<p class="sub" style="margin-top: 15px;">Thank you for registering to attend the <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a>, taking place on 28- 29 October 2025 in {{ $details['eventLocation'] }}. By registering as a delegate, you are subject to the terms and conditions outlined in the invoice.</p>
+<p class="sub" style="margin-top: 15px;">Thank you for registering to attend the <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a>, taking place on 14- 15 October 2025 in {{ $details['eventLocation'] }}. By registering as a delegate, you are subject to the terms and conditions outlined in the invoice.</p>
 
 <p class="sub" style="margin-top: 15px;">Your registration has been confirmed, and your delegate pass can be accessed during the <strong><em>conference only</em></strong>. You will have access to the networking break, networking lunch, and the Gala dinner. Please find below the summary of your booking confirmation.</p>
 
