@@ -13,7 +13,7 @@
 
 <img src="data:image/png;base64, {!! base64_encode(
     QrCode::format('png')->size(200)->generate($details['qrCodeForPrint']),
-) !!} ">
+) !!} " style="margin-top: 15px; display: block;">
 
 <p class="sub" style="margin-top: 20px;"><strong>Delegate Information</strong></p>
 <p class="sub">Full name: {{  $details['name'] }}</p>
