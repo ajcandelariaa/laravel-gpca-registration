@@ -28,7 +28,7 @@ Download invoice
 <p class="sub" style="margin-top: 5px;">Upon your arrival, kindly make your way to the registration desk to collect your event badge. This badge will serve as your access pass, allowing entry to all sessions and networking events scheduled throughout the day.</p>
 
 <p class="sub" style="margin-top: 20px; text-decoration: underline;"><strong>Hotel booking</strong></p>
-<p class="sub" style="margin-top: 5px;">For the hotel accommodation, guests can send an email to reservations.pullmandubaidowntown@accor.com and copy: arjun.mahindru@accor.com and nerissa.devilla@accor.com with details below details to make the reservation.</p>
+<p class="sub" style="margin-top: 5px;">For the hotel accommodation, guests can send an email to reservations.pullmandubaidowntown@accor.com and copy: arjun.mahindru@accor.com , nerissa.devilla@accor.com with their details to make the reservation.</p>
 
 <ul class="event-list">
     <li style="margin-top: 5px;">Guests should mention the booking name <strong>“GPCA Product Stewardship Workshop”</strong> and booking code <a href="https://accorce2.oraclehospitality.eu-frankfurt-1.ocs.oraclecloud.com/OPERA9/opera/operacloud/faces/opera-cloud-index/OperaCloud"><strong>“2509GULFPE”</strong></a> to avail of the special rates.</li>
