@@ -36,7 +36,15 @@ class RegistrationFree extends Mailable
      */
     public function envelope()
     {
-        $subject = 'Pending Registration confirmation for the ' . $this->details['eventName'];
+        if ($this->details['eventYear'] == '2025') {
+            if ($this->details['eventCategory'] == "AF") {
+                $subject = 'Pending Registration for the ' . $this->details['eventName'] . ' (FOC)';
+            } else {
+                $subject = 'Pending Registration confirmation for the ' . $this->details['eventName'];
+            }
+        } else {
+            $subject = 'Pending Registration confirmation for the ' . $this->details['eventName'];
+        }
 
         return new Envelope(
             from: new Address('forumregistration@gpca.org.ae', 'GPCA Events Registration'),
@@ -221,6 +229,10 @@ class RegistrationFree extends Mailable
             } else if ($this->details['eventCategory'] == "PSTW") {
                 return new Content(
                     markdown: 'emails.2025.pstw.registration-free',
+                );
+            } else if ($this->details['eventCategory'] == "AF") {
+                return new Content(
+                    markdown: 'emails.2025.af.registration-free',
                 );
             } else {
                 return new Content(
