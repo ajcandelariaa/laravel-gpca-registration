@@ -24,9 +24,17 @@ Download invoice
 
 <p class="sub" style="margin-top: 15px;">To request updates on your registration details, contact <a href="mailto:jovelyn@gpca.org.ae">jovelyn@gpca.org.ae</a> to ensure your badge information is accurate.</p>
 
-<p class="sub" style="margin-top: 20px; text-decoration: underline;"><strong>Collection of Badges</strong></p>
+<p class="sub" style="margin-top: 20px; text-decoration: underline;"><strong>Collection of badges</strong></p>
+<p class="sub" style="margin-top: 5px;">Upon your arrival, kindly make your way to the registration desk to collect your event badge. This badge will serve as your access pass, allowing entry to all sessions and networking events scheduled throughout the day.</p>
 
-<p class="sub" style="margin-top: 5px;">Upon arrival, please proceed to the registration desk located in the Foyer to collect your event badge. Kindly present your ID or email confirmation for verification.</p>
+<p class="sub" style="margin-top: 20px; text-decoration: underline;"><strong>Hotel booking</strong></p>
+<p class="sub" style="margin-top: 5px;">For the hotel accommodation, guests can send an email to reservations.pullmandubaidowntown@accor.com with details in order for the hotel’s reservations team to make the reservation in the system and send the booking confirmation along with the SecurePay Link (link for online card payment).</p>
+
+<ul class="event-list">
+    <li style="margin-top: 5px;">Guests should mention the booking name <strong>“GPCA Product Stewardship Workshop”</strong> and booking code <a href="https://accorce2.oraclehospitality.eu-frankfurt-1.ocs.oraclecloud.com/OPERA9/opera/operacloud/faces/opera-cloud-index/OperaCloud"><strong>“2504GULFPE_001”</strong></a> to avail of the special rates.</li>
+    <li>AED 820 – AED 870+++ per night includes breakfast and internet.</li>
+    <li>All room reservations must be completed at the latest by 31<sup>st</sup> March 2025.</li>
+</ul>
 
 <p class="sub" style="margin-top: 15px;">Stay updated on upcoming GPCA events and industry news by following our <a href="https://www.linkedin.com/company/gulf-petrochemicals-and-chemicals-association-gpca-/">LinkedIn Page</a>. You can also connect with us on our official social media accounts: <a href="https://twitter.com/GulfPetChem">Twitter</a>, <a href="https://www.instagram.com/gulfpetchem/">Instagram</a>, <a href="https://www.facebook.com/GulfPetChem?fref=ts">Facebook</a>, and <a href="https://www.youtube.com/user/GPCAorg">YouTube</a>. </p>
 
