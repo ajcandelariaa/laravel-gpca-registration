@@ -271,6 +271,10 @@ class RegistrationUnpaid extends Mailable
                 return new Content(
                     markdown: 'emails.2025.psw.registration-unpaid',
                 );
+            } else if ($this->details['eventCategory'] == "PSTW") {
+                return new Content(
+                    markdown: 'emails.2025.pstw.registration-unpaid',
+                );
             } else {
                 return new Content(
                     markdown: 'emails.registration-unpaid',

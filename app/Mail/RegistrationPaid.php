@@ -276,6 +276,10 @@ class RegistrationPaid extends Mailable
                 return new Content(
                     markdown: 'emails.2025.psw.registration-paid',
                 );
+            } else if ($this->details['eventCategory'] == "PSTW") {
+                return new Content(
+                    markdown: 'emails.2025.pstw.registration-paid',
+                );
             } else {
                 return new Content(
                     markdown: 'emails.registration-paid',

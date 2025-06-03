@@ -218,6 +218,10 @@ class RegistrationFree extends Mailable
                 return new Content(
                     markdown: 'emails.2025.psw.registration-free',
                 );
+            } else if ($this->details['eventCategory'] == "PSTW") {
+                return new Content(
+                    markdown: 'emails.2025.pstw.registration-free',
+                );
             } else {
                 return new Content(
                     markdown: 'emails.registration-free',
