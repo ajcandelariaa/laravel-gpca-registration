@@ -627,11 +627,11 @@ class RegistrationForm extends Component
                 }
             } else  if ($this->event->category == "RCC" && $this->event->year == "2025") {
                 if ($this->accessType == AccessTypes::CONFERENCE_ONLY->value) {
-                    $this->invoiceDescription = $this->event->name . ' – 28-29 October 2025 at ' . $this->event->location;
+                    $this->invoiceDescription = $this->event->name . ' – 14-15 October 2025 at ' . $this->event->location;
                 } else if ($this->accessType == AccessTypes::WORKSHOP_ONLY->value) {
-                    $this->invoiceDescription = "Workshop – 27th October 2025 at " .  $this->event->location;
+                    $this->invoiceDescription = "Pre-Conference Workshops – 13th October 2025 at " .  $this->event->location;
                 } else {
-                    $this->invoiceDescription = "Workshop – 27th October 2025 and " . $this->event->name . ' - 28-29 October 2025 at ' . $this->event->location;
+                    $this->invoiceDescription = "Pre-Conference Workshops – 13th October 2025 and " . $this->event->name . ' - 14-15 October 2025 at ' . $this->event->location;
                 }
             } else {
                 $this->invoiceDescription = $this->event->name . ' – ' . $this->eventFormattedDate . ' at ' . $this->event->location;

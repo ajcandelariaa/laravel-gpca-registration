@@ -4113,11 +4113,11 @@ class RegistrationController extends Controller
                 }
             } else if ($event->category == "RCC" && $event->year == "2025") {
                 if ($mainDelegate->access_type == AccessTypes::CONFERENCE_ONLY->value) {
-                    $invoiceDescription = $event->name . ' – 28-29 October 2025 at ' . $event->location;
+                    $invoiceDescription = $event->name . ' – 14-15 October 2025 at ' . $event->location;
                 } else if ($mainDelegate->access_type == AccessTypes::WORKSHOP_ONLY->value) {
-                    $invoiceDescription = "Workshop – 27th October 2025 at " .  $event->location;
+                    $invoiceDescription = "Pre-Conference Workshops – 13th October 2025 at " .  $event->location;
                 } else {
-                    $invoiceDescription = "Workshop – 27th October 2025 and " . $event->name . ' - 28-29 October 2025 at ' . $event->location;
+                    $invoiceDescription = "Pre-Conference Workshops – 13th October 2025 and " . $event->name . ' - 14-15 October 2025 at ' . $event->location;
                 }
             } else {
                 $invoiceDescription = $event->name . ' – ' . $eventFormattedData . ' at ' . $event->location;

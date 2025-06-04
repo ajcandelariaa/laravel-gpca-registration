@@ -493,11 +493,11 @@ class RegistrantDetails extends Component
             }
         } else if ($this->event->category == "RCC" && $this->event->year == "2025") {
             if ($this->accessType == AccessTypes::CONFERENCE_ONLY->value) {
-                $this->finalData['invoiceData']['invoiceDescription'] = $this->event->name . ' – 28-29 October 2025 at ' . $this->event->location;
+                $this->finalData['invoiceData']['invoiceDescription'] = $this->event->name . ' – 14-15 October 2025 at ' . $this->event->location;
             } else if ($this->accessType == AccessTypes::WORKSHOP_ONLY->value) {
-                $this->finalData['invoiceData']['invoiceDescription'] = "Workshop – 27th October 2025 at " .  $this->event->location;
+                $this->finalData['invoiceData']['invoiceDescription'] = "Pre-Conference Workshops – 13th October 2025 at " .  $this->event->location;
             } else {
-                $this->finalData['invoiceData']['invoiceDescription'] = "Workshop – 27th October 2025 and " . $this->event->name . ' - 28-29 October 2025 at ' . $this->event->location;
+                $this->finalData['invoiceData']['invoiceDescription'] = "Pre-Conference Workshops – 13th October 2025 and " . $this->event->name . ' - 14-15 October 2025 at ' . $this->event->location;
             }
         } else {
             $this->finalData['invoiceData']['invoiceDescription'] = $this->event->name . ' – ' . $this->eventFormattedDate . ' at ' . $this->event->location;
