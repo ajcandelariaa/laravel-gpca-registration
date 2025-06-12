@@ -7,9 +7,9 @@
 
 <p class="sub" style="margin-top: 15px;">Thank you for registering to attend the <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a>, taking place from {{ $details['eventDates'] }} at the {{ $details['eventLocation'] }}. By registering as a delegate, you are subject to the terms and conditions outlined in the invoice.</p>
 
-<p class="sub" style="margin-top: 15px;"><strong>PLEASE NOTE</strong></p>
+<p class="sub" style="margin-top: 15px; color: red;"><strong>PLEASE NOTE</strong></p>
 
-<p class="sub" style="margin-top: 5px;">Your registration is confirmed, however, payment is required to collect your badge onsite. To complete your payment, kindly reach out to our finance team at <a href="mailto:analee@gpca.org.ae">analee@gpca.org.ae</a> for assistance. If you register at the early bird rate but do not complete the payment by the cutoff date, the fee will be adjusted to the standard rate.</p>
+<p class="sub" style="margin-top: 5px; color: red;">Your registration is confirmed, however, payment is required to collect your badge onsite. To complete your payment, kindly reach out to our finance team at <a href="mailto:analee@gpca.org.ae">analee@gpca.org.ae</a> for assistance. If you register at the early bird rate but do not complete the payment by the cutoff date, the fee will be adjusted to the standard rate.</p>
 
 <p class="sub" style="margin-top: 15px;">Your registration details as follows:</p>
 
