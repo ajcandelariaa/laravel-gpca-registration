@@ -14,6 +14,7 @@ class RccAwardsDocument extends Model
         'event_category',
         'participant_id',
         'document',
+        'document_file_name',
         'document_type',
     ];
 }

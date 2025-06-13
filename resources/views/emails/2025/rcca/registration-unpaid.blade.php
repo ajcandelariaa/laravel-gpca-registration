@@ -19,14 +19,12 @@
 <p class="sub">City, Country: {{  $details['city'] }}, {{  $details['country'] }}</p>
 <p class="sub">Submission category: {{  $details['category'] }}</p>
 <p class="sub">Sub-category: {{  $details['subCategory'] }}</p>
-<p class="sub"><strong><a href="{{ $details['downloadLink'] }}{{ $details['entryFormId'] }}">Download entry form</a></strong></p>
+<p class="sub"><strong>Download entry form: <a href="{{ $details['downloadLink'] }}{{ $details['entryFormId'] }}" style="text-decoration: none;">{{ $details['entryFormFileName'] }}</a></strong></p>
 @if (count($details['supportingDocumentsDownloadId']) > 0)
-    <p class="sub">Download supporting documents:</p>
-    <ul>
-    @foreach ($details['supportingDocumentsDownloadId'] as $index => $documentId)
-        <li><a href="{{ $details['downloadLink'] }}{{ $documentId }}">Supporting document {{ $index + 1 }}</a></li>
-    @endforeach
-    </ul>
+<p class="sub"><strong>Download supporting documents:</strong></p>
+@for ($i=0; $i < count($details['supportingDocumentsDownloadId']); $i++)
+    <p class="sub">{{ $i+1 }}. <strong><a href="{{ $details['downloadLink'] }}{{ $details['supportingDocumentsDownloadId'][$i] }}" style="text-decoration: none;">{{ $details['supportingDocumentsDownloadFileName'][$i] }}</a></strong></p>
+@endfor
 @endif
 @if ($sendInvoice)
 <p class="sub">Amount paid: $ {{ number_format($details['amountPaid'], 2, '.', ',') }}</p>

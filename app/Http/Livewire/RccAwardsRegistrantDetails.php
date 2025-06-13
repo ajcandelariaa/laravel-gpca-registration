@@ -351,66 +351,70 @@ class RccAwardsRegistrantDetails extends Component
 
         $eventFormattedData = Carbon::parse($this->event->event_start_date)->format('j F Y');
         $invoiceLink = env('APP_URL') . '/' . $this->event->category . '/' . $this->event->id . '/view-invoice/' . $this->finalData['mainParticipantId'];
-        $downloadLink = env('APP_URL') . '/download-file/';
+        $downloadLink = env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . '/download-file/';
 
         foreach ($this->finalData['allParticipants'] as $participantsIndex => $participants) {
             foreach ($participants as $innerParticipant) {
                 if (end($participants) == $innerParticipant) {
-                    $details1 = [
-                        'name' => $innerParticipant['name'],
-                        'eventLink' => $this->event->link,
-                        'eventName' => $this->event->name,
-                        'eventDates' => $eventFormattedData,
-                        'eventLocation' => $this->event->location,
-                        'eventCategory' => $this->event->category,
-                        'eventYear' => $this->event->year,
+                    if (!$innerParticipant['participant_cancelled']) {
+                        $details1 = [
+                            'name' => $innerParticipant['name'],
+                            'eventLink' => $this->event->link,
+                            'eventName' => $this->event->name,
+                            'eventDates' => $eventFormattedData,
+                            'eventLocation' => $this->event->location,
+                            'eventCategory' => $this->event->category,
+                            'eventYear' => $this->event->year,
 
-                        'jobTitle' => $innerParticipant['job_title'],
-                        'companyName' => $this->finalData['company_name'],
-                        'emailAddress' => $innerParticipant['email_address'],
-                        'mobileNumber' => $innerParticipant['mobile_number'],
-                        'city' => $innerParticipant['city'],
-                        'country' => $innerParticipant['country'],
+                            'jobTitle' => $innerParticipant['job_title'],
+                            'companyName' => $this->finalData['company_name'],
+                            'emailAddress' => $innerParticipant['email_address'],
+                            'mobileNumber' => $innerParticipant['mobile_number'],
+                            'city' => $innerParticipant['city'],
+                            'country' => $innerParticipant['country'],
 
-                        'category' => $this->finalData['category'],
-                        'subCategory' => ($this->finalData['sub_category'] != null) ? $this->finalData['sub_category'] : 'N/A',
+                            'category' => $this->finalData['category'],
+                            'subCategory' => ($this->finalData['sub_category'] != null) ? $this->finalData['sub_category'] : 'N/A',
 
-                        'entryFormId' => $this->finalData['entryFormId'],
-                        'supportingDocumentsDownloadId' => $this->finalData['supportingDocumentsDownloadId'],
-                        'downloadLink' => $downloadLink,
+                            'entryFormId' => $this->finalData['entryFormId'],
+                            'entryFormFileName' => $this->finalData['entryFormFileName'],
+                            'supportingDocumentsDownloadId' => $this->finalData['supportingDocumentsDownloadId'],
+                            'supportingDocumentsDownloadFileName' => $this->finalData['supportingDocumentsDownloadFileName'],
+                            'downloadLink' => $downloadLink,
 
-                        'amountPaid' => $this->finalData['invoiceData']['total_amount'],
-                        'transactionId' => $innerParticipant['transactionId'],
-                        'invoiceLink' => $invoiceLink,
+                            'amountPaid' => $this->finalData['invoiceData']['total_amount'],
+                            'transactionId' => $innerParticipant['transactionId'],
+                            'invoiceLink' => $invoiceLink,
 
-                        'badgeLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-badge" . "/" . $innerParticipant['participantType'] . "/" . $innerParticipant['participantId'],
-                    ];
+                            'badgeLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-badge" . "/" . $innerParticipant['participantType'] . "/" . $innerParticipant['participantId'],
+                        ];
 
-                    $details2 = [
-                        'name' => $innerParticipant['name'],
-                        'eventLink' => $this->event->link,
-                        'eventName' => $this->event->name,
-                        'eventCategory' => $this->event->category,
-                        'eventYear' => $this->event->year,
+                        $details2 = [
+                            'name' => $innerParticipant['name'],
+                            'eventLink' => $this->event->link,
+                            'eventName' => $this->event->name,
+                            'eventCategory' => $this->event->category,
+                            'eventYear' => $this->event->year,
 
-                        'invoiceAmount' => $this->finalData['invoiceData']['total_amount'],
-                        'amountPaid' => $this->finalData['invoiceData']['total_amount'],
-                        'balance' => 0,
-                        'invoiceLink' => $invoiceLink,
-                    ];
+                            'invoiceAmount' => $this->finalData['invoiceData']['total_amount'],
+                            'amountPaid' => $this->finalData['invoiceData']['total_amount'],
+                            'balance' => 0,
+                            'invoiceLink' => $invoiceLink,
+                        ];
 
-                    try {
-                        Mail::to($innerParticipant['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaid($details1));
-                    } catch (\Exception $e) {
-                        Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaid($details1));
-                    }
+                        try {
+                            Mail::to($innerParticipant['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaid($details1));
+                        } catch (\Exception $e) {
+                            Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaid($details1));
+                        }
 
-                    if ($this->sendInvoice) {
-                        if ($participantsIndex == 0) {
-                            try {
-                                Mail::to($innerParticipant['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
-                            } catch (\Exception $e) {
-                                Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+                        if ($this->sendInvoice) {
+                            if ($participantsIndex == 0) {
+                                try {
+                                    Mail::to($innerParticipant['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+                                } catch (\Exception $e) {
+                                    Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+                                }
                             }
                         }
                     }
@@ -599,73 +603,77 @@ class RccAwardsRegistrantDetails extends Component
         foreach ($this->finalData['allParticipants'] as $participantsIndex => $participants) {
             foreach ($participants as $innerParticipant) {
                 if (end($participants) == $innerParticipant) {
-                    $details1 = [
-                        'name' => $innerParticipant['name'],
-                        'eventLink' => $this->event->link,
-                        'eventName' => $this->event->name,
-                        'eventDates' => $eventFormattedData,
-                        'eventLocation' => $this->event->location,
-                        'eventCategory' => $this->event->category,
-                        'eventYear' => $this->event->year,
+                    if (!$innerParticipant['participant_cancelled']) {
+                        $details1 = [
+                            'name' => $innerParticipant['name'],
+                            'eventLink' => $this->event->link,
+                            'eventName' => $this->event->name,
+                            'eventDates' => $eventFormattedData,
+                            'eventLocation' => $this->event->location,
+                            'eventCategory' => $this->event->category,
+                            'eventYear' => $this->event->year,
 
-                        'jobTitle' => $innerParticipant['job_title'],
-                        'companyName' => $this->finalData['company_name'],
-                        'emailAddress' => $innerParticipant['email_address'],
-                        'mobileNumber' => $innerParticipant['mobile_number'],
-                        'city' => $innerParticipant['city'],
-                        'country' => $innerParticipant['country'],
+                            'jobTitle' => $innerParticipant['job_title'],
+                            'companyName' => $this->finalData['company_name'],
+                            'emailAddress' => $innerParticipant['email_address'],
+                            'mobileNumber' => $innerParticipant['mobile_number'],
+                            'city' => $innerParticipant['city'],
+                            'country' => $innerParticipant['country'],
 
-                        'category' => $this->finalData['category'],
-                        'subCategory' => ($this->finalData['sub_category'] != null) ? $this->finalData['sub_category'] : 'N/A',
+                            'category' => $this->finalData['category'],
+                            'subCategory' => ($this->finalData['sub_category'] != null) ? $this->finalData['sub_category'] : 'N/A',
 
-                        'entryFormId' => $this->finalData['entryFormId'],
-                        'supportingDocumentsDownloadId' => $this->finalData['supportingDocumentsDownloadId'],
-                        'downloadLink' => $downloadLink,
+                            'entryFormId' => $this->finalData['entryFormId'],
+                            'entryFormFileName' => $this->finalData['entryFormFileName'],
+                            'supportingDocumentsDownloadId' => $this->finalData['supportingDocumentsDownloadId'],
+                            'supportingDocumentsDownloadFileName' => $this->finalData['supportingDocumentsDownloadFileName'],
+                            'downloadLink' => $downloadLink,
 
-                        'amountPaid' => $this->finalData['invoiceData']['total_amount'],
-                        'transactionId' => $innerParticipant['transactionId'],
-                        'invoiceLink' => $invoiceLink,
+                            'amountPaid' => $this->finalData['invoiceData']['total_amount'],
+                            'transactionId' => $innerParticipant['transactionId'],
+                            'invoiceLink' => $invoiceLink,
 
-                        'badgeLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-badge" . "/" . $innerParticipant['participantType'] . "/" . $innerParticipant['participantId'],
-                    ];
+                            'badgeLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-badge" . "/" . $innerParticipant['participantType'] . "/" . $innerParticipant['participantId'],
+                        ];
 
-                    $details2 = [
-                        'name' => $innerParticipant['name'],
-                        'eventLink' => $this->event->link,
-                        'eventName' => $this->event->name,
-                        'eventCategory' => $this->event->category,
-                        'eventYear' => $this->event->year,
+                        $details2 = [
+                            'name' => $innerParticipant['name'],
+                            'eventLink' => $this->event->link,
+                            'eventName' => $this->event->name,
+                            'eventCategory' => $this->event->category,
+                            'eventYear' => $this->event->year,
 
-                        'invoiceAmount' => $this->finalData['invoiceData']['total_amount'],
-                        'amountPaid' => $this->finalData['invoiceData']['total_amount'],
-                        'balance' => 0,
-                        'invoiceLink' => $invoiceLink,
-                    ];
+                            'invoiceAmount' => $this->finalData['invoiceData']['total_amount'],
+                            'amountPaid' => $this->finalData['invoiceData']['total_amount'],
+                            'balance' => 0,
+                            'invoiceLink' => $invoiceLink,
+                        ];
 
-                    if ($this->finalData['payment_status'] == "unpaid") {
-                        try {
-                            Mail::to($innerParticipant['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationUnpaid($details1, $this->sendInvoice));
-                        } catch (\Exception $e) {
-                            Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationUnpaid($details1, $this->sendInvoice));
-                        }
-                    } else if ($this->finalData['payment_status'] == "free" && $this->finalData['registration_status'] == "pending") {
-                        try {
-                            Mail::to($innerParticipant['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationFree($details1, $this->sendInvoice));
-                        } catch (\Exception $e) {
-                            Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationFree($details1, $this->sendInvoice));
-                        }
-                    } else {
-                        try {
-                            Mail::to($innerParticipant['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaid($details1, $this->sendInvoice));
-                        } catch (\Exception $e) {
-                            Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaid($details1, $this->sendInvoice));
-                        }
-                        if ($this->sendInvoice) {
-                            if ($participantsIndex == 0) {
-                                try {
-                                    Mail::to($innerParticipant['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
-                                } catch (\Exception $e) {
-                                    Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+                        if ($this->finalData['payment_status'] == "unpaid") {
+                            try {
+                                Mail::to($innerParticipant['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationUnpaid($details1, $this->sendInvoice));
+                            } catch (\Exception $e) {
+                                Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationUnpaid($details1, $this->sendInvoice));
+                            }
+                        } else if ($this->finalData['payment_status'] == "free" && $this->finalData['registration_status'] == "pending") {
+                            try {
+                                Mail::to($innerParticipant['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationFree($details1, $this->sendInvoice));
+                            } catch (\Exception $e) {
+                                Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationFree($details1, $this->sendInvoice));
+                            }
+                        } else {
+                            try {
+                                Mail::to($innerParticipant['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaid($details1, $this->sendInvoice));
+                            } catch (\Exception $e) {
+                                Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaid($details1, $this->sendInvoice));
+                            }
+                            if ($this->sendInvoice) {
+                                if ($participantsIndex == 0) {
+                                    try {
+                                        Mail::to($innerParticipant['email_address'])->cc($this->ccEmailNotif)->send(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+                                    } catch (\Exception $e) {
+                                        Mail::to(config('app.ccEmailNotif.error'))->send(new RegistrationPaymentConfirmation($details2, $this->sendInvoice));
+                                    }
                                 }
                             }
                         }

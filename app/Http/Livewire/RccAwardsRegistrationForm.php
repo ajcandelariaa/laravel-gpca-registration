@@ -330,26 +330,30 @@ class RccAwardsRegistrationForm extends Component
         ]);
 
         $currentYear = strval(Carbon::parse($this->event->event_start_date)->year);
-
-        $uploadedEntryForm = $this->entryForm->store('public/rcca/' . $currentYear . '/entryform');
+        
+        $fileName1 = Carbon::now()->timestamp . '_' . Str::of($this->entryForm->getClientOriginalName())->replace([' ', '-'], '_')->lower();
+        $uploadedEntryForm = $this->entryForm->storeAs('public/rcca/' . $currentYear . '/entryform', $fileName1);
 
         RccAwardsDocuments::create([
             'event_id' => $this->event->id,
             'event_category' => $this->event->category,
             'participant_id' => $newRegistrant->id,
             'document' => $uploadedEntryForm,
+            'document_file_name' => $fileName1,
             'document_type' => 'entryForm',
         ]);
 
         if (count($this->supportingDocuments) > 0) {
             foreach ($this->supportingDocuments as $document) {
-                $uploadedSupportingDocument = $document->store('public/rcca/' . $currentYear . '/supportingdocument');
+                $fileName2 = Carbon::now()->timestamp . '_' . Str::of($document->getClientOriginalName())->replace([' ', '-'], '_')->lower();
+                $uploadedSupportingDocument = $document->storeAs('public/rcca/' . $currentYear . '/supportingdocument', $fileName2);
 
                 RccAwardsDocuments::create([
                     'event_id' => $this->event->id,
                     'event_category' => $this->event->category,
                     'participant_id' => $newRegistrant->id,
                     'document' => $uploadedSupportingDocument,
+                    'document_file_name' => $fileName2,
                     'document_type' => 'supportingDocument',
                 ]);
             }
@@ -433,18 +437,22 @@ class RccAwardsRegistrationForm extends Component
         $invoiceLink = env('APP_URL') . '/' . $this->event->category . '/' . $this->event->id . '/view-invoice/' . $this->currentMainPartcipantId;
 
         $entryFormId = RccAwardsDocuments::where('event_id', $this->event->id)->where('participant_id', $this->currentMainPartcipantId)->where('document_type', 'entryForm')->value('id');
+        $entryFormFileName = RccAwardsDocuments::where('event_id', $this->event->id)->where('participant_id', $this->currentMainPartcipantId)->where('document_type', 'entryForm')->value('document_file_name');
 
+        
         $getSupportingDocumentFiles = RccAwardsDocuments::where('event_id', $this->event->id)->where('participant_id', $this->currentMainPartcipantId)->where('document_type', 'supportingDocument')->get();
 
         $supportingDocumentsDownloadId = [];
+        $supportingDocumentsDownloadFileName = [];
 
         if ($getSupportingDocumentFiles->isNotEmpty()) {
             foreach ($getSupportingDocumentFiles as $supportingDocument) {
                 $supportingDocumentsDownloadId[] = $supportingDocument->id;
+                $supportingDocumentsDownloadFileName[] = $supportingDocument->document_file_name;
             }
         }
 
-        $downloadLink = env('APP_URL') . '/download-file/';
+        $downloadLink = env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . '/download-file/';
 
         $details1 = [
             'name' => $this->salutation . " " . $this->firstName . " " . $this->middleName . " " . $this->lastName,
@@ -463,8 +471,11 @@ class RccAwardsRegistrationForm extends Component
             'country' => $this->country,
             'category' => $this->category,
             'subCategory' => ($this->subCategory != null) ? $this->subCategory : 'N/A',
+            
             'entryFormId' => $entryFormId,
+            'entryFormFileName' => $entryFormFileName,
             'supportingDocumentsDownloadId' => $supportingDocumentsDownloadId,
+            'supportingDocumentsDownloadFileName' => $supportingDocumentsDownloadFileName,
             'downloadLink' => $downloadLink,
 
             'amountPaid' => 0,

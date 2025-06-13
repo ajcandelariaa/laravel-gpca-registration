@@ -3254,7 +3254,6 @@ class RegistrationController extends Controller
 
                     $mainParticipant = RccAwardsMainParticipant::where('id', $mainDelegateId)->first();
                     $event = Event::where('id', $mainParticipant->event_id)->first();
-
                     $eventFormattedData = Carbon::parse($event->event_start_date)->format('j F Y');
 
                     $transactionId = RccAwardsParticipantTransaction::where('participant_id', $mainDelegateId)->where('participant_type', "main")->value('id');
@@ -3270,18 +3269,21 @@ class RegistrationController extends Controller
                     $invoiceLink = env('APP_URL') . '/' . $event->category . '/' . $event->id . '/view-invoice/' . $mainDelegateId;
 
                     $entryFormId = RccAwardsDocument::where('event_id', $event->id)->where('participant_id', $mainDelegateId)->where('document_type', 'entryForm')->value('id');
+                    $entryFormFileName = RccAwardsDocument::where('event_id', $event->id)->where('participant_id', $mainDelegateId)->where('document_type', 'entryForm')->value('document_file_name');
 
                     $getSupportingDocumentFiles = RccAwardsDocument::where('event_id', $event->id)->where('participant_id', $mainDelegateId)->where('document_type', 'supportingDocument')->get();
 
                     $supportingDocumentsDownloadId = [];
+                    $supportingDocumentsDownloadFileName = [];
 
                     if ($getSupportingDocumentFiles->isNotEmpty()) {
                         foreach ($getSupportingDocumentFiles as $supportingDocument) {
                             $supportingDocumentsDownloadId[] = $supportingDocument->id;
+                            $supportingDocumentsDownloadFileName[] = $supportingDocument->document_file_name;
                         }
                     }
 
-                    $downloadLink = env('APP_URL') . '/download-file/';
+                    $downloadLink = env('APP_URL') . "/" . $event->category . "/" . $event->id . '/download-file/';
 
                     $details1 = [
                         'name' => $mainParticipant->salutation . " " . $mainParticipant->first_name . " " . $mainParticipant->middle_name . " " . $mainParticipant->last_name,
@@ -3301,7 +3303,9 @@ class RegistrationController extends Controller
                         'category' => $mainParticipant->category,
                         'subCategory' => ($mainParticipant->sub_category != null) ? $mainParticipant->sub_category : 'N/A',
                         'entryFormId' => $entryFormId,
+                        'entryFormFileName' => $entryFormFileName,
                         'supportingDocumentsDownloadId' => $supportingDocumentsDownloadId,
+                        'supportingDocumentsDownloadFileName' => $supportingDocumentsDownloadFileName,
                         'downloadLink' => $downloadLink,
 
                         'amountPaid' => $mainParticipant->unit_price,
@@ -3444,27 +3448,52 @@ class RegistrationController extends Controller
     public function eventDownloadFile($eventCategory, $eventId, $documentId)
     {
         if (Event::where('id', $eventId)->exists()) {
-            if (AwardsParticipantDocument::where('id', $documentId)->exists()) {
-                $documentFilePathTemp = AwardsParticipantDocument::where('id', $documentId)->value('document');
-                $documentFilePath = Str::replace('public', 'storage', $documentFilePathTemp);
+            if ($eventCategory == "SCEA") {
+                if (AwardsParticipantDocument::where('id', $documentId)->exists()) {
+                    $documentFilePathTemp = AwardsParticipantDocument::where('id', $documentId)->value('document');
+                    $documentFilePath = Str::replace('public', 'storage', $documentFilePathTemp);
 
-                if (!Storage::url($documentFilePath)) {
+                    if (!Storage::url($documentFilePath)) {
+                        abort(404, 'File not found');
+                    }
+
+                    $mimeType = Storage::mimeType($documentFilePath);
+
+                    $path = parse_url($documentFilePath, PHP_URL_PATH);
+                    $filename = basename($path);
+
+                    $headers = [
+                        'Content-Type' => $mimeType,
+                        'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+                    ];
+
+                    return Response::download($documentFilePath, $filename, $headers);
+                } else {
                     abort(404, 'File not found');
                 }
-
-                $mimeType = Storage::mimeType($documentFilePath);
-
-                $path = parse_url($documentFilePath, PHP_URL_PATH);
-                $filename = basename($path);
-
-                $headers = [
-                    'Content-Type' => $mimeType,
-                    'Content-Disposition' => 'attachment; filename="' . $filename . '"',
-                ];
-
-                return Response::download($documentFilePath, $filename, $headers);
             } else {
-                abort(404, 'File not found');
+                if (RccAwardsDocument::where('id', $documentId)->exists()) {
+                    $documentFilePathTemp = RccAwardsDocument::where('id', $documentId)->value('document');
+                    $documentFilePath = Str::replace('public', 'storage', $documentFilePathTemp);
+
+                    if (!Storage::url($documentFilePath)) {
+                        abort(404, 'File not found');
+                    }
+
+                    $mimeType = Storage::mimeType($documentFilePath);
+
+                    $path = parse_url($documentFilePath, PHP_URL_PATH);
+                    $filename = basename($path);
+
+                    $headers = [
+                        'Content-Type' => $mimeType,
+                        'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+                    ];
+
+                    return Response::download($documentFilePath, $filename, $headers);
+                } else {
+                    abort(404, 'File not found');
+                }
             }
         } else {
             abort(404, 'Event not found');
@@ -4067,7 +4096,7 @@ class RegistrationController extends Controller
 
             if ($eventCategory == "GLF" || $eventCategory == "DFCLW1") {
                 $eventFormattedData = Carbon::parse($event->event_end_date)->format('j F Y');
-            } else if ($eventCategory == "PSW" && $event->year == "2025") { 
+            } else if ($eventCategory == "PSW" && $event->year == "2025") {
                 $eventFormattedData = Carbon::parse($event->event_start_date)->format('j F') . ' - ' . Carbon::parse($event->event_end_date)->format('j F Y');
             } else {
                 $eventFormattedData = Carbon::parse($event->event_start_date)->format('j') . '-' . Carbon::parse($event->event_end_date)->format('j F Y');
