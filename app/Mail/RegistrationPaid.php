@@ -75,6 +75,8 @@ class RegistrationPaid extends Mailable
                 $subject = 'Registration confirmation for the ' . $this->details['eventName'];
             } else if ($this->details['eventCategory'] == "AF") {
                 $subject = 'Registration confirmation for the ' . $this->details['eventName'] . ' (PAID)';
+            } else if ($this->details['eventCategory'] == "RCCA") {
+                $subject = 'Thank you for your entry submission to the ' . $this->details['eventName'];
             } else {
                 $subject = 'Registration confirmation for the ' . $this->details['eventName'];
             }
@@ -285,6 +287,10 @@ class RegistrationPaid extends Mailable
             } else if ($this->details['eventCategory'] == "AF") {
                 return new Content(
                     markdown: 'emails.2025.af.registration-paid',
+                );
+            } else if ($this->details['eventCategory'] == "RCCA") {
+                return new Content(
+                    markdown: 'emails.2025.rcca.registration-paid',
                 );
             } else {
                 return new Content(

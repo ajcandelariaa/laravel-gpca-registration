@@ -74,6 +74,8 @@ class RegistrationUnpaid extends Mailable
                 $subject = 'Pending Registration for the ' . $this->details['eventName'];
             } else if ($this->details['eventCategory'] == "AF") {
                 $subject = 'Outstanding payment for your ' . $this->details['eventName'] . " Registration (UNPAID)";
+            } else if ($this->details['eventCategory'] == "RCCA") {
+                $subject = 'Outstanding payment for your entry submission on the ' . $this->details['eventName'];
             } else {
                 $subject = 'Outstanding payment for your ' . $this->details['eventName'] . ' registration';
             }
@@ -280,6 +282,10 @@ class RegistrationUnpaid extends Mailable
             } else if ($this->details['eventCategory'] == "AF") {
                 return new Content(
                     markdown: 'emails.2025.af.registration-unpaid',
+                );
+            } else if ($this->details['eventCategory'] == "RCCA") {
+                return new Content(
+                    markdown: 'emails.2025.rcca.registration-unpaid',
                 );
             } else {
                 return new Content(

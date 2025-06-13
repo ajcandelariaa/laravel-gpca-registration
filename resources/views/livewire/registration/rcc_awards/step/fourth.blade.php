@@ -59,7 +59,8 @@
         </div>
 
         <ul class="list-decimal ml-8 mt-5">
-            <li>Pay the submission fee on or before the submission deadline, 15th July, to qualify your entries.</li>
+            <li>Pay the submission fee on or before the submission deadline, 1<sup>st</sup> August 2025, to qualify your entries.</li>
+            {{-- <li>Pay the submission fee on or before the submission deadline, 15th July, to qualify your entries.</li> --}}
             <li>Payment is non-refundable</li>
         </ul>
     </div>
