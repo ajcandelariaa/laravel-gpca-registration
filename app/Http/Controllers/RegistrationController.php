@@ -4678,6 +4678,7 @@ class RegistrationController extends Controller
                 "invoiceNumber" => $tempInvoiceNumber,
                 "bookRefNumber" => $tempBookReference,
                 "paymentStatus" => $mainParticipant->payment_status,
+                "registrationMethod" => null,
                 "eventName" => $event->name,
                 "eventLocation" => $event->location,
                 "eventVat" => $event->event_vat,
