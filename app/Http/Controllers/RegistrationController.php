@@ -1566,13 +1566,16 @@ class RegistrationController extends Controller
 
             $entryFormId = RccAwardsDocument::where('event_id', $eventId)->where('participant_id', $mainParticipant->id)->where('document_type', 'entryForm')->value('id');
 
+            $entryFormFileName = RccAwardsDocument::where('event_id', $eventId)->where('participant_id', $mainParticipant->id)->where('document_type', 'entryForm')->value('document_file_name');
             $getSupportingDocumentFiles = RccAwardsDocument::where('event_id', $eventId)->where('participant_id', $mainParticipant->id)->where('document_type', 'supportingDocument')->get();
 
             $supportingDocumentsDownloadId = [];
+            $supportingDocumentsDownloadFileName = [];
 
             if ($getSupportingDocumentFiles->isNotEmpty()) {
                 foreach ($getSupportingDocumentFiles as $supportingDocument) {
                     $supportingDocumentsDownloadId[] = $supportingDocument->id;
+                    $supportingDocumentsDownloadFileName[] = $supportingDocument->document_file_name;
                 }
             }
 
@@ -1588,7 +1591,9 @@ class RegistrationController extends Controller
                 'company_name' => $mainParticipant->company_name,
 
                 'entryFormId' => $entryFormId,
+                'entryFormFileName' => $entryFormFileName,
                 'supportingDocumentsDownloadId' => $supportingDocumentsDownloadId,
+                'supportingDocumentsDownloadFileName' => $supportingDocumentsDownloadFileName,
 
                 'heard_where' => $mainParticipant->heard_where,
 
