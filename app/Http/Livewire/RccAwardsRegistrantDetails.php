@@ -55,8 +55,12 @@ class RccAwardsRegistrantDetails extends Component
     {
         $this->countries = config('app.countries');
         $this->salutations = config('app.salutations');
-        $this->awardsCategories = config('app.rccAwardsCategories');
         $this->event = Events::where('id', $eventId)->where('category', $eventCategory)->first();
+        if ($this->event->year == "2025") {
+            $this->awardsCategories = config('app.rccAwardsCategories.2025');
+        } else {
+            $this->awardsCategories = config('app.rccAwardsCategories.2023');
+        }
         $this->eventCategory = $eventCategory;
         $this->eventId = $eventId;
         $this->registrantId = $registrantId;

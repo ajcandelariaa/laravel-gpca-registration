@@ -527,20 +527,38 @@ return [
     // ],
 
     'rccAwardsCategories' => [
-        'Process Safety' => null,
-        'Sustainable Environmental Protection' => [
-            'Sustainable Energy',
-            'Green Technology',
-            'Conservation and Biodiversity',
-            'Waste Reduction and Management',
+        '2023' => [
+            'Process Safety' => null,
+            'Sustainable Environmental Protection' => [
+                'Sustainable Energy',
+                'Green Technology',
+                'Conservation and Biodiversity',
+                'Waste Reduction and Management',
+            ],
+            'Rising Star Award' => null,
+            'Community Awareness' => [
+                'Environmental Stewardship',
+                'Community Engagement and Partnerships',
+                'Health and Safety',
+            ],
+            'Responsible Partner' => null,
         ],
-        'Rising Star Award' => null,
-        'Community Awareness' => [
-            'Environmental Stewardship',
-            'Community Engagement and Partnerships',
-            'Health and Safety',
+        '2025' => [
+            'Process Safety' => null,
+            'Sustainable Environmental Protection' => [
+                'Sustainable Energy',
+                'Green Technology',
+                'Conservation and Biodiversity',
+                'Waste Reduction and Management',
+            ],
+            'Rising Star Award' => null,
+            'Community Awareness' => [
+                'Environmental Stewardship',
+                'Community Engagement and Partnerships',
+                'Health and Safety',
+            ],
+            'Best Contractor Award' => null,
         ],
-        'Responsible Partner' => null,
     ],
 
     'sccAwardsCategories' => [

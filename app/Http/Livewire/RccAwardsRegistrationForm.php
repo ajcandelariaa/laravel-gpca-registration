@@ -3,8 +3,6 @@
 namespace App\Http\Livewire;
 
 use App\Mail\RegistrationFree;
-use App\Mail\RegistrationPaid;
-use App\Mail\RegistrationPaymentConfirmation;
 use App\Mail\RegistrationUnpaid;
 use Livewire\Component;
 use App\Models\Member as Members;
@@ -59,19 +57,18 @@ class RccAwardsRegistrationForm extends Component
     {
         $this->countries = config('app.countries');
         $this->salutations = config('app.salutations');
-        $this->awardsCategories = config('app.rccAwardsCategories');
+        $this->bankDetails = config('app.bankDetails.DEFAULT');
 
-        if ($data->category == "AF" || $data->category == "AFS" || $data->category == "AFV") {
-            $this->bankDetails = config('app.bankDetails.AF');
+        if ($data['year'] == "2025") {
+            $this->awardsCategories = config('app.rccAwardsCategories.2025');
         } else {
-            $this->bankDetails = config('app.bankDetails.DEFAULT');
+            $this->awardsCategories = config('app.rccAwardsCategories.2023');
         }
 
         $this->event = $data;
         $this->currentStep = 1;
 
         $this->members = Members::where('active', true)->orderBy('name', 'ASC')->get();
-
         $this->cardDetails = false;
 
         $today = Carbon::today();
@@ -89,7 +86,6 @@ class RccAwardsRegistrationForm extends Component
         $this->finalStdStartDate = Carbon::parse($this->event->std_start_date)->format('d M Y');
         $this->finalEventStartDate = Carbon::parse($this->event->event_start_date)->format('d M Y');
         $this->finalEventEndDate = Carbon::parse($this->event->event_end_date)->format('d M Y');
-
 
         $this->eventFormattedDate = Carbon::parse($this->event->event_start_date)->format('j') . '-' . Carbon::parse($this->event->event_end_date)->format('j F Y');
 
@@ -388,12 +384,12 @@ class RccAwardsRegistrationForm extends Component
             $this->members = Members::where('active', true)->orderBy('name', 'ASC')->get();
         }
 
-        if($this->currentStep == 3){
+        if ($this->currentStep == 3) {
             $this->entryForm = null;
             $this->supportingDocuments = [];
             $this->supportingDocumentsError = [];
         }
-        
+
         $this->resetCalculations();
         $this->currentStep -= 1;
     }
@@ -423,7 +419,7 @@ class RccAwardsRegistrationForm extends Component
         ])->save();
 
         $transaction = RccAwardsParticipantTransactions::where('participant_id', $this->currentMainPartcipantId)->where('participant_type', "main")->first();
-        
+
         $eventFormattedData = Carbon::parse($this->event->event_start_date)->format('j F Y');
         $lastDigit = 1000 + intval($transaction->id);
 
@@ -474,7 +470,7 @@ class RccAwardsRegistrationForm extends Component
             'amountPaid' => 0,
             'transactionId' => $tempTransactionId,
             'invoiceLink' => $invoiceLink,
-            'badgeLink' => env('APP_URL')."/".$this->event->category."/".$this->event->id."/view-badge"."/"."main"."/".$this->currentMainPartcipantId,
+            'badgeLink' => env('APP_URL') . "/" . $this->event->category . "/" . $this->event->id . "/view-badge" . "/" . "main" . "/" . $this->currentMainPartcipantId,
         ];
 
         if ($paymentStatus == "free") {
