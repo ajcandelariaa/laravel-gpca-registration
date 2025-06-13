@@ -62,7 +62,8 @@
             <tr>
                 <td class="text-black w-1/2">
                     <div class="bg-white py-4 font-bold mb-1 ml-1 ">
-                        Non-Member <span class="text-xs italic text-red-600">(Responsible partner category only)</span>
+                        Non-Member <span class="text-xs italic text-red-600">(Best Contractor Award category only)</span>
+                        {{-- Non-Member <span class="text-xs italic text-red-600">(Responsible partner category only)</span> --}}
                     </div>
                 </td>
                 @if ($finalEbEndDate != null)
@@ -158,7 +159,12 @@
                             <button wire:click.prevent="memberClicked"
                                 class="{{ $participantPassType == 'member' ? 'bg-registrationPrimaryColor text-white' : 'hover:bg-registrationPrimaryColor hover:text-white border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor' }} w-48 py-2 rounded-md">Member</button>
 
-                            @if ($category == 'Responsible Partner')
+                            @if ($category == 'Responsible Partner' && $event->year == 2023)
+                                <button wire:click.prevent="nonMemberClicked"
+                                    class="{{ $participantPassType == 'nonMember' ? 'bg-registrationPrimaryColor text-white' : 'hover:bg-registrationPrimaryColor hover:text-white border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor' }} w-48 py-2 rounded-md">Non-Member</button>
+                            @endif
+
+                            @if ($category == 'Best Contractor Award' && $event->year == 2025)
                                 <button wire:click.prevent="nonMemberClicked"
                                     class="{{ $participantPassType == 'nonMember' ? 'bg-registrationPrimaryColor text-white' : 'hover:bg-registrationPrimaryColor hover:text-white border-registrationPrimaryColor border-2 bg-white text-registrationPrimaryColor' }} w-48 py-2 rounded-md">Non-Member</button>
                             @endif
