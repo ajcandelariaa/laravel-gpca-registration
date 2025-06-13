@@ -191,7 +191,8 @@
    <div class="terms-and-condition">
        <p>Terms and Conditions</p>
        <ol>
-            <li>Pay the submission fee on or before the submission deadline, 15th July, to qualify your entries.</li>
+            <li>Pay the submission fee on or before the submission deadline, 1st August, to qualify your entries.</li>
+            {{-- <li>Pay the submission fee on or before the submission deadline, 15th July, to qualify your entries.</li> --}}
             <li>Payment is non-refundable</li>
        </ol>
    </div>
