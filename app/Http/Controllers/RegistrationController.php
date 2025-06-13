@@ -6159,9 +6159,8 @@ class RegistrationController extends Controller
 
                 $discountPrice = 0.0;
                 $netAMount = $mainParticipant->unit_price;
-
+                
                 $entryFormId = RccAwardsDocument::where('event_id', $eventId)->where('participant_id', $mainParticipant->id)->where('document_type', 'entryForm')->value('id');
-
 
                 $getSupportingDocumentFiles = RccAwardsDocument::where('event_id', $eventId)->where('participant_id', $mainParticipant->id)->where('document_type', 'supportingDocument')->get();
 
@@ -6169,12 +6168,14 @@ class RegistrationController extends Controller
 
                 if ($getSupportingDocumentFiles->isNotEmpty()) {
                     foreach ($getSupportingDocumentFiles as $supportingDocument) {
-                        $supportingDocumentLink = env('APP_URL') . '/download-file/' . $supportingDocument->id;
+                        $supportingDocumentLink = env('APP_URL') . "/" . $event->category . "/" . $event->id . '/download-file/' . $supportingDocument->id;
                         $supportingDocumentLinks[] = $supportingDocumentLink;
                     }
                 }
 
-                $entryFormDownloadLink = env('APP_URL') . '/download-file/' . $entryFormId;
+                $entryFormDownloadLink = env('APP_URL') . "/" . $event->category . "/" . $event->id . '/download-file/' . $entryFormId;
+
+                $vatPrice = $netAMount * ($event->event_vat / 100);
 
                 array_push($finalExcelData, [
                     'transaction_id' => $tempBookReference,
@@ -6205,12 +6206,13 @@ class RegistrationController extends Controller
                     'unit_price' => $mainParticipant->unit_price,
                     'discount_price' => $discountPrice,
                     'net_amount' => $netAMount,
+                    'vat_price' => $vatPrice,
                     'printed_badge_date' => null,
 
                     // PLEASE CONTINUE HERE
                     'total_amount' => $mainParticipant->total_amount,
-                    'payment_status' => $mainParticipant->payment_status,
-                    'registration_status' => $mainParticipant->registration_status,
+                    'payment_status' => $mainParticipant->delegate_refunded ? 'refunded' : $mainParticipant->payment_status,
+                    'registration_status' => $mainParticipant->delegate_cancelled ? 'cancelled' : $mainParticipant->registration_status,
                     'mode_of_payment' => $mainParticipant->mode_of_payment,
                     'invoice_number' => $tempInvoiceNumber,
                     'reference_number' => $tempBookReference,
@@ -6276,12 +6278,13 @@ class RegistrationController extends Controller
                             'unit_price' => $mainParticipant->unit_price,
                             'discount_price' => $discountPrice,
                             'net_amount' => $netAMount,
+                            'vat_price' => $vatPrice,
                             'printed_badge_date' => null,
 
                             // PLEASE CONTINUE HERE
                             'total_amount' => $mainParticipant->total_amount,
-                            'payment_status' => $mainParticipant->payment_status,
-                            'registration_status' => $mainParticipant->registration_status,
+                            'payment_status' => $subParticipant->delegate_refunded ? 'refunded' : $mainParticipant->payment_status,
+                            'registration_status' => $subParticipant->delegate_cancelled ? 'cancelled' : $mainParticipant->registration_status,
                             'mode_of_payment' => $mainParticipant->mode_of_payment,
                             'invoice_number' => $tempInvoiceNumber,
                             'reference_number' => $tempBookReference,
@@ -6351,6 +6354,7 @@ class RegistrationController extends Controller
 
             'Unit Price',
             'Discount Price',
+            'Vat Price',
             'Total Amount',
             'Payment Status',
             'Registration Status',
@@ -6376,7 +6380,6 @@ class RegistrationController extends Controller
             'Participant Cancelled Date & Time',
             'Participant Refunded Date & Time',
             'Participant Replaced Date & Time',
-
         );
 
         $callback = function () use ($finalExcelData, $columns) {
@@ -6417,6 +6420,7 @@ class RegistrationController extends Controller
 
                         $data['unit_price'],
                         $data['discount_price'],
+                        $data['vat_price'],
                         $data['net_amount'],
                         $data['payment_status'],
                         $data['registration_status'],
