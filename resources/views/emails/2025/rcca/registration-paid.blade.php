@@ -3,7 +3,7 @@
 
 <p class="sub" style="margin-top: 15px;">Greetings from GPCA!</p>
 
-<p class="sub" style="margin-top: 15px;">Thank you for your entry submission for the <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a> scheduled to take place on {{ $details['eventDates'] }} at the {{ $details['eventLocation'] }}.</p>
+<p class="sub" style="margin-top: 15px;">Thank you for your entry submission for the <a href="{{ $details['eventLink'] }}" target="_blank">{{ $details['eventName'] }}</a> scheduled to take place on 14<sup>th</sup> October 2025 at the {{ $details['eventLocation'] }}.</p>
 
 <p class="sub" style="margin-top: 15px;">We have received the following details you provided, which have been shared with the GPCA team:</p>
 
