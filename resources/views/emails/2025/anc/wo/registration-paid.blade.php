@@ -1,5 +1,5 @@
 <x-mail::message>
-<img src="http://gpca.org.ae/conferences/anc/wp-content/uploads/2025/07/Copy-of-PC-and-SC-banners-19-1.png" style="width: 600px; height: auto;">
+<img src="http://gpca.org.ae/conferences/anc/wp-content/uploads/2025/07/Copy-of-PC-and-SC-banners-19-1.png" style="width: 540px; height: auto;">
     
 <p class="sub" style="margin-top: 15px;">Dear {{ $details['name'] }},</p>
 
