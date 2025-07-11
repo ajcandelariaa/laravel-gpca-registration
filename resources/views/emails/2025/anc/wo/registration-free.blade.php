@@ -1,5 +1,9 @@
 <x-mail::message>
-<p class="sub">Dear {{ $details['name'] }},</p>
+<a href="https://www.marriott.com/event-reservations/reservation-link.mi?id=1751879868394&key=GRP&app=resvlink" target="_blank">
+    <img src="http://gpca.org.ae/conferences/anc/wp-content/uploads/2025/07/email-notif-banner.png">
+</a>
+    
+<p class="sub" style="margin-top: 15px;">Dear {{ $details['name'] }},</p>
 
 <p class="sub" style="margin-top: 15px;">Thank you for registering to attend the <a href="http://gpca.org.ae/conferences/anc/operational-excellence-workshop/">3<sup>rd</sup> Operational Excellence Workshop</a>, taking place on 29 September in the {{ $details['eventLocation'] }}. By registering as a workshop attendee, you are subject to the terms and conditions outlined in the invoice.</p>
 
