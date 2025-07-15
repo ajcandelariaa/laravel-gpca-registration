@@ -278,7 +278,8 @@ class RccAwardsRegistrationForm extends Component
         $this->emailMainExistingError = null;
         $this->checkUnitPrice();
         $this->calculateAmount();
-        $this->paymentMethod = null;
+        // $this->paymentMethod = null;
+        $this->paymentMethod = 'creditCard';
         $this->currentStep += 1;
 
         $this->dispatchBrowserEvent('swal:remove-registration-loading-screen');

@@ -26,7 +26,7 @@
             </div>
         </div>
 
-        <div class="mt-5 flex gap-5">
+        {{-- <div class="mt-5 flex gap-5">
             @if ($finalTotal == 0)
                 <button wire:click.prevent="btClicked" type="button"
                     class="{{ $paymentMethod == 'bankTransfer' ? 'bg-registrationSecondaryColor text-white' : 'hover:bg-registrationSecondaryColor hover:text-white border-registrationSecondaryColor border-2 bg-white text-registrationSecondaryColor' }} font-bold w-52 rounded-md py-5 ">
@@ -40,6 +40,17 @@
                     class="{{ $paymentMethod == 'creditCard' ? 'bg-registrationSecondaryColor text-white' : 'hover:bg-registrationSecondaryColor hover:text-white border-registrationSecondaryColor border-2 bg-white text-registrationSecondaryColor' }} font-bold w-52 rounded-md py-5 ">
                     <i class="fa-solid fa-credit-card mr-2"></i> Credit card</button>
             @endif
+        </div> --}}
+
+        <div class="mt-5 flex gap-5 items-start">
+            <div class="flex flex-col">
+                <button wire:click.prevent="ccClicked" type="button"
+                    class="{{ $paymentMethod == 'creditCard' ? 'bg-registrationSecondaryColor text-white' : 'hover:bg-registrationSecondaryColor hover:text-white border-registrationSecondaryColor border-2 bg-white text-registrationSecondaryColor' }} font-bold w-52 rounded-md py-5 ">
+                    <i class="fa-solid fa-credit-card mr-2"></i> Credit card</button>
+
+                <span class="text-registrationPrimaryColor italic text-sm text-center mt-1">for Visa and MasterCard
+                    only</span>
+            </div>
         </div>
 
         @if ($paymentMethodError != null)

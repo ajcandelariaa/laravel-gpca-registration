@@ -97,6 +97,8 @@
                     <p>If <strong>NO</strong>, please proceed with the registration</p>
                 </div>
             </div>
+
+            <p class="mt-5 font-semibold text-red-600">Note: <span class="italic">Only Mastercard and VISA credit card payments are accepted.</span></p>
         </div>
 
         <div class="col-span-2 lg:col-span-1 flex flex-col gap-5">
