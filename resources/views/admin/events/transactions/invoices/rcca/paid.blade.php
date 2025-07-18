@@ -15,6 +15,7 @@
        <tr>
            <td class="invoice-intro-left">
                <p>{{ $companyName }}</p>
+               <p>{{ $participantName }}</p>
                <p>{{ $companyAddress }}</p>
                <p>{{ $companyCity }}</p>
                <p>{{ $companyCountry }}</p>
