@@ -1858,9 +1858,13 @@ class RegistrationController extends Controller
         if ($finalData['finalQuantity'] > 0) {
             if ($eventCategory == "RCCA") {
                 if ($finalData['paymentStatus'] == "unpaid") {
-                    $pdf = Pdf::loadView('admin.events.transactions.invoices.rcca.unpaid', $finalData);
+                    $pdf = Pdf::loadView('admin.events.transactions.invoices.rcca.unpaid', $finalData)
+                    ->setOption('header-html', view('admin.events.transactions.invoices.header')->render())
+                    ->setOption('footer-html', view('admin.events.transactions.invoices.footer')->render());
                 } else {
-                    $pdf = Pdf::loadView('admin.events.transactions.invoices.rcca.paid', $finalData);
+                    $pdf = Pdf::loadView('admin.events.transactions.invoices.rcca.paid', $finalData)
+                    ->setOption('header-html', view('admin.events.transactions.invoices.header')->render())
+                    ->setOption('footer-html', view('admin.events.transactions.invoices.footer')->render());
                 }
             } else if ($eventCategory == "SCEA") {
                 if ($finalData['paymentStatus'] == "unpaid") {
