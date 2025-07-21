@@ -1,6 +1,6 @@
 <x-mail::message>
 <a href="https://www.marriott.com/event-reservations/reservation-link.mi?id=1751879868394&key=GRP&app=resvlink" target="_blank">
-    <img src="http://gpca.org.ae/conferences/anc/wp-content/uploads/2025/07/email-notif-banner.png">
+    <img src="http://gpca.org.ae/conferences/anc/wp-content/uploads/2025/07/email-notif-banner-v2.jpg">
 </a>
     
 <p class="sub" style="margin-top: 15px;">Dear {{ $details['name'] }},</p>
