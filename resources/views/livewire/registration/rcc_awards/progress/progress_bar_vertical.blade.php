@@ -51,7 +51,7 @@
     <div class="flex items-center gap-6">
         <div class="{{ $currentStep >= 4 ? 'bg-registrationPrimaryColor text-white' : 'text-registrationPrimaryColor bg-white border-solid border-registrationPrimaryColor border-2' }} font-bold rounded-full flex items-center justify-center"
             style="height: 55px; width: 55px; font-size: 18px;">
-            5
+            4
         </div>
 
         <div class="text-registrationPrimaryColor font-bold text-xl">
