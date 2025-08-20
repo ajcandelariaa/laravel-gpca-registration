@@ -292,6 +292,10 @@ class RegistrationPaid extends Mailable
                 return new Content(
                     markdown: 'emails.2025.rcca.registration-paid',
                 );
+            } else if ($this->details['eventCategory'] == "IPAW") {
+                return new Content(
+                    markdown: 'emails.2025.ipaw.registration-paid',
+                );
             } else {
                 return new Content(
                     markdown: 'emails.registration-paid',

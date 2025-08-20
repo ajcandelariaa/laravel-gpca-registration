@@ -234,6 +234,10 @@ class RegistrationFree extends Mailable
                 return new Content(
                     markdown: 'emails.2025.af.registration-free',
                 );
+            } else if ($this->details['eventCategory'] == "IPAW") {
+                return new Content(
+                    markdown: 'emails.2025.ipaw.registration-free',
+                );
             } else {
                 return new Content(
                     markdown: 'emails.registration-free',
