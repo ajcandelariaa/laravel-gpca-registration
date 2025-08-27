@@ -347,7 +347,7 @@
                     Do you require a parking space at the Sabic Plastics Applications Development Center (SPADC)? <span class="text-red-500">*</span>
                 </div>
                 <div>
-                    <select wire:model.lazy="ipawCarParkNeeded"
+                    <select wire:model.lazy="carParkNeeded"
                         class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
                         <option value=""></option>
                         <option value="Yes">Yes</option>
