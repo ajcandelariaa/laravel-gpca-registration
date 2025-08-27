@@ -23,6 +23,14 @@
 
         <div class="mt-8"></div>
         @include('livewire.registration.step.rates_table.fe_rates')
+
+        @if ($event->category == 'IPAW' && $event->year == '2025')
+            <div class="mt-5">
+                Academia professionals and students are eligible for a discounted delegate registration rate. To know
+                more, please contact Mohamed Zaman at <a href="mailto:zaman@gpca.org.ae"
+                    target="_blank"><strong>zaman@gpca.org.ae</strong></a>.
+            </div>
+        @endif
     @endif
 
 
@@ -236,6 +244,7 @@
 
         <p class="col-span-2 mt-5">For inquiries or to speak with a member of our team, please contact our sales team at
             <a href="mailto:sales@gpca.org.ae" class="underline">sales@gpca.org.ae</a> or call +971 4 451 0666 ext. 103,
-            106.</p>
+            106.
+        </p>
     @endif
 </div>
