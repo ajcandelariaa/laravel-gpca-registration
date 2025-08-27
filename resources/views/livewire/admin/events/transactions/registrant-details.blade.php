@@ -148,6 +148,11 @@
                                 @endif
                             </p>
                         @endif
+
+                        @if ($eventCategory == 'IPAW' && $event->year == '2025')
+                            <p>Do you require a parking space at the Sabic Plastics Applications Development Center (SPADC)?</p>
+                            <p class="font-bold">{{ $finalData['car_park_needed'] }}</p>
+                        @endif
                     </div>
                 </div>
 

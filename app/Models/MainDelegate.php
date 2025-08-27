@@ -75,6 +75,7 @@ class MainDelegate extends Model
         'pc_attending_nd',
         'scc_attending_nd',
 
+        'car_park_needed',
 
         'registration_method',
         'transaction_remarks',

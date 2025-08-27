@@ -341,6 +341,20 @@
                     </select>
                 </div>
             </div>
+        @elseif ($event->category == 'IPAW' && $event->year == '2025')
+            <div class="col-span-2 space-y-2">
+                <div class="text-registrationPrimaryColor">
+                    Do you require a parking space at the Sabic Plastics Applications Development Center (SPADC)? <span class="text-red-500">*</span>
+                </div>
+                <div>
+                    <select wire:model.lazy="ipawCarParkNeeded"
+                        class="bg-registrationInputFieldsBGColor w-full py-1 px-3 outline-registrationPrimaryColor">
+                        <option value=""></option>
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                    </select>
+                </div>
+            </div>
         @else
         @endif
 

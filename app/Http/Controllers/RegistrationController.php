@@ -714,6 +714,7 @@ class RegistrationController extends Controller
                 'finalQuantity' => $countFinalQuantity,
                 'pc_attending_nd' => $mainDelegate->pc_attending_nd,
                 'scc_attending_nd' => $mainDelegate->scc_attending_nd,
+                'car_park_needed' => $mainDelegate->car_park_needed,
 
                 'attending_plenary' => $mainDelegate->attending_plenary,
                 'attending_symposium' => $mainDelegate->attending_symposium,
@@ -5171,6 +5172,8 @@ class RegistrationController extends Controller
 
                             'receive_whatsapp_notifications' => $mainDelegate->receive_whatsapp_notifications,
 
+                            'car_park_needed' => $mainDelegate->car_park_needed,
+
                             'optional_interests' => $mainDelegate->optional_interests,
 
                             'unit_price' => $unitPrice,
@@ -5314,6 +5317,8 @@ class RegistrationController extends Controller
 
             'Would like to receive WhatsApp notifications',
 
+            'Car Park Needed',
+
             'Optional Interests'
         );
 
@@ -5409,6 +5414,8 @@ class RegistrationController extends Controller
                         $data['attending_sustainability'],
 
                         $data['receive_whatsapp_notifications'],
+
+                        $data['car_park_needed'],
 
                         $data['optional_interests'],
                     )

@@ -73,6 +73,8 @@ class RegistrationForm extends Component
     public $pcAttendingND;
     public $sccAttendingND;
 
+    public $carParkNeeded;
+
     public $eventFormattedDate;
 
     public $ccEmailNotif;
@@ -541,6 +543,27 @@ class RegistrationForm extends Component
                             'optionalInterests.required' => 'Please choose at least one',
                         ]
                     );
+                } else if ($this->event->category == "IPAW" && $this->event->year == '2025') {
+                    $this->validate(
+                        [
+                            'companySector' => 'required',
+                            'companyAddress' => 'required',
+                            'companyCountry' => 'required',
+                            'companyCity' => 'required',
+                            'companyMobileNumber' => 'required',
+                            'assistantEmailAddress' => 'nullable|email',
+                            'carParkNeeded' => 'required',
+                        ],
+                        [
+                            'companySector.required' => 'Company sector is required',
+                            'companyAddress.required' => 'Company address is required',
+                            'companyCountry.required' => 'Country is required',
+                            'companyCity.required' => 'City is required',
+                            'companyMobileNumber.required' => 'Mobile number is required',
+                            'assistantEmailAddress.email' => 'Assistant\'s email address must be a valid email',
+                            'carParkNeeded.required' => 'Please choose at least one',
+                        ]
+                    );
                 } else {
                     $this->validate(
                         [
@@ -796,6 +819,7 @@ class RegistrationForm extends Component
 
             'pc_attending_nd' => $this->pcAttendingND,
             'scc_attending_nd' => $this->sccAttendingND,
+            'car_park_needed' => $this->carParkNeeded,
         ]);
 
         $transaction = Transactions::create([
