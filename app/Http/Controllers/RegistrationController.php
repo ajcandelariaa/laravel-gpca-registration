@@ -5005,6 +5005,8 @@ class RegistrationController extends Controller
 
                     'receive_whatsapp_notifications' => $mainDelegate->receive_whatsapp_notifications,
 
+                    'car_park_needed' => $mainDelegate->car_park_needed,
+
                     'optional_interests' => $mainDelegate->optional_interests,
 
                     'unit_price' => $unitPrice,
