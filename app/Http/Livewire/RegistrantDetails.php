@@ -217,6 +217,9 @@ class RegistrantDetails extends Component
             }
         }
 
+        $this->accessType = $this->finalData['access_type'];
+        $this->rateType = $this->finalData['rate_type'];
+
         $this->showDelegateModal = true;
     }
 
@@ -314,6 +317,9 @@ class RegistrantDetails extends Component
         $this->type = null;
         $this->country = null;
         $this->interests = null;
+        
+        $this->accessType = null;
+        $this->rateType = null;
     }
 
 
@@ -400,6 +406,9 @@ class RegistrantDetails extends Component
         $this->companyMobileNumber = $this->finalData['company_mobile_number'];
         $this->assistantEmailAddress = $this->finalData['assistant_email_address'];
 
+        $this->accessType = $this->finalData['access_type'];
+        $this->rateType = $this->finalData['rate_type'];
+
         $this->showCompanyModal = true;
     }
 
@@ -422,6 +431,9 @@ class RegistrantDetails extends Component
         $this->companyLandlineNumber = null;
         $this->companyMobileNumber = null;
         $this->assistantEmailAddress = null;
+
+        $this->accessType = null;
+        $this->rateType = null;
     }
 
     public function updateRegistrationDetails()
