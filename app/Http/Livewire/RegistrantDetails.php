@@ -166,7 +166,7 @@ class RegistrantDetails extends Component
 
         $this->finalData['allDelegates'][$this->delegateIndex][$this->delegateInnerIndex]['salutation'] = $this->salutation;
         $this->finalData['allDelegates'][$this->delegateIndex][$this->delegateInnerIndex]['first_name'] = $this->firstName;
-        $this->finalData['allDelegates'][$this->delegateIndex][$this->delegateInnerIndex]['middle_name'] = $this->salutation;
+        $this->finalData['allDelegates'][$this->delegateIndex][$this->delegateInnerIndex]['middle_name'] = $this->middleName;
         $this->finalData['allDelegates'][$this->delegateIndex][$this->delegateInnerIndex]['last_name'] = $this->lastName;
         $this->finalData['allDelegates'][$this->delegateIndex][$this->delegateInnerIndex]['name'] = $this->salutation . " " . $this->firstName . " " . $this->middleName . " " . $this->lastName;
         $this->finalData['allDelegates'][$this->delegateIndex][$this->delegateInnerIndex]['email_address'] = $this->emailAddress;
@@ -810,7 +810,7 @@ class RegistrantDetails extends Component
             }
         }
 
-        if ($mainDelegate->delegate_replaced_by_id == null & (!$mainDelegate->delegate_refunded)) {
+        if ($mainDelegate->delegate_replaced_by_id == null && (!$mainDelegate->delegate_refunded)) {
             $countFinalQuantity++;
         }
 
@@ -898,7 +898,7 @@ class RegistrantDetails extends Component
         if (!$subDelegates->isEmpty()) {
             foreach ($subDelegates as $subDelegate) {
 
-                if ($subDelegate->delegate_replaced_by_id == null & (!$subDelegate->delegate_refunded)) {
+                if ($subDelegate->delegate_replaced_by_id == null && (!$subDelegate->delegate_refunded)) {
                     $countFinalQuantity++;
                 }
 
