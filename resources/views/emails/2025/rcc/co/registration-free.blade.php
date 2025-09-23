@@ -26,6 +26,28 @@ Download invoice
 <p class="sub" style="margin-top: 20px; text-decoration: underline;"><strong>Collection of badges</strong></p>
 <p class="sub" style="margin-top: 5px;">Upon arrival, please proceed to the registration desk located in the Foyer to collect your event badge. Kindly present your ID or email confirmation for verification.</p>
 
+<p class="sub" style="margin-top: 20px; text-decoration: underline;"><strong>Hotel Booking</strong></p>
+<p class="sub" style="margin-top: 5px;">To ensure a smooth and comfortable experience for all attendees, the 6<sup>th</sup> GPCA Responsible Care Conference offers exclusive hotel rates and comprehensive travel information. Taking place from 13–15 October 2025 at the Sheraton Bahrain Hotel, Manama, Bahrain, this year’s event provides tailored accommodation packages and essential travel guidance to support your participation.</p>
+
+<p class="sub" style="margin-top: 20px; text-decoration: underline;"><strong>Signature Room</strong></p>
+<p class="sub" style="margin-top: 5px;">Single Occupancy: BHD 70</p>
+<p class="sub">Double Occupancy: BHD 80</p>
+
+<p class="sub" style="margin-top: 20px; text-decoration: underline;"><strong>Club Room</strong></p>
+<p class="sub" style="margin-top: 5px;">Single Occupancy: BHD 110</p>
+<p class="sub">Double Occupancy: BHD 140</p>
+
+<p class="sub" style="margin-top: 20px; text-decoration: underline;"><strong>Junior Suite</strong></p>
+<p class="sub" style="margin-top: 5px;">Single Occupancy: BHD 145</p>
+<p class="sub">Double Occupancy: BHD 155</p>
+
+<p class="sub" style="margin-top: 20px;"><strong><em>Note: All prices are inclusive of breakfast and subject to applicable taxes.</em></strong></p>
+
+<p class="sub" style="margin-top: 20px;">For reservation and inquiries, please contact:</p>
+<p class="sub" style="margin-top: 5px;">Rakan Hussein</p>
+<p class="sub"><a href="mailto:Rakan.hussein@sheraton.com">Rakan.hussein@sheraton.com</a></p>
+<p class="sub">+973 3888 2716</p>
+
 <p class="sub" style="margin-top: 20px;">If you wish to upgrade from a conference pass to a full event pass, the following additional fees will apply:</p>
 <p class="sub" style="margin-top: 5px;">Member companies: $200</p>
 <p class="sub">Non-member companies registered at the Early Bird rate: $200</p>
