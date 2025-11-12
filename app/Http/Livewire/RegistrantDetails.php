@@ -104,7 +104,7 @@ class RegistrantDetails extends Component
             [
                 'firstName' => 'required',
                 'lastName' => 'required',
-                'emailAddress' => 'required|email',
+                'emailAddress' => 'required',
                 'nationality' => 'required',
                 'mobileNumber' => 'required',
                 'jobTitle' => 'required',
@@ -115,7 +115,6 @@ class RegistrantDetails extends Component
                 'firstName.required' => "First name is required",
                 'lastName.required' => "Last name is required",
                 'emailAddress.required' => "Email address is required",
-                'emailAddress.email' => "Email address must be a valid email",
                 'nationality.required' => "Nationality is required",
                 'mobileNumber.required' => "Mobile number is required",
                 'jobTitle.required' => "Job title is required",
@@ -1665,7 +1664,7 @@ class RegistrantDetails extends Component
                     [
                         'replaceFirstName' => 'required',
                         'replaceLastName' => 'required',
-                        'replaceEmailAddress' => 'required|email',
+                        'replaceEmailAddress' => 'required',
                         'replaceNationality' => 'required',
                         'replaceMobileNumber' => 'required',
                         'replaceJobTitle' => 'required',
@@ -1676,7 +1675,6 @@ class RegistrantDetails extends Component
                         'replaceFirstName.required' => "First name is required",
                         'replaceLastName.required' => "Last name is required",
                         'replaceEmailAddress.required' => "Email address is required",
-                        'replaceEmailAddress.email' => "Email address must be a valid email",
                         'replaceNationality.required' => "Nationality is required",
                         'replaceMobileNumber.required' => "Mobile number is required",
                         'replaceJobTitle.required' => "Job title is required",
