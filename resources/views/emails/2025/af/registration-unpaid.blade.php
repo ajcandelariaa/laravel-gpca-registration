@@ -60,7 +60,7 @@ Download invoice
 
 <p class="sub" style="margin-top: 15px;">Stay updated on upcoming GPCA events and industry news by following our <a href="https://www.linkedin.com/company/gulf-petrochemicals-and-chemicals-association-gpca-/">LinkedIn Page</a>. You can also connect with us on our official social media accounts: <a href="https://twitter.com/GulfPetChem">Twitter</a>, <a href="https://www.instagram.com/gulfpetchem/">Instagram</a>, <a href="https://www.facebook.com/GulfPetChem?fref=ts">Facebook</a>, and <a href="https://www.youtube.com/user/GPCAorg">YouTube</a>. </p>
 
-<p class="sub" style="margin-top: 15px;">Thank you, and we look forward to welcoming you in Bahrain for the {{ $details['eventName'] }}</p>
+<p class="sub" style="margin-top: 15px;">Thank you, and we look forward to welcoming you in Bahrain for the {{ $details['eventName'] }}.</p>
 
 <p class="sub" style="margin-top: 15px;">Kind Regards,</p>
 <p class="sub">GPCA Team</p>
