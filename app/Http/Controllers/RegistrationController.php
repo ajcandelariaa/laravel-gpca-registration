@@ -4958,6 +4958,12 @@ class RegistrationController extends Controller
                 if ($mainDelegate->delegate_cancelled != null) {
                 }
 
+                if($mainDelegate->alternative_company_name != null){
+                    $finalCompanyName = $mainDelegate->alternative_company_name;
+                } else {
+                    $finalCompanyName = $mainDelegate->company_name;
+                }
+
                 array_push($finalExcelData, [
                     'transaction_id' => $tempBookReference,
                     'id' => $mainDelegate->id,
@@ -4967,7 +4973,7 @@ class RegistrationController extends Controller
                     'pass_type' => $mainDelegate->pass_type,
                     'rate_type' => ($netAMount == 0) ? 'Complementary' : $mainDelegate->rate_type,
 
-                    'company_name' => $mainDelegate->company_name,
+                    'company_name' => $finalCompanyName,
                     'company_sector' => $mainDelegate->company_sector,
                     'company_address' => $mainDelegate->company_address,
                     'company_city' => $mainDelegate->company_city,
@@ -5136,7 +5142,7 @@ class RegistrationController extends Controller
                             'pass_type' => $mainDelegate->pass_type,
                             'rate_type' => $mainDelegate->rate_type,
 
-                            'company_name' => $mainDelegate->company_name,
+                            'company_name' => $finalCompanyName,
                             'company_sector' => $mainDelegate->company_sector,
                             'company_address' => $mainDelegate->company_address,
                             'company_city' => $mainDelegate->company_city,
