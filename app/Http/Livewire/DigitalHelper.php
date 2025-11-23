@@ -23,7 +23,11 @@ class DigitalHelper extends Component
 
     public function render()
     {
-        return view('livewire.digital-helper.2024.af.digital-helper');
+        if ($this->event->year == "2024") {
+            return view('livewire.digital-helper.2024.af.digital-helper');
+        } else {
+            return view('livewire.digital-helper.2025.af.digital-helper');
+        }
     }
 
     public function optionClicked($option)
@@ -174,7 +178,7 @@ class DigitalHelper extends Component
             ];
             $howToCollectYourBadge = "Please proceed to the Madinat Al Ifran Theatre Foyer and line up at counter \"VIP/SPEAKERS\". You can find the counter assignment in the image below:";
         } else if (strtoupper($badgeType) == "EXHIBITOR" || strtoupper($badgeType) == "MEDIA") {
-            if($isPrinted == true){
+            if ($isPrinted == true) {
                 $counterGroup = null;
                 foreach ($letterCounters2 as $counterKey => $counter) {
                     $counterArrayOfLetters = str_split($counterKey);
@@ -185,11 +189,11 @@ class DigitalHelper extends Component
                             break;
                         }
                     }
-                    if($counterGroup != null){
+                    if ($counterGroup != null) {
                         break;
                     }
                 }
-    
+
                 $howToCollectYourBadge = "Please proceed to the Exhibition Foyer and line up at counter '{$counterKey}'. You can find the counter assignment based on your company's first letter in the image below";
             } else {
                 $imageLinks = [
@@ -205,13 +209,13 @@ class DigitalHelper extends Component
             ];
             $howToCollectYourBadge = "Please proceed to the Madinat Al Ifran Theatre Foyer and line up at counter \"Youth\". You can find the counter assignment in the image below:";
         } else {
-            if($isPrinted == true){
-                if(strtoupper($companyName) == "3P GULF GROUP"){
+            if ($isPrinted == true) {
+                if (strtoupper($companyName) == "3P GULF GROUP") {
                     $imageLinks = [
                         'https://www.gpcaforum.com/wp-content/uploads/2024/12/madinat-foyer-counters.png',
                         'https://www.gpcaforum.com/wp-content/uploads/2024/12/madinat-o-to-q.png',
                     ];
-                    
+
                     $howToCollectYourBadge = "Please proceed to the Madinat Al Ifran Theatre Foyer and line up at counter 'OPQ'. You can find the counter assignment based on your company's first letter in the image below";
                 } else {
                     $counterGroup = null;
@@ -224,11 +228,11 @@ class DigitalHelper extends Component
                                 break;
                             }
                         }
-                        if($counterGroup != null){
+                        if ($counterGroup != null) {
                             break;
                         }
                     }
-        
+
                     $howToCollectYourBadge = "Please proceed to the Madinat Al Ifran Theatre Foyer and line up at counter '$counterGroup'. You can find the counter assignment based on your company's first letter in the image below";
                 }
             } else {

@@ -403,8 +403,13 @@ class DelegateController extends Controller
     {
         $event = Event::where('category', $eventCategory)->where('id', $eventId)->first();
         if ($event) {
-            if ($eventCategory == "AF" && $event->year == "2024") {
+            if ($eventCategory == "AF" && $event->year == "2025") {
                 return view('digital-helper.2024.af.af-digital-helper', [
+                    "pageTitle" => "Digital helper - " . $event->name,
+                    "event" => $event,
+                ]);
+            } else if ($eventCategory == "AF" && $event->year == "2025") {
+                return view('digital-helper.2025.af.af-digital-helper', [
                     "pageTitle" => "Digital helper - " . $event->name,
                     "event" => $event,
                 ]);
@@ -422,6 +427,12 @@ class DelegateController extends Controller
         if ($event) {
             if ($eventCategory == "AF" && $event->year == "2024") {
                 return view('digital-helper.2024.af.af-digital-helper-faq', [
+                    "pageTitle" => "Digital helper FAQs - " . $event->name,
+                    "eventCategory" => $eventCategory,
+                    "eventId" => $eventId,
+                ]);
+            } else if ($eventCategory == "AF" && $event->year == "2025") {
+                return view('digital-helper.2025.af.af-digital-helper-faq', [
                     "pageTitle" => "Digital helper FAQs - " . $event->name,
                     "eventCategory" => $eventCategory,
                     "eventId" => $eventId,

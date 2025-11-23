@@ -32,3 +32,7 @@ Route::post('/fast-track/{eventCategory}/{eventYear}/toggle-badge-collected', [F
 Route::post('/fast-track/{eventCategory}/{eventYear}/update-details', [FastTrackController::class, 'updateDetails']);
 
 Route::post('/fast-track/{eventCategory}/{eventYear}/badge-scan', [FastTrackController::class, 'badgeScan']);
+
+
+// Onsite registration APIs
+Route::post('/onsite-registration/{eventCategory}/{eventYear}/register-delegate', [DelegateController::class, 'registerOnsiteDelegate']);
