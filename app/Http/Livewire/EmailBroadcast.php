@@ -256,14 +256,7 @@ class EmailBroadcast extends Component
             }
         }
 
-        if ($badgeCategory == "youth-forum") {
-            $mainDelegates = MainDelegates::where('event_id', $this->event->id)->whereIn('registration_status', ['confirmed', 'pending'])->where('badge_type', "Youth Forum")->get();
-        } else if ($badgeCategory == "youth-council") {
-            $mainDelegates = MainDelegates::where('event_id', $this->event->id)->whereIn('registration_status', ['confirmed', 'pending'])->where('badge_type', "Youth Council")->get();
-        } else {
-            $mainDelegates = MainDelegates::where('event_id', $this->event->id)->whereIn('registration_status', ['confirmed', 'pending'])->get();
-        }
-
+        $mainDelegates = MainDelegates::where('event_id', $this->event->id)->whereIn('registration_status', ['confirmed', 'pending'])->get();
 
         foreach ($mainDelegates as $mainDelegate) {
             if ($mainDelegate->alternative_company_name != null) {
@@ -291,30 +284,58 @@ class EmailBroadcast extends Component
                     $lastEmailSent = 'N/A';
                 }
 
-                array_push($tempArray, [
-                    'delegateId' => $mainDelegate->id,
-                    'delegateType' => "main",
-                    'fullName' => $fullNameMain,
-                    'companyName' => $companyName,
-                    'jobTitle' => $mainDelegate->job_title,
-                    'emailAddress' => $mainDelegate->email_address,
-                    'transactionId' => $finalTransactionId,
-                    'badgeType' => $mainDelegate->badge_type,
-                    'qrCodeForPrint' => $qrCodeForPrint,
-                    'emailBroadcastSentCount' => $mainDelegate->email_broadcast_sent_count,
-                    'emailBroadcastLastSent' => $lastEmailSent,
-                    'registrationStatus' => $mainDelegate->registration_status,
-                    'highlight' => false,
-                ]);
-
-                if ($badgeCategory == "youth-forum") {
-                    $additionalDelegates = AdditionalDelegates::where('main_delegate_id', $mainDelegate->id)->where('badge_type', "Youth Forum")->get();
-                } else if ($badgeCategory == "youth-council") {
-                    $additionalDelegates = AdditionalDelegates::where('main_delegate_id', $mainDelegate->id)->where('badge_type', "Youth Council")->get();
+                if ($badgeCategory == "youth-forum" && ($mainDelegate->badge_type == "Youth Forum")) {
+                    array_push($tempArray, [
+                        'delegateId' => $mainDelegate->id,
+                        'delegateType' => "main",
+                        'fullName' => $fullNameMain,
+                        'companyName' => $companyName,
+                        'jobTitle' => $mainDelegate->job_title,
+                        'emailAddress' => $mainDelegate->email_address,
+                        'transactionId' => $finalTransactionId,
+                        'badgeType' => $mainDelegate->badge_type,
+                        'qrCodeForPrint' => $qrCodeForPrint,
+                        'emailBroadcastSentCount' => $mainDelegate->email_broadcast_sent_count,
+                        'emailBroadcastLastSent' => $lastEmailSent,
+                        'registrationStatus' => $mainDelegate->registration_status,
+                        'highlight' => false,
+                    ]);
+                } else if ($badgeCategory == "youth-council" && ($mainDelegate->badge_type == "Youth Council")) {
+                    array_push($tempArray, [
+                        'delegateId' => $mainDelegate->id,
+                        'delegateType' => "main",
+                        'fullName' => $fullNameMain,
+                        'companyName' => $companyName,
+                        'jobTitle' => $mainDelegate->job_title,
+                        'emailAddress' => $mainDelegate->email_address,
+                        'transactionId' => $finalTransactionId,
+                        'badgeType' => $mainDelegate->badge_type,
+                        'qrCodeForPrint' => $qrCodeForPrint,
+                        'emailBroadcastSentCount' => $mainDelegate->email_broadcast_sent_count,
+                        'emailBroadcastLastSent' => $lastEmailSent,
+                        'registrationStatus' => $mainDelegate->registration_status,
+                        'highlight' => false,
+                    ]);
                 } else {
-                    $additionalDelegates = AdditionalDelegates::where('main_delegate_id', $mainDelegate->id)->get();
+                    array_push($tempArray, [
+                        'delegateId' => $mainDelegate->id,
+                        'delegateType' => "main",
+                        'fullName' => $fullNameMain,
+                        'companyName' => $companyName,
+                        'jobTitle' => $mainDelegate->job_title,
+                        'emailAddress' => $mainDelegate->email_address,
+                        'transactionId' => $finalTransactionId,
+                        'badgeType' => $mainDelegate->badge_type,
+                        'qrCodeForPrint' => $qrCodeForPrint,
+                        'emailBroadcastSentCount' => $mainDelegate->email_broadcast_sent_count,
+                        'emailBroadcastLastSent' => $lastEmailSent,
+                        'registrationStatus' => $mainDelegate->registration_status,
+                        'highlight' => false,
+                    ]);
                 }
 
+                $additionalDelegates = AdditionalDelegates::where('main_delegate_id', $mainDelegate->id)->get();
+                
                 if ($additionalDelegates->isNotEmpty()) {
                     foreach ($additionalDelegates as $additionalDelegate) {
                         if (!$additionalDelegate->delegate_cancelled) {
@@ -335,21 +356,55 @@ class EmailBroadcast extends Component
                                 $lastEmailSent = 'N/A';
                             }
 
-                            array_push($tempArray, [
-                                'delegateId' => $additionalDelegate->id,
-                                'delegateType' => "sub",
-                                'fullName' => $fullNameSub,
-                                'companyName' => $companyName,
-                                'jobTitle' => $additionalDelegate->job_title,
-                                'emailAddress' => $additionalDelegate->email_address,
-                                'transactionId' => $finalTransactionId,
-                                'badgeType' => $additionalDelegate->badge_type,
-                                'qrCodeForPrint' => $qrCodeForPrint,
-                                'emailBroadcastSentCount' => $additionalDelegate->email_broadcast_sent_count,
-                                'emailBroadcastLastSent' => $lastEmailSent,
-                                'registrationStatus' => $mainDelegate->registration_status,
-                                'highlight' => false,
-                            ]);
+                            if ($badgeCategory == "youth-forum" && ($additionalDelegate->badge_type == "Youth Forum")) {
+                                array_push($tempArray, [
+                                    'delegateId' => $additionalDelegate->id,
+                                    'delegateType' => "sub",
+                                    'fullName' => $fullNameSub,
+                                    'companyName' => $companyName,
+                                    'jobTitle' => $additionalDelegate->job_title,
+                                    'emailAddress' => $additionalDelegate->email_address,
+                                    'transactionId' => $finalTransactionId,
+                                    'badgeType' => $additionalDelegate->badge_type,
+                                    'qrCodeForPrint' => $qrCodeForPrint,
+                                    'emailBroadcastSentCount' => $additionalDelegate->email_broadcast_sent_count,
+                                    'emailBroadcastLastSent' => $lastEmailSent,
+                                    'registrationStatus' => $mainDelegate->registration_status,
+                                    'highlight' => false,
+                                ]);
+                            } else if ($badgeCategory == "youth-council" && ($additionalDelegate->badge_type == "Youth Council")) {
+                                array_push($tempArray, [
+                                    'delegateId' => $additionalDelegate->id,
+                                    'delegateType' => "sub",
+                                    'fullName' => $fullNameSub,
+                                    'companyName' => $companyName,
+                                    'jobTitle' => $additionalDelegate->job_title,
+                                    'emailAddress' => $additionalDelegate->email_address,
+                                    'transactionId' => $finalTransactionId,
+                                    'badgeType' => $additionalDelegate->badge_type,
+                                    'qrCodeForPrint' => $qrCodeForPrint,
+                                    'emailBroadcastSentCount' => $additionalDelegate->email_broadcast_sent_count,
+                                    'emailBroadcastLastSent' => $lastEmailSent,
+                                    'registrationStatus' => $mainDelegate->registration_status,
+                                    'highlight' => false,
+                                ]);
+                            } else {
+                                array_push($tempArray, [
+                                    'delegateId' => $additionalDelegate->id,
+                                    'delegateType' => "sub",
+                                    'fullName' => $fullNameSub,
+                                    'companyName' => $companyName,
+                                    'jobTitle' => $additionalDelegate->job_title,
+                                    'emailAddress' => $additionalDelegate->email_address,
+                                    'transactionId' => $finalTransactionId,
+                                    'badgeType' => $additionalDelegate->badge_type,
+                                    'qrCodeForPrint' => $qrCodeForPrint,
+                                    'emailBroadcastSentCount' => $additionalDelegate->email_broadcast_sent_count,
+                                    'emailBroadcastLastSent' => $lastEmailSent,
+                                    'registrationStatus' => $mainDelegate->registration_status,
+                                    'highlight' => false,
+                                ]);
+                            }
                         }
                     }
                 }
