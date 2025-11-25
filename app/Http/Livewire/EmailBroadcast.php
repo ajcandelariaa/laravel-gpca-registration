@@ -300,7 +300,9 @@ class EmailBroadcast extends Component
                         'registrationStatus' => $mainDelegate->registration_status,
                         'highlight' => false,
                     ]);
-                } else if ($badgeCategory == "youth-council" && ($mainDelegate->badge_type == "Youth Council")) {
+                }
+
+                if ($badgeCategory == "youth-council" && ($mainDelegate->badge_type == "Youth Council")) {
                     array_push($tempArray, [
                         'delegateId' => $mainDelegate->id,
                         'delegateType' => "main",
@@ -316,7 +318,9 @@ class EmailBroadcast extends Component
                         'registrationStatus' => $mainDelegate->registration_status,
                         'highlight' => false,
                     ]);
-                } else {
+                }
+
+                if ($badgeCategory == "all") {
                     array_push($tempArray, [
                         'delegateId' => $mainDelegate->id,
                         'delegateType' => "main",
@@ -335,7 +339,7 @@ class EmailBroadcast extends Component
                 }
 
                 $additionalDelegates = AdditionalDelegates::where('main_delegate_id', $mainDelegate->id)->get();
-                
+
                 if ($additionalDelegates->isNotEmpty()) {
                     foreach ($additionalDelegates as $additionalDelegate) {
                         if (!$additionalDelegate->delegate_cancelled) {
@@ -372,7 +376,9 @@ class EmailBroadcast extends Component
                                     'registrationStatus' => $mainDelegate->registration_status,
                                     'highlight' => false,
                                 ]);
-                            } else if ($badgeCategory == "youth-council" && ($additionalDelegate->badge_type == "Youth Council")) {
+                            }
+
+                            if ($badgeCategory == "youth-council" && ($additionalDelegate->badge_type == "Youth Council")) {
                                 array_push($tempArray, [
                                     'delegateId' => $additionalDelegate->id,
                                     'delegateType' => "sub",
@@ -388,7 +394,9 @@ class EmailBroadcast extends Component
                                     'registrationStatus' => $mainDelegate->registration_status,
                                     'highlight' => false,
                                 ]);
-                            } else {
+                            }
+
+                            if ($badgeCategory == "all") {
                                 array_push($tempArray, [
                                     'delegateId' => $additionalDelegate->id,
                                     'delegateType' => "sub",
