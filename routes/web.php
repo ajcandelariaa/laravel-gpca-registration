@@ -56,7 +56,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('/{delegateType}/{delegateId}/print-badge', [DelegateController::class, 'delegateDetailPrintBadge'])->name('admin.event.delegates.detail.printBadge');
                     Route::get('/{delegateType}/{delegateId}/scan-badge', [DelegateController::class, 'delegateDetailScanBadge'])->name('admin.event.delegates.detail.scanBadge');
                 });
-                Route::get('/email-broadcast', [DelegateController::class, 'eventEmailBroadcastView'])->name('admin.event.email-broadcast.view');
+                Route::get('/email-broadcast/{badgeCategory}', [DelegateController::class, 'eventEmailBroadcastView'])->name('admin.event.email-broadcast.view');
 
                 Route::prefix('printed-badge')->group(function () {
                     Route::get('/', [DelegateController::class, 'printedBadgeListView'])->name('admin.printed.badge.list.view');

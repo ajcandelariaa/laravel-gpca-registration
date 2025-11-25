@@ -360,13 +360,14 @@ class DelegateController extends Controller
     }
 
 
-    public function eventEmailBroadcastView($eventCategory, $eventId)
+    public function eventEmailBroadcastView($eventCategory, $eventId, $badgeCategory)
     {
         if (Event::where('category', $eventCategory)->where('id', $eventId)->exists()) {
             return view('admin.events.broadcast.email_broadcast', [
                 "pageTitle" => "Email broadcast",
                 "eventCategory" => $eventCategory,
                 "eventId" => $eventId,
+                "badgeCategory" => $badgeCategory,
             ]);
         } else {
             abort(404, 'The URL is incorrect');

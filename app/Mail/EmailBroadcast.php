@@ -41,6 +41,12 @@ class EmailBroadcast extends Mailable
             }
         } else if ($this->details['eventYear'] == '2024') {
             $subject = '18ᵗʰ Annual GPCA Forum - Registration & Badge Information';
+        } else if ($this->details['eventYear'] == '2024') {
+            if($this->details['badgeCategory'] == "youth-forum" || $this->details['badgeCategory'] == "youth-council") {
+                $subject = '4ᵗʰ GPCA Youth Forum - Registration Information';
+            } else {
+                $subject = '19ᵗʰ Annual GPCA Forum - Registration & Badge Information';
+            }
         } else {
             $subject = 'Annual GPCA Forum - Registration & Badge Information';
         }
@@ -60,7 +66,7 @@ class EmailBroadcast extends Mailable
     {
         if ($this->details['eventYear'] == '2023') {
             if ($this->details['eventCategory'] == "AF") {
-                if($this->details['registrationStatus'] == "confirmed"){
+                if ($this->details['registrationStatus'] == "confirmed") {
                     return new Content(
                         markdown: 'emails.2023.af.confirm-email-broadcast',
                     );
@@ -70,7 +76,7 @@ class EmailBroadcast extends Mailable
                     );
                 }
             } else if ($this->details['eventCategory'] == "AFV") {
-                if($this->details['registrationStatus'] == "confirmed"){
+                if ($this->details['registrationStatus'] == "confirmed") {
                     return new Content(
                         markdown: 'emails.2023.visitor.confirm-email-broadcast',
                     );
@@ -86,7 +92,7 @@ class EmailBroadcast extends Mailable
             }
         } else if ($this->details['eventYear'] == '2024') {
             if ($this->details['eventCategory'] == "AF") {
-                if($this->details['registrationStatus'] == "confirmed"){
+                if ($this->details['registrationStatus'] == "confirmed") {
                     return new Content(
                         markdown: 'emails.2024.af.confirm-email-broadcast',
                     );
@@ -94,6 +100,34 @@ class EmailBroadcast extends Mailable
                     return new Content(
                         markdown: 'emails.2024.af.pending-email-broadcast',
                     );
+                }
+            } else {
+                return new Content(
+                    markdown: 'emails.email-broadcast',
+                );
+            }
+        } else if ($this->details['eventYear'] == '2025') {
+            if ($this->details['eventCategory'] == "AF") {
+                if ($this->details['badgeCategory'] == "youth-forum" || $this->details['badgeCategory'] == "youth-council") {
+                    if ($this->details['registrationStatus'] == "confirmed") {
+                        return new Content(
+                            markdown: 'emails.2025.af.youth.confirm-email-broadcast',
+                        );
+                    } else {
+                        return new Content(
+                            markdown: 'emails.2025.af.youth.pending-email-broadcast',
+                        );
+                    }
+                } else {
+                    if ($this->details['registrationStatus'] == "confirmed") {
+                        return new Content(
+                            markdown: 'emails.2025.af.confirm-email-broadcast',
+                        );
+                    } else {
+                        return new Content(
+                            markdown: 'emails.2025.af.pending-email-broadcast',
+                        );
+                    }
                 }
             } else {
                 return new Content(

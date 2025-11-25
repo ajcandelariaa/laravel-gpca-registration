@@ -54,12 +54,13 @@
         <table class="w-full text-center border-collapse border mt-10">
             <tr class="bg-registrationPrimaryColor text-white">
                 <td class="border py-4 px-3" width="4%">No.</td>
-                <td class="border py-4 px-3" width="8%">Transaction ID</td>
+                <td class="border py-4 px-3" width="6%">Transaction ID</td>
                 <td class="border py-4 px-3" width="15%">Full Name</td>
                 <td class="border py-4 px-3" width="15%">Job Title</td>
                 <td class="border py-4 px-3" width="15%">Company Name</td>
                 <td class="border py-4 px-3" width="15%">Email Address</td>
-                <td class="border py-4 px-3" width="8%">Registration Status</td>
+                <td class="border py-4 px-3" width="6%">Badge Type</td>
+                <td class="border py-4 px-3" width="4%">Registration Status</td>
                 <td class="border py-4 px-3" width="5%">Email Sent Count</td>
                 <td class="border py-4 px-3" width="10%">Email Last Sent</td>
                 <td class="border py-4 px-3" width="5%">Action</td>
@@ -76,6 +77,7 @@
                 <td class="border py-2 px-3 text-sm">{{ $delegate['jobTitle'] }}</td>
                 <td class="border py-2 px-3 text-sm">{{ $delegate['companyName'] }}</td>
                 <td class="border py-2 px-3 text-sm">{{ $delegate['emailAddress'] }}</td>
+                <td class="border py-2 px-3 text-sm">{{ $delegate['badgeType'] }}</td>
                 <td class="border py-2 px-3 text-sm">{{ $delegate['registrationStatus'] }}</td>
                 <td class="border py-2 px-3 text-sm">{{ $delegate['emailBroadcastSentCount'] }}</td>
                 <td class="border py-2 px-3 text-sm">

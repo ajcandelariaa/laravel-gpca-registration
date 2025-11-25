@@ -25,7 +25,7 @@ class EmailBroadcast extends Component
 
     protected $listeners = ['broadcastEmailConfirmed' => 'sendEmailBroadcast'];
 
-    public function mount($eventCategory, $eventId)
+    public function mount($eventCategory, $eventId, $badgeCategory)
     {
         $this->event = Events::where('id', $eventId)->where('category', $eventCategory)->first();
 
@@ -34,7 +34,7 @@ class EmailBroadcast extends Component
         // } else {
         //     $this->allDelegates = $this->getAllDelegates();
         // }
-        $this->allDelegates = $this->getAllDelegates();
+        $this->allDelegates = $this->getAllDelegates($badgeCategory);
     }
 
     public function render()
@@ -246,7 +246,7 @@ class EmailBroadcast extends Component
 
 
 
-    public function getAllDelegates()
+    public function getAllDelegates($badgeCategory)
     {
         $tempArray = array();
 
@@ -256,7 +256,14 @@ class EmailBroadcast extends Component
             }
         }
 
-        $mainDelegates = MainDelegates::where('event_id', $this->event->id)->whereIn('registration_status', ['confirmed', 'pending'])->get();
+        if ($badgeCategory == "youth-forum") {
+            $mainDelegates = MainDelegates::where('event_id', $this->event->id)->whereIn('registration_status', ['confirmed', 'pending'])->where('badge_type', "Youth Forum")->get();
+        } else if ($badgeCategory == "youth-council") {
+            $mainDelegates = MainDelegates::where('event_id', $this->event->id)->whereIn('registration_status', ['confirmed', 'pending'])->where('badge_type', "Youth Council")->get();
+        } else {
+            $mainDelegates = MainDelegates::where('event_id', $this->event->id)->whereIn('registration_status', ['confirmed', 'pending'])->get();
+        }
+
 
         foreach ($mainDelegates as $mainDelegate) {
             if ($mainDelegate->alternative_company_name != null) {
@@ -300,7 +307,13 @@ class EmailBroadcast extends Component
                     'highlight' => false,
                 ]);
 
-                $additionalDelegates = AdditionalDelegates::where('main_delegate_id', $mainDelegate->id)->get();
+                if ($badgeCategory == "youth-forum") {
+                    $additionalDelegates = AdditionalDelegates::where('main_delegate_id', $mainDelegate->id)->where('badge_type', "Youth Forum")->get();
+                } else if ($badgeCategory == "youth-council") {
+                    $additionalDelegates = AdditionalDelegates::where('main_delegate_id', $mainDelegate->id)->where('badge_type', "Youth Council")->get();
+                } else {
+                    $additionalDelegates = AdditionalDelegates::where('main_delegate_id', $mainDelegate->id)->get();
+                }
 
                 if ($additionalDelegates->isNotEmpty()) {
                     foreach ($additionalDelegates as $additionalDelegate) {
