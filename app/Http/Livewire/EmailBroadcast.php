@@ -23,6 +23,8 @@ class EmailBroadcast extends Component
     public $isHighlightingDelegates = false;
     public $sendOneEmailArrayIndex = null;
 
+    public $badgeCategory;
+
     protected $listeners = ['broadcastEmailConfirmed' => 'sendEmailBroadcast'];
 
     public function mount($eventCategory, $eventId, $badgeCategory)
@@ -34,7 +36,8 @@ class EmailBroadcast extends Component
         // } else {
         //     $this->allDelegates = $this->getAllDelegates();
         // }
-        $this->allDelegates = $this->getAllDelegates($badgeCategory);
+        $this->badgeCategory = $badgeCategory;
+        $this->allDelegates = $this->getAllDelegates($this->badgeCategory);
     }
 
     public function render()
@@ -96,6 +99,7 @@ class EmailBroadcast extends Component
                 'transactionId' => $this->allDelegates[$i]['transactionId'],
                 'qrCodeForPrint' => $this->allDelegates[$i]['qrCodeForPrint'],
                 'emailAddress' => $this->allDelegates[$i]['emailAddress'],
+                'badgeCategory' => $this->badgeCategory,
             ];
 
             try {
@@ -184,6 +188,7 @@ class EmailBroadcast extends Component
             'badgeType' => $this->allDelegates[$this->sendOneEmailArrayIndex]['badgeType'],
             'qrCodeForPrint' => $this->allDelegates[$this->sendOneEmailArrayIndex]['qrCodeForPrint'],
             'emailAddress' => $this->allDelegates[$this->sendOneEmailArrayIndex]['emailAddress'],
+            'badgeCategory' => $this->badgeCategory,
         ];
 
         try {
