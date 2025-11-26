@@ -1,5 +1,5 @@
 <x-mail::message>
-<p class="sub">Dear Delegate</p>
+<p class="sub">Dear Delegate,</p>
 
 <p class="sub" style="margin-top: 15px;">Before we meet in Bahrain for the GPCA Youth Forum (8–11 December 2025), here is the key thing to know from day one:</p>
 
@@ -8,8 +8,6 @@
 <p class="sub" style="margin-top: 15px;">This is where your program runs, where your community gathers, and where the Youth Forum experience comes to life.</p>
 
 <p class="sub" style="margin-top: 15px; text-decoration: underline;"><strong>What you will find in the Youth Zone: </strong></p>
-<p class="sub">Attendees can collect their badges from 1 December at the designated areas below. To ensure a seamless and convenient experience for our valued attendees, please note the following collection points.</p>
-
 <ul class="event-list">
     <li style="margin-top: 5px;">Your daily youth delegate program and features</li>
     <li>Interactive challenges and hands-on activations</li>
