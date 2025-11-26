@@ -30,7 +30,7 @@
 
 <p class="sub" style="margin-top: 15px;">Or Use The QR Code Below: </p>
 
-<img src="https://www.gpcaforum.com/wp-content/uploads/2025/11/yf-whatsapp-qr.jpg" alt="YF25 WhatsApp Group QR Code" style="display: block; margin-top: 15px; width: 150px; height: auto;">
+<img src="https://www.gpcaforum.com/wp-content/uploads/2025/11/yf-whatsapp-qr.jpg" alt="YF25 WhatsApp Group QR Code" style="display: block; margin-top: 15px; width: 50px; height: auto;">
 
 <p class="sub" style="margin-top: 15px;">We will see you in the Youth Zone,</p>
 
