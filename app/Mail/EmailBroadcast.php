@@ -43,7 +43,7 @@ class EmailBroadcast extends Mailable
             $subject = '18ᵗʰ Annual GPCA Forum - Registration & Badge Information';
         } else if ($this->details['eventYear'] == '2024') {
             if($this->details['badgeCategory'] == "youth-forum" || $this->details['badgeCategory'] == "youth-council") {
-                $subject = '4ᵗʰ GPCA Youth Forum - Registration Information';
+                $subject = 'Welcome to the GPCA Youth Forum 2025 | Your Guide to the Youth Zone';
             } else {
                 $subject = '19ᵗʰ Annual GPCA Forum - Registration & Badge Information';
             }
