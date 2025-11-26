@@ -261,7 +261,13 @@ class EmailBroadcast extends Component
             }
         }
 
-        $mainDelegates = MainDelegates::where('event_id', $this->event->id)->whereIn('registration_status', ['confirmed', 'pending'])->get();
+        $sendToRegistrationStatus = ['confirmed', 'pending'];
+
+        if ($badgeCategory == "youth-forum" || $badgeCategory == "youth-council") {
+            $sendToRegistrationStatus = ['confirmed'];
+        }
+
+        $mainDelegates = MainDelegates::where('event_id', $this->event->id)->whereIn('registration_status', $sendToRegistrationStatus)->get();
 
         foreach ($mainDelegates as $mainDelegate) {
             if ($mainDelegate->alternative_company_name != null) {
