@@ -112,11 +112,11 @@ class EmailBroadcast extends Mailable
                 if ($this->details['badgeCategory'] == "youth-forum" || $this->details['badgeCategory'] == "youth-council") {
                     if ($this->details['registrationStatus'] == "confirmed") {
                         return new Content(
-                            markdown: 'emails.2025.af.youth.2.confirm-email-broadcast',
+                            markdown: 'emails.2025.af.youth.broadcast.2.confirm-email-broadcast',
                         );
                     } else {
                         return new Content(
-                            markdown: 'emails.2025.af.youth.2.pending-email-broadcast',
+                            markdown: 'emails.2025.af.youth.broadcast.2.pending-email-broadcast',
                         );
                     }
                 } else {
