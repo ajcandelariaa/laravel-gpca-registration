@@ -24,7 +24,7 @@
             <p class="sub" style="text-align: center; font-size: 11px; font-weight: bold;">16:00 – 18:30</p>
         </td>
         <td width="430" style="border: 1px solid black;">
-            <p class="sub" style="font-size: 11px;">Attend the inaugural of the 18<sup>th</sup> Annual GPCA Forum</p>
+            <p class="sub" style="font-size: 11px;">Attend the inaugural of the 19<sup>th</sup> Annual GPCA Forum</p>
         </td>
     </tr>
 </table>
