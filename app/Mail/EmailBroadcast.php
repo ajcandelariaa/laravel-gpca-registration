@@ -43,7 +43,8 @@ class EmailBroadcast extends Mailable
             $subject = '18ᵗʰ Annual GPCA Forum - Registration & Badge Information';
         } else if ($this->details['eventYear'] == '2025') {
             if($this->details['badgeCategory'] == "youth-forum" || $this->details['badgeCategory'] == "youth-council") {
-                $subject = 'Welcome to the GPCA Youth Forum 2025 | Your Guide to the Youth Zone';
+                // $subject = 'Welcome to the GPCA Youth Forum 2025 | Your Guide to the Youth Zone';
+                $subject = '7 Days to Go | Your Youth Zone Schedule & WhatsApp Link';
             } else {
                 $subject = '19ᵗʰ Annual GPCA Forum - Registration & Badge Information';
             }
@@ -111,11 +112,11 @@ class EmailBroadcast extends Mailable
                 if ($this->details['badgeCategory'] == "youth-forum" || $this->details['badgeCategory'] == "youth-council") {
                     if ($this->details['registrationStatus'] == "confirmed") {
                         return new Content(
-                            markdown: 'emails.2025.af.youth.confirm-email-broadcast',
+                            markdown: 'emails.2025.af.youth.2.confirm-email-broadcast',
                         );
                     } else {
                         return new Content(
-                            markdown: 'emails.2025.af.youth.pending-email-broadcast',
+                            markdown: 'emails.2025.af.youth.2.pending-email-broadcast',
                         );
                     }
                 } else {
