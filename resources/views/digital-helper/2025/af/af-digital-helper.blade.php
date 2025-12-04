@@ -26,6 +26,8 @@
         <img src="https://www.gpcaforum.com/wp-content/uploads/2025/11/AF-digital-helper-banner-1-scaled.jpg"
             class="w-full object-fill object-center md:block hidden">
 
+            <p>19th</p>
+
         @livewire('digital-helper', ['event' => $event])
     </div>
 
