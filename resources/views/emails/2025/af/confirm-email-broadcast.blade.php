@@ -136,7 +136,7 @@
             <p class="sub" style="text-align: center; font-size: 11px;">VIPs</p>
         </td>
         <td width="430" style="border: 1px solid black;">
-            <p class="sub" style="font-size: 11px;">VIP Majlis</p>
+            <p class="sub" style="text-align: center; font-size: 11px;">VIP Majlis</p>
         </td>
     </tr>
     <tr valign="middle">
@@ -144,7 +144,7 @@
             <p class="sub" style="text-align: center; font-size: 11px;">Premiere delegates</p>
         </td>
         <td width="430" rowspan="4" style="border: 1px solid black;">
-            <p class="sub" style="font-size: 11px;">Exhibition Hall 1</p>
+            <p class="sub" style="text-align: center; font-size: 11px;">Exhibition Hall 1</p>
         </td>
     </tr>
     <tr valign="middle">
