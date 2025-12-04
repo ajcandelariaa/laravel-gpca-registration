@@ -404,7 +404,7 @@ class DelegateController extends Controller
     {
         $event = Event::where('category', $eventCategory)->where('id', $eventId)->first();
         if ($event) {
-            if ($eventCategory == "AF" && $event->year == "2025") {
+            if ($eventCategory == "AF" && $event->year == "2024") {
                 return view('digital-helper.2024.af.af-digital-helper', [
                     "pageTitle" => "Digital helper - " . $event->name,
                     "event" => $event,
