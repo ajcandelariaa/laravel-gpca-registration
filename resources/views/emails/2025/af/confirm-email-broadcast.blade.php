@@ -128,9 +128,7 @@
 <p class="sub" style="margin-top: 15px;"><strong>General Information</strong></p>
 <p class="sub">All registered attendees attending the 19<sup>th</sup> Annual GPCA Forum are warmly invited to join us for the Networking Luncheons served from Day 2 to Day 4 of the event.</p>
 
-<p class="sub" style="margin-top: 15px; text-decoration: underline;"><strong>Locations</strong></p>
-
-<br>
+<p class="sub" style="margin-top: 15px; margin-bottom: 5px; text-decoration: underline;"><strong>Locations</strong></p>
 
 <table width="540" align="center" cellpadding="5" cellspacing="5" style="border-collapse: collapse; border: 1px solid black;">
     <tr valign="middle">
