@@ -123,7 +123,85 @@ class DigitalHelper extends Component
     }
 
 
-    public function getTextAndVisualDetails($companyName, $badgeType, $isPrinted)
+
+    public function getTextAndVisualDetails2025($companyName, $badgeType, $isPrinted)
+    {
+        $letterCounters1 = [
+            'ABC' => [
+                'https://www.gpcaforum.com/wp-content/uploads/2025/12/abc.png',
+            ],
+            'DEF' => [
+                'https://www.gpcaforum.com/wp-content/uploads/2025/12/def.png',
+            ],
+            'GHI' => [
+                'https://www.gpcaforum.com/wp-content/uploads/2025/12/ghi.png',
+            ],
+            'JKLMN' => [
+                'https://www.gpcaforum.com/wp-content/uploads/2025/12/jklmn.png',
+            ],
+            'OPQ' => [
+                'https://www.gpcaforum.com/wp-content/uploads/2025/12/opq.png',
+            ],
+            'S' => [
+                'https://www.gpcaforum.com/wp-content/uploads/2025/12/s.png',
+            ],
+            'RTUV' => [
+                'https://www.gpcaforum.com/wp-content/uploads/2025/12/rtuv.png',
+            ],
+            'WXYZ' => [
+                'https://www.gpcaforum.com/wp-content/uploads/2025/12/wxyz.png',
+            ],
+        ];
+
+        $howToCollectYourBadge = null;
+        $imageLinks = [];
+        $firstLetter = strtoupper(substr($companyName, 0, 1));
+
+        if (strtoupper($badgeType) == "VIP" || strtoupper($badgeType) == "SPEAKER") {
+            $imageLinks = [
+                'https://www.gpcaforum.com/wp-content/uploads/2025/12/vip-speakers.png',
+            ];
+            $howToCollectYourBadge = "Please proceed to the Registration Area and line up at counter \"VIP & SPEAKERS\". You can find the counter assignment in the image below:";
+        } else if (strtoupper($badgeType) == "YOUTH COUNCIL" || strtoupper($badgeType) == "YOUTH FORUM") {
+            $imageLinks = [
+                'https://www.gpcaforum.com/wp-content/uploads/2025/12/youth-forum.png',
+            ];
+            $howToCollectYourBadge = "Please proceed to the Registration Area and line up at counter \"YOUTH FORUM\". You can find the counter assignment in the image below:";
+        } else {
+            if (strtoupper($companyName) == "GPIC") {
+                $imageLinks = [
+                    'https://www.gpcaforum.com/wp-content/uploads/2025/12/gpic.png',
+                ];
+
+                $howToCollectYourBadge = "Please proceed to the Registration Area and line up at counter 'GPIC'. You can find the counter assignment based on your company's first letter in the image below";
+            } else {
+                $counterGroup = null;
+                foreach ($letterCounters1 as $counterKey => $counter) {
+                    $counterArrayOfLetters = str_split($counterKey);
+                    foreach ($counterArrayOfLetters as $letter) {
+                        if ($firstLetter == $letter) {
+                            $counterGroup = $counterKey;
+                            $imageLinks = $counter;
+                            break;
+                        }
+                    }
+                    if ($counterGroup != null) {
+                        break;
+                    }
+                }
+
+                $howToCollectYourBadge = "Please proceed to the Registration Area and line up at counter '$counterGroup'. You can find the counter assignment based on your company's first letter in the image below";
+            }
+        }
+
+        return [
+            'howToCollectYourBadge' => $howToCollectYourBadge,
+            'imageLinks' => $imageLinks,
+        ];
+    }
+
+
+    public function getTextAndVisualDetails2024($companyName, $badgeType, $isPrinted)
     {
         $letterCounters1 = [
             'ABCD' => [
@@ -294,7 +372,7 @@ class DigitalHelper extends Component
                         if ($isCollectedBy != null) {
                             $howToCollectYourBadge = $isCollectedBy;
                         } else {
-                            $data = $this->getTextAndVisualDetails($companyName, $mainDelegate->badge_type, $isPrinted);
+                            $data = $this->getTextAndVisualDetails2025($companyName, $mainDelegate->badge_type, $isPrinted);
                             $howToCollectYourBadge = $data['howToCollectYourBadge'];
                             $visuals = $data['imageLinks'];
                         }
@@ -353,7 +431,7 @@ class DigitalHelper extends Component
                                 if ($isCollectedBy != null) {
                                     $howToCollectYourBadge = $isCollectedBy;
                                 } else {
-                                    $data = $this->getTextAndVisualDetails($companyName, $subDelegate->badge_type, $isPrinted);
+                                    $data = $this->getTextAndVisualDetails2025($companyName, $subDelegate->badge_type, $isPrinted);
                                     $howToCollectYourBadge = $data['howToCollectYourBadge'];
                                     $visuals = $data['imageLinks'];
                                 }

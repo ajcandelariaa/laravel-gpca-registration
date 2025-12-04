@@ -30,7 +30,7 @@
             <div>
                 <p class="font-bold mt-10 text-lg">1. Sample registration confirmation email</p>
                 <p class="mt-4">Here’s what your confirmation email should look like:</p>
-                <img src="https://www.gpcaforum.com/wp-content/uploads/2024/10/sample-registration-confirmation.png" class="w-full md:w-96 block">
+                <img src="https://www.gpcaforum.com/wp-content/uploads/2025/12/sample-registration-confirmation.png" class="w-full md:w-96 block">
                 <p class="font-bold mt-5">Key details to look for:</p>
                 <p>Event name: 19<sup>th</sup> Annual GPCA Forum</p>
                 <p>Confirmation Status: Confirmed</p>
