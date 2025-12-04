@@ -4,6 +4,7 @@ use App\Http\Controllers\DelegateController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\FastTrackController;
 use App\Http\Controllers\MemberController;
+use App\Http\Controllers\OnsiteRegistrationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -35,4 +36,14 @@ Route::post('/fast-track/{eventCategory}/{eventYear}/badge-scan', [FastTrackCont
 
 
 // Onsite registration APIs
-Route::post('/onsite-registration/{eventCategory}/{eventYear}/register-delegate', [DelegateController::class, 'registerOnsiteDelegate']);
+Route::group(['middleware' => 'api.check.secret.code'], function () {
+    Route::prefix('{api_code}')->group(function () {
+        Route::group(['middleware' => 'api.check.event.exists'], function () {
+            Route::prefix('event/{eventCategory}/{eventId}/onsite-registration')->group(function () {
+                Route::get('/fetch-metadata', [OnsiteRegistrationController::class, 'fetchMetadata']);
+                Route::post('/validate', [OnsiteRegistrationController::class, 'validateOnsiteRegistration']);
+                Route::post('/confirm', [OnsiteRegistrationController::class, 'confirmOnsiteRegistration']);
+            });
+        });
+    });
+});
