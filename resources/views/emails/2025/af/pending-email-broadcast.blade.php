@@ -1,5 +1,7 @@
 <x-mail::message>
-<p class="sub">Warm greetings from GPCA!</p>
+<img src="https://www.gpcaforum.com/wp-content/uploads/2025/08/email-notif-banner-v2.jpg">
+
+<p class="sub" style="margin-top: 15px;">Warm greetings from GPCA!</p>
 
 <p class="sub" style="margin-top: 15px;">It is with great pleasure to welcome you to the <a href="https://www.gpcaforum.com/" target="_blank">19<sup>th</sup> Annual GPCA Forum</a>, scheduled to take place from <strong>8-11 December 2025</strong> at the <strong>Exhibition World Bahrain, Sakhir, Kingdom of Bahrain</strong>.</p>
 
@@ -128,8 +130,6 @@
 
 <p class="sub" style="margin-top: 15px; text-decoration: underline;"><strong>Locations</strong></p>
 
-<br>
-
 <table width="540" align="center" cellpadding="5" cellspacing="5" style="border-collapse: collapse; border: 1px solid black;">
     <tr valign="middle">
         <td width="110" style="border: 1px solid black;" align="center">
@@ -173,7 +173,7 @@
 <p class="sub" style="margin-top: 15px;"><strong><em>To access the venue, please present your delegate pass.</em></strong></p>
 
 <p class="sub" style="margin-top: 15px;"><strong>Gala Dinner</strong></p>
-<p class="sub"><strong>(December 10/ 19:00-22:00)/strong></p>
+<p class="sub"><strong>(December 10/ 19:00-22:00)</strong></p>
 <p class="sub"><strong><a href="https://maps.app.goo.gl/opKoaBtGoDBNj4SG7" target="_blank">Bahrain National Theatre</a></strong></p>
 
 <p class="sub" style="margin-top: 15px;">Join us for an evening of splendor, featuring gourmet cuisine, live performances, and the opportunity to network with industry leaders. It’s a night dedicated to acknowledging achievements and fostering meaningful connections.</p>
