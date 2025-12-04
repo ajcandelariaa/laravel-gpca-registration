@@ -39,7 +39,7 @@
             <div class="mt-5 flex flex-col gap-3 items-center">
                 @if (count($currentDelegate['visuals']) > 0)
                     @foreach ($currentDelegate['visuals'] as $imageLink)
-                        <img src="{{ $imageLink }}" class="w-full md:w-96 block">
+                        <img src="{{ $imageLink }}" class="w-full block">
                     @endforeach
                 @endif
             </div>
