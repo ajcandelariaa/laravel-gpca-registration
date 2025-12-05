@@ -517,7 +517,7 @@ class FastTrackController extends Controller
                         'fullName' => $name,
                         'jobTitle' => $jobTitle,
                         'companyName' => $companyName,
-                        'badgeType' => $badgeType,
+                        'badgeType' => trim($badgeType),
                     ];
 
                     return response()->json([
