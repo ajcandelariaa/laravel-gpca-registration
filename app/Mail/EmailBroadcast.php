@@ -44,7 +44,9 @@ class EmailBroadcast extends Mailable
         } else if ($this->details['eventYear'] == '2025') {
             if($this->details['badgeCategory'] == "youth-forum" || $this->details['badgeCategory'] == "youth-council") {
                 // $subject = 'Welcome to the GPCA Youth Forum 2025 | Your Guide to the Youth Zone';
-                $subject = '7 Days to Go | Your Youth Zone Schedule & WhatsApp Link';
+                // $subject = '7 Days to Go | Your Youth Zone Schedule & WhatsApp Link';
+                $subject = 'Two days to go. Be in the Youth Zone daily';
+                // $subject = 'Tomorrow we start. Begin in the Youth Zone';
             } else {
                 $subject = '19ᵗʰ Annual GPCA Forum - Registration & Badge Information';
             }
@@ -113,12 +115,16 @@ class EmailBroadcast extends Mailable
                     if ($this->details['registrationStatus'] == "confirmed") {
                         return new Content(
                             // markdown: 'emails.2025.af.youth.broadcast.1.confirm-email-broadcast',
-                            markdown: 'emails.2025.af.youth.broadcast.2.confirm-email-broadcast',
+                            // markdown: 'emails.2025.af.youth.broadcast.2.confirm-email-broadcast',
+                            markdown: 'emails.2025.af.youth.broadcast.3.confirm-email-broadcast',
+                            // markdown: 'emails.2025.af.youth.broadcast.4.confirm-email-broadcast',
                         );
                     } else {
                         return new Content(
                             // markdown: 'emails.2025.af.youth.broadcast.1.pending-email-broadcast',
-                            markdown: 'emails.2025.af.youth.broadcast.2.pending-email-broadcast',
+                            // markdown: 'emails.2025.af.youth.broadcast.2.pending-email-broadcast',
+                            markdown: 'emails.2025.af.youth.broadcast.3.pending-email-broadcast',
+                            // markdown: 'emails.2025.af.youth.broadcast.4.pending-email-broadcast',
                         );
                     }
                 } else {
