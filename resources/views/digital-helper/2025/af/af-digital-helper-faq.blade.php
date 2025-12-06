@@ -17,10 +17,10 @@
 
 <body class="font-montserrat">
     <div class="mb-10">
-        <img src="https://www.gpcaforum.com/wp-content/uploads/2025/11/AF-digital-helper-banner-2.jpg"
+        <img src="https://www.gpcaforum.com/wp-content/uploads/2025/12/AF-digital-helper-banner-22.png"
             class="w-full object-fill object-center md:hidden block">
 
-        <img src="https://www.gpcaforum.com/wp-content/uploads/2025/11/AF-digital-helper-banner-1-scaled.jpg"
+        <img src="https://www.gpcaforum.com/wp-content/uploads/2025/12/AF-digital-helper-banner-11-scaled.png"
             class="w-full object-fill object-center md:block hidden">
 
         <div class="w-10/12 mx-auto md:w-full md:px-10">
