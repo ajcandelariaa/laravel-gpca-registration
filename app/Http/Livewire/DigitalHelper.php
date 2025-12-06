@@ -128,28 +128,28 @@ class DigitalHelper extends Component
     {
         $letterCounters1 = [
             'ABC' => [
-                'https://www.gpcaforum.com/wp-content/uploads/2025/12/abc-1.png',
+                'https://www.gpcaforum.com/wp-content/uploads/2025/12/abc-2.png',
             ],
             'DEF' => [
-                'https://www.gpcaforum.com/wp-content/uploads/2025/12/def-1.png',
+                'https://www.gpcaforum.com/wp-content/uploads/2025/12/def-2.png',
             ],
             'GHI' => [
-                'https://www.gpcaforum.com/wp-content/uploads/2025/12/ghi-1.png',
+                'https://www.gpcaforum.com/wp-content/uploads/2025/12/ghi-2.png',
             ],
             'JKLMN' => [
-                'https://www.gpcaforum.com/wp-content/uploads/2025/12/jklmn-1.png',
+                'https://www.gpcaforum.com/wp-content/uploads/2025/12/jklmn-2.png',
             ],
             'OPQ' => [
-                'https://www.gpcaforum.com/wp-content/uploads/2025/12/opq-1.png',
+                'https://www.gpcaforum.com/wp-content/uploads/2025/12/opq-2.png',
             ],
-            'S' => [
-                'https://www.gpcaforum.com/wp-content/uploads/2025/12/s-1.png',
+            'SR' => [
+                'https://www.gpcaforum.com/wp-content/uploads/2025/12/rs.png',
             ],
-            'RTUV' => [
-                'https://www.gpcaforum.com/wp-content/uploads/2025/12/rtuv-1.png',
+            'TUV' => [
+                'https://www.gpcaforum.com/wp-content/uploads/2025/12/tuv.png',
             ],
             'WXYZ' => [
-                'https://www.gpcaforum.com/wp-content/uploads/2025/12/wxyz-1.png',
+                'https://www.gpcaforum.com/wp-content/uploads/2025/12/wxyz-2.png',
             ],
         ];
 
@@ -159,24 +159,24 @@ class DigitalHelper extends Component
 
         if (strtoupper($badgeType) == "VIP" || strtoupper($badgeType) == "SPEAKER") {
             $imageLinks = [
-                'https://www.gpcaforum.com/wp-content/uploads/2025/12/vip-speakers-1.png',
+                'https://www.gpcaforum.com/wp-content/uploads/2025/12/vip-speakers-2.png',
             ];
             $howToCollectYourBadge = "Please proceed to the Registration Area and line up at counter \"VIP & SPEAKERS\". You can find the counter assignment in the image below:";
         } else if (strtoupper($badgeType) == "YOUTH COUNCIL" || strtoupper($badgeType) == "YOUTH FORUM") {
             $imageLinks = [
-                'https://www.gpcaforum.com/wp-content/uploads/2025/12/youth-forum-1.png',
+                'https://www.gpcaforum.com/wp-content/uploads/2025/12/youth-forum-2.png',
             ];
             $howToCollectYourBadge = "Please proceed to the Registration Area and line up at counter \"YOUTH FORUM\". You can find the counter assignment in the image below:";
         } else {
             if (strtoupper($companyName) == "GPIC") {
                 $imageLinks = [
-                    'https://www.gpcaforum.com/wp-content/uploads/2025/12/gpic-1.png',
+                    'https://www.gpcaforum.com/wp-content/uploads/2025/12/gpic-2.png',
                 ];
 
                 $howToCollectYourBadge = "Please proceed to the Registration Area and line up at counter 'GPIC'. You can find the counter assignment based on your company's first letter in the image below";
             } else if (strtoupper($companyName) == "3P GULF GROUP") {
                 $imageLinks = [
-                    'https://www.gpcaforum.com/wp-content/uploads/2025/12/abc-1.png',
+                    'https://www.gpcaforum.com/wp-content/uploads/2025/12/abc-2.png',
                 ];
 
                 $howToCollectYourBadge = "Please proceed to the Registration Area and line up at counter 'ABC'.";
