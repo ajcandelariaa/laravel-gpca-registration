@@ -10,7 +10,7 @@
 <p class="sub" style="margin-top: 15px; text-decoration: underline;"><strong>Day 1 Youth Zone details</strong></p>
 <p class="sub">📍 Youth Zone: <strong>Exhibition World Bahrain + HALL 10</strong></p>
 <p class="sub">🕒 Day 1: <strong>14:15-18:00</strong></p>
-<p class="sub">📌 Youth Forum's detailed <strong><a href="https://www.gpcaforum.com/wp-content/uploads/2025/12/4th-GPCA-Youth-Fourm-Agenda_24-Oct-PDFV2.pdf">AGENDA</a></strong></p>
+<p class="sub">📌 Youth Forum's detailed <strong><a href="https://www.gpcaforum.com/wp-content/uploads/2025/12/4th-GPCA-Youth-Forum-Agenda-Dec-8th-PDF.pdf">AGENDA</a></strong></p>
 
 <p class="sub" style="margin-top: 15px; text-decoration: underline;"><strong>Last call to join the Delegates WhatsApp Group</strong></p>
 
